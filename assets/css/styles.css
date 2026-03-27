@@ -212,6 +212,34 @@ button {
   background: linear-gradient(135deg, #4668b8, #1f2b46);
 }
 
+.material-symbols-rounded {
+  font-family: "Material Symbols Rounded";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 1.15rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  direction: ltr;
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+  -webkit-font-smoothing: antialiased;
+}
+
+.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.icon-only-btn {
+  padding: 0;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.95fr);
@@ -966,6 +994,10 @@ body.is-kana-quiz-sheet-open .page-shell {
   line-height: 1;
 }
 
+.kana-quiz-close .material-symbols-rounded {
+  font-size: 1.25rem;
+}
+
 .kana-quiz-close:hover,
 .kana-quiz-close:focus-visible {
   border-color: var(--line-strong);
@@ -1389,14 +1421,18 @@ body.is-kana-quiz-sheet-open .page-shell {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .vocab-view-toggle {
   display: inline-grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+.vocab-view-toggle .button-with-icon {
+  gap: 6px;
 }
 
 .vocab-summary {
@@ -1494,6 +1530,10 @@ body.is-kana-quiz-sheet-open .page-shell {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.vocab-pagination .button-with-icon {
+  gap: 4px;
 }
 
 .vocab-page-info {
@@ -1750,9 +1790,9 @@ body.is-kana-quiz-sheet-open .page-shell {
 
 .flashcard strong {
   display: block;
-  margin-top: 30px;
+  margin-top: 22px;
   font-family: "Noto Sans JP", sans-serif;
-  font-size: clamp(2.4rem, 4vw, 4rem);
+  font-size: clamp(2.1rem, 3.5vw, 3.4rem);
 }
 
 .flashcard p {
@@ -1761,13 +1801,13 @@ body.is-kana-quiz-sheet-open .page-shell {
 
 .flashcard-reading {
   font-family: "Noto Sans JP", sans-serif;
-  font-size: 1.35rem;
+  font-size: 1.18rem;
   color: var(--muted);
   white-space: pre-line;
 }
 
 .flashcard-meaning {
-  font-size: 1.35rem;
+  font-size: 1.18rem;
   font-weight: 700;
   opacity: 0;
   transform: translateY(8px);
@@ -1782,8 +1822,26 @@ body.is-kana-quiz-sheet-open .page-shell {
 
 .flashcard-hint {
   display: inline-flex;
-  margin-top: 18px;
+  margin-top: 14px;
   color: var(--muted);
+}
+
+.flashcard-nav-btn {
+  flex: 0 0 auto;
+  width: 52px;
+  min-width: 52px;
+  padding: 0;
+  border-radius: 16px;
+  font-size: 1.28rem;
+}
+
+.flashcard-nav-btn span {
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.flashcard-nav-btn .material-symbols-rounded {
+  font-size: 1.42rem;
 }
 
 .grammar-grid {
@@ -2456,7 +2514,7 @@ body::after {
 
 .hero {
   gap: 24px;
-  margin-top: 36px;
+  margin-top: 22px;
 }
 
 .hero-copy,
@@ -2798,7 +2856,8 @@ body::after {
 }
 
 .flashcard {
-  min-height: 360px;
+  min-height: 300px;
+  padding: 24px;
   border-color: rgba(18, 20, 25, 0.08);
   background:
     radial-gradient(circle at top right, rgba(63, 100, 201, 0.08), transparent 24%),
@@ -2855,6 +2914,7 @@ body::after {
 
   .hero {
     grid-template-columns: 1fr;
+    margin-top: 18px;
   }
 
   .stats-grid,
@@ -2973,7 +3033,7 @@ body::after {
   }
 
   .flashcard {
-    min-height: 320px;
+    min-height: 270px;
   }
 
   .vocab-toolbar,
@@ -3218,6 +3278,10 @@ body::after {
   .topbar {
     padding: 14px;
     border-radius: 24px;
+  }
+
+  .hero {
+    margin-top: 14px;
   }
 
   .brand {

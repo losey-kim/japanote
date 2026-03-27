@@ -314,6 +314,10 @@ button {
   margin-top: 28px;
 }
 
+.hero-actions {
+  margin-top: 38px;
+}
+
 .hero-chip-row {
   position: relative;
   z-index: 1;
@@ -2334,21 +2338,21 @@ body.is-kana-quiz-sheet-open .page-shell {
 /* Visual refresh */
 
 :root {
-  --bg: #efe7d8;
-  --surface: rgba(255, 253, 248, 0.86);
-  --surface-strong: #fffdf9;
-  --panel-dark: #111722;
-  --panel-dark-soft: #1d2533;
-  --text: #121419;
-  --muted: #595650;
-  --line: rgba(18, 20, 25, 0.1);
-  --line-strong: rgba(18, 20, 25, 0.16);
-  --coral: #d3684c;
-  --mint: #2f8f7d;
-  --gold: #b7852a;
-  --sky: #3f64c9;
-  --shadow: 0 24px 54px rgba(34, 26, 20, 0.1);
-  --shadow-soft: 0 14px 32px rgba(34, 26, 20, 0.08);
+  --bg: #f8f2ed;
+  --surface: rgba(255, 252, 248, 0.9);
+  --surface-strong: #fffdfa;
+  --panel-dark: #2d2a4a;
+  --panel-dark-soft: #3c395f;
+  --text: #2c2948;
+  --muted: #746d7f;
+  --line: rgba(44, 41, 72, 0.1);
+  --line-strong: rgba(44, 41, 72, 0.16);
+  --coral: #f24b49;
+  --mint: #f5b6a8;
+  --gold: #f2d7cf;
+  --sky: #7f7aa7;
+  --shadow: 0 24px 54px rgba(47, 43, 77, 0.1);
+  --shadow-soft: 0 14px 32px rgba(47, 43, 77, 0.08);
   --radius-xl: 32px;
   --radius-lg: 24px;
   --radius-md: 18px;
@@ -2356,9 +2360,10 @@ body.is-kana-quiz-sheet-open .page-shell {
 
 body {
   background:
-    radial-gradient(circle at 10% 0%, rgba(211, 104, 76, 0.12), transparent 24%),
-    radial-gradient(circle at 92% 10%, rgba(63, 100, 201, 0.1), transparent 18%),
-    linear-gradient(180deg, #f8f4eb 0%, #efe7d8 100%);
+    radial-gradient(circle at 8% 0%, rgba(242, 75, 73, 0.14), transparent 24%),
+    radial-gradient(circle at 92% 12%, rgba(127, 122, 167, 0.12), transparent 18%),
+    radial-gradient(circle at 58% 100%, rgba(245, 182, 168, 0.14), transparent 28%),
+    linear-gradient(180deg, #fffdfa 0%, #f8f2ed 100%);
 }
 
 body::before {
@@ -2369,7 +2374,7 @@ body::before {
   width: auto;
   height: auto;
   border-radius: 0;
-  background: repeating-linear-gradient(180deg, rgba(18, 20, 25, 0.022) 0 1px, transparent 1px 56px);
+  background: repeating-linear-gradient(180deg, rgba(44, 41, 72, 0.018) 0 1px, transparent 1px 56px);
   filter: none;
   opacity: 0.55;
 }
@@ -2381,7 +2386,7 @@ body::after {
   width: 1px;
   height: auto;
   border-radius: 0;
-  background: rgba(211, 104, 76, 0.18);
+  background: rgba(242, 75, 73, 0.16);
   filter: none;
 }
 
@@ -2396,8 +2401,8 @@ body::after {
   z-index: 20;
   padding: 18px 20px;
   border-radius: 28px;
-  background: rgba(255, 253, 249, 0.78);
-  box-shadow: 0 18px 40px rgba(34, 26, 20, 0.08);
+  background: rgba(255, 252, 248, 0.9);
+  box-shadow: 0 18px 40px rgba(47, 43, 77, 0.08);
 }
 
 .brand-mark {
@@ -2406,8 +2411,8 @@ body::after {
   height: 54px;
   border-radius: 16px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 10px 20px rgba(18, 23, 32, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 20px rgba(47, 43, 77, 0.1);
 }
 
 .brand-mark::after {
@@ -2421,7 +2426,7 @@ body::after {
 
 .brand-sub {
   max-width: 320px;
-  color: rgba(18, 20, 25, 0.58);
+  color: rgba(44, 41, 72, 0.6);
 }
 
 .nav-links {
@@ -2431,22 +2436,22 @@ body::after {
 .nav-links a {
   min-height: 42px;
   padding: 0 16px;
-  color: rgba(18, 20, 25, 0.7);
-  background: transparent;
+  color: rgba(44, 41, 72, 0.72);
+  background: rgba(255, 255, 255, 0.64);
 }
 
 .nav-links a:hover,
 .nav-links a:focus-visible {
   color: var(--text);
-  border-color: rgba(18, 20, 25, 0.08);
-  background: rgba(18, 20, 25, 0.045);
+  border-color: rgba(242, 75, 73, 0.18);
+  background: rgba(242, 75, 73, 0.08);
 }
 
 .nav-links a[aria-current="page"] {
-  color: var(--text);
-  background: rgba(18, 20, 25, 0.06);
-  border-color: rgba(18, 20, 25, 0.12);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  color: white;
+  background: linear-gradient(135deg, #312d50, #403c67);
+  border-color: rgba(44, 41, 72, 0.2);
+  box-shadow: 0 10px 20px rgba(47, 43, 77, 0.12);
 }
 
 .hero {
@@ -2468,8 +2473,8 @@ body::after {
 .grammar-practice-copy,
 .grammar-practice-card,
 .reading-card {
-  border-color: rgba(18, 20, 25, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(252, 247, 240, 0.93));
+  border-color: rgba(44, 41, 72, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(252, 245, 240, 0.96));
   box-shadow: var(--shadow);
 }
 
@@ -2489,8 +2494,9 @@ body::after {
   min-height: 470px;
   padding: 48px 48px 44px;
   background:
-    radial-gradient(circle at 88% 18%, rgba(63, 100, 201, 0.11), transparent 18%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(252, 247, 240, 0.92));
+    radial-gradient(circle at 86% 16%, rgba(245, 182, 168, 0.22), transparent 18%),
+    radial-gradient(circle at 16% 0%, rgba(242, 75, 73, 0.08), transparent 20%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 242, 236, 0.96));
 }
 
 .hero-copy::before {
@@ -2499,7 +2505,7 @@ body::after {
   width: 96px;
   height: 96px;
   border-radius: 24px;
-  background: linear-gradient(160deg, rgba(211, 104, 76, 0.18), rgba(63, 100, 201, 0.08));
+  display: none;
 }
 
 .hero-copy::after {
@@ -2507,8 +2513,8 @@ body::after {
   bottom: 34px;
   width: 178px;
   height: 178px;
-  border: 1px dashed rgba(18, 20, 25, 0.12);
-  background: transparent;
+  border: 1px dashed rgba(44, 41, 72, 0.1);
+  background: rgba(127, 122, 167, 0.05);
 }
 
 .eyebrow,
@@ -2516,7 +2522,7 @@ body::after {
 .panel-label,
 .quiz-meta span,
 .grammar-level {
-  color: rgba(18, 20, 25, 0.54);
+  color: rgba(44, 41, 72, 0.54);
 }
 
 .hero-copy h1,
@@ -2530,7 +2536,7 @@ body::after {
 .grammar-practice-copy h3,
 .grammar-practice-header h3,
 .reading-header h3 {
-  color: #111722;
+  color: #2c2948;
   letter-spacing: -0.045em;
 }
 
@@ -2549,49 +2555,53 @@ body::after {
 .grammar-practice-explanation,
 .reading-korean,
 .reading-explanation {
-  color: #56524c;
+  color: #746d7f;
 }
 
 .hero-chip {
-  border-color: rgba(18, 20, 25, 0.08);
-  background: rgba(18, 20, 25, 0.04);
-  color: #3d3935;
+  border-color: rgba(44, 41, 72, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+  color: #4c4769;
   font-weight: 600;
 }
 
 .primary-btn,
 .secondary-btn,
 .level-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 48px;
   padding: 0 20px;
   border-radius: 999px;
+  line-height: 1.1;
 }
 
 .primary-btn {
-  background: linear-gradient(150deg, #121720, #273043);
-  box-shadow: 0 14px 28px rgba(18, 23, 32, 0.18);
+  background: linear-gradient(135deg, #f24b49, #ff6b67);
+  box-shadow: 0 14px 28px rgba(242, 75, 73, 0.24);
 }
 
 .secondary-btn,
 .level-button {
-  border-color: rgba(18, 20, 25, 0.1);
-  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(44, 41, 72, 0.1);
+  background: rgba(255, 255, 255, 0.86);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .level-button.is-active {
   color: white;
-  background: linear-gradient(150deg, #121720, #273043);
-  box-shadow: 0 12px 24px rgba(18, 23, 32, 0.18);
+  background: linear-gradient(135deg, #f24b49, #ff6b67);
+  box-shadow: 0 12px 24px rgba(242, 75, 73, 0.22);
 }
 
 .hero-panel {
   position: relative;
   overflow: hidden;
   padding: 28px;
-  border-color: rgba(255, 255, 255, 0.08);
-  background: linear-gradient(165deg, #101722, #1b2432 62%, #23314c);
-  box-shadow: 0 28px 48px rgba(17, 24, 39, 0.2);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: linear-gradient(165deg, #2d2a4a, #363259 62%, #4a466f);
+  box-shadow: 0 28px 48px rgba(47, 43, 77, 0.2);
 }
 
 .hero-panel::before {
@@ -2602,7 +2612,7 @@ body::after {
   width: 170px;
   height: 170px;
   border-radius: 999px;
-  background: rgba(211, 104, 76, 0.16);
+  background: rgba(245, 182, 168, 0.22);
   filter: blur(6px);
 }
 
@@ -2650,19 +2660,19 @@ body::after {
 }
 
 .accent-coral::before {
-  background: linear-gradient(90deg, rgba(211, 104, 76, 0.98), rgba(242, 181, 121, 0.98));
+  background: linear-gradient(90deg, rgba(242, 75, 73, 0.98), rgba(255, 133, 126, 0.96));
 }
 
 .accent-mint::before {
-  background: linear-gradient(90deg, rgba(47, 143, 125, 0.98), rgba(116, 204, 174, 0.92));
+  background: linear-gradient(90deg, rgba(245, 182, 168, 0.98), rgba(255, 210, 199, 0.96));
 }
 
 .accent-gold::before {
-  background: linear-gradient(90deg, rgba(183, 133, 42, 0.98), rgba(232, 196, 117, 0.96));
+  background: linear-gradient(90deg, rgba(247, 210, 199, 0.98), rgba(255, 232, 224, 0.96));
 }
 
 .accent-sky::before {
-  background: linear-gradient(90deg, rgba(63, 100, 201, 0.98), rgba(122, 153, 238, 0.94));
+  background: linear-gradient(90deg, rgba(77, 73, 117, 0.98), rgba(139, 133, 184, 0.94));
 }
 
 .page-intro,
@@ -4111,6 +4121,228 @@ html[data-theme="dark"] .reading-feedback {
   html:not([data-theme="light"]) .kana-tile.is-muted,
   html[data-theme="dark"] .kana-tile.is-muted {
     opacity: 0.68;
+  }
+}
+
+html[data-theme="dark"] .nav-links a {
+  color: #dbe5f1;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(246, 248, 252, 0.08);
+}
+
+html[data-theme="dark"] .brand-sub,
+html[data-theme="dark"] .hero-copy p,
+html[data-theme="dark"] .section-copy,
+html[data-theme="dark"] .panel-summary p,
+html[data-theme="dark"] .panel-metrics p,
+html[data-theme="dark"] .stat-card p,
+html[data-theme="dark"] .starter-item p,
+html[data-theme="dark"] .quiz-result-copy,
+html[data-theme="dark"] .flashcard-hint,
+html[data-theme="dark"] .match-feedback,
+html[data-theme="dark"] .quiz-feedback,
+html[data-theme="dark"] .match-stat-card p {
+  color: #d3dce8;
+}
+
+html[data-theme="dark"] .eyebrow,
+html[data-theme="dark"] .section-heading span,
+html[data-theme="dark"] .panel-label,
+html[data-theme="dark"] .quiz-meta span,
+html[data-theme="dark"] .grammar-level,
+html[data-theme="dark"] .quiz-hud-item span,
+html[data-theme="dark"] .panel-metrics span,
+html[data-theme="dark"] .routine-list span {
+  color: #b9c5d5;
+}
+
+html[data-theme="dark"] .hero-copy h1,
+html[data-theme="dark"] .section-heading h2,
+html[data-theme="dark"] .page-intro h1,
+html[data-theme="dark"] .quiz-card h3,
+html[data-theme="dark"] .starter-overview h3,
+html[data-theme="dark"] .starter-checklist-head h3,
+html[data-theme="dark"] .basic-practice-copy h3,
+html[data-theme="dark"] .basic-practice-header h3,
+html[data-theme="dark"] .grammar-practice-copy h3,
+html[data-theme="dark"] .grammar-practice-header h3,
+html[data-theme="dark"] .reading-header h3,
+html[data-theme="dark"] .panel-summary strong,
+html[data-theme="dark"] .panel-metrics strong,
+html[data-theme="dark"] .panel-footer strong,
+html[data-theme="dark"] .stat-card strong {
+  color: #f7fbff;
+}
+
+html[data-theme="dark"] .hero-copy,
+html[data-theme="dark"] .hero-panel,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .flashcard-panel,
+html[data-theme="dark"] .grammar-item,
+html[data-theme="dark"] .quiz-card,
+html[data-theme="dark"] .page-intro,
+html[data-theme="dark"] .starter-overview,
+html[data-theme="dark"] .starter-checklist-card,
+html[data-theme="dark"] .starter-item,
+html[data-theme="dark"] .basic-practice-copy,
+html[data-theme="dark"] .basic-practice-card,
+html[data-theme="dark"] .grammar-practice-copy,
+html[data-theme="dark"] .grammar-practice-card,
+html[data-theme="dark"] .reading-card,
+html[data-theme="dark"] .match-sidebar,
+html[data-theme="dark"] .match-board,
+html[data-theme="dark"] .quiz-toggle-panel,
+html[data-theme="dark"] .quiz-note-panel {
+  background:
+    linear-gradient(180deg, rgba(20, 26, 36, 0.98), rgba(14, 20, 28, 0.98)),
+    linear-gradient(135deg, rgba(63, 100, 201, 0.1), rgba(211, 104, 76, 0.06));
+  border-color: rgba(246, 248, 252, 0.14);
+}
+
+html[data-theme="dark"] .hero-chip,
+html[data-theme="dark"] .secondary-btn,
+html[data-theme="dark"] .level-button,
+html[data-theme="dark"] .quiz-toggle-group .level-button,
+html[data-theme="dark"] .match-card,
+html[data-theme="dark"] .basic-practice-option,
+html[data-theme="dark"] .grammar-practice-option,
+html[data-theme="dark"] .reading-option,
+html[data-theme="dark"] .quiz-option,
+html[data-theme="dark"] .routine-list li,
+html[data-theme="dark"] .panel-summary,
+html[data-theme="dark"] .panel-metrics div,
+html[data-theme="dark"] .panel-footer,
+html[data-theme="dark"] .starter-priority li,
+html[data-theme="dark"] .starter-track,
+html[data-theme="dark"] .starter-checklist-head strong,
+html[data-theme="dark"] .basic-practice-meta span,
+html[data-theme="dark"] .reading-meta span,
+html[data-theme="dark"] .grammar-practice-meta span,
+html[data-theme="dark"] .quiz-meta span,
+html[data-theme="dark"] .reading-korean,
+html[data-theme="dark"] .basic-practice-note,
+html[data-theme="dark"] .grammar-practice-note,
+html[data-theme="dark"] .reading-passage,
+html[data-theme="dark"] .basic-practice-display-box,
+html[data-theme="dark"] .quiz-hud-item,
+html[data-theme="dark"] .match-stat-card,
+html[data-theme="dark"] .match-column-head,
+html[data-theme="dark"] .quiz-result,
+html[data-theme="dark"] .quiz-result-item,
+html[data-theme="dark"] .quiz-note-item {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(246, 248, 252, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .nav-links a {
+    color: #dbe5f1;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(246, 248, 252, 0.08);
+  }
+
+  html:not([data-theme="light"]) .brand-sub,
+  html:not([data-theme="light"]) .hero-copy p,
+  html:not([data-theme="light"]) .section-copy,
+  html:not([data-theme="light"]) .panel-summary p,
+  html:not([data-theme="light"]) .panel-metrics p,
+  html:not([data-theme="light"]) .stat-card p,
+  html:not([data-theme="light"]) .starter-item p,
+  html:not([data-theme="light"]) .quiz-result-copy,
+  html:not([data-theme="light"]) .flashcard-hint,
+  html:not([data-theme="light"]) .match-feedback,
+  html:not([data-theme="light"]) .quiz-feedback,
+  html:not([data-theme="light"]) .match-stat-card p {
+    color: #d3dce8;
+  }
+
+  html:not([data-theme="light"]) .eyebrow,
+  html:not([data-theme="light"]) .section-heading span,
+  html:not([data-theme="light"]) .panel-label,
+  html:not([data-theme="light"]) .quiz-meta span,
+  html:not([data-theme="light"]) .grammar-level,
+  html:not([data-theme="light"]) .quiz-hud-item span,
+  html:not([data-theme="light"]) .panel-metrics span,
+  html:not([data-theme="light"]) .routine-list span {
+    color: #b9c5d5;
+  }
+
+  html:not([data-theme="light"]) .hero-copy h1,
+  html:not([data-theme="light"]) .section-heading h2,
+  html:not([data-theme="light"]) .page-intro h1,
+  html:not([data-theme="light"]) .quiz-card h3,
+  html:not([data-theme="light"]) .starter-overview h3,
+  html:not([data-theme="light"]) .starter-checklist-head h3,
+  html:not([data-theme="light"]) .basic-practice-copy h3,
+  html:not([data-theme="light"]) .basic-practice-header h3,
+  html:not([data-theme="light"]) .grammar-practice-copy h3,
+  html:not([data-theme="light"]) .grammar-practice-header h3,
+  html:not([data-theme="light"]) .reading-header h3,
+  html:not([data-theme="light"]) .panel-summary strong,
+  html:not([data-theme="light"]) .panel-metrics strong,
+  html:not([data-theme="light"]) .panel-footer strong,
+  html:not([data-theme="light"]) .stat-card strong {
+    color: #f7fbff;
+  }
+
+  html:not([data-theme="light"]) .hero-copy,
+  html:not([data-theme="light"]) .hero-panel,
+  html:not([data-theme="light"]) .stat-card,
+  html:not([data-theme="light"]) .flashcard-panel,
+  html:not([data-theme="light"]) .grammar-item,
+  html:not([data-theme="light"]) .quiz-card,
+  html:not([data-theme="light"]) .page-intro,
+  html:not([data-theme="light"]) .starter-overview,
+  html:not([data-theme="light"]) .starter-checklist-card,
+  html:not([data-theme="light"]) .starter-item,
+  html:not([data-theme="light"]) .basic-practice-copy,
+  html:not([data-theme="light"]) .basic-practice-card,
+  html:not([data-theme="light"]) .grammar-practice-copy,
+  html:not([data-theme="light"]) .grammar-practice-card,
+  html:not([data-theme="light"]) .reading-card,
+  html:not([data-theme="light"]) .match-sidebar,
+  html:not([data-theme="light"]) .match-board,
+  html:not([data-theme="light"]) .quiz-toggle-panel,
+  html:not([data-theme="light"]) .quiz-note-panel {
+    background:
+      linear-gradient(180deg, rgba(20, 26, 36, 0.98), rgba(14, 20, 28, 0.98)),
+      linear-gradient(135deg, rgba(63, 100, 201, 0.1), rgba(211, 104, 76, 0.06));
+    border-color: rgba(246, 248, 252, 0.14);
+  }
+
+  html:not([data-theme="light"]) .hero-chip,
+  html:not([data-theme="light"]) .secondary-btn,
+  html:not([data-theme="light"]) .level-button,
+  html:not([data-theme="light"]) .quiz-toggle-group .level-button,
+  html:not([data-theme="light"]) .match-card,
+  html:not([data-theme="light"]) .basic-practice-option,
+  html:not([data-theme="light"]) .grammar-practice-option,
+  html:not([data-theme="light"]) .reading-option,
+  html:not([data-theme="light"]) .quiz-option,
+  html:not([data-theme="light"]) .routine-list li,
+  html:not([data-theme="light"]) .panel-summary,
+  html:not([data-theme="light"]) .panel-metrics div,
+  html:not([data-theme="light"]) .panel-footer,
+  html:not([data-theme="light"]) .starter-priority li,
+  html:not([data-theme="light"]) .starter-track,
+  html:not([data-theme="light"]) .starter-checklist-head strong,
+  html:not([data-theme="light"]) .basic-practice-meta span,
+  html:not([data-theme="light"]) .reading-meta span,
+  html:not([data-theme="light"]) .grammar-practice-meta span,
+  html:not([data-theme="light"]) .quiz-meta span,
+  html:not([data-theme="light"]) .reading-korean,
+  html:not([data-theme="light"]) .basic-practice-note,
+  html:not([data-theme="light"]) .grammar-practice-note,
+  html:not([data-theme="light"]) .reading-passage,
+  html:not([data-theme="light"]) .basic-practice-display-box,
+  html:not([data-theme="light"]) .quiz-hud-item,
+  html:not([data-theme="light"]) .match-stat-card,
+  html:not([data-theme="light"]) .match-column-head,
+  html:not([data-theme="light"]) .quiz-result,
+  html:not([data-theme="light"]) .quiz-result-item,
+  html:not([data-theme="light"]) .quiz-note-item {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(246, 248, 252, 0.12);
   }
 }
 

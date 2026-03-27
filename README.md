@@ -1,4 +1,4 @@
-# JLPT Compass
+# Japanote
 
 JLPT 시험 공부를 위한 정적 학습 사이트입니다.
 

@@ -2,6 +2,7 @@
 
 const contentLevels = ["N5", "N4", "N3"];
 const contentRegistry = globalThis.japanoteContent || {};
+const kanaStrokeSvgs = globalThis.kanaStrokeSvgs || {};
 const vocabContent = contentRegistry.vocab || {};
 const grammarContent = contentRegistry.grammar || {};
 const readingContent = contentRegistry.reading || {};
@@ -11,6 +12,27 @@ function getLevelContentSets(source) {
     sets[level] = Array.isArray(source?.[level]) ? source[level] : [];
     return sets;
   }, {});
+}
+
+function getLegacyVocabKey(level) {
+  return `jlpt${level}`;
+}
+
+function getDynamicVocabSource(level = "N5") {
+  if (Array.isArray(vocabContent?.[level]) && vocabContent[level].length) {
+    return vocabContent[level];
+  }
+
+  const legacyKey = getLegacyVocabKey(level);
+  if (Array.isArray(vocabContent?.[legacyKey]) && vocabContent[legacyKey].length) {
+    return vocabContent[legacyKey];
+  }
+
+  if (level === "N5" && Array.isArray(globalThis.jlptN5Vocab) && globalThis.jlptN5Vocab.length) {
+    return globalThis.jlptN5Vocab;
+  }
+
+  return [];
 }
 
 const fallbackFlashcards = [
@@ -464,11 +486,7 @@ const quizQuestions = [
   }
 ];
 
-const dynamicQuizSource = Array.isArray(vocabContent.jlptN5)
-  ? vocabContent.jlptN5
-  : Array.isArray(globalThis.jlptN5Vocab)
-    ? globalThis.jlptN5Vocab
-    : [];
+let dynamicQuizSource = getDynamicVocabSource("N5");
 const quizModeLabels = {
   meaning: "뜻 맞히기",
   reading: "읽기 맞히기"
@@ -566,7 +584,7 @@ function buildDynamicQuizPool(items) {
   );
 }
 
-const dynamicQuizPool = buildDynamicQuizPool(dynamicQuizSource);
+let dynamicQuizPool = buildDynamicQuizPool(dynamicQuizSource);
 
 function buildDynamicFlashcardPool(items) {
   const cards = items
@@ -595,9 +613,6 @@ function buildDynamicVocabListPool(items) {
 
   return cards.length ? cards : [...fallbackFlashcards];
 }
-
-flashcards = buildDynamicFlashcardPool(dynamicQuizPool);
-vocabListItems = buildDynamicVocabListPool(dynamicQuizPool);
 
 function buildDynamicWordPracticeItems(items) {
   const tones = ["tone-coral", "tone-mint", "tone-gold", "tone-sky"];
@@ -639,7 +654,13 @@ function buildDynamicWordPracticeItems(items) {
   return questions.length ? questions : basicPracticeSets.words.items;
 }
 
-basicPracticeSets.words.items = buildDynamicWordPracticeItems(dynamicQuizPool);
+function refreshDynamicVocabContent() {
+  dynamicQuizSource = getDynamicVocabSource("N5");
+  dynamicQuizPool = buildDynamicQuizPool(dynamicQuizSource);
+  flashcards = buildDynamicFlashcardPool(dynamicQuizPool);
+  vocabListItems = buildDynamicVocabListPool(dynamicQuizPool);
+  basicPracticeSets.words.items = buildDynamicWordPracticeItems(dynamicQuizPool);
+}
 
 const kanaBlueprintGroups = [
   {
@@ -1369,6 +1390,928 @@ function renderKanaLibrary() {
       openKanaQuizSheet(track);
     });
   });
+}
+
+function clampValue(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+const writingPracticeSettings = {
+  mode: "hiragana"
+};
+
+const writingPracticeState = {
+  sessionItems: [],
+  sessionIndex: 0,
+  guideVisible: true,
+  answerVisible: false,
+  isAnimating: false,
+  animationToken: 0,
+  layoutFrame: null,
+  pointerId: null,
+  isDrawing: false,
+  strokes: [],
+  score: null,
+  feedback: "희미한 글자 위를 천천히 따라써보세요.",
+  tip: "가이드가 잘 보이도록 천천히 크게 써보세요.",
+  slotEntries: [],
+  targetCanvas: document.createElement("canvas"),
+  hasVectorGuide: false,
+  renderSeed: 0
+};
+
+function getWritingPracticeDefaultFeedback() {
+  return "희미한 글자 위를 천천히 따라써보세요.";
+}
+
+function getWritingPracticeDefaultTip() {
+  return "가이드가 잘 보이도록 천천히 크게 써보세요.";
+}
+
+function buildWritingPracticePool(script) {
+  const label = script === "katakana" ? "카타카나" : "히라가나";
+  const deck = kanaStudyDecks[script] || [];
+
+  return deck.flatMap((group, groupIndex) =>
+    group.items
+      .filter((item) => item.quiz !== false)
+      .map((item, itemIndex) => ({
+        id: `writing-${script}-${groupIndex}-${itemIndex}`,
+        script,
+        group: group.title,
+        char: item.char,
+        reading: item.reading,
+        source: `${label} · ${group.title}`
+      }))
+  );
+}
+
+const writingPracticePools = {
+  hiragana: buildWritingPracticePool("hiragana"),
+  katakana: buildWritingPracticePool("katakana")
+};
+
+function buildWritingPracticeSession(mode = writingPracticeSettings.mode) {
+  if (mode === "random") {
+    return shuffleQuizArray([...writingPracticePools.hiragana, ...writingPracticePools.katakana]);
+  }
+
+  return [...(writingPracticePools[mode] || writingPracticePools.hiragana)];
+}
+
+function ensureWritingPracticeSession() {
+  if (!writingPracticeState.sessionItems.length) {
+    writingPracticeState.sessionItems = buildWritingPracticeSession(writingPracticeSettings.mode);
+    writingPracticeState.sessionIndex = 0;
+  }
+}
+
+function getCurrentWritingPracticeItem() {
+  ensureWritingPracticeSession();
+
+  if (!writingPracticeState.sessionItems.length) {
+    return null;
+  }
+
+  return writingPracticeState.sessionItems[writingPracticeState.sessionIndex] || null;
+}
+
+function cancelWritingPracticeAnimation() {
+  writingPracticeState.animationToken += 1;
+  writingPracticeState.isAnimating = false;
+}
+
+function resetWritingPracticeRound() {
+  cancelWritingPracticeAnimation();
+  writingPracticeState.pointerId = null;
+  writingPracticeState.isDrawing = false;
+  writingPracticeState.guideVisible = true;
+  writingPracticeState.answerVisible = false;
+  writingPracticeState.strokes = [];
+  writingPracticeState.score = null;
+  writingPracticeState.feedback = getWritingPracticeDefaultFeedback();
+  writingPracticeState.tip = getWritingPracticeDefaultTip();
+}
+
+function rewriteSvgReference(value, idMap) {
+  if (!value) {
+    return value;
+  }
+
+  if (value.startsWith("url(#") && value.endsWith(")")) {
+    const id = value.slice(5, -1);
+    return idMap.has(id) ? `url(#${idMap.get(id)})` : value;
+  }
+
+  if (value.startsWith("#")) {
+    const id = value.slice(1);
+    return idMap.has(id) ? `#${idMap.get(id)}` : value;
+  }
+
+  return value;
+}
+
+function uniquifyWritingSvgIds(svg, prefix) {
+  const idMap = new Map();
+
+  svg.querySelectorAll("[id]").forEach((element) => {
+    const originalId = element.id;
+    const nextId = `${prefix}-${originalId}`;
+    idMap.set(originalId, nextId);
+    element.id = nextId;
+  });
+
+  svg.querySelectorAll("*").forEach((element) => {
+    ["clip-path", "href", "xlink:href", "mask", "filter"].forEach((attribute) => {
+      const value = element.getAttribute(attribute);
+      const nextValue = rewriteSvgReference(value, idMap);
+
+      if (nextValue !== value) {
+        element.setAttribute(attribute, nextValue);
+      }
+    });
+  });
+}
+
+function collectWritingStrokeEntries(svg) {
+  const strokesGroup = svg.querySelector('g[data-strokesvg="strokes"]');
+
+  if (!strokesGroup) {
+    return [];
+  }
+
+  return Array.from(strokesGroup.children)
+    .map((child) => {
+      const paths =
+        child.tagName.toLowerCase() === "path" ? [child] : Array.from(child.querySelectorAll("path"));
+
+      if (!paths.length) {
+        return null;
+      }
+
+      const measuredPaths = paths.map((path) => {
+        const length = path.getTotalLength();
+        path.dataset.length = String(length);
+        return path;
+      });
+
+      const maxLength = Math.max(...measuredPaths.map((path) => Number(path.dataset.length || 0)));
+
+      return {
+        duration: clampValue(Math.round(maxLength / 2.9), 280, 760),
+        paths: measuredPaths
+      };
+    })
+    .filter(Boolean);
+}
+
+function setWritingStrokeEntriesState(revealed = false, opacity = 0) {
+  writingPracticeState.slotEntries.forEach((entry) => {
+    entry.strokeEntries.forEach((strokeEntry) => {
+      strokeEntry.paths.forEach((path) => {
+        const length = Number(path.dataset.length || 0);
+        path.style.transition = "none";
+        path.style.strokeDasharray = `${length}`;
+        path.style.strokeDashoffset = revealed ? "0" : `${length}`;
+        path.style.opacity = opacity > 0 ? String(opacity) : "0";
+      });
+    });
+  });
+}
+
+function buildWritingPracticeStage(current) {
+  const layer = document.getElementById("writing-svg-layer");
+  const stageEmpty = document.getElementById("writing-practice-stage-empty");
+
+  if (!layer || !stageEmpty || !current) {
+    return;
+  }
+
+  const characters = Array.from(current.char);
+  const renderPrefix = `writing-${current.id}-${writingPracticeState.renderSeed + 1}`;
+
+  writingPracticeState.renderSeed += 1;
+  writingPracticeState.slotEntries = [];
+  writingPracticeState.hasVectorGuide = false;
+
+  layer.innerHTML = "";
+  layer.style.setProperty("--slot-count", String(characters.length || 1));
+
+  characters.forEach((character, index) => {
+    const slot = document.createElement("div");
+    slot.className = "writing-character-slot";
+    slot.dataset.char = character;
+
+    const rawSvg = kanaStrokeSvgs[character];
+
+    if (!rawSvg) {
+      const fallback = document.createElement("div");
+      fallback.className = "writing-character-fallback";
+      fallback.textContent = character;
+      slot.appendChild(fallback);
+      layer.appendChild(slot);
+      writingPracticeState.slotEntries.push({
+        char: character,
+        slot,
+        svg: null,
+        viewBox: { x: 0, y: 0, width: 1024, height: 1024 },
+        shadowPaths: [],
+        strokeEntries: []
+      });
+      return;
+    }
+
+    slot.innerHTML = rawSvg;
+
+    const svg = slot.querySelector("svg");
+
+    if (!svg) {
+      const fallback = document.createElement("div");
+      fallback.className = "writing-character-fallback";
+      fallback.textContent = character;
+      slot.innerHTML = "";
+      slot.appendChild(fallback);
+      layer.appendChild(slot);
+      writingPracticeState.slotEntries.push({
+        char: character,
+        slot,
+        svg: null,
+        viewBox: { x: 0, y: 0, width: 1024, height: 1024 },
+        shadowPaths: [],
+        strokeEntries: []
+      });
+      return;
+    }
+
+    svg.classList.add("writing-character-svg");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    uniquifyWritingSvgIds(svg, `${renderPrefix}-${index}`);
+
+    const viewBox = svg.viewBox?.baseVal
+      ? {
+          x: svg.viewBox.baseVal.x,
+          y: svg.viewBox.baseVal.y,
+          width: svg.viewBox.baseVal.width || 1024,
+          height: svg.viewBox.baseVal.height || 1024
+        }
+      : { x: 0, y: 0, width: 1024, height: 1024 };
+
+    const shadowPaths = Array.from(svg.querySelectorAll('g[data-strokesvg="shadows"] path'))
+      .map((path) => path.getAttribute("d"))
+      .filter(Boolean);
+
+    const strokeEntries = collectWritingStrokeEntries(svg);
+
+    writingPracticeState.hasVectorGuide = writingPracticeState.hasVectorGuide || shadowPaths.length > 0;
+
+    layer.appendChild(slot);
+    writingPracticeState.slotEntries.push({
+      char: character,
+      slot,
+      svg,
+      viewBox,
+      shadowPaths,
+      strokeEntries
+    });
+  });
+
+  stageEmpty.hidden = writingPracticeState.hasVectorGuide;
+  stageEmpty.textContent = writingPracticeState.hasVectorGuide
+    ? ""
+    : "따라쓰기 데이터를 준비하지 못했어요.";
+  setWritingStrokeEntriesState(false, 0);
+}
+
+function updateWritingPracticeStageState() {
+  const stage = document.getElementById("writing-practice-stage");
+
+  if (!stage) {
+    return;
+  }
+
+  stage.classList.toggle("is-guide-hidden", !writingPracticeState.guideVisible);
+  stage.classList.toggle("is-answer-visible", writingPracticeState.answerVisible);
+}
+
+function getWritingPracticeStrokeCount() {
+  return writingPracticeState.slotEntries.reduce((count, entry) => count + entry.strokeEntries.length, 0);
+}
+
+function updateWritingPracticeControls() {
+  const guideToggle = document.getElementById("writing-guide-toggle");
+  const revealToggle = document.getElementById("writing-practice-reveal");
+  const clearButton = document.getElementById("writing-practice-clear");
+  const scoreButton = document.getElementById("writing-practice-score-btn");
+  const replayButton = document.getElementById("writing-practice-replay");
+
+  if (guideToggle) {
+    guideToggle.textContent = writingPracticeState.guideVisible ? "가이드 숨기기" : "가이드 보기";
+    guideToggle.disabled = !writingPracticeState.hasVectorGuide;
+  }
+
+  if (revealToggle) {
+    revealToggle.textContent = writingPracticeState.answerVisible ? "정답 가리기" : "정답 보기";
+    revealToggle.disabled = !writingPracticeState.hasVectorGuide;
+  }
+
+  if (clearButton) {
+    clearButton.disabled = writingPracticeState.strokes.length === 0;
+  }
+
+  if (scoreButton) {
+    scoreButton.disabled = !writingPracticeState.hasVectorGuide || writingPracticeState.isAnimating;
+  }
+
+  if (replayButton) {
+    replayButton.disabled = !writingPracticeState.hasVectorGuide || writingPracticeState.isAnimating;
+  }
+}
+
+function updateWritingPracticePanel() {
+  const current = getCurrentWritingPracticeItem();
+  const title = document.getElementById("writing-practice-title");
+  const source = document.getElementById("writing-practice-source");
+  const progress = document.getElementById("writing-practice-progress");
+  const strokes = document.getElementById("writing-practice-strokes");
+  const character = document.getElementById("writing-practice-char");
+  const reading = document.getElementById("writing-practice-reading");
+  const score = document.getElementById("writing-practice-score");
+  const feedback = document.getElementById("writing-practice-feedback");
+  const prompt = document.getElementById("writing-practice-prompt");
+  const tip = document.getElementById("writing-practice-tip");
+
+  document.querySelectorAll("[data-writing-mode]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.writingMode === writingPracticeSettings.mode);
+  });
+
+  if (!current) {
+    if (title) {
+      title.textContent = "문자 따라쓰기";
+    }
+    if (source) {
+      source.textContent = "-";
+    }
+    if (progress) {
+      progress.textContent = "-";
+    }
+    if (strokes) {
+      strokes.textContent = "-";
+    }
+    if (character) {
+      character.textContent = "-";
+    }
+    if (reading) {
+      reading.textContent = "-";
+    }
+    if (score) {
+      score.textContent = "-";
+    }
+    if (feedback) {
+      feedback.textContent = getWritingPracticeDefaultFeedback();
+    }
+    if (prompt) {
+      prompt.textContent = "가이드를 따라 천천히 써보고, 다 쓴 뒤 점수를 확인해보세요.";
+    }
+    if (tip) {
+      tip.textContent = getWritingPracticeDefaultTip();
+    }
+    updateWritingPracticeStageState();
+    updateWritingPracticeControls();
+    return;
+  }
+
+  const total = writingPracticeState.sessionItems.length;
+  const modeLabel =
+    writingPracticeSettings.mode === "random"
+      ? "랜덤"
+      : current.script === "katakana"
+        ? "카타카나"
+        : "히라가나";
+
+  if (title) {
+    title.textContent = `${modeLabel} 따라쓰기`;
+  }
+  if (source) {
+    source.textContent = current.source;
+  }
+  if (progress) {
+    progress.textContent = `${writingPracticeState.sessionIndex + 1} / ${total}`;
+  }
+  if (strokes) {
+    strokes.textContent = `${getWritingPracticeStrokeCount()}획`;
+  }
+  if (character) {
+    character.textContent = current.char;
+  }
+  if (reading) {
+    reading.textContent = current.reading;
+  }
+  if (score) {
+    score.textContent = writingPracticeState.score === null ? "-" : `${writingPracticeState.score}점`;
+  }
+  if (feedback) {
+    feedback.textContent = writingPracticeState.feedback;
+  }
+  if (prompt) {
+    prompt.textContent = `「${current.char}」를 칸 안에 맞춰 써보고, 끝나면 점수를 확인해보세요.`;
+  }
+  if (tip) {
+    tip.textContent = writingPracticeState.tip;
+  }
+
+  updateWritingPracticeStageState();
+  updateWritingPracticeControls();
+}
+
+function getWritingBrushWidth(canvas) {
+  return clampValue(Math.round(Math.min(canvas.width, canvas.height) * 0.026), 18, 44);
+}
+
+function drawWritingStroke(ctx, canvas, points) {
+  if (!points.length) {
+    return;
+  }
+
+  const absolutePoints = points.map((point) => ({
+    x: point.x * canvas.width,
+    y: point.y * canvas.height
+  }));
+
+  if (absolutePoints.length === 1) {
+    const radius = getWritingBrushWidth(canvas) * 0.5;
+    ctx.beginPath();
+    ctx.arc(absolutePoints[0].x, absolutePoints[0].y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(absolutePoints[0].x, absolutePoints[0].y);
+
+  for (let index = 1; index < absolutePoints.length; index += 1) {
+    ctx.lineTo(absolutePoints[index].x, absolutePoints[index].y);
+  }
+
+  ctx.stroke();
+}
+
+function renderWritingOverlay() {
+  const canvas = document.getElementById("writing-overlay-canvas");
+  const ctx = canvas?.getContext("2d");
+
+  if (!canvas || !ctx) {
+    return;
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "rgba(30, 35, 49, 0.94)";
+  ctx.fillStyle = "rgba(30, 35, 49, 0.94)";
+  ctx.lineWidth = getWritingBrushWidth(canvas);
+
+  writingPracticeState.strokes.forEach((stroke) => {
+    drawWritingStroke(ctx, canvas, stroke);
+  });
+}
+
+function renderWritingPracticeTargetMask() {
+  const canvas = document.getElementById("writing-overlay-canvas");
+  const ctx = writingPracticeState.targetCanvas.getContext("2d");
+
+  if (!canvas || !ctx) {
+    return;
+  }
+
+  writingPracticeState.targetCanvas.width = canvas.width;
+  writingPracticeState.targetCanvas.height = canvas.height;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!writingPracticeState.hasVectorGuide) {
+    return;
+  }
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const scaleRatio = canvas.width / Math.max(canvasRect.width, 1);
+  ctx.fillStyle = "#ffffff";
+
+  writingPracticeState.slotEntries.forEach((entry) => {
+    if (!entry.svg || !entry.shadowPaths.length) {
+      return;
+    }
+
+    const svgRect = entry.svg.getBoundingClientRect();
+
+    if (!svgRect.width || !svgRect.height) {
+      return;
+    }
+
+    const x = (svgRect.left - canvasRect.left) * scaleRatio;
+    const y = (svgRect.top - canvasRect.top) * scaleRatio;
+    const width = svgRect.width * scaleRatio;
+    const height = svgRect.height * scaleRatio;
+    const scale = Math.min(width / entry.viewBox.width, height / entry.viewBox.height);
+    const offsetX = x + (width - entry.viewBox.width * scale) / 2 - entry.viewBox.x * scale;
+    const offsetY = y + (height - entry.viewBox.height * scale) / 2 - entry.viewBox.y * scale;
+
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+    ctx.scale(scale, scale);
+    entry.shadowPaths.forEach((pathData) => {
+      ctx.fill(new Path2D(pathData));
+    });
+    ctx.restore();
+  });
+}
+
+function syncWritingPracticeCanvas() {
+  const canvas = document.getElementById("writing-overlay-canvas");
+
+  if (!canvas) {
+    return;
+  }
+
+  const rect = canvas.getBoundingClientRect();
+
+  if (!rect.width || !rect.height) {
+    return;
+  }
+
+  const ratio = window.devicePixelRatio || 1;
+  const nextWidth = Math.max(1, Math.round(rect.width * ratio));
+  const nextHeight = Math.max(1, Math.round(rect.height * ratio));
+
+  if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+    canvas.width = nextWidth;
+    canvas.height = nextHeight;
+  }
+
+  renderWritingOverlay();
+  renderWritingPracticeTargetMask();
+}
+
+function scheduleWritingPracticeLayout(replay = false) {
+  if (writingPracticeState.layoutFrame) {
+    cancelAnimationFrame(writingPracticeState.layoutFrame);
+  }
+
+  writingPracticeState.layoutFrame = window.requestAnimationFrame(() => {
+    writingPracticeState.layoutFrame = null;
+    syncWritingPracticeCanvas();
+    updateWritingPracticeStageState();
+
+    if (replay && writingPracticeState.hasVectorGuide) {
+      replayWritingStrokeAnimation();
+    }
+  });
+}
+
+function getWritingPracticeScoreResult(score, coverage, precision) {
+  if (score >= 90) {
+    return {
+      score,
+      feedback: "거의 맞았어요. 획 모양이 안정적으로 들어왔어요.",
+      tip: "이 감각으로 다음 글자도 이어가보세요."
+    };
+  }
+
+  if (score >= 78) {
+    if (coverage < precision) {
+      return {
+        score,
+        feedback: "모양은 좋아요. 다만 빠진 부분이 조금 있어요.",
+        tip: "획의 끝점을 한 번만 더 길게 빼보면 더 닮아져요."
+      };
+    }
+
+    return {
+      score,
+      feedback: "대체로 잘 맞아요. 가이드 밖으로 나온 부분만 조금 줄여보세요.",
+      tip: "선을 조금 더 천천히 눌러 쓰면 점수가 더 올라가요."
+    };
+  }
+
+  if (score >= 62) {
+    if (coverage < 0.55) {
+      return {
+        score,
+        feedback: "형태는 잡혔지만 빠진 획이 아직 보여요.",
+        tip: "획순 다시 보기로 시작점과 끝점을 확인해보세요."
+      };
+    }
+
+    return {
+      score,
+      feedback: "전체 윤곽은 보이기 시작했어요. 조금만 더 안쪽으로 모아 써보세요.",
+      tip: "가이드 안에서 크기를 조금 줄이면 훨씬 비슷해져요."
+    };
+  }
+
+  if (coverage < 0.42) {
+    return {
+      score,
+      feedback: "빠진 부분이 많아요. 획을 끝까지 이어서 써보면 좋아요.",
+      tip: "정답 보기로 흐름을 보고, 화면을 꽉 채운다는 느낌으로 다시 써보세요."
+    };
+  }
+
+  if (precision < 0.34) {
+    return {
+      score,
+      feedback: "획이 가이드 밖으로 많이 벗어났어요.",
+      tip: "한 번에 빨리 쓰기보다 짧게 끊어가며 맞춰보세요."
+    };
+  }
+
+  return {
+    score,
+    feedback: "첫 형태는 잡혔어요. 다시 한 번 천천히 써보면 금방 올라가요.",
+    tip: "가이드를 켠 상태로 크기와 간격부터 먼저 맞춰보세요."
+  };
+}
+
+function scoreWritingPractice() {
+  const canvas = document.getElementById("writing-overlay-canvas");
+  const userCtx = canvas?.getContext("2d");
+  const targetCtx = writingPracticeState.targetCanvas.getContext("2d");
+
+  if (!canvas || !userCtx || !targetCtx || !writingPracticeState.hasVectorGuide) {
+    return;
+  }
+
+  if (!writingPracticeState.strokes.some((stroke) => stroke.length)) {
+    writingPracticeState.feedback = "아직 쓴 획이 없어요. 먼저 한 번 써볼까요?";
+    writingPracticeState.tip = "글자를 칸 안에 크게 한 번 쓴 뒤 점수를 눌러보세요.";
+    updateWritingPracticePanel();
+    return;
+  }
+
+  renderWritingPracticeTargetMask();
+
+  const userData = userCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+  const targetData = targetCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let targetPixels = 0;
+  let userPixels = 0;
+  let overlapPixels = 0;
+
+  for (let index = 3; index < targetData.length; index += 4) {
+    const targetOn = targetData[index] > 32;
+    const userOn = userData[index] > 32;
+
+    if (targetOn) {
+      targetPixels += 1;
+    }
+    if (userOn) {
+      userPixels += 1;
+    }
+    if (targetOn && userOn) {
+      overlapPixels += 1;
+    }
+  }
+
+  if (!targetPixels || !userPixels) {
+    writingPracticeState.feedback = "아직 비교할 선이 충분하지 않아요. 조금 더 크게 써보세요.";
+    writingPracticeState.tip = "획을 한두 번 더 보강한 뒤 다시 점수를 눌러보세요.";
+    updateWritingPracticePanel();
+    return;
+  }
+
+  const coverage = overlapPixels / targetPixels;
+  const precision = overlapPixels / userPixels;
+  const score = clampValue(Math.round((coverage * 0.68 + precision * 0.32) * 100), 0, 100);
+  const result = getWritingPracticeScoreResult(score, coverage, precision);
+
+  writingPracticeState.score = result.score;
+  writingPracticeState.feedback = result.feedback;
+  writingPracticeState.tip = result.tip;
+
+  updateWritingPracticePanel();
+  updateStudyStreak();
+  saveState();
+  renderStats();
+}
+
+function getWritingCanvasPoint(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+
+  return {
+    x: clampValue((event.clientX - rect.left) / rect.width, 0, 1),
+    y: clampValue((event.clientY - rect.top) / rect.height, 0, 1)
+  };
+}
+
+function handleWritingPointerDown(event) {
+  if (event.pointerType === "mouse" && event.button !== 0) {
+    return;
+  }
+
+  if (!getCurrentWritingPracticeItem()) {
+    return;
+  }
+
+  const canvas = event.currentTarget;
+
+  if (!(canvas instanceof HTMLCanvasElement)) {
+    return;
+  }
+
+  event.preventDefault();
+  canvas.setPointerCapture(event.pointerId);
+  writingPracticeState.pointerId = event.pointerId;
+  writingPracticeState.isDrawing = true;
+
+  if (writingPracticeState.score !== null) {
+    writingPracticeState.score = null;
+    writingPracticeState.feedback = getWritingPracticeDefaultFeedback();
+    writingPracticeState.tip = getWritingPracticeDefaultTip();
+  }
+
+  const point = getWritingCanvasPoint(event, canvas);
+  writingPracticeState.strokes.push([point]);
+  renderWritingOverlay();
+  updateWritingPracticePanel();
+}
+
+function handleWritingPointerMove(event) {
+  if (!writingPracticeState.isDrawing || writingPracticeState.pointerId !== event.pointerId) {
+    return;
+  }
+
+  const canvas = event.currentTarget;
+
+  if (!(canvas instanceof HTMLCanvasElement)) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const point = getWritingCanvasPoint(event, canvas);
+  const currentStroke = writingPracticeState.strokes[writingPracticeState.strokes.length - 1];
+
+  if (!currentStroke) {
+    return;
+  }
+
+  const lastPoint = currentStroke[currentStroke.length - 1];
+
+  if (lastPoint && Math.hypot(point.x - lastPoint.x, point.y - lastPoint.y) < 0.0022) {
+    return;
+  }
+
+  currentStroke.push(point);
+  renderWritingOverlay();
+}
+
+function finishWritingPointer(event) {
+  if (writingPracticeState.pointerId !== event.pointerId) {
+    return;
+  }
+
+  const canvas = event.currentTarget;
+
+  if (canvas instanceof HTMLCanvasElement && canvas.hasPointerCapture(event.pointerId)) {
+    canvas.releasePointerCapture(event.pointerId);
+  }
+
+  writingPracticeState.pointerId = null;
+  writingPracticeState.isDrawing = false;
+  updateWritingPracticeControls();
+}
+
+function waitForWritingAnimation(duration) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, duration);
+  });
+}
+
+async function replayWritingStrokeAnimation() {
+  if (!writingPracticeState.hasVectorGuide) {
+    return;
+  }
+
+  cancelWritingPracticeAnimation();
+  const token = writingPracticeState.animationToken;
+  writingPracticeState.isAnimating = true;
+  setWritingStrokeEntriesState(false, 0);
+  updateWritingPracticeControls();
+
+  for (const entry of writingPracticeState.slotEntries) {
+    for (const strokeEntry of entry.strokeEntries) {
+      if (token !== writingPracticeState.animationToken) {
+        return;
+      }
+
+      strokeEntry.paths.forEach((path) => {
+        const length = Number(path.dataset.length || 0);
+        path.style.transition = "none";
+        path.style.strokeDasharray = `${length}`;
+        path.style.strokeDashoffset = `${length}`;
+        path.style.opacity = "1";
+        path.getBoundingClientRect();
+      });
+
+      strokeEntry.paths.forEach((path) => {
+        path.style.transition = `stroke-dashoffset ${strokeEntry.duration}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease`;
+        path.style.strokeDashoffset = "0";
+      });
+
+      await waitForWritingAnimation(strokeEntry.duration + 90);
+    }
+  }
+
+  if (token !== writingPracticeState.animationToken) {
+    return;
+  }
+
+  writingPracticeState.isAnimating = false;
+  setWritingStrokeEntriesState(true, writingPracticeState.answerVisible ? 0.88 : 0.18);
+  updateWritingPracticeControls();
+}
+
+function clearWritingPracticeCanvas(resetStatus = true) {
+  writingPracticeState.strokes = [];
+
+  if (resetStatus) {
+    writingPracticeState.score = null;
+    writingPracticeState.feedback = getWritingPracticeDefaultFeedback();
+    writingPracticeState.tip = getWritingPracticeDefaultTip();
+  }
+
+  renderWritingOverlay();
+  updateWritingPracticePanel();
+}
+
+function startWritingPracticeSession(mode = writingPracticeSettings.mode) {
+  const nextMode = ["hiragana", "katakana", "random"].includes(mode) ? mode : "hiragana";
+  writingPracticeSettings.mode = nextMode;
+  writingPracticeState.sessionItems = buildWritingPracticeSession(nextMode);
+  writingPracticeState.sessionIndex = 0;
+  resetWritingPracticeRound();
+  renderWritingPractice();
+}
+
+function nextWritingPracticeItem() {
+  if (!writingPracticeState.sessionItems.length) {
+    startWritingPracticeSession(writingPracticeSettings.mode);
+    return;
+  }
+
+  if (writingPracticeState.sessionIndex + 1 >= writingPracticeState.sessionItems.length) {
+    writingPracticeState.sessionItems = buildWritingPracticeSession(writingPracticeSettings.mode);
+    writingPracticeState.sessionIndex = 0;
+  } else {
+    writingPracticeState.sessionIndex += 1;
+  }
+
+  resetWritingPracticeRound();
+  renderWritingPractice();
+}
+
+function toggleWritingGuide() {
+  writingPracticeState.guideVisible = !writingPracticeState.guideVisible;
+  updateWritingPracticePanel();
+}
+
+function toggleWritingAnswer() {
+  if (!writingPracticeState.hasVectorGuide) {
+    return;
+  }
+
+  writingPracticeState.answerVisible = !writingPracticeState.answerVisible;
+
+  if (writingPracticeState.answerVisible) {
+    writingPracticeState.guideVisible = true;
+    writingPracticeState.tip = "정답 모양을 켰어요. 획순을 보고 같은 흐름으로 다시 써보세요.";
+    updateWritingPracticePanel();
+    replayWritingStrokeAnimation();
+    return;
+  }
+
+  writingPracticeState.tip =
+    writingPracticeState.score === null ? getWritingPracticeDefaultTip() : writingPracticeState.tip;
+  setWritingStrokeEntriesState(false, 0);
+  updateWritingPracticePanel();
+}
+
+function renderWritingPractice() {
+  const shell = document.getElementById("writing-practice-shell");
+
+  if (!shell) {
+    return;
+  }
+
+  ensureWritingPracticeSession();
+
+  const current = getCurrentWritingPracticeItem();
+
+  if (!current) {
+    updateWritingPracticePanel();
+    return;
+  }
+
+  buildWritingPracticeStage(current);
+  updateWritingPracticePanel();
+  scheduleWritingPracticeLayout(true);
 }
 
 function createQuizMeta(item, mode, promptKind) {
@@ -3093,6 +4036,14 @@ function attachEventListeners() {
   const kanaCountButtons = document.querySelectorAll("[data-kana-count]");
   const kanaTimeButtons = document.querySelectorAll("[data-kana-time]");
   const kanaSetupStart = document.getElementById("kana-setup-start");
+  const writingModeButtons = document.querySelectorAll("[data-writing-mode]");
+  const writingReplay = document.getElementById("writing-practice-replay");
+  const writingGuideToggle = document.getElementById("writing-guide-toggle");
+  const writingRevealToggle = document.getElementById("writing-practice-reveal");
+  const writingClear = document.getElementById("writing-practice-clear");
+  const writingScore = document.getElementById("writing-practice-score-btn");
+  const writingNext = document.getElementById("writing-practice-next");
+  const writingCanvas = document.getElementById("writing-overlay-canvas");
 
   if (flashcardToggle) {
     flashcardToggle.addEventListener("click", toggleFlashcardReveal);
@@ -3219,6 +4170,50 @@ function attachEventListeners() {
   kanaQuizCloseButtons.forEach((button) => {
     button.addEventListener("click", closeKanaQuizSheet);
   });
+  writingModeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextMode = button.dataset.writingMode || "hiragana";
+
+      if (nextMode === writingPracticeSettings.mode) {
+        return;
+      }
+
+      startWritingPracticeSession(nextMode);
+    });
+  });
+  if (writingReplay) {
+    writingReplay.addEventListener("click", replayWritingStrokeAnimation);
+  }
+  if (writingGuideToggle) {
+    writingGuideToggle.addEventListener("click", toggleWritingGuide);
+  }
+  if (writingRevealToggle) {
+    writingRevealToggle.addEventListener("click", toggleWritingAnswer);
+  }
+  if (writingClear) {
+    writingClear.addEventListener("click", () => {
+      clearWritingPracticeCanvas(true);
+    });
+  }
+  if (writingScore) {
+    writingScore.addEventListener("click", scoreWritingPractice);
+  }
+  if (writingNext) {
+    writingNext.addEventListener("click", nextWritingPracticeItem);
+  }
+  if (writingCanvas) {
+    writingCanvas.addEventListener("pointerdown", handleWritingPointerDown);
+    writingCanvas.addEventListener("pointermove", handleWritingPointerMove);
+    writingCanvas.addEventListener("pointerup", finishWritingPointer);
+    writingCanvas.addEventListener("pointercancel", finishWritingPointer);
+  }
+  window.addEventListener("resize", () => {
+    if (!document.getElementById("writing-practice-shell")) {
+      return;
+    }
+
+    scheduleWritingPracticeLayout(false);
+  });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && kanaQuizSheetState.open) {
       closeKanaQuizSheet();
@@ -3231,6 +4226,7 @@ function renderAll() {
   renderStarterPath();
   renderKanaQuizSetup();
   renderKanaLibrary();
+  renderWritingPractice();
   renderBasicPractice();
   renderKanaQuizSheet();
   renderQuizSessionHud("kana");
@@ -3241,6 +4237,8 @@ function renderAll() {
   renderStats();
 }
 
+refreshDynamicVocabContent();
+activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize);
 attachEventListeners();
 renderAll();
 

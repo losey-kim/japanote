@@ -1269,6 +1269,351 @@ body.is-kana-quiz-sheet-open .page-shell {
   opacity: 0.72;
 }
 
+.writing-practice-shell {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.writing-practice-copy,
+.writing-practice-card {
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 240, 0.88)),
+    linear-gradient(135deg, rgba(93, 133, 207, 0.08), rgba(222, 107, 72, 0.08));
+  box-shadow: var(--shadow);
+}
+
+.writing-practice-copy h3,
+.writing-practice-card h3 {
+  margin: 12px 0 0;
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.writing-practice-copy h3 {
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+}
+
+.writing-practice-copy p,
+.writing-practice-feedback,
+.writing-practice-tip {
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.writing-practice-copy > p {
+  margin: 14px 0 0;
+}
+
+.writing-practice-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.writing-practice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.writing-practice-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(25, 21, 22, 0.08);
+  color: var(--muted);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.88rem;
+}
+
+.writing-practice-scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.writing-practice-scoreboard div {
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(25, 21, 22, 0.08);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.writing-practice-scoreboard span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.writing-practice-scoreboard strong {
+  display: block;
+  margin-top: 8px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.writing-practice-feedback {
+  min-height: 58px;
+  margin: 16px 0 0;
+  font-weight: 700;
+}
+
+.writing-practice-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.writing-practice-prompt-box {
+  position: relative;
+  overflow: hidden;
+  margin-top: 18px;
+  padding: 22px;
+  border-radius: 26px;
+  background: var(--panel-dark);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.writing-practice-prompt-box::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--coral), var(--gold), var(--sky));
+}
+
+.writing-practice-prompt-box .eyebrow {
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.writing-practice-prompt-box p {
+  margin: 12px 0 0;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 1.06rem;
+  line-height: 1.75;
+}
+
+.writing-practice-stage-shell {
+  margin-top: 18px;
+}
+
+.writing-practice-stage {
+  position: relative;
+  min-height: clamp(300px, 48vw, 460px);
+  padding: 18px;
+  border-radius: 30px;
+  border: 1px solid rgba(25, 21, 22, 0.08);
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 255, 255, 0.9), transparent 26%),
+    radial-gradient(circle at 82% 20%, rgba(255, 203, 189, 0.44), transparent 24%),
+    linear-gradient(180deg, rgba(255, 253, 250, 0.92), rgba(247, 241, 235, 0.94));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.74);
+  overflow: hidden;
+}
+
+.writing-svg-layer,
+#writing-overlay-canvas,
+.writing-practice-stage-empty {
+  position: absolute;
+  inset: 18px;
+}
+
+.writing-svg-layer {
+  --slot-count: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--slot-count), minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 20px);
+  align-items: stretch;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.writing-character-slot {
+  position: relative;
+  min-width: 0;
+  border-radius: 26px;
+  border: 1px dashed rgba(25, 21, 22, 0.12);
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  overflow: hidden;
+}
+
+.writing-character-slot::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.writing-character-slot > svg,
+.writing-character-fallback {
+  position: absolute;
+  inset: 8%;
+}
+
+.writing-character-slot > svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.writing-character-svg {
+  --shadow: rgba(44, 41, 72, 0.12);
+  --stroke: rgba(242, 75, 73, 0.22);
+}
+
+.writing-character-svg g[data-strokesvg="shadows"] {
+  opacity: 0.96;
+  transition: opacity 180ms ease;
+}
+
+.writing-character-svg g[data-strokesvg="strokes"] path {
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.writing-practice-stage.is-guide-hidden .writing-character-svg g[data-strokesvg="shadows"] {
+  opacity: 0.12;
+}
+
+.writing-practice-stage.is-answer-visible .writing-character-svg {
+  --shadow: rgba(242, 75, 73, 0.18);
+  --stroke: rgba(242, 75, 73, 0.88);
+}
+
+.writing-practice-stage.is-answer-visible .writing-character-slot {
+  border-style: solid;
+  background: rgba(255, 252, 248, 0.92);
+}
+
+.writing-character-fallback {
+  display: grid;
+  place-items: center;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: clamp(5rem, 10vw, 7rem);
+  color: rgba(44, 41, 72, 0.16);
+}
+
+#writing-overlay-canvas {
+  z-index: 2;
+  border-radius: 22px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.writing-practice-stage-empty {
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--muted);
+  text-align: center;
+}
+
+.writing-practice-stage-empty[hidden] {
+  display: none;
+}
+
+.writing-practice-tip {
+  margin: 16px 0 0;
+}
+
+.writing-practice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.writing-practice-actions > * {
+  flex: 1 1 calc(33.333% - 12px);
+  min-width: 140px;
+}
+
+@media (max-width: 1100px) {
+  .writing-practice-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .writing-practice-scoreboard {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .writing-practice-copy,
+  .writing-practice-card {
+    padding: 22px;
+  }
+
+  .writing-practice-card-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .writing-practice-scoreboard {
+    grid-template-columns: 1fr;
+  }
+
+  .writing-practice-stage {
+    min-height: 280px;
+    padding: 14px;
+    border-radius: 24px;
+  }
+
+  .writing-svg-layer,
+  #writing-overlay-canvas,
+  .writing-practice-stage-empty {
+    inset: 14px;
+  }
+
+  .writing-practice-actions > * {
+    flex-basis: calc(50% - 12px);
+    min-width: 0;
+  }
+}
+
+@media (max-width: 540px) {
+  .writing-practice-copy,
+  .writing-practice-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .writing-practice-prompt-box {
+    padding: 18px;
+  }
+
+  .writing-practice-stage {
+    min-height: 248px;
+  }
+
+  .writing-practice-actions > * {
+    flex-basis: 100%;
+  }
+}
+
 .basic-practice-shell {
   display: grid;
   grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);

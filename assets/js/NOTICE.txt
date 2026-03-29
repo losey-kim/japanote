@@ -1,0 +1,9 @@
+Kana writing SVG assets in `kana-strokes.js` are derived from:
+https://github.com/zhengkyl/strokesvg
+
+Attribution summary:
+- Hiragana and katakana SVG files are derived from the Klee One font.
+- Klee One is licensed under the SIL Open Font License.
+- The strokesvg repository tooling is released under the MIT License.
+
+Please refer to the upstream repository for the full license text and notices.

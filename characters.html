@@ -49,6 +49,54 @@
           <article class="kana-table-card"><div class="kana-table-head"><div><span class="eyebrow">HIRAGANA</span><h3>히라가나 한눈에 보기</h3></div><button class="secondary-btn kana-quiz-link" type="button" data-kana-track="hiragana">히라가나 퀴즈 해보기</button></div><div class="kana-table-body" id="hiragana-table"></div></article>
           <article class="kana-table-card"><div class="kana-table-head"><div><span class="eyebrow">KATAKANA</span><h3>카타카나 한눈에 보기</h3></div><button class="secondary-btn kana-quiz-link" type="button" data-kana-track="katakana">카타카나 퀴즈 해보기</button></div><div class="kana-table-body" id="katakana-table"></div></article>
         </div>
+        <div class="writing-practice-shell" id="writing-practice-shell">
+          <article class="writing-practice-copy">
+            <span class="eyebrow">TRACE LAB</span>
+            <h3>문자를 직접 따라쓰면서 손에 익혀봐요</h3>
+            <p>희미한 가이드를 따라 쓰고, 획 애니메이션으로 순서를 본 뒤, 간단 점수로 얼마나 비슷한지 바로 확인해보세요.</p>
+            <div class="writing-practice-switcher" id="writing-practice-switcher" role="tablist" aria-label="따라쓰기 문자 고르기">
+              <button class="level-button is-active" type="button" data-writing-mode="hiragana">히라가나</button>
+              <button class="level-button" type="button" data-writing-mode="katakana">카타카나</button>
+              <button class="level-button" type="button" data-writing-mode="random">랜덤</button>
+            </div>
+            <div class="writing-practice-meta">
+              <span id="writing-practice-source">히라가나 · 기본음</span>
+              <span id="writing-practice-progress">1 / 1</span>
+              <span id="writing-practice-strokes">0획</span>
+            </div>
+            <div class="writing-practice-scoreboard">
+              <div><span>현재 문자</span><strong id="writing-practice-char">-</strong></div>
+              <div><span>읽기</span><strong id="writing-practice-reading">-</strong></div>
+              <div><span>마지막 점수</span><strong id="writing-practice-score">-</strong></div>
+            </div>
+            <p class="writing-practice-feedback" id="writing-practice-feedback">희미한 글자 위를 천천히 따라써보세요.</p>
+          </article>
+          <article class="writing-practice-card">
+            <div class="writing-practice-card-head">
+              <div><span class="eyebrow">WRITING STAGE</span><h3 id="writing-practice-title">문자 따라쓰기</h3></div>
+              <button class="secondary-btn" id="writing-practice-replay" type="button">획순 다시 보기</button>
+            </div>
+            <div class="writing-practice-prompt-box">
+              <span class="eyebrow">PROMPT</span>
+              <p id="writing-practice-prompt">가이드를 따라 천천히 써보고, 다 쓴 뒤 점수를 확인해보세요.</p>
+            </div>
+            <div class="writing-practice-stage-shell">
+              <div class="writing-practice-stage" id="writing-practice-stage">
+                <div class="writing-svg-layer" id="writing-svg-layer" aria-hidden="true"></div>
+                <canvas id="writing-overlay-canvas" aria-label="문자 따라쓰기 캔버스"></canvas>
+                <div class="writing-practice-stage-empty" id="writing-practice-stage-empty" hidden>따라쓰기 데이터를 준비하고 있어요.</div>
+              </div>
+            </div>
+            <p class="writing-practice-tip" id="writing-practice-tip">가이드가 잘 보이도록 천천히 크게 써보세요.</p>
+            <div class="writing-practice-actions">
+              <button class="secondary-btn" id="writing-guide-toggle" type="button">가이드 숨기기</button>
+              <button class="secondary-btn" id="writing-practice-reveal" type="button">정답 보기</button>
+              <button class="secondary-btn" id="writing-practice-clear" type="button">지우기</button>
+              <button class="primary-btn" id="writing-practice-score-btn" type="button">점수 확인하기</button>
+              <button class="secondary-btn" id="writing-practice-next" type="button">다음 글자</button>
+            </div>
+          </article>
+        </div>
       </section>
     </main>
   </div>
@@ -63,12 +111,13 @@
       <div class="kana-quiz-sheet-display"><strong id="kana-quiz-sheet-display">-</strong><p id="kana-quiz-sheet-display-sub"></p></div>
       <div class="kana-quiz-sheet-note" id="kana-quiz-sheet-note"></div>
       <div class="kana-quiz-options" id="kana-quiz-options"></div>
+      <div class="quiz-result kana-quiz-result" id="kana-quiz-result" hidden><div class="quiz-result-grid"><article class="quiz-result-item"><span>이번 점수</span><strong id="kana-quiz-result-score">0 / 0</strong></article><article class="quiz-result-item"><span>정답률</span><strong id="kana-quiz-result-accuracy">0%</strong></article><article class="quiz-result-item"><span>아쉬운 문제</span><strong id="kana-quiz-result-wrong">0개</strong></article></div><p class="quiz-result-copy" id="kana-quiz-result-copy">결과를 정리하고 있어요.</p></div>
       <p class="kana-quiz-feedback" id="kana-quiz-feedback"></p>
       <p class="kana-quiz-explanation" id="kana-quiz-explanation"></p>
       <div class="quiz-actions kana-quiz-actions"><button class="primary-btn" id="kana-quiz-next" type="button">다음으로 가볼까요?</button></div>
     </section>
   </div>
-  <script src="assets/js/theme.js"></script><script src="assets/js/jlpt-n5-data.js"></script><script src="assets/js/app.js"></script>
+  <script src="assets/js/theme.js"></script><script src="assets/js/jlpt-vocab-data.js"></script><script src="assets/js/vocab-registry.js"></script><script src="assets/js/kana-strokes.js"></script><script src="assets/js/app.js"></script>
 </body>
 </html>
 

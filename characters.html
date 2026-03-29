@@ -21,7 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
   <link rel="icon" type="image/png" href="assets/images/favicon.png">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260329j">
 </head>
 <body>
   <div class="page-shell">
@@ -31,71 +31,136 @@
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="테마 바꿔보기" title="테마 바꿔보기"></button>
     </header>
     <main>
-      <section class="content-section">
-        <div class="section-heading kana-library-heading"><span>KANA</span><h2>히라가나와 카타카나부터 익혀봐요</h2><p class="section-copy">표를 쓱 보고 바로 퀴즈로 넘어가봐요.</p></div>
-        <div class="kana-setup-shell" id="kana-setup-shell">
-          <button class="kana-setup-toggle" id="kana-setup-toggle" type="button" aria-expanded="true" aria-controls="kana-setup-panel">
-            <div class="kana-setup-toggle-copy"><span class="eyebrow">QUIZ SETUP</span><strong>퀴즈 설정 바꿔볼까요?</strong><span class="kana-setup-toggle-summary" id="kana-setup-summary">히라가나 · 10문제 · 5초</span></div>
-            <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+      <section class="content-section characters-page">
+        <div class="section-heading kana-library-heading characters-page-heading">
+          <span>KANA</span>
+          <h2>문자표는 따로 보고, 연습은 탭으로 가볍게 이어가요</h2>
+          <p class="section-copy">퀴즈와 따라쓰기는 한 자리에서 전환하고, 히라가나/카타카나 표는 따로 골라보며 짧게 공부할 수 있게 정리했어요.</p>
+        </div>
+
+        <div class="characters-tab-list" role="tablist" aria-label="문자 학습 탭">
+          <button class="level-button characters-tab-button is-active" type="button" data-characters-tab="library" id="characters-tab-library" role="tab" aria-selected="true" aria-controls="characters-tab-panel-library">
+            <span class="material-symbols-rounded" aria-hidden="true">grid_view</span>
+            <span>문자표</span>
           </button>
-          <div class="kana-setup-panel" id="kana-setup-panel">
-            <div class="kana-setup-group"><span>문자 선택</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-mode="hiragana">히라가나</button><button class="level-button" type="button" data-kana-mode="katakana">카타카나</button><button class="level-button" type="button" data-kana-mode="random">랜덤</button></div></div>
-            <div class="kana-setup-group"><span>문제 수</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-count="10">10문제</button><button class="level-button" type="button" data-kana-count="20">20문제</button><button class="level-button" type="button" data-kana-count="30">30문제</button><button class="level-button" type="button" data-kana-count="all">전부</button></div></div>
-            <div class="kana-setup-group"><span>제한시간</span><div class="kana-setup-buttons"><button class="level-button" type="button" data-kana-time="0">천천히</button><button class="level-button is-active" type="button" data-kana-time="5">5초</button><button class="level-button" type="button" data-kana-time="10">10초</button><button class="level-button" type="button" data-kana-time="15">15초</button></div></div>
-            <button class="primary-btn kana-setup-start" id="kana-setup-start" type="button">이대로 시작해볼까요?</button>
-          </div>
+          <button class="level-button characters-tab-button" type="button" data-characters-tab="quiz" id="characters-tab-quiz" role="tab" aria-selected="false" aria-controls="characters-tab-panel-quiz" tabindex="-1">
+            <span class="material-symbols-rounded" aria-hidden="true">quiz</span>
+            <span>퀴즈</span>
+          </button>
+          <button class="level-button characters-tab-button" type="button" data-characters-tab="writing" id="characters-tab-writing" role="tab" aria-selected="false" aria-controls="characters-tab-panel-writing" tabindex="-1">
+            <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+            <span>따라쓰기</span>
+          </button>
         </div>
-        <div class="kana-library-grid">
-          <article class="kana-table-card"><div class="kana-table-head"><div><span class="eyebrow">HIRAGANA</span><h3>히라가나 한눈에 보기</h3></div><button class="secondary-btn kana-quiz-link" type="button" data-kana-track="hiragana">히라가나 퀴즈 해보기</button></div><div class="kana-table-body" id="hiragana-table"></div></article>
-          <article class="kana-table-card"><div class="kana-table-head"><div><span class="eyebrow">KATAKANA</span><h3>카타카나 한눈에 보기</h3></div><button class="secondary-btn kana-quiz-link" type="button" data-kana-track="katakana">카타카나 퀴즈 해보기</button></div><div class="kana-table-body" id="katakana-table"></div></article>
-        </div>
-        <div class="writing-practice-shell" id="writing-practice-shell">
-          <article class="writing-practice-copy">
-            <span class="eyebrow">TRACE LAB</span>
-            <h3>문자를 직접 따라쓰면서 손에 익혀봐요</h3>
-            <p>희미한 가이드를 따라 쓰고, 획 애니메이션으로 순서를 본 뒤, 간단 점수로 얼마나 비슷한지 바로 확인해보세요.</p>
-            <div class="writing-practice-switcher" id="writing-practice-switcher" role="tablist" aria-label="따라쓰기 문자 고르기">
-              <button class="level-button is-active" type="button" data-writing-mode="hiragana">히라가나</button>
-              <button class="level-button" type="button" data-writing-mode="katakana">카타카나</button>
-              <button class="level-button" type="button" data-writing-mode="random">랜덤</button>
-            </div>
-            <div class="writing-practice-meta">
-              <span id="writing-practice-source">히라가나 · 기본음</span>
-              <span id="writing-practice-progress">1 / 1</span>
-              <span id="writing-practice-strokes">0획</span>
-            </div>
-            <div class="writing-practice-scoreboard">
-              <div><span>현재 문자</span><strong id="writing-practice-char">-</strong></div>
-              <div><span>읽기</span><strong id="writing-practice-reading">-</strong></div>
-              <div><span>마지막 점수</span><strong id="writing-practice-score">-</strong></div>
-            </div>
-            <p class="writing-practice-feedback" id="writing-practice-feedback">희미한 글자 위를 천천히 따라써보세요.</p>
-          </article>
-          <article class="writing-practice-card">
-            <div class="writing-practice-card-head">
-              <div><span class="eyebrow">WRITING STAGE</span><h3 id="writing-practice-title">문자 따라쓰기</h3></div>
-              <button class="secondary-btn" id="writing-practice-replay" type="button">획순 다시 보기</button>
-            </div>
-            <div class="writing-practice-prompt-box">
-              <span class="eyebrow">PROMPT</span>
-              <p id="writing-practice-prompt">가이드를 따라 천천히 써보고, 다 쓴 뒤 점수를 확인해보세요.</p>
-            </div>
-            <div class="writing-practice-stage-shell">
-              <div class="writing-practice-stage" id="writing-practice-stage">
-                <div class="writing-svg-layer" id="writing-svg-layer" aria-hidden="true"></div>
-                <canvas id="writing-overlay-canvas" aria-label="문자 따라쓰기 캔버스"></canvas>
-                <div class="writing-practice-stage-empty" id="writing-practice-stage-empty" hidden>따라쓰기 데이터를 준비하고 있어요.</div>
+
+        <div class="characters-tab-panels">
+          <section class="characters-tab-panel characters-library-shell" id="characters-tab-panel-library" data-characters-tab-panel="library" role="tabpanel" aria-labelledby="characters-tab-library">
+            <div class="characters-library-head">
+              <div class="characters-library-copy">
+                <span class="eyebrow">KANA LIBRARY</span>
+                <h3 id="characters-library-title">히라가나/카타카나 문자표</h3>
+                <p>문자를 눌러서 바로 따라쓰기로 넘어갈 수 있어요.</p>
+              </div>
+              <div class="characters-library-switcher" role="tablist" aria-label="문자표 탭">
+                <button class="level-button is-active" type="button" data-characters-library-tab="hiragana" id="characters-library-tab-hiragana" role="tab" aria-selected="true" aria-controls="characters-library-panel-hiragana">히라가나</button>
+                <button class="level-button" type="button" data-characters-library-tab="katakana" id="characters-library-tab-katakana" role="tab" aria-selected="false" aria-controls="characters-library-panel-katakana" tabindex="-1">카타카나</button>
               </div>
             </div>
-            <p class="writing-practice-tip" id="writing-practice-tip">가이드가 잘 보이도록 천천히 크게 써보세요.</p>
-            <div class="writing-practice-actions">
-              <button class="secondary-btn" id="writing-guide-toggle" type="button">가이드 숨기기</button>
-              <button class="secondary-btn" id="writing-practice-reveal" type="button">정답 보기</button>
-              <button class="secondary-btn" id="writing-practice-clear" type="button">지우기</button>
-              <button class="primary-btn" id="writing-practice-score-btn" type="button">점수 확인하기</button>
-              <button class="secondary-btn" id="writing-practice-next" type="button">다음 글자</button>
+
+            <article class="kana-table-card characters-library-panel" id="characters-library-panel-hiragana" data-characters-library-panel="hiragana" role="tabpanel" aria-labelledby="characters-library-tab-hiragana">
+              <div class="kana-table-head"><div><span class="eyebrow">HIRAGANA</span><h3>히라가나 한눈에 보기</h3></div><button class="secondary-btn kana-quiz-link" type="button" data-kana-track="hiragana">히라가나 퀴즈 해보기</button></div>
+              <div class="kana-table-body" id="hiragana-table"></div>
+            </article>
+
+            <article class="kana-table-card characters-library-panel" id="characters-library-panel-katakana" data-characters-library-panel="katakana" role="tabpanel" aria-labelledby="characters-library-tab-katakana" hidden aria-hidden="true">
+              <div class="kana-table-head"><div><span class="eyebrow">KATAKANA</span><h3>카타카나 한눈에 보기</h3></div><button class="secondary-btn kana-quiz-link" type="button" data-kana-track="katakana">카타카나 퀴즈 해보기</button></div>
+              <div class="kana-table-body" id="katakana-table"></div>
+            </article>
+          </section>
+
+          <section class="characters-tab-panel characters-quiz-panel" id="characters-tab-panel-quiz" data-characters-tab-panel="quiz" role="tabpanel" aria-labelledby="characters-tab-quiz" hidden aria-hidden="true">
+            <div class="kana-setup-shell" id="kana-setup-shell">
+              <button class="kana-setup-toggle" id="kana-setup-toggle" type="button" aria-expanded="true" aria-controls="kana-setup-panel">
+                <div class="kana-setup-toggle-copy"><span class="eyebrow">QUIZ SETUP</span><strong>퀴즈 설정 바꿔볼까요?</strong><span class="kana-setup-toggle-summary" id="kana-setup-summary">히라가나 · 10문제 · 5초</span></div>
+                <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+              </button>
+              <div class="kana-setup-panel" id="kana-setup-panel">
+                <div class="kana-setup-group"><span>문자 선택</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-mode="hiragana">히라가나</button><button class="level-button" type="button" data-kana-mode="katakana">카타카나</button><button class="level-button" type="button" data-kana-mode="random">랜덤</button></div></div>
+                <div class="kana-setup-group"><span>문제 수</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-count="10">10문제</button><button class="level-button" type="button" data-kana-count="20">20문제</button><button class="level-button" type="button" data-kana-count="30">30문제</button><button class="level-button" type="button" data-kana-count="all">전부</button></div></div>
+                <div class="kana-setup-group"><span>제한시간</span><div class="kana-setup-buttons"><button class="level-button" type="button" data-kana-time="0">천천히</button><button class="level-button is-active" type="button" data-kana-time="5">5초</button><button class="level-button" type="button" data-kana-time="10">10초</button><button class="level-button" type="button" data-kana-time="15">15초</button></div></div>
+              </div>
             </div>
-          </article>
+            <button class="primary-btn kana-setup-start" id="kana-setup-start" type="button">퀴즈 시작</button>
+          </section>
+
+          <section class="characters-tab-panel" id="characters-tab-panel-writing" data-characters-tab-panel="writing" role="tabpanel" aria-labelledby="characters-tab-writing" hidden aria-hidden="true">
+            <div class="writing-practice-shell" id="writing-practice-shell">
+              <article class="writing-practice-copy">
+                <span class="eyebrow">TRACE LAB</span>
+                <h3>문자를 직접 따라쓰면서 손에 익혀봐요</h3>
+                <p>원하는 문자와 순서를 골라서 바로 연습하고, 문자표에서 누른 글자부터 이어서 써볼 수 있어요.</p>
+                <div class="kana-setup-shell writing-setup-shell" id="writing-setup-shell">
+                  <button class="kana-setup-toggle" id="writing-setup-toggle" type="button" aria-expanded="true" aria-controls="writing-setup-panel">
+                    <div class="kana-setup-toggle-copy"><span class="eyebrow">WRITING SETUP</span><strong>따라쓰기 설정 바꿔볼까요?</strong><span class="kana-setup-toggle-summary" id="writing-setup-summary">히라가나 · 순서대로</span></div>
+                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                  </button>
+                  <div class="kana-setup-panel writing-setup-panel" id="writing-setup-panel">
+                    <div class="kana-setup-group"><span>문자 선택</span><div class="writing-practice-switcher" id="writing-practice-switcher" aria-label="따라쓰기 문자 고르기"><button class="level-button is-active" type="button" data-writing-mode="hiragana">히라가나</button><button class="level-button" type="button" data-writing-mode="katakana">카타카나</button><button class="level-button" type="button" data-writing-mode="random">랜덤</button></div></div>
+                    <div class="kana-setup-group"><span>순서</span><div class="writing-practice-order-switcher" aria-label="따라쓰기 순서 선택"><button class="level-button is-active" type="button" data-writing-order="sequence">순서대로</button><button class="level-button" type="button" data-writing-order="random">랜덤</button></div></div>
+                  </div>
+                </div>
+                <div class="writing-practice-meta">
+                  <span id="writing-practice-source">히라가나 · 기본음</span>
+                  <span id="writing-practice-progress">1 / 1</span>
+                  <span id="writing-practice-strokes">0획</span>
+                </div>
+                <div class="writing-practice-scoreboard">
+                  <div class="writing-practice-current-card">
+                    <span>현재 문자 · 읽기</span>
+                    <div class="writing-practice-current-row">
+                      <strong id="writing-practice-char">-</strong>
+                      <span class="writing-practice-current-separator">읽기</span>
+                      <strong id="writing-practice-reading">-</strong>
+                    </div>
+                  </div>
+                  <div><span>마지막 점수</span><strong id="writing-practice-score">-</strong></div>
+                </div>
+                <p class="writing-practice-feedback" id="writing-practice-feedback">희미한 글자 위를 천천히 따라써보세요.</p>
+              </article>
+              <article class="writing-practice-card">
+                <div class="writing-practice-card-head">
+                  <div><span class="eyebrow">WRITING STAGE</span><h3 id="writing-practice-title">문자 따라쓰기</h3></div>
+                </div>
+                <div class="writing-practice-prompt-box">
+                  <span class="eyebrow">PROMPT</span>
+                  <p id="writing-practice-prompt">가이드를 따라 천천히 써보고, 다 쓴 뒤 점수를 확인해보세요.</p>
+                </div>
+                <div class="writing-practice-head-actions">
+                  <button class="secondary-btn" id="writing-practice-replay" type="button">획순 보기</button>
+                  <button class="primary-btn" id="writing-practice-score-btn" type="button">점수 확인하기</button>
+                </div>
+                <div class="writing-practice-stage-shell">
+                  <div class="writing-practice-stage" id="writing-practice-stage">
+                    <div class="writing-svg-layer" id="writing-svg-layer" aria-hidden="true"></div>
+                    <canvas id="writing-overlay-canvas" aria-label="문자 따라쓰기 캔버스"></canvas>
+                    <div class="writing-practice-stage-empty" id="writing-practice-stage-empty" hidden>따라쓰기 데이터를 준비하고 있어요.</div>
+                  </div>
+                </div>
+                <p class="writing-practice-tip" id="writing-practice-tip">가이드가 잘 보이도록 천천히 크게 써보세요.</p>
+                <div class="writing-practice-actions">
+                  <div class="writing-practice-actions-row writing-practice-actions-row-duo">
+                    <button class="secondary-btn" id="writing-guide-toggle" type="button">가이드 숨기기</button>
+                    <button class="secondary-btn" id="writing-practice-reveal" type="button">정답 보기</button>
+                  </div>
+                  <div class="writing-practice-actions-row writing-practice-actions-row-trio">
+                    <button class="secondary-btn" id="writing-practice-prev" type="button">이전 글자</button>
+                    <button class="secondary-btn" id="writing-practice-clear" type="button">지우기</button>
+                    <button class="secondary-btn" id="writing-practice-next" type="button">다음 글자</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
         </div>
       </section>
     </main>
@@ -117,7 +182,7 @@
       <div class="quiz-actions kana-quiz-actions"><button class="primary-btn" id="kana-quiz-next" type="button">다음으로 가볼까요?</button></div>
     </section>
   </div>
-  <script src="assets/js/theme.js"></script><script src="assets/js/jlpt-vocab-data.js"></script><script src="assets/js/vocab-registry.js"></script><script src="assets/js/kana-strokes.js"></script><script src="assets/js/app.js"></script>
+  <script src="assets/js/theme.js?v=20260329j"></script><script src="assets/js/jlpt-vocab-data.js?v=20260329j"></script><script src="assets/js/vocab-registry.js?v=20260329j"></script><script src="assets/js/kana-strokes.js?v=20260329j"></script><script src="assets/js/app.js?v=20260329j"></script>
 </body>
 </html>
 

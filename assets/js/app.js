@@ -851,7 +851,8 @@ const kanaQuizSheetState = {
   mode: "hiragana",
   sessionIndex: 0,
   sessionItems: [],
-  answered: false
+  answered: false,
+  finished: false
 };
 
 function getKanaQuizModeLabel(mode) {
@@ -922,6 +923,55 @@ function getKanaQuizDurationLabel(duration) {
   return Number(duration) <= 0 ? "천천히" : `${duration}초`;
 }
 
+function ensureKanaQuizResult() {
+  let result = document.getElementById("kana-quiz-result");
+
+  if (result) {
+    return result;
+  }
+
+  const feedback = document.getElementById("kana-quiz-feedback");
+
+  if (!feedback?.parentElement) {
+    return null;
+  }
+
+  result = document.createElement("div");
+  result.className = "quiz-result kana-quiz-result";
+  result.id = "kana-quiz-result";
+  result.hidden = true;
+  result.innerHTML =
+    '<div class="quiz-result-grid"><article class="quiz-result-item"><span>이번 점수</span><strong id="kana-quiz-result-score">0 / 0</strong></article><article class="quiz-result-item"><span>정답률</span><strong id="kana-quiz-result-accuracy">0%</strong></article><article class="quiz-result-item"><span>아쉬운 문제</span><strong id="kana-quiz-result-wrong">0개</strong></article></div><p class="quiz-result-copy" id="kana-quiz-result-copy">결과를 정리하고 있어요.</p>';
+  feedback.parentElement.insertBefore(result, feedback);
+
+  return result;
+}
+
+function renderKanaQuizResult() {
+  const result = ensureKanaQuizResult();
+  const score = document.getElementById("kana-quiz-result-score");
+  const accuracy = document.getElementById("kana-quiz-result-accuracy");
+  const wrong = document.getElementById("kana-quiz-result-wrong");
+  const copy = document.getElementById("kana-quiz-result-copy");
+
+  if (!result || !score || !accuracy || !wrong || !copy) {
+    return;
+  }
+
+  const total = kanaQuizSheetState.sessionItems.length;
+  const correct = quizSessions.kana.correct;
+  const wrongCount = Math.max(0, total - correct);
+
+  result.hidden = false;
+  score.textContent = `${correct} / ${total}`;
+  accuracy.textContent = `${getQuizAccuracyValue(correct, total)}%`;
+  wrong.textContent = `${wrongCount}개`;
+  copy.textContent =
+    wrongCount === 0
+      ? `${getKanaQuizModeLabel(kanaQuizSheetState.mode)} ${total}문제, 전부 맞혔어요!`
+      : `${getKanaQuizModeLabel(kanaQuizSheetState.mode)} ${total}문제까지 왔어요. 한 번 더 해볼까요?`;
+}
+
 function renderKanaQuizSetup() {
   const setupShell = document.getElementById("kana-setup-shell");
   const setupToggle = document.getElementById("kana-setup-toggle");
@@ -970,6 +1020,7 @@ function startKanaQuizSession(mode = kanaQuizSettings.mode) {
   kanaQuizSheetState.sessionItems = buildKanaQuizSession(nextMode);
   kanaQuizSheetState.sessionIndex = 0;
   kanaQuizSheetState.answered = false;
+  kanaQuizSheetState.finished = false;
   kanaQuizSheetState.open = true;
 
   quizSessions.kana.duration = Number(kanaQuizSettings.duration);
@@ -1006,11 +1057,12 @@ function renderKanaQuizSheet() {
   const display = document.getElementById("kana-quiz-sheet-display");
   const displaySub = document.getElementById("kana-quiz-sheet-display-sub");
   const options = document.getElementById("kana-quiz-options");
+  const result = ensureKanaQuizResult();
   const feedback = document.getElementById("kana-quiz-feedback");
   const explanation = document.getElementById("kana-quiz-explanation");
   const next = document.getElementById("kana-quiz-next");
 
-  if (!sheet || !label || !title || !desc || !source || !progress || !promptBox || !note || !prompt || !display || !displaySub || !options || !feedback || !explanation || !next) {
+  if (!sheet || !label || !title || !desc || !source || !progress || !promptBox || !note || !prompt || !display || !displaySub || !options || !result || !feedback || !explanation || !next) {
     return;
   }
 
@@ -1022,6 +1074,36 @@ function renderKanaQuizSheet() {
   document.body.classList.toggle("is-kana-quiz-sheet-open", kanaQuizSheetState.open);
 
   if (!kanaQuizSheetState.open) {
+    return;
+  }
+
+  if (kanaQuizSheetState.finished) {
+    const total = kanaQuizSheetState.sessionItems.length;
+    const modeLabel = getKanaQuizModeLabel(kanaQuizSheetState.mode);
+
+    label.textContent = `${modeLabel.toUpperCase()} QUIZ`;
+    title.textContent = `${modeLabel} 퀴즈 끝!`;
+    desc.textContent = "결과를 한 번 볼까요?";
+    source.textContent = [
+      getKanaQuizModeLabel(kanaQuizSettings.mode),
+      getKanaQuizCountLabel(kanaQuizSettings.count),
+      getKanaQuizDurationLabel(kanaQuizSettings.duration)
+    ].join(" · ");
+    progress.textContent = `${total} / ${total}`;
+    promptBox.hidden = true;
+    note.hidden = true;
+    note.textContent = "";
+    prompt.textContent = "";
+    display.textContent = "잘했어요!";
+    displaySub.textContent = "";
+    options.innerHTML = "";
+    options.hidden = true;
+    feedback.textContent = `${total}문제까지 풀었어요.`;
+    explanation.textContent = "";
+    explanation.hidden = true;
+    next.disabled = false;
+    next.textContent = "다시 해볼까요?";
+    renderKanaQuizResult();
     return;
   }
 
@@ -1038,6 +1120,8 @@ function renderKanaQuizSheet() {
     display.textContent = "-";
     displaySub.textContent = "";
     options.innerHTML = "";
+    options.hidden = false;
+    result.hidden = true;
     feedback.textContent = "";
     explanation.textContent = "";
     next.disabled = true;
@@ -1059,9 +1143,11 @@ function renderKanaQuizSheet() {
   feedback.textContent = "";
   explanation.textContent = "";
   explanation.hidden = true;
+  result.hidden = true;
+  options.hidden = false;
   next.disabled = true;
   next.textContent =
-    current.index + 1 >= current.total ? "처음부터 다시 해볼까요?" : "다음으로 가볼까요?";
+    current.index + 1 >= current.total ? "결과 보러 갈까요?" : "다음으로 가볼까요?";
 
   options.innerHTML = "";
   current.item.options.forEach((option, optionIndex) => {
@@ -1147,7 +1233,8 @@ function handleKanaQuizTimeout() {
 
 function nextKanaQuizSheetQuestion() {
   const current = getKanaQuizSheetCurrentItem();
-  if (!current) {
+
+  if (kanaQuizSheetState.finished || !current) {
     startKanaQuizSession(kanaQuizSettings.mode);
     return;
   }
@@ -1161,7 +1248,8 @@ function nextKanaQuizSheetQuestion() {
   }
 
   if (current.index + 1 >= current.total) {
-    startKanaQuizSession(kanaQuizSettings.mode);
+    kanaQuizSheetState.finished = true;
+    renderKanaQuizSheet();
     return;
   }
 

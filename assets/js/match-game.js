@@ -53,12 +53,32 @@ function buildMatchPool(source) {
     );
 }
 
-const matchSource = Array.isArray(globalThis.japanoteContent?.vocab?.jlptN5)
-  ? globalThis.japanoteContent.vocab.jlptN5
-  : Array.isArray(globalThis.jlptN5Vocab)
-    ? globalThis.jlptN5Vocab
-    : [];
-const matchPool = buildMatchPool(matchSource);
+function getMatchSource() {
+  const vocabRegistry = globalThis.japanoteContent?.vocab || {};
+
+  if (Array.isArray(vocabRegistry.N5) && vocabRegistry.N5.length) {
+    return vocabRegistry.N5;
+  }
+
+  if (Array.isArray(vocabRegistry.jlptN5) && vocabRegistry.jlptN5.length) {
+    return vocabRegistry.jlptN5;
+  }
+
+  if (Array.isArray(globalThis.jlptN5Vocab) && globalThis.jlptN5Vocab.length) {
+    return globalThis.jlptN5Vocab;
+  }
+
+  return [];
+}
+
+let matchPool = buildMatchPool(getMatchSource());
+const fallbackMatchPool = [
+  { id: "match-fallback-1", reading: "たべる", meaning: "먹다" },
+  { id: "match-fallback-2", reading: "いく", meaning: "가다" },
+  { id: "match-fallback-3", reading: "みる", meaning: "보다" },
+  { id: "match-fallback-4", reading: "がっこう", meaning: "학교" },
+  { id: "match-fallback-5", reading: "ともだち", meaning: "친구" }
+];
 
 const matchState = {
   round: [],
@@ -71,6 +91,50 @@ const matchState = {
   streak: 0,
   bestStreak: 0
 };
+
+function refreshMatchPool() {
+  const nextPool = buildMatchPool(getMatchSource());
+  matchPool = nextPool.length >= matchRoundSize ? nextPool : [...fallbackMatchPool];
+}
+
+function setMatchActionAvailability(enabled) {
+  const newRound = document.getElementById("match-new-round");
+  const resetRound = document.getElementById("match-reset-round");
+
+  if (newRound) {
+    newRound.disabled = !enabled;
+  }
+
+  if (resetRound) {
+    resetRound.disabled = !enabled;
+  }
+}
+
+function renderMatchUnavailableState(message) {
+  const leftList = document.getElementById("match-left-list");
+  const rightList = document.getElementById("match-right-list");
+
+  matchState.round = [];
+  matchState.leftCards = [];
+  matchState.rightCards = [];
+  matchState.selectedLeft = null;
+  matchState.selectedRight = null;
+  matchState.matchedIds = [];
+  matchState.attempts = 0;
+  matchState.streak = 0;
+
+  if (leftList) {
+    leftList.innerHTML = "";
+  }
+
+  if (rightList) {
+    rightList.innerHTML = "";
+  }
+
+  setMatchActionAvailability(false);
+  setMatchFeedback(message);
+  renderMatchStats();
+}
 
 function createMatchRound() {
   const picked = shuffleMatchItems(matchPool).slice(0, matchRoundSize);
@@ -226,6 +290,12 @@ function handleMatchSelection(card) {
 }
 
 function startNewMatchRound() {
+  if (matchPool.length < matchRoundSize) {
+    renderMatchUnavailableState("단어 데이터를 불러오는 중이에요. 잠시 후 다시 해볼까요?");
+    return;
+  }
+
+  setMatchActionAvailability(true);
   createMatchRound();
   setMatchFeedback("왼쪽이랑 오른쪽에서 하나씩 골라 짝을 맞춰봐요.");
   renderMatchBoard();
@@ -243,7 +313,6 @@ function attachMatchEventListeners() {
   }
 }
 
-if (matchPool.length >= matchRoundSize) {
-  attachMatchEventListeners();
-  startNewMatchRound();
-}
+refreshMatchPool();
+attachMatchEventListeners();
+startNewMatchRound();

@@ -1,4 +1,4 @@
-const matchRoundSize = 8;
+const matchRoundSize = 5;
 
 function normalizeMatchText(value) {
   const text = String(value ?? "").trim();

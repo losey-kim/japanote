@@ -1060,7 +1060,21 @@ function getKanaQuizSheetCurrentItem() {
   };
 }
 
+function getKanaQuizCountLabel(count) {
+  return String(count) === "all" ? "전부" : `${count}문제`;
+}
+
+function getKanaQuizDurationLabel(duration) {
+  return Number(duration) <= 0 ? "천천히" : `${duration}초`;
+}
+
 function renderKanaQuizSetup() {
+  const setupShell = document.getElementById("kana-setup-shell");
+  const setupToggle = document.getElementById("kana-setup-toggle");
+  const setupPanel = document.getElementById("kana-setup-panel");
+  const setupSummary = document.getElementById("kana-setup-summary");
+  const isOpen = state.kanaSetupOpen !== false;
+
   document.querySelectorAll("[data-kana-mode]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.kanaMode === kanaQuizSettings.mode);
   });
@@ -1072,6 +1086,27 @@ function renderKanaQuizSetup() {
   document.querySelectorAll("[data-kana-time]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.kanaTime === String(kanaQuizSettings.duration));
   });
+
+  if (setupSummary) {
+    setupSummary.textContent = [
+      getKanaQuizModeLabel(kanaQuizSettings.mode),
+      getKanaQuizCountLabel(kanaQuizSettings.count),
+      getKanaQuizDurationLabel(kanaQuizSettings.duration)
+    ].join(" · ");
+  }
+
+  if (setupShell) {
+    setupShell.classList.toggle("is-open", isOpen);
+  }
+
+  if (setupToggle) {
+    setupToggle.setAttribute("aria-expanded", String(isOpen));
+  }
+
+  if (setupPanel) {
+    setupPanel.hidden = !isOpen;
+    setupPanel.setAttribute("aria-hidden", String(!isOpen));
+  }
 }
 
 function startKanaQuizSession(mode = kanaQuizSettings.mode) {
@@ -1840,6 +1875,7 @@ const defaultState = {
   quizAnsweredCount: 0,
   readingLevel: "N5",
   readingIndexes: { N5: 0, N4: 0, N3: 0 },
+  kanaSetupOpen: true,
   lastStudyDate: null,
   streak: 0
 };
@@ -1900,6 +1936,7 @@ state.vocabFilter = ["all", "review", "mastered"].includes(state.vocabFilter)
   ? state.vocabFilter
   : "all";
 state.vocabPage = Number.isFinite(Number(state.vocabPage)) ? Math.max(1, Number(state.vocabPage)) : 1;
+state.kanaSetupOpen = state.kanaSetupOpen !== false;
 activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize);
 
 const quizSessions = {
@@ -3371,6 +3408,7 @@ function attachEventListeners() {
   const grammarPracticeNext = document.getElementById("grammar-practice-next");
   const kanaQuizNext = document.getElementById("kana-quiz-next");
   const kanaQuizCloseButtons = document.querySelectorAll("[data-kana-sheet-close]");
+  const kanaSetupToggle = document.getElementById("kana-setup-toggle");
   const kanaModeButtons = document.querySelectorAll("[data-kana-mode]");
   const kanaCountButtons = document.querySelectorAll("[data-kana-count]");
   const kanaTimeButtons = document.querySelectorAll("[data-kana-time]");
@@ -3467,6 +3505,13 @@ function attachEventListeners() {
   }
   if (kanaQuizNext) {
     kanaQuizNext.addEventListener("click", nextKanaQuizSheetQuestion);
+  }
+  if (kanaSetupToggle) {
+    kanaSetupToggle.addEventListener("click", () => {
+      state.kanaSetupOpen = !state.kanaSetupOpen;
+      saveState();
+      renderKanaQuizSetup();
+    });
   }
   kanaModeButtons.forEach((button) => {
     button.addEventListener("click", () => {

@@ -853,10 +853,65 @@ button {
   gap: 20px;
 }
 
+.kana-setup-shell {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.kana-setup-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 247, 240, 0.94)),
+    linear-gradient(135deg, rgba(93, 133, 207, 0.08), rgba(222, 107, 72, 0.08));
+  box-shadow: var(--shadow-soft);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kana-setup-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.kana-setup-toggle-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.kana-setup-toggle-copy strong {
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+
+.kana-setup-toggle-summary {
+  color: var(--muted);
+  font-size: 0.96rem;
+}
+
+.kana-setup-toggle .material-symbols-rounded {
+  flex-shrink: 0;
+  font-size: 2rem;
+  color: var(--accent);
+  transition: transform 0.2s ease;
+}
+
+.kana-setup-shell.is-open .kana-setup-toggle .material-symbols-rounded {
+  transform: rotate(180deg);
+}
+
 .kana-setup-panel {
   display: grid;
   gap: 16px;
-  margin-bottom: 20px;
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 28px;
@@ -3345,6 +3400,19 @@ body::after {
 
   .kana-library-grid {
     grid-template-columns: 1fr;
+  }
+
+  .kana-setup-toggle {
+    padding: 18px;
+    gap: 14px;
+  }
+
+  .kana-setup-toggle-copy strong {
+    font-size: 1rem;
+  }
+
+  .kana-setup-toggle-summary {
+    font-size: 0.92rem;
   }
 
   .kana-setup-panel {

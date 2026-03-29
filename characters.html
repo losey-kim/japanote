@@ -33,11 +33,17 @@
     <main>
       <section class="content-section">
         <div class="section-heading kana-library-heading"><span>KANA</span><h2>히라가나와 카타카나부터 익혀봐요</h2><p class="section-copy">표를 쓱 보고 바로 퀴즈로 넘어가봐요.</p></div>
-        <div class="kana-setup-panel">
-          <div class="kana-setup-group"><span>문자 선택</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-mode="hiragana">히라가나</button><button class="level-button" type="button" data-kana-mode="katakana">카타카나</button><button class="level-button" type="button" data-kana-mode="random">랜덤</button></div></div>
-          <div class="kana-setup-group"><span>문제 수</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-count="10">10문제</button><button class="level-button" type="button" data-kana-count="20">20문제</button><button class="level-button" type="button" data-kana-count="30">30문제</button><button class="level-button" type="button" data-kana-count="all">전부</button></div></div>
-          <div class="kana-setup-group"><span>제한시간</span><div class="kana-setup-buttons"><button class="level-button" type="button" data-kana-time="0">천천히</button><button class="level-button is-active" type="button" data-kana-time="5">5초</button><button class="level-button" type="button" data-kana-time="10">10초</button><button class="level-button" type="button" data-kana-time="15">15초</button></div></div>
-          <button class="primary-btn kana-setup-start" id="kana-setup-start" type="button">이대로 시작해볼까요?</button>
+        <div class="kana-setup-shell" id="kana-setup-shell">
+          <button class="kana-setup-toggle" id="kana-setup-toggle" type="button" aria-expanded="true" aria-controls="kana-setup-panel">
+            <div class="kana-setup-toggle-copy"><span class="eyebrow">QUIZ SETUP</span><strong>퀴즈 설정 바꿔볼까요?</strong><span class="kana-setup-toggle-summary" id="kana-setup-summary">히라가나 · 10문제 · 5초</span></div>
+            <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+          </button>
+          <div class="kana-setup-panel" id="kana-setup-panel">
+            <div class="kana-setup-group"><span>문자 선택</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-mode="hiragana">히라가나</button><button class="level-button" type="button" data-kana-mode="katakana">카타카나</button><button class="level-button" type="button" data-kana-mode="random">랜덤</button></div></div>
+            <div class="kana-setup-group"><span>문제 수</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-count="10">10문제</button><button class="level-button" type="button" data-kana-count="20">20문제</button><button class="level-button" type="button" data-kana-count="30">30문제</button><button class="level-button" type="button" data-kana-count="all">전부</button></div></div>
+            <div class="kana-setup-group"><span>제한시간</span><div class="kana-setup-buttons"><button class="level-button" type="button" data-kana-time="0">천천히</button><button class="level-button is-active" type="button" data-kana-time="5">5초</button><button class="level-button" type="button" data-kana-time="10">10초</button><button class="level-button" type="button" data-kana-time="15">15초</button></div></div>
+            <button class="primary-btn kana-setup-start" id="kana-setup-start" type="button">이대로 시작해볼까요?</button>
+          </div>
         </div>
         <div class="kana-library-grid">
           <article class="kana-table-card"><div class="kana-table-head"><div><span class="eyebrow">HIRAGANA</span><h3>히라가나 한눈에 보기</h3></div><button class="secondary-btn kana-quiz-link" type="button" data-kana-track="hiragana">히라가나 퀴즈 해보기</button></div><div class="kana-table-body" id="hiragana-table"></div></article>

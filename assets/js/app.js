@@ -1008,6 +1008,12 @@ function getKanaQuizModeLabel(mode) {
   return mode === "katakana" ? "카타카나" : "히라가나";
 }
 
+const vocabFilterLabels = {
+  all: "전체",
+  review: "다시 보기",
+  mastered: "익힌 단어"
+};
+
 function getKanaQuizPool(mode) {
   if (mode === "random") {
     return [
@@ -1808,6 +1814,7 @@ const defaultState = {
   flashcardIndex: 0,
   flashcardRevealed: false,
   vocabView: "card",
+  vocabFilter: "all",
   vocabPage: 1,
   starterDoneIds: [],
   basicPracticeTrack: "kana",
@@ -1819,6 +1826,7 @@ const defaultState = {
     sentences: 0
   },
   masteredIds: [],
+  reviewIds: [],
   grammarDoneIds: [],
   grammarPracticeLevel: "N5",
   grammarPracticeIndexes: { N5: 0, N4: 0, N3: 0 },
@@ -1883,7 +1891,14 @@ state.quizSessionFinished = false;
 state.quizIndex = 0;
 state.quizMistakes = Array.isArray(state.quizMistakes) ? state.quizMistakes : [];
 state.quizSessionMistakeIds = [];
+state.masteredIds = Array.from(new Set(Array.isArray(state.masteredIds) ? state.masteredIds : []));
+state.reviewIds = Array.from(
+  new Set((Array.isArray(state.reviewIds) ? state.reviewIds : []).filter((id) => !state.masteredIds.includes(id)))
+);
 state.vocabView = state.vocabView === "list" ? "list" : "card";
+state.vocabFilter = ["all", "review", "mastered"].includes(state.vocabFilter)
+  ? state.vocabFilter
+  : "all";
 state.vocabPage = Number.isFinite(Number(state.vocabPage)) ? Math.max(1, Number(state.vocabPage)) : 1;
 activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize);
 
@@ -2287,12 +2302,89 @@ function nextBasicPracticeSet() {
 }
 
 
+function getVocabFilter(filter = state.vocabFilter) {
+  return Object.prototype.hasOwnProperty.call(vocabFilterLabels, filter) ? filter : "all";
+}
+
+function filterVocabItems(items, filter = state.vocabFilter) {
+  const activeFilter = getVocabFilter(filter);
+
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  if (activeFilter === "review") {
+    return items.filter((item) => state.reviewIds.includes(item.id));
+  }
+
+  if (activeFilter === "mastered") {
+    return items.filter((item) => state.masteredIds.includes(item.id));
+  }
+
+  return items;
+}
+
+function getVocabFilterCounts() {
+  return {
+    all: vocabListItems.length,
+    review: filterVocabItems(vocabListItems, "review").length,
+    mastered: filterVocabItems(vocabListItems, "mastered").length
+  };
+}
+
+function getVocabSummaryText(count) {
+  const activeFilter = getVocabFilter();
+
+  if (activeFilter === "review") {
+    return `다시 볼 단어 ${count}개예요`;
+  }
+
+  if (activeFilter === "mastered") {
+    return `익힌 단어 ${count}개 모였어요`;
+  }
+
+  return `전체 단어 ${count}개예요`;
+}
+
+function setVocabFilter(filter) {
+  const nextFilter = getVocabFilter(filter);
+
+  if (state.vocabFilter === nextFilter) {
+    return;
+  }
+
+  state.vocabFilter = nextFilter;
+  state.flashcardIndex = 0;
+  state.flashcardRevealed = false;
+  state.vocabPage = 1;
+  saveState();
+  renderVocabPage();
+}
+
+function syncFlashcardIndexAfterVocabUpdate(currentCardId, previousIndex) {
+  const nextCards = getVisibleFlashcards();
+  const currentVisibleIndex = nextCards.findIndex((item) => item.id === currentCardId);
+
+  if (!nextCards.length) {
+    state.flashcardIndex = 0;
+    return;
+  }
+
+  if (currentVisibleIndex !== -1) {
+    state.flashcardIndex =
+      nextCards.length > 1 ? (currentVisibleIndex + 1) % nextCards.length : currentVisibleIndex;
+    return;
+  }
+
+  state.flashcardIndex = Math.min(previousIndex, nextCards.length - 1);
+}
+
 function getVisibleFlashcards() {
-  return flashcards;
+  return filterVocabItems(flashcards);
 }
 
 function getVisibleVocabList() {
-  return vocabListItems;
+  return filterVocabItems(vocabListItems);
 }
 
 function getVocabPageCount(items) {
@@ -2304,19 +2396,42 @@ function clampVocabPage(items) {
 }
 
 function renderFlashcard() {
+  const activeFilter = getVocabFilter();
   const cards = getVisibleFlashcards();
-  const emptyCard = {
-    level: "N5",
-    word: "아직 단어가 없어요",
-    reading: "",
-    meaning: "",
-    id: "empty"
+  const emptyCardMap = {
+    all: {
+      level: "N5",
+      word: "아직 단어가 없어요",
+      reading: "단어가 들어오면 같이 볼게요.",
+      meaning: "조금만 기다려주세요.",
+      id: "empty-all"
+    },
+    review: {
+      level: "REVIEW",
+      word: "다시 볼 단어가 없어요",
+      reading: "잘하고 있어요.",
+      meaning: "헷갈린 단어가 생기면 여기 모아둘게요.",
+      id: "empty-review"
+    },
+    mastered: {
+      level: "MASTERED",
+      word: "익힌 단어가 아직 없어요",
+      reading: "하나씩 쌓아봐요.",
+      meaning: "익혔어요!를 누른 단어가 여기 모여요.",
+      id: "empty-mastered"
+    }
   };
-  const source = cards.length ? cards : [emptyCard];
+  const source = cards.length ? cards : [emptyCardMap[activeFilter]];
   const currentIndex = state.flashcardIndex % source.length;
   const card = source[currentIndex];
+  const hasCards = cards.length > 0;
+  const isRevealed = hasCards && state.flashcardRevealed;
   const flashcard = document.getElementById("flashcard");
   const flashcardToggle = document.getElementById("flashcard-toggle");
+  const flashcardPrev = document.getElementById("flashcard-prev");
+  const flashcardNext = document.getElementById("flashcard-next");
+  const flashcardAgain = document.getElementById("flashcard-again");
+  const flashcardMastered = document.getElementById("flashcard-mastered");
   const level = document.getElementById("flashcard-level");
   const word = document.getElementById("flashcard-word");
   const reading = document.getElementById("flashcard-reading");
@@ -2331,15 +2446,35 @@ function renderFlashcard() {
   word.textContent = formatQuizLineBreaks(card.word);
   reading.textContent = formatQuizLineBreaks(card.reading);
   meaning.textContent = formatQuizLineBreaks(card.meaning);
-  hint.textContent = state.flashcardRevealed
-    ? "뜻까지 확인했어요."
-    : "눌러서 뜻을 확인해보세요.";
-  flashcard.classList.toggle("is-revealed", state.flashcardRevealed);
-  flashcardToggle.setAttribute("aria-expanded", String(state.flashcardRevealed));
+  hint.textContent = hasCards
+    ? isRevealed
+      ? "뜻까지 확인했어요."
+      : "눌러서 뜻을 확인해보세요."
+    : activeFilter === "review"
+      ? "헷갈린 단어가 생기면 여기서 다시 볼 수 있어요."
+      : activeFilter === "mastered"
+        ? "익힌 단어가 쌓이면 여기서 모아볼 수 있어요."
+        : "단어가 준비되면 여기서 같이 익혀봐요.";
+  flashcard.classList.toggle("is-revealed", isRevealed);
+  flashcardToggle.disabled = !hasCards;
+  flashcardToggle.setAttribute("aria-expanded", String(isRevealed));
   flashcardToggle.setAttribute(
     "aria-label",
-    state.flashcardRevealed ? "뜻 다시 접어둘게요" : "뜻 확인해볼까요?"
+    hasCards ? (isRevealed ? "뜻 다시 접어둘게요" : "뜻 확인해볼까요?") : "단어 준비 중이에요"
   );
+
+  if (flashcardPrev) {
+    flashcardPrev.disabled = cards.length <= 1;
+  }
+  if (flashcardNext) {
+    flashcardNext.disabled = cards.length <= 1;
+  }
+  if (flashcardAgain) {
+    flashcardAgain.disabled = !hasCards;
+  }
+  if (flashcardMastered) {
+    flashcardMastered.disabled = !hasCards;
+  }
 }
 
 function renderVocabList() {
@@ -2348,6 +2483,7 @@ function renderVocabList() {
   const prev = document.getElementById("vocab-page-prev");
   const next = document.getElementById("vocab-page-next");
   const summary = document.getElementById("vocab-summary");
+  const activeFilter = getVocabFilter();
   const items = getVisibleVocabList();
 
   if (!list || !pageInfo || !prev || !next || !summary) {
@@ -2364,25 +2500,38 @@ function renderVocabList() {
   const startIndex = (state.vocabPage - 1) * vocabPageSize;
   const pageItems = items.slice(startIndex, startIndex + vocabPageSize);
 
-  summary.textContent = `${items.length}개 준비됐어요`;
+  summary.textContent = getVocabSummaryText(items.length);
   pageInfo.textContent = `${state.vocabPage} / ${pageCount}`;
   prev.disabled = state.vocabPage <= 1;
   next.disabled = state.vocabPage >= pageCount;
 
   if (!pageItems.length) {
-    list.innerHTML = '<p class="vocab-list-empty">아직 보여줄 단어가 없어요.</p>';
+    list.innerHTML = `<p class="vocab-list-empty">${
+      activeFilter === "review"
+        ? "다시 볼 단어가 아직 없어요."
+        : activeFilter === "mastered"
+          ? "익힌 단어가 아직 없어요."
+          : "아직 보여줄 단어가 없어요."
+    }</p>`;
     return;
   }
 
   list.innerHTML = pageItems
     .map((item, index) => {
+      const review = state.reviewIds.includes(item.id);
       const mastered = state.masteredIds.includes(item.id);
+      const badges = [
+        review ? '<span class="vocab-review-badge">다시 보기</span>' : "",
+        mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""
+      ]
+        .filter(Boolean)
+        .join("");
 
       return `
         <article class="vocab-list-card">
           <div class="vocab-list-card-head">
             <span class="vocab-list-index">${startIndex + index + 1}</span>
-            ${mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""}
+            <div class="vocab-status-badges">${badges}</div>
           </div>
           <div class="vocab-list-main">
             <strong class="vocab-list-word">${formatQuizLineBreaks(item.word)}</strong>
@@ -2400,15 +2549,29 @@ function renderVocabPage() {
   const listView = document.getElementById("vocab-list-view");
   const summary = document.getElementById("vocab-summary");
   const items = getVisibleVocabList();
+  const counts = getVocabFilterCounts();
 
   if (summary) {
-    summary.textContent = `${items.length}개 준비됐어요`;
+    summary.textContent = getVocabSummaryText(items.length);
   }
 
   document.querySelectorAll("[data-vocab-view]").forEach((button) => {
     const active = button.dataset.vocabView === state.vocabView;
     button.classList.toggle("is-active", active);
     button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+
+  document.querySelectorAll("[data-vocab-filter]").forEach((button) => {
+    const filter = getVocabFilter(button.dataset.vocabFilter);
+    const active = filter === getVocabFilter();
+    const count = button.querySelector("[data-vocab-filter-count]");
+
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+
+    if (count) {
+      count.textContent = String(counts[filter]);
+    }
   });
 
   if (cardView) {
@@ -2443,6 +2606,27 @@ function moveFlashcard(step) {
   renderVocabPage();
 }
 
+function markFlashcardForReview() {
+  const cards = getVisibleFlashcards();
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = state.flashcardIndex % cards.length;
+  const currentCard = cards[currentIndex];
+
+  if (!state.reviewIds.includes(currentCard.id)) {
+    state.reviewIds.push(currentCard.id);
+  }
+
+  state.masteredIds = state.masteredIds.filter((id) => id !== currentCard.id);
+  updateStudyStreak();
+  state.flashcardRevealed = false;
+  syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
+  saveState();
+  renderAll();
+}
+
 function markFlashcardMastered() {
   const cards = getVisibleFlashcards();
   if (!cards.length) {
@@ -2456,9 +2640,10 @@ function markFlashcardMastered() {
     state.masteredIds.push(currentCard.id);
   }
 
+  state.reviewIds = state.reviewIds.filter((id) => id !== currentCard.id);
   updateStudyStreak();
   state.flashcardRevealed = false;
-  state.flashcardIndex = (state.flashcardIndex + 1) % cards.length;
+  syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
   saveState();
   renderAll();
 }
@@ -3173,6 +3358,7 @@ function attachEventListeners() {
   const flashcardAgain = document.getElementById("flashcard-again");
   const flashcardMastered = document.getElementById("flashcard-mastered");
   const vocabViewButtons = document.querySelectorAll("[data-vocab-view]");
+  const vocabFilterButtons = document.querySelectorAll("[data-vocab-filter]");
   const vocabPagePrev = document.getElementById("vocab-page-prev");
   const vocabPageNext = document.getElementById("vocab-page-next");
   const quizNext = document.getElementById("quiz-next");
@@ -3200,11 +3386,7 @@ function attachEventListeners() {
     flashcardNext.addEventListener("click", () => moveFlashcard(1));
   }
   if (flashcardAgain) {
-    flashcardAgain.addEventListener("click", () => {
-      state.flashcardRevealed = false;
-      saveState();
-      renderVocabPage();
-    });
+    flashcardAgain.addEventListener("click", markFlashcardForReview);
   }
   if (flashcardMastered) {
     flashcardMastered.addEventListener("click", markFlashcardMastered);
@@ -3220,6 +3402,11 @@ function attachEventListeners() {
       state.vocabView = nextView;
       saveState();
       renderVocabPage();
+    });
+  });
+  vocabFilterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setVocabFilter(button.dataset.vocabFilter);
     });
   });
   if (vocabPagePrev) {

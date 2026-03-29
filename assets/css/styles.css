@@ -1429,6 +1429,12 @@ body.is-kana-quiz-sheet-open .page-shell {
   margin-bottom: 12px;
 }
 
+.vocab-toolbar-groups {
+  display: grid;
+  gap: 10px;
+  flex: 1 1 auto;
+}
+
 .vocab-card-view {
   display: flex;
   flex-direction: column;
@@ -1456,10 +1462,38 @@ body.is-kana-quiz-sheet-open .page-shell {
   gap: 6px;
 }
 
+.vocab-filter-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.vocab-filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 120px;
+  padding-inline: 14px;
+}
+
+.vocab-filter-button strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.84rem;
+}
+
+.vocab-filter-button.is-active {
+  color: white;
+  border-color: transparent;
+  background: var(--panel-dark);
+  box-shadow: 0 16px 28px rgba(33, 28, 24, 0.16);
+}
+
 .vocab-summary {
   margin: 0;
   color: var(--muted);
   font-size: 0.96rem;
+  text-align: right;
 }
 
 .vocab-list-view {
@@ -1488,6 +1522,7 @@ body.is-kana-quiz-sheet-open .page-shell {
 }
 
 .vocab-list-index,
+.vocab-review-badge,
 .vocab-mastered-badge {
   display: inline-flex;
   align-items: center;
@@ -1506,6 +1541,18 @@ body.is-kana-quiz-sheet-open .page-shell {
 .vocab-mastered-badge {
   color: white;
   background: var(--mint);
+}
+
+.vocab-review-badge {
+  color: white;
+  background: var(--coral);
+}
+
+.vocab-status-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .vocab-list-main {
@@ -3138,6 +3185,15 @@ body::after {
 
   .vocab-view-toggle {
     width: 100%;
+  }
+
+  .vocab-filter-toggle {
+    width: 100%;
+  }
+
+  .vocab-filter-button {
+    flex: 1 1 calc(33.333% - 8px);
+    min-width: 0;
   }
 
   .vocab-page-info,

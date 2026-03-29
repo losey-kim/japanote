@@ -35,9 +35,16 @@
         <div class="section-heading"><span>VOCAB TRAINER</span><h2>N5 단어, 카드로 익혀봐요</h2><p class="section-copy">카드를 넘기며 읽기랑 뜻을 같이 익혀봐요.</p></div>
         <div class="flashcard-panel">
           <div class="vocab-toolbar">
-            <div class="vocab-view-toggle" role="tablist" aria-label="단어 보는 방식 고르기">
-              <button class="level-button button-with-icon is-active" type="button" data-vocab-view="card" aria-pressed="true" aria-label="카드로 보기"><span class="material-symbols-rounded" aria-hidden="true">style</span><span>카드</span></button>
-              <button class="level-button button-with-icon" type="button" data-vocab-view="list" aria-pressed="false" aria-label="리스트로 보기"><span class="material-symbols-rounded" aria-hidden="true">view_list</span><span>리스트</span></button>
+            <div class="vocab-toolbar-groups">
+              <div class="vocab-view-toggle" role="tablist" aria-label="단어 보는 방식 고르기">
+                <button class="level-button button-with-icon is-active" type="button" data-vocab-view="card" aria-pressed="true" aria-label="카드로 보기"><span class="material-symbols-rounded" aria-hidden="true">style</span><span>카드</span></button>
+                <button class="level-button button-with-icon" type="button" data-vocab-view="list" aria-pressed="false" aria-label="리스트로 보기"><span class="material-symbols-rounded" aria-hidden="true">view_list</span><span>리스트</span></button>
+              </div>
+              <div class="vocab-filter-toggle" role="group" aria-label="단어 묶음 고르기">
+                <button class="secondary-btn vocab-filter-button is-active" type="button" data-vocab-filter="all" aria-pressed="true"><span>전체</span><strong data-vocab-filter-count="all">0</strong></button>
+                <button class="secondary-btn vocab-filter-button" type="button" data-vocab-filter="review" aria-pressed="false"><span>다시 보기</span><strong data-vocab-filter-count="review">0</strong></button>
+                <button class="secondary-btn vocab-filter-button" type="button" data-vocab-filter="mastered" aria-pressed="false"><span>익힌 단어</span><strong data-vocab-filter-count="mastered">0</strong></button>
+              </div>
             </div>
             <p class="vocab-summary" id="vocab-summary">0개 준비됐어요</p>
           </div>
@@ -58,7 +65,7 @@
                 <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="flashcard-next" type="button" aria-label="다음 카드" title="다음 카드"><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
               </div>
             </article>
-            <div class="flashcard-actions"><button class="secondary-btn" id="flashcard-again" type="button">한 번 더 볼래요</button><button class="primary-btn" id="flashcard-mastered" type="button">익혔어요!</button></div>
+            <div class="flashcard-actions"><button class="secondary-btn" id="flashcard-again" type="button">다시 볼래요</button><button class="primary-btn" id="flashcard-mastered" type="button">익혔어요!</button></div>
           </div>
 
           <div class="vocab-list-view" id="vocab-list-view" hidden>

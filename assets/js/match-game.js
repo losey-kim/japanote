@@ -1,4 +1,5 @@
 const matchRoundSize = 5;
+const matchWrongFlashDuration = 520;
 
 function normalizeMatchText(value) {
   const text = String(value ?? "").trim();
@@ -86,11 +87,16 @@ const matchState = {
   rightCards: [],
   selectedLeft: null,
   selectedRight: null,
+  wrongLeft: null,
+  wrongRight: null,
   matchedIds: [],
   attempts: 0,
   streak: 0,
-  bestStreak: 0
+  bestStreak: 0,
+  isLocked: false
 };
+
+let wrongMatchTimer = null;
 
 function refreshMatchPool() {
   const nextPool = buildMatchPool(getMatchSource());
@@ -114,14 +120,18 @@ function renderMatchUnavailableState(message) {
   const leftList = document.getElementById("match-left-list");
   const rightList = document.getElementById("match-right-list");
 
+  clearWrongMatchTimer();
   matchState.round = [];
   matchState.leftCards = [];
   matchState.rightCards = [];
   matchState.selectedLeft = null;
   matchState.selectedRight = null;
+  matchState.wrongLeft = null;
+  matchState.wrongRight = null;
   matchState.matchedIds = [];
   matchState.attempts = 0;
   matchState.streak = 0;
+  matchState.isLocked = false;
 
   if (leftList) {
     leftList.innerHTML = "";
@@ -136,7 +146,15 @@ function renderMatchUnavailableState(message) {
   renderMatchStats();
 }
 
+function clearWrongMatchTimer() {
+  if (wrongMatchTimer) {
+    clearTimeout(wrongMatchTimer);
+    wrongMatchTimer = null;
+  }
+}
+
 function createMatchRound() {
+  clearWrongMatchTimer();
   const picked = shuffleMatchItems(matchPool).slice(0, matchRoundSize);
 
   matchState.round = picked;
@@ -156,9 +174,12 @@ function createMatchRound() {
   );
   matchState.selectedLeft = null;
   matchState.selectedRight = null;
+  matchState.wrongLeft = null;
+  matchState.wrongRight = null;
   matchState.matchedIds = [];
   matchState.attempts = 0;
   matchState.streak = 0;
+  matchState.isLocked = false;
 }
 
 function renderMatchStats() {
@@ -199,6 +220,9 @@ function setMatchFeedback(message, tone = "") {
 function createMatchCard(card, selectedId) {
   const button = document.createElement("button");
   const matched = matchState.matchedIds.includes(card.id);
+  const wrong =
+    (card.side === "left" && matchState.wrongLeft === card.id) ||
+    (card.side === "right" && matchState.wrongRight === card.id);
 
   button.type = "button";
   button.className = "match-card";
@@ -211,6 +235,10 @@ function createMatchCard(card, selectedId) {
 
   if (matched) {
     button.classList.add("is-matched");
+  }
+
+  if (wrong) {
+    button.classList.add("is-wrong");
   }
 
   button.addEventListener("click", () => handleMatchSelection(card));
@@ -243,6 +271,21 @@ function resetSelectedCards() {
   matchState.selectedRight = null;
 }
 
+function queueFailedMatchReset() {
+  matchState.isLocked = true;
+  renderMatchBoard();
+
+  clearWrongMatchTimer();
+  wrongMatchTimer = setTimeout(() => {
+    matchState.wrongLeft = null;
+    matchState.wrongRight = null;
+    matchState.isLocked = false;
+    resetSelectedCards();
+    renderMatchBoard();
+    wrongMatchTimer = null;
+  }, matchWrongFlashDuration);
+}
+
 function handleSuccessfulMatch(id) {
   matchState.matchedIds.push(id);
   matchState.streak += 1;
@@ -261,7 +304,7 @@ function handleFailedMatch() {
 }
 
 function handleMatchSelection(card) {
-  if (matchState.matchedIds.includes(card.id)) {
+  if (matchState.isLocked || matchState.matchedIds.includes(card.id)) {
     return;
   }
 
@@ -281,12 +324,14 @@ function handleMatchSelection(card) {
 
   if (matchState.selectedLeft === matchState.selectedRight) {
     handleSuccessfulMatch(matchState.selectedLeft);
+    resetSelectedCards();
+    renderMatchBoard();
   } else {
+    matchState.wrongLeft = matchState.selectedLeft;
+    matchState.wrongRight = matchState.selectedRight;
     handleFailedMatch();
+    queueFailedMatchReset();
   }
-
-  resetSelectedCards();
-  renderMatchBoard();
 }
 
 function startNewMatchRound() {

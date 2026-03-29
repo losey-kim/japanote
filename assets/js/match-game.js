@@ -181,15 +181,15 @@ function handleSuccessfulMatch(id) {
   matchState.bestStreak = Math.max(matchState.bestStreak, matchState.streak);
 
   if (matchState.matchedIds.length === matchState.round.length) {
-    setMatchFeedback("모든 짝을 맞췄습니다. 새 라운드를 시작해도 됩니다.", "is-success");
+    setMatchFeedback("와, 전부 맞혔어요! 새 라운드도 해볼까요?", "is-success");
   } else {
-    setMatchFeedback("정답입니다. 다음 짝을 이어서 맞춰보세요.", "is-success");
+    setMatchFeedback("잘했어요! 다음 짝도 이어서 찾아봐요.", "is-success");
   }
 }
 
 function handleFailedMatch() {
   matchState.streak = 0;
-  setMatchFeedback("짝이 맞지 않습니다. 다른 카드를 골라보세요.", "is-fail");
+  setMatchFeedback("조금 아쉬워요. 다른 카드를 골라볼까요?", "is-fail");
 }
 
 function handleMatchSelection(card) {
@@ -223,7 +223,7 @@ function handleMatchSelection(card) {
 
 function startNewMatchRound() {
   createMatchRound();
-  setMatchFeedback("왼쪽 카드와 오른쪽 카드를 하나씩 선택하세요.");
+  setMatchFeedback("왼쪽이랑 오른쪽에서 하나씩 골라 짝을 맞춰봐요.");
   renderMatchBoard();
 }
 

@@ -22,15 +22,15 @@ function applyThemeMode(mode) {
 
 function updateThemeToggleLabel(mode = getSavedThemeMode()) {
   const labelMap = {
-    system: "테마: 시스템",
-    light: "테마: 라이트",
-    dark: "테마: 다크"
+    system: "테마는 기기에 맞출게요",
+    light: "밝게 볼까요?",
+    dark: "차분하게 볼까요?"
   };
 
   document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
     button.textContent = "";
     button.dataset.themeMode = mode;
-    button.setAttribute("aria-label", `현재 ${labelMap[mode]}`);
+    button.setAttribute("aria-label", labelMap[mode]);
     button.setAttribute("title", labelMap[mode]);
   });
 }

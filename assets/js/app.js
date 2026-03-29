@@ -33,7 +33,7 @@ const starterItems = [
     track: "문자",
     module: "hiragana",
     title: "히라가나 전체 보기",
-    detail: "히라가나를 한 번에 보고 바로 퀴즈로 이어집니다.",
+    detail: "히라가나를 쭉 보고 바로 퀴즈까지 가봐요.",
     duration: "2~3분"
   },
   {
@@ -41,7 +41,7 @@ const starterItems = [
     track: "문자",
     module: "katakana",
     title: "카타카나 전체 보기",
-    detail: "카타카나를 따로 보고 읽기를 익힙니다.",
+    detail: "카타카나를 쭉 보면서 읽기를 익혀봐요.",
     duration: "2~3분"
   },
   {
@@ -49,7 +49,7 @@ const starterItems = [
     track: "단어",
     module: "words",
     title: "N5 단어 보기",
-    detail: "자주 나오는 N5 단어를 빠르게 반복합니다.",
+    detail: "자주 나오는 N5 단어를 가볍게 익혀봐요.",
     duration: "3분"
   },
   {
@@ -57,7 +57,7 @@ const starterItems = [
     track: "문법",
     module: "particles",
     title: "조사 5개 보기",
-    detail: "は, が, を, に, で를 먼저 구분합니다.",
+    detail: "헷갈리기 쉬운 조사 5개부터 가볍게 볼까요?",
     duration: "1분"
   },
   {
@@ -65,7 +65,7 @@ const starterItems = [
     track: "한자",
     module: "kanji",
     title: "N5 한자 시작",
-    detail: "자주 쓰는 N5 한자를 읽기와 뜻으로 봅니다.",
+    detail: "자주 쓰는 N5 한자를 읽기랑 뜻으로 익혀봐요.",
     duration: "5분"
   },
   {
@@ -73,7 +73,7 @@ const starterItems = [
     track: "독해",
     module: "sentences",
     title: "짧은 문장 읽기",
-    detail: "메모나 공지처럼 짧은 문장을 읽어 봅니다.",
+    detail: "메모나 공지처럼 짧은 문장을 읽어봐요.",
     duration: "1지문"
   }
 ];
@@ -87,7 +87,7 @@ const basicPracticeSets = {
         source: "히라가나 1",
         title: "히라가나 기본 모음",
         note: "문자를 보고 바로 소리를 떠올리기",
-        prompt: "이 글자는 어떻게 읽나요?",
+        prompt: "이 글자, 어떻게 읽을까요?",
         display: "あ",
         displaySub: "기본 모음",
         options: ["a / 아", "i / 이", "u / 우", "e / 에"],
@@ -99,7 +99,7 @@ const basicPracticeSets = {
         source: "히라가나 2",
         title: "히라가나 자주 쓰는 글자",
         note: "단어에서 자주 나오는 글자",
-        prompt: "이 글자는 어떻게 읽나요?",
+        prompt: "이 글자, 어떻게 읽을까요?",
         display: "き",
         displaySub: "예: きく, きょう",
         options: ["ki / 키", "sa / 사", "ta / 타", "ne / 네"],
@@ -111,7 +111,7 @@ const basicPracticeSets = {
         source: "가타카나 1",
         title: "가타카나 읽기",
         note: "외래어에서 많이 보는 글자",
-        prompt: "이 글자는 어떻게 읽나요?",
+        prompt: "이 글자, 어떻게 읽을까요?",
         display: "コ",
         displaySub: "예: コーヒー",
         options: ["ko / 코", "so / 소", "to / 토", "no / 노"],
@@ -123,7 +123,7 @@ const basicPracticeSets = {
         source: "가타카나 2",
         title: "가타카나 기본 글자",
         note: "가타카나도 읽기부터 고정",
-        prompt: "이 글자는 어떻게 읽나요?",
+        prompt: "이 글자, 어떻게 읽을까요?",
         display: "ケ",
         displaySub: "예: ケーキ",
         options: ["ke / 케", "re / 레", "na / 나", "ha / 하"],
@@ -135,7 +135,7 @@ const basicPracticeSets = {
         source: "히라가나 3",
         title: "문자 읽기 마무리",
         note: "헷갈리는 글자 구분",
-        prompt: "이 글자는 어떻게 읽나요?",
+        prompt: "이 글자, 어떻게 읽을까요?",
         display: "ぬ",
         displaySub: "ぬ / め / ね 구분하기",
         options: ["nu / 누", "me / 메", "ne / 네", "no / 노"],
@@ -153,7 +153,7 @@ const basicPracticeSets = {
         source: "N5 단어 1",
         title: "동사 읽기",
         note: "읽기와 뜻을 같이 묶기",
-        prompt: "이 단어의 뜻으로 맞는 것을 고르세요.",
+        prompt: "이 단어 뜻, 어떤 걸까요?",
         display: "たべる",
         displaySub: "食べる",
         options: ["먹다", "가다", "보다", "듣다"],
@@ -165,7 +165,7 @@ const basicPracticeSets = {
         source: "N5 단어 2",
         title: "명사 읽기",
         note: "초급 핵심 장소 단어",
-        prompt: "이 단어의 뜻으로 맞는 것을 고르세요.",
+        prompt: "이 단어 뜻, 어떤 걸까요?",
         display: "がっこう",
         displaySub: "学校",
         options: ["학교", "선생님", "친구", "책"],
@@ -177,7 +177,7 @@ const basicPracticeSets = {
         source: "N5 단어 3",
         title: "기본 명사",
         note: "뜻보다 읽기를 먼저 붙잡기",
-        prompt: "이 단어의 뜻으로 맞는 것을 고르세요.",
+        prompt: "이 단어 뜻, 어떤 걸까요?",
         display: "みず",
         displaySub: "水",
         options: ["물", "불", "사람", "달"],
@@ -189,7 +189,7 @@ const basicPracticeSets = {
         source: "N5 단어 4",
         title: "시간 표현",
         note: "오늘, 내일 구분하기",
-        prompt: "이 단어의 뜻으로 맞는 것을 고르세요.",
+        prompt: "이 단어 뜻, 어떤 걸까요?",
         display: "あした",
         displaySub: "明日",
         options: ["내일", "오늘", "어제", "아침"],
@@ -201,7 +201,7 @@ const basicPracticeSets = {
         source: "N5 단어 5",
         title: "사람 표현",
         note: "자주 쓰는 인간관계 단어",
-        prompt: "이 단어의 뜻으로 맞는 것을 고르세요.",
+        prompt: "이 단어 뜻, 어떤 걸까요?",
         display: "ともだち",
         displaySub: "友だち",
         options: ["친구", "선생님", "학생", "가족"],
@@ -218,8 +218,8 @@ const basicPracticeSets = {
         id: "bp-p1",
         source: "조사 1",
         title: "주제 표시",
-        note: "A는 B입니다 형태",
-        prompt: "빈칸에 가장 자연스러운 조사를 고르세요.",
+        note: "A는 B예요 형태",
+        prompt: "빈칸에 어울리는 조사를 골라봐요.",
         display: "わたし（　）がくせい です。",
         displaySub: "나는 학생입니다.",
         options: ["は", "を", "で", "に"],
@@ -231,7 +231,7 @@ const basicPracticeSets = {
         source: "조사 2",
         title: "도착점",
         note: "어디에 가는지",
-        prompt: "빈칸에 가장 자연스러운 조사를 고르세요.",
+        prompt: "빈칸에 어울리는 조사를 골라봐요.",
         display: "がっこう（　）いきます。",
         displaySub: "학교에 갑니다.",
         options: ["を", "に", "が", "と"],
@@ -243,7 +243,7 @@ const basicPracticeSets = {
         source: "조사 3",
         title: "행동 장소",
         note: "어디에서 하는지",
-        prompt: "빈칸에 가장 자연스러운 조사를 고르세요.",
+        prompt: "빈칸에 어울리는 조사를 골라봐요.",
         display: "スーパー（　）みずを かいます。",
         displaySub: "슈퍼에서 물을 삽니다.",
         options: ["で", "に", "を", "は"],
@@ -255,7 +255,7 @@ const basicPracticeSets = {
         source: "조사 4",
         title: "목적어",
         note: "무엇을 하는지",
-        prompt: "빈칸에 가장 자연스러운 조사를 고르세요.",
+        prompt: "빈칸에 어울리는 조사를 골라봐요.",
         display: "ほん（　）よみます。",
         displaySub: "책을 읽습니다.",
         options: ["に", "を", "で", "が"],
@@ -267,7 +267,7 @@ const basicPracticeSets = {
         source: "조사 5",
         title: "함께 하는 대상",
         note: "누구와 같이",
-        prompt: "빈칸에 가장 자연스러운 조사를 고르세요.",
+        prompt: "빈칸에 어울리는 조사를 골라봐요.",
         display: "ともだち（　）べんきょう します。",
         displaySub: "친구와 공부합니다.",
         options: ["と", "を", "で", "へ"],
@@ -285,7 +285,7 @@ const basicPracticeSets = {
         source: "한자 1",
         title: "가장 먼저 보는 한자",
         note: "대표 읽기를 먼저 고정",
-        prompt: "이 한자의 읽기로 맞는 것을 고르세요.",
+        prompt: "이 한자, 어떻게 읽을까요?",
         display: "日",
         displaySub: "뜻: 해, 날",
         options: ["ひ", "みず", "つき", "やま"],
@@ -297,7 +297,7 @@ const basicPracticeSets = {
         source: "한자 2",
         title: "사람 한자",
         note: "가장 자주 쓰는 기초 한자",
-        prompt: "이 한자의 읽기로 맞는 것을 고르세요.",
+        prompt: "이 한자, 어떻게 읽을까요?",
         display: "人",
         displaySub: "뜻: 사람",
         options: ["ひと", "ほん", "か", "みる"],
@@ -309,7 +309,7 @@ const basicPracticeSets = {
         source: "한자 3",
         title: "달 한자",
         note: "요일과 날짜에서 자주 나옴",
-        prompt: "이 한자의 읽기로 맞는 것을 고르세요.",
+        prompt: "이 한자, 어떻게 읽을까요?",
         display: "月",
         displaySub: "뜻: 달, 월",
         options: ["つき", "ひ", "みず", "き"],
@@ -321,7 +321,7 @@ const basicPracticeSets = {
         source: "한자 4",
         title: "불 한자",
         note: "짧게 자주 반복하기",
-        prompt: "이 한자의 읽기로 맞는 것을 고르세요.",
+        prompt: "이 한자, 어떻게 읽을까요?",
         display: "火",
         displaySub: "뜻: 불",
         options: ["ひ", "みず", "ひと", "つき"],
@@ -333,7 +333,7 @@ const basicPracticeSets = {
         source: "한자 5",
         title: "물 한자",
         note: "초급 명사와 같이 익히기",
-        prompt: "이 한자의 읽기로 맞는 것을 고르세요.",
+        prompt: "이 한자, 어떻게 읽을까요?",
         display: "水",
         displaySub: "뜻: 물",
         options: ["みず", "か", "き", "ほん"],
@@ -351,7 +351,7 @@ const basicPracticeSets = {
         source: "문장 1",
         title: "입니다 문장",
         note: "아주 짧은 단정 표현",
-        prompt: "문장의 뜻으로 맞는 것을 고르세요.",
+        prompt: "문장 뜻에 맞는 답을 골라봐요.",
         display: "これは ほん です。",
         displaySub: "이것은 책입니다.",
         options: ["이것은 책입니다.", "이것은 물입니다.", "저것은 학교입니다.", "이것은 친구입니다."],
@@ -363,7 +363,7 @@ const basicPracticeSets = {
         source: "문장 2",
         title: "이동 문장",
         note: "장소 + 이동",
-        prompt: "문장의 뜻으로 맞는 것을 고르세요.",
+        prompt: "문장 뜻에 맞는 답을 골라봐요.",
         display: "あした がっこうへ いきます。",
         displaySub: "시간 표현 + 장소 + 가다",
         options: ["내일 학교에 갑니다.", "오늘 학교에서 공부합니다.", "내일 집에 옵니다.", "어제 학교에 갔습니다."],
@@ -375,7 +375,7 @@ const basicPracticeSets = {
         source: "문장 3",
         title: "행동 문장",
         note: "목적어 + 동사",
-        prompt: "문장의 뜻으로 맞는 것을 고르세요.",
+        prompt: "문장 뜻에 맞는 답을 골라봐요.",
         display: "みずを のみます。",
         displaySub: "을/를 + 마십니다",
         options: ["물을 마십니다.", "물을 봅니다.", "책을 읽습니다.", "밥을 먹습니다."],
@@ -387,7 +387,7 @@ const basicPracticeSets = {
         source: "문장 4",
         title: "같이 하는 행동",
         note: "と 조사 익히기",
-        prompt: "문장의 뜻으로 맞는 것을 고르세요.",
+        prompt: "문장 뜻에 맞는 답을 골라봐요.",
         display: "ともだちと べんきょう します。",
         displaySub: "친구와 공부합니다.",
         options: ["친구와 공부합니다.", "친구를 만납니다.", "친구와 갑니다.", "친구가 공부합니다."],
@@ -399,7 +399,7 @@ const basicPracticeSets = {
         source: "문장 5",
         title: "소유 표현",
         note: "나의 + 명사",
-        prompt: "문장의 뜻으로 맞는 것을 고르세요.",
+        prompt: "문장 뜻에 맞는 답을 골라봐요.",
         display: "わたしの せんせい です。",
         displaySub: "소유 표현 확인",
         options: ["제 선생님입니다.", "저는 선생님입니다.", "제 친구입니다.", "학생입니다."],
@@ -411,16 +411,16 @@ const basicPracticeSets = {
 };
 
 const grammarItems = [
-  { id: "g1", level: "N5", pattern: "〜たい", description: "희망을 나타낼 때 쓰는 기본 표현입니다." },
-  { id: "g2", level: "N5", pattern: "〜てください", description: "상대에게 요청할 때 쓰는 표현입니다." },
-  { id: "g3", level: "N4", pattern: "〜ようになる", description: "상태 변화 또는 가능해진 일을 나타냅니다." },
-  { id: "g4", level: "N4", pattern: "〜ながら", description: "두 동작을 동시에 할 때 사용합니다." },
-  { id: "g5", level: "N3", pattern: "〜わけではない", description: "전면 부정이 아니라는 뉘앙스를 줄 때 씁니다." },
-  { id: "g6", level: "N3", pattern: "〜ことになる", description: "결정되거나 귀결된 내용을 말할 때 사용합니다." },
-  { id: "g7", level: "N2", pattern: "〜に違いない", description: "강한 추측과 확신을 나타냅니다." },
-  { id: "g8", level: "N2", pattern: "〜ざるを得ない", description: "하지 않을 수 없다는 의미입니다." },
-  { id: "g9", level: "N1", pattern: "〜を皮切りに", description: "어떤 일을 시작점으로 삼을 때 사용합니다." },
-  { id: "g10", level: "N1", pattern: "〜ずくめ", description: "특정 성질로 가득 찬 상태를 나타냅니다." }
+  { id: "g1", level: "N5", pattern: "〜たい", description: "무엇을 하고 싶은지 말할 때 자주 써요." },
+  { id: "g2", level: "N5", pattern: "〜てください", description: "부드럽게 부탁할 때 쓰기 좋아요." },
+  { id: "g3", level: "N4", pattern: "〜ようになる", description: "상태가 바뀌거나 가능해진 일을 말할 때 써요." },
+  { id: "g4", level: "N4", pattern: "〜ながら", description: "두 동작을 함께 할 때 써요." },
+  { id: "g5", level: "N3", pattern: "〜わけではない", description: "완전히 그렇진 않다는 느낌을 줄 때 써요." },
+  { id: "g6", level: "N3", pattern: "〜ことになる", description: "그렇게 정해지거나 되기로 한 일을 말할 때 써요." },
+  { id: "g7", level: "N2", pattern: "〜に違いない", description: "강하게 추측하거나 확신할 때 써요." },
+  { id: "g8", level: "N2", pattern: "〜ざるを得ない", description: "하지 않을 수 없다는 뜻으로 써요." },
+  { id: "g9", level: "N1", pattern: "〜を皮切りに", description: "어떤 일을 시작점으로 잡을 때 써요." },
+  { id: "g10", level: "N1", pattern: "〜ずくめ", description: "특정한 성질로 가득 찬 상태를 말할 때 써요." }
 ];
 
 const grammarPracticeSets = {
@@ -616,8 +616,8 @@ const quizQuestions = [
 
 const dynamicQuizSource = Array.isArray(globalThis.jlptN5Vocab) ? globalThis.jlptN5Vocab : [];
 const quizModeLabels = {
-  meaning: "히라가나 -> 뜻",
-  reading: "읽기"
+  meaning: "뜻 맞히기",
+  reading: "읽기 맞히기"
 };
 const quizSessionSizeOptions = [10, 20];
 
@@ -770,8 +770,8 @@ function buildDynamicWordPracticeItems(items) {
         id: `bp-dw-${item.id}-${index}`,
         source: `N5 단어 ${index + 1}`,
         title: item.part ? `${item.part} 읽기` : "N5 단어 읽기",
-        note: "N5 랜덤 단어 덱",
-        prompt: "이 단어의 뜻으로 맞는 것을 고르세요.",
+        note: "N5 단어를 랜덤으로 만나봐요.",
+        prompt: "이 단어 뜻, 어떤 걸까요?",
         display: item.reading,
         displaySub: item.word,
         options,
@@ -973,13 +973,13 @@ function buildKanaPracticeItems(script) {
         id: `bp-${script}-${index}`,
         source: `${script === "hiragana" ? "히라가나" : "카타카나"} ${index + 1}`,
         title: `${script === "hiragana" ? "히라가나" : "카타카나"} 읽기`,
-        note: "전체 표에서 바로 확인한 문자들입니다.",
-        prompt: "이 글자의 읽기로 맞는 것을 고르세요.",
+        note: "방금 표에서 본 글자들이에요.",
+        prompt: "이 글자, 어떻게 읽을까요?",
         display: item.char,
         displaySub: item.reading,
         options,
         answer,
-        explanation: `${item.char}는 ${item.reading}로 읽습니다.`,
+        explanation: `${item.char}는 ${item.reading}로 읽어요.`,
         tone: index % 2 === 0 ? "tone-coral" : "tone-sky"
       };
     })
@@ -1132,8 +1132,8 @@ function renderKanaQuizSheet() {
 
   if (!current) {
     label.textContent = "KANA QUIZ";
-    title.textContent = "문자 퀴즈";
-    desc.textContent = "퀴즈를 불러오지 못했습니다.";
+    title.textContent = "문자 퀴즈 해볼까요?";
+    desc.textContent = "퀴즈를 불러오지 못했어요.";
     source.textContent = "-";
     progress.textContent = "-";
     promptBox.hidden = true;
@@ -1151,8 +1151,8 @@ function renderKanaQuizSheet() {
 
   const modeLabel = getKanaQuizModeLabel(kanaQuizSheetState.mode);
   label.textContent = `${modeLabel.toUpperCase()} QUIZ`;
-  title.textContent = `${modeLabel} 퀴즈`;
-  desc.textContent = "문자를 보고 읽는 법을 맞혀보세요.";
+  title.textContent = `${modeLabel} 퀴즈 해볼까요?`;
+  desc.textContent = "문자를 보고 읽기를 골라보세요.";
   source.textContent = formatQuizLineBreaks(current.item.source);
   progress.textContent = `${current.index + 1} / ${current.total}`;
   promptBox.hidden = true;
@@ -1165,7 +1165,8 @@ function renderKanaQuizSheet() {
   explanation.textContent = "";
   explanation.hidden = true;
   next.disabled = true;
-  next.textContent = current.index + 1 >= current.total ? "다시 시작" : "다음 문제";
+  next.textContent =
+    current.index + 1 >= current.total ? "처음부터 다시 해볼까요?" : "다음으로 가볼까요?";
 
   options.innerHTML = "";
   current.item.options.forEach((option, optionIndex) => {
@@ -1239,7 +1240,7 @@ function handleKanaQuizTimeout() {
   const feedback = document.getElementById("kana-quiz-feedback");
   const explanation = document.getElementById("kana-quiz-explanation");
   if (feedback) {
-    feedback.textContent = "시간이 끝났습니다.";
+    feedback.textContent = "시간이 끝났어요.";
   }
   if (explanation) {
     explanation.textContent = "";
@@ -1259,7 +1260,7 @@ function nextKanaQuizSheetQuestion() {
   if (!kanaQuizSheetState.answered) {
     const feedback = document.getElementById("kana-quiz-feedback");
     if (feedback) {
-      feedback.textContent = "답을 고르면 다음으로 넘어갈 수 있습니다.";
+      feedback.textContent = "답을 고르면 다음으로 갈 수 있어요.";
     }
     return;
   }
@@ -1330,13 +1331,13 @@ function renderKanaLibrary() {
       targetId: "hiragana-table",
       track: "hiragana",
       title: "히라가나 전부",
-      description: "기본음, 탁음, 요음, 소문자를 한 번에 확인할 수 있습니다."
+      description: "기본음부터 요음까지 한 번에 쭉 살펴봐요."
     },
     {
       targetId: "katakana-table",
       track: "katakana",
       title: "카타카나 전부",
-      description: "외래어와 표기에서 쓰는 카타카나를 한 번에 볼 수 있습니다."
+      description: "자주 보는 카타카나를 한눈에 익혀봐요."
     }
   ];
 
@@ -1965,7 +1966,7 @@ function renderQuizSessionHud(key) {
     return;
   }
 
-  timer.textContent = session.duration <= 0 ? "무제한" : `${session.timeLeft}초`;
+  timer.textContent = session.duration <= 0 ? "천천히" : `${session.timeLeft}초`;
   timer.classList.toggle(
     "is-warning",
     session.duration > 0 && session.timeLeft <= Math.max(5, Math.floor(session.duration / 3))
@@ -2078,14 +2079,14 @@ function renderStarterPath() {
     article.innerHTML = `
       <div class="starter-item-head">
         <span class="starter-track">${item.track}</span>
-        <span>${done ? "완료" : item.duration}</span>
+        <span>${done ? "해봤어요" : item.duration}</span>
       </div>
       <h3>${item.title}</h3>
       <p>${item.detail}</p>
       <div class="starter-item-actions">
-        <button class="secondary-btn starter-learn" type="button">바로 학습</button>
+        <button class="secondary-btn starter-learn" type="button">바로 해볼까요?</button>
         <button class="secondary-btn starter-toggle${done ? " is-checked" : ""}" type="button">
-          ${done ? "체크 해제" : "완료 체크"}
+          ${done ? "다시 해볼래요" : "해봤어요"}
         </button>
       </div>
     `;
@@ -2241,8 +2242,8 @@ function handleBasicPracticeAnswer(index) {
   });
 
   document.getElementById("basic-practice-feedback").textContent = correct
-    ? "정답입니다."
-    : "오답입니다. 정답을 표시했습니다.";
+    ? "잘했어요!"
+    : "아쉽지만 괜찮아요. 정답 같이 볼게요.";
   document.getElementById("basic-practice-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -2268,7 +2269,7 @@ function handleBasicPracticeTimeout() {
     }
   });
 
-  document.getElementById("basic-practice-feedback").textContent = "시간이 끝났습니다.";
+  document.getElementById("basic-practice-feedback").textContent = "시간이 끝났어요.";
   document.getElementById("basic-practice-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -2306,7 +2307,7 @@ function renderFlashcard() {
   const cards = getVisibleFlashcards();
   const emptyCard = {
     level: "N5",
-    word: "단어가 없습니다",
+    word: "아직 단어가 없어요",
     reading: "",
     meaning: "",
     id: "empty"
@@ -2315,13 +2316,14 @@ function renderFlashcard() {
   const currentIndex = state.flashcardIndex % source.length;
   const card = source[currentIndex];
   const flashcard = document.getElementById("flashcard");
+  const flashcardToggle = document.getElementById("flashcard-toggle");
   const level = document.getElementById("flashcard-level");
   const word = document.getElementById("flashcard-word");
   const reading = document.getElementById("flashcard-reading");
   const meaning = document.getElementById("flashcard-meaning");
   const hint = document.getElementById("flashcard-hint");
 
-  if (!flashcard || !level || !word || !reading || !meaning || !hint) {
+  if (!flashcard || !flashcardToggle || !level || !word || !reading || !meaning || !hint) {
     return;
   }
 
@@ -2330,9 +2332,14 @@ function renderFlashcard() {
   reading.textContent = formatQuizLineBreaks(card.reading);
   meaning.textContent = formatQuizLineBreaks(card.meaning);
   hint.textContent = state.flashcardRevealed
-    ? "뜻을 확인했습니다"
-    : "카드를 눌러 뜻 보기";
+    ? "뜻까지 확인했어요."
+    : "눌러서 뜻을 확인해보세요.";
   flashcard.classList.toggle("is-revealed", state.flashcardRevealed);
+  flashcardToggle.setAttribute("aria-expanded", String(state.flashcardRevealed));
+  flashcardToggle.setAttribute(
+    "aria-label",
+    state.flashcardRevealed ? "뜻 다시 접어둘게요" : "뜻 확인해볼까요?"
+  );
 }
 
 function renderVocabList() {
@@ -2357,13 +2364,13 @@ function renderVocabList() {
   const startIndex = (state.vocabPage - 1) * vocabPageSize;
   const pageItems = items.slice(startIndex, startIndex + vocabPageSize);
 
-  summary.textContent = `총 ${items.length}개`;
+  summary.textContent = `${items.length}개 준비됐어요`;
   pageInfo.textContent = `${state.vocabPage} / ${pageCount}`;
   prev.disabled = state.vocabPage <= 1;
   next.disabled = state.vocabPage >= pageCount;
 
   if (!pageItems.length) {
-    list.innerHTML = '<p class="vocab-list-empty">표시할 단어가 없습니다.</p>';
+    list.innerHTML = '<p class="vocab-list-empty">아직 보여줄 단어가 없어요.</p>';
     return;
   }
 
@@ -2375,7 +2382,7 @@ function renderVocabList() {
         <article class="vocab-list-card">
           <div class="vocab-list-card-head">
             <span class="vocab-list-index">${startIndex + index + 1}</span>
-            ${mastered ? '<span class="vocab-mastered-badge">암기 완료</span>' : ""}
+            ${mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""}
           </div>
           <div class="vocab-list-main">
             <strong class="vocab-list-word">${formatQuizLineBreaks(item.word)}</strong>
@@ -2395,7 +2402,7 @@ function renderVocabPage() {
   const items = getVisibleVocabList();
 
   if (summary) {
-    summary.textContent = `총 ${items.length}개`;
+    summary.textContent = `${items.length}개 준비됐어요`;
   }
 
   document.querySelectorAll("[data-vocab-view]").forEach((button) => {
@@ -2473,12 +2480,12 @@ function renderGrammar() {
     article.innerHTML = `
       <div class="grammar-header">
         <span class="grammar-level">${item.level}</span>
-        <span>${checked ? "완료" : "진행중"}</span>
+        <span>${checked ? "해봤어요" : "지금 해봐요"}</span>
       </div>
       <h3>${item.pattern}</h3>
       <p>${item.description}</p>
       <button class="secondary-btn grammar-toggle${checked ? " is-checked" : ""}" type="button">
-        ${checked ? "체크 해제" : "학습 완료로 체크"}
+        ${checked ? "다시 해볼래요" : "해봤어요"}
       </button>
     `;
 
@@ -2598,8 +2605,8 @@ function handleGrammarPracticeAnswer(index) {
   });
 
   document.getElementById("grammar-practice-feedback").textContent = correct
-    ? "정답입니다."
-    : "오답입니다. 정답을 표시했습니다.";
+    ? "잘했어요!"
+    : "아쉽지만 괜찮아요. 정답 같이 볼게요.";
   document.getElementById("grammar-practice-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -2625,7 +2632,7 @@ function handleGrammarPracticeTimeout() {
     }
   });
 
-  document.getElementById("grammar-practice-feedback").textContent = "시간이 끝났습니다.";
+  document.getElementById("grammar-practice-feedback").textContent = "시간이 끝났어요.";
   document.getElementById("grammar-practice-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -2718,8 +2725,8 @@ function renderQuizResult() {
   wrong.textContent = `${wrongCount}개`;
   copy.textContent =
     wrongCount === 0
-      ? `${getQuizModeLabel()} ${total}문제를 모두 맞혔습니다.`
-      : `${getQuizModeLabel()} ${total}문제를 마쳤습니다. 오답노트에서 틀린 문제를 다시 보세요.`;
+      ? `${getQuizModeLabel()} ${total}문제, 전부 맞혔어요!`
+      : `${getQuizModeLabel()} ${total}문제까지 왔어요. 틀린 문제는 다시 볼까요?`;
 }
 
 function renderQuizMistakes() {
@@ -2746,10 +2753,10 @@ function renderQuizMistakes() {
             <strong>${item.word || item.correctAnswer}</strong>
           </div>
           <p class="quiz-note-item-prompt">${item.prompt}</p>
-          <p class="quiz-note-item-meta">정답: ${item.correctAnswer}</p>
-          <p class="quiz-note-item-meta">내 답: ${item.userAnswer}</p>
-          <p class="quiz-note-item-meta">읽기: ${item.reading || "-"}</p>
-          <p class="quiz-note-item-meta">뜻: ${item.meaning || "-"}</p>
+          <p class="quiz-note-item-meta">정답 · ${item.correctAnswer}</p>
+          <p class="quiz-note-item-meta">내 답 · ${item.userAnswer}</p>
+          <p class="quiz-note-item-meta">읽기 · ${item.reading || "-"}</p>
+          <p class="quiz-note-item-meta">뜻 · ${item.meaning || "-"}</p>
         </article>
       `
     )
@@ -2776,17 +2783,17 @@ function startNewQuizSession() {
 }
 
 function getQuizFeedbackText(question, correct, userAnswer) {
-  const readingText = question.meta?.reading ? ` 읽기: ${question.meta.reading}` : "";
-  const meaningText = question.meta?.meaning ? ` 뜻: ${question.meta.meaning}` : "";
+  const readingText = question.meta?.reading ? ` 읽기 · ${question.meta.reading}` : "";
+  const meaningText = question.meta?.meaning ? ` 뜻 · ${question.meta.meaning}` : "";
 
   if (correct) {
     return question.meta?.mode === "reading"
-      ? `정답입니다.${meaningText}`
-      : `정답입니다.${readingText}`;
+      ? `잘했어요!${meaningText}`
+      : `잘했어요!${readingText}`;
   }
 
-  return `오답입니다. 정답은 "${question.answer}" 입니다.${question.meta?.mode === "reading" ? meaningText : readingText} ${
-    userAnswer === "시간 초과" ? "시간 초과로 기록되었습니다." : ""
+  return `아쉽지만 괜찮아요. 정답은 "${question.answer}"예요.${question.meta?.mode === "reading" ? meaningText : readingText} ${
+    userAnswer === "시간 초과" ? "시간 초과로 남겨둘게요." : ""
   }`.trim();
 }
 
@@ -2842,13 +2849,13 @@ function finalizeQuizQuestion(question, selectedOption, correct) {
 
   if (feedback) {
     feedback.textContent = lastQuestion
-      ? `${getQuizFeedbackText(question, correct, selectedOption || "시간 초과")} 마지막 문제입니다. 결과를 확인하세요.`
+      ? `${getQuizFeedbackText(question, correct, selectedOption || "시간 초과")} 마지막 문제예요. 결과 보러 가볼까요?`
       : getQuizFeedbackText(question, correct, selectedOption || "시간 초과");
   }
 
   revealQuizAnswer(question, selectedOption, correct);
   setQuizActionState({
-    nextLabel: lastQuestion ? "결과 보기" : "다음 문제",
+    nextLabel: lastQuestion ? "결과 보러 갈까요?" : "다음으로 가볼까요?",
     nextDisabled: false,
     nextHidden: false,
     restartHidden: false
@@ -2879,12 +2886,12 @@ function renderQuiz() {
     stopQuizSessionTimer("quiz");
     level.textContent = `N5 · ${getQuizModeLabel()}`;
     progress.textContent = `${activeQuizQuestions.length} / ${activeQuizQuestions.length}`;
-    questionText.textContent = "세션 완료";
-    feedback.textContent = `${activeQuizQuestions.length}문제를 모두 풀었습니다.`;
+    questionText.textContent = "이번 퀴즈 끝!";
+    feedback.textContent = `${activeQuizQuestions.length}문제까지 잘 풀었어요.`;
     optionsContainer.innerHTML = "";
     optionsContainer.hidden = true;
     setQuizActionState({
-      nextLabel: "다음 문제",
+      nextLabel: "다음으로 가볼까요?",
       nextDisabled: true,
       nextHidden: true,
       restartHidden: false
@@ -2920,7 +2927,10 @@ function renderQuiz() {
   });
 
   setQuizActionState({
-    nextLabel: state.quizIndex >= activeQuizQuestions.length - 1 ? "결과 보기" : "다음 문제",
+    nextLabel:
+      state.quizIndex >= activeQuizQuestions.length - 1
+        ? "결과 보러 갈까요?"
+        : "다음으로 가볼까요?",
     nextDisabled: true,
     nextHidden: false,
     restartHidden: false
@@ -2963,7 +2973,7 @@ function nextQuiz() {
 
   if (!answered) {
     if (feedback) {
-      feedback.textContent = "답을 고른 뒤 다음으로 넘어갈 수 있습니다.";
+      feedback.textContent = "답을 고르면 다음으로 갈 수 있어요.";
     }
     return;
   }
@@ -3091,8 +3101,8 @@ function handleReadingAnswer(index) {
   });
 
   document.getElementById("reading-feedback").textContent = correct
-    ? "정답입니다."
-    : "오답입니다. 정답을 표시했습니다.";
+    ? "잘했어요!"
+    : "아쉽지만 괜찮아요. 정답 같이 볼게요.";
   document.getElementById("reading-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -3118,7 +3128,7 @@ function handleReadingTimeout() {
     }
   });
 
-  document.getElementById("reading-feedback").textContent = "시간이 끝났습니다.";
+  document.getElementById("reading-feedback").textContent = "시간이 끝났어요.";
   document.getElementById("reading-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -3157,7 +3167,7 @@ function renderStats() {
 }
 
 function attachEventListeners() {
-  const flashcard = document.getElementById("flashcard");
+  const flashcardToggle = document.getElementById("flashcard-toggle");
   const flashcardPrev = document.getElementById("flashcard-prev");
   const flashcardNext = document.getElementById("flashcard-next");
   const flashcardAgain = document.getElementById("flashcard-again");
@@ -3180,8 +3190,8 @@ function attachEventListeners() {
   const kanaTimeButtons = document.querySelectorAll("[data-kana-time]");
   const kanaSetupStart = document.getElementById("kana-setup-start");
 
-  if (flashcard) {
-    flashcard.addEventListener("click", toggleFlashcardReveal);
+  if (flashcardToggle) {
+    flashcardToggle.addEventListener("click", toggleFlashcardReveal);
   }
   if (flashcardPrev) {
     flashcardPrev.addEventListener("click", () => moveFlashcard(-1));

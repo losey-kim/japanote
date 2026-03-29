@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Japanote는 문자, 단어, 문법, 독해, 퀴즈를 가볍게 연습하는 일본어 학습 노트입니다.">
+  <meta name="description" content="문자부터 퀴즈까지, 오늘도 가볍게 일본어 해봐요.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Japanote">
   <meta property="og:title" content="Japanote">
-  <meta property="og:description" content="문자, 단어, 문법, 독해, 퀴즈를 가볍게 연습하는 일본어 학습 노트">
+  <meta property="og:description" content="문자부터 퀴즈까지, 오늘도 가볍게 일본어 해봐요.">
   <meta property="og:url" content="https://losey-kim.github.io/Japanote/reading.html">
   <meta property="og:image" content="https://losey-kim.github.io/Japanote/assets/images/social-preview.png">
   <meta property="og:image:alt" content="Japanote 로고">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Japanote">
-  <meta name="twitter:description" content="문자, 단어, 문법, 독해, 퀴즈를 가볍게 연습하는 일본어 학습 노트">
+  <meta name="twitter:description" content="문자부터 퀴즈까지, 오늘도 가볍게 일본어 해봐요.">
   <meta name="twitter:image" content="https://losey-kim.github.io/Japanote/assets/images/social-preview.png">
-  <title>Japanote - 독해</title>
+  <title>Japanote - 독해 연습</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -26,24 +26,24 @@
 <body>
   <div class="page-shell">
     <header class="topbar">
-      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span><div><p class="brand-name">Japanote</p><p class="brand-sub">일본어 공부를 가볍게 정리하는 노트</p></div></a>
-      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">처음 시작</a><a href="characters.html">문자</a><a href="vocab.html">단어</a><a href="grammar.html">문법</a><a href="reading.html" aria-current="page">독해</a><a href="quiz.html">퀴즈</a><a href="match.html">게임</a></nav>
-      <button class="theme-toggle" type="button" data-theme-toggle aria-label="현재 테마" title="테마"></button>
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span><div><p class="brand-name">Japanote</p><p class="brand-sub">오늘도 가볍게 일본어, 같이 해봐요</p></div></a>
+      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="vocab.html">단어</a><a href="grammar.html">문법</a><a href="reading.html" aria-current="page">독해</a><a href="quiz.html">퀴즈</a><a href="match.html">매칭</a></nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="테마 바꿔보기" title="테마 바꿔보기"></button>
     </header>
     <main>
       <section id="practice-sets" class="content-section">
-        <div class="section-heading"><span>READING PRACTICE</span><h2>독해 연습</h2><p class="section-copy">지문과 질문을 바로 볼 수 있게 정리했습니다.</p></div>
-        <div class="reading-level-switcher" id="reading-level-switcher" role="tablist" aria-label="독해 급수 선택"></div>
+        <div class="section-heading"><span>READING PRACTICE</span><h2>짧은 글, 같이 읽어볼까요?</h2><p class="section-copy">짧은 글부터 편하게 읽어보세요.</p></div>
+        <div class="reading-level-switcher" id="reading-level-switcher" role="tablist" aria-label="독해 레벨 고르기"></div>
         <article class="reading-card">
           <div class="reading-meta"><span id="reading-level">N5</span><span id="reading-source">N5R p1</span></div>
-          <div class="quiz-hud"><div class="quiz-hud-item"><span>진행</span><strong id="reading-progress">1 / 3</strong></div><div class="quiz-hud-item"><span>제한시간</span><strong id="reading-timer">45초</strong></div><div class="quiz-hud-item"><span>정답</span><strong id="reading-correct">0</strong></div><div class="quiz-hud-item"><span>연속 정답</span><strong id="reading-streak">0</strong></div></div>
-          <div class="reading-header"><div><span class="eyebrow">READING SET</span><h3 id="reading-title">독해 문제</h3></div><p class="reading-korean" id="reading-korean"></p></div>
+          <div class="quiz-hud"><div class="quiz-hud-item"><span>진행</span><strong id="reading-progress">1 / 3</strong></div><div class="quiz-hud-item"><span>남은 시간</span><strong id="reading-timer">45초</strong></div><div class="quiz-hud-item"><span>맞힌 수</span><strong id="reading-correct">0</strong></div><div class="quiz-hud-item"><span>연속 성공</span><strong id="reading-streak">0</strong></div></div>
+          <div class="reading-header"><div><span class="eyebrow">READING SET</span><h3 id="reading-title">독해 한 문제</h3></div><p class="reading-korean" id="reading-korean"></p></div>
           <div class="reading-passage" id="reading-passage"></div>
-          <div class="reading-question-box"><span class="eyebrow">QUESTION</span><h4 id="reading-question">질문을 불러오는 중입니다.</h4></div>
+          <div class="reading-question-box"><span class="eyebrow">QUESTION</span><h4 id="reading-question">질문을 데려오고 있어요.</h4></div>
           <div class="reading-options" id="reading-options"></div>
           <p class="reading-feedback" id="reading-feedback"></p>
           <p class="reading-explanation" id="reading-explanation"></p>
-          <div class="quiz-actions"><button class="primary-btn" id="reading-next" type="button">다음 지문</button></div>
+          <div class="quiz-actions"><button class="primary-btn" id="reading-next" type="button">다음 글도 볼까요?</button></div>
         </article>
       </section>
     </main>
@@ -51,3 +51,4 @@
   <script src="assets/js/theme.js"></script><script src="assets/js/app.js"></script>
 </body>
 </html>
+

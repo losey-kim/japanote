@@ -77,18 +77,65 @@
           </section>
 
           <section class="characters-tab-panel characters-quiz-panel" id="characters-tab-panel-quiz" data-characters-tab-panel="quiz" role="tabpanel" aria-labelledby="characters-tab-quiz" hidden aria-hidden="true">
-            <div class="kana-setup-shell" id="kana-setup-shell">
-              <button class="kana-setup-toggle" id="kana-setup-toggle" type="button" aria-expanded="true" aria-controls="kana-setup-panel">
-                <div class="kana-setup-toggle-copy"><span class="eyebrow">QUIZ SETUP</span><strong>퀴즈 설정 바꿔볼까요?</strong><span class="kana-setup-toggle-summary" id="kana-setup-summary">히라가나 · 10문제 · 5초</span></div>
-                <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-              </button>
-              <div class="kana-setup-panel" id="kana-setup-panel">
-                <div class="kana-setup-group"><span>문자 선택</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-mode="hiragana">히라가나</button><button class="level-button" type="button" data-kana-mode="katakana">카타카나</button><button class="level-button" type="button" data-kana-mode="random">랜덤</button></div></div>
-                <div class="kana-setup-group"><span>문제 수</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-count="10">10문제</button><button class="level-button" type="button" data-kana-count="20">20문제</button><button class="level-button" type="button" data-kana-count="30">30문제</button><button class="level-button" type="button" data-kana-count="all">전부</button></div></div>
-                <div class="kana-setup-group"><span>제한시간</span><div class="kana-setup-buttons"><button class="level-button" type="button" data-kana-time="0">천천히</button><button class="level-button is-active" type="button" data-kana-time="5">5초</button><button class="level-button" type="button" data-kana-time="10">10초</button><button class="level-button" type="button" data-kana-time="15">15초</button></div></div>
+            <div class="match-shell kana-quiz-shell">
+              <aside class="match-sidebar">
+                <div class="match-sidebar-head"><span class="eyebrow">QUIZ HUD</span><h3>문자 퀴즈</h3></div>
+                <div class="kana-setup-shell" id="kana-setup-shell">
+                  <button class="kana-setup-toggle" id="kana-setup-toggle" type="button" aria-expanded="true" aria-controls="kana-setup-panel">
+                    <div class="kana-setup-toggle-copy"><span class="eyebrow">QUIZ SETUP</span><strong>퀴즈 설정 바꿔볼까요?</strong><span class="kana-setup-toggle-summary" id="kana-setup-summary">히라가나 · 10문제 · 5초</span></div>
+                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                  </button>
+                  <div class="kana-setup-panel" id="kana-setup-panel">
+                    <div class="kana-setup-group"><span>문자 선택</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-mode="hiragana">히라가나</button><button class="level-button" type="button" data-kana-mode="katakana">카타카나</button><button class="level-button" type="button" data-kana-mode="random">랜덤</button></div></div>
+                    <div class="kana-setup-group"><span>문제 수</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-count="10">10문제</button><button class="level-button" type="button" data-kana-count="20">20문제</button><button class="level-button" type="button" data-kana-count="30">30문제</button><button class="level-button" type="button" data-kana-count="all">전부</button></div></div>
+                    <div class="kana-setup-group"><span>제한시간</span><div class="kana-setup-buttons"><button class="level-button" type="button" data-kana-time="0">천천히</button><button class="level-button is-active" type="button" data-kana-time="5">5초</button><button class="level-button" type="button" data-kana-time="10">10초</button><button class="level-button" type="button" data-kana-time="15">15초</button></div></div>
+                  </div>
+                </div>
+                <div class="match-actions">
+                  <button class="primary-btn button-with-icon kana-setup-start" id="kana-setup-start" type="button"><span class="material-symbols-rounded" aria-hidden="true">play_arrow</span><span>시작하기</span></button>
+                </div>
+              </aside>
+              <div class="match-board kana-quiz-board">
+                <p class="vocab-list-empty" id="kana-quiz-empty">설정을 마쳤다면 시작하기를 눌러주세요.</p>
+                <div class="kana-quiz-sheet" id="kana-quiz-practice-view" aria-hidden="true" hidden>
+                  <article class="basic-practice-card kana-practice-card" id="kana-quiz-card" hidden>
+                    <div class="basic-practice-meta"><span id="kana-quiz-sheet-source">-</span><span id="kana-quiz-sheet-progress">1 / 1</span></div>
+                    <div class="quiz-hud"><div class="quiz-hud-item"><span>남은 시간</span><strong id="kana-quiz-timer">0초</strong></div><div class="quiz-hud-item"><span>맞힌 수</span><strong id="kana-quiz-correct">0</strong></div></div>
+                    <div class="basic-practice-header"><div><span class="eyebrow" id="kana-quiz-sheet-label">KANA QUIZ</span><h3 id="kana-quiz-sheet-title">문자 퀴즈 해볼까요?</h3></div><p class="basic-practice-note" id="kana-quiz-sheet-desc">문자를 보고 읽기를 골라보세요.</p></div>
+                    <div class="basic-practice-prompt-box" id="kana-quiz-sheet-copy" hidden><span class="eyebrow">QUESTION</span><p id="kana-quiz-sheet-prompt">문제를 데려오고 있어요.</p></div>
+                    <div class="basic-practice-display-box"><strong id="kana-quiz-sheet-display">-</strong><p id="kana-quiz-sheet-display-sub"></p></div>
+                    <p class="basic-practice-note" id="kana-quiz-sheet-note" hidden></p>
+                    <div class="basic-practice-options" id="kana-quiz-options"></div>
+                    <p class="basic-practice-feedback kana-quiz-feedback" id="kana-quiz-feedback"></p>
+                    <p class="basic-practice-explanation kana-quiz-explanation" id="kana-quiz-explanation"></p>
+                    <div class="quiz-actions kana-quiz-actions"><button class="primary-btn" id="kana-quiz-next" type="button">다음으로 가볼까요?</button></div>
+                  </article>
+                </div>
+                <div class="match-result-view kana-result-view" id="kana-quiz-result-view" hidden>
+                  <p class="match-result-title">결과보기</p>
+                  <div class="match-result-grid">
+                    <article class="match-result-stat"><span>전체</span><strong id="kana-quiz-result-total">0</strong></article>
+                    <article class="match-result-stat"><span>정답</span><strong id="kana-quiz-result-correct-count">0</strong></article>
+                    <article class="match-result-stat"><span>오답</span><strong id="kana-quiz-result-wrong-count">0</strong></article>
+                  </div>
+                  <div class="match-result-filters">
+                    <label class="match-result-filter-field" for="kana-quiz-result-filter">
+                      <div class="match-result-filter-select-wrap">
+                        <select class="match-result-filter-select" id="kana-quiz-result-filter" aria-label="문자 퀴즈 결과 필터">
+                          <option value="all">전체</option>
+                          <option value="correct">정답</option>
+                          <option value="wrong">오답</option>
+                        </select>
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                      </div>
+                    </label>
+                  </div>
+                  <p class="match-result-empty" id="kana-quiz-result-empty" hidden>보여줄 결과가 아직 없어요.</p>
+                  <div class="match-result-list" id="kana-quiz-result-list"></div>
+                  <div class="quiz-actions"><button class="primary-btn button-with-icon" id="kana-quiz-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시하기</span></button></div>
+                </div>
               </div>
             </div>
-            <button class="primary-btn kana-setup-start" id="kana-setup-start" type="button">퀴즈 시작</button>
           </section>
 
           <section class="characters-tab-panel" id="characters-tab-panel-writing" data-characters-tab-panel="writing" role="tabpanel" aria-labelledby="characters-tab-writing" hidden aria-hidden="true">
@@ -161,23 +208,6 @@
         </div>
       </section>
     </main>
-  </div>
-  <div class="kana-quiz-sheet" id="kana-quiz-sheet" hidden aria-hidden="true">
-    <button class="kana-quiz-sheet-backdrop" type="button" data-kana-sheet-close aria-label="퀴즈 닫기"></button>
-    <section class="kana-quiz-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="kana-quiz-sheet-title" aria-describedby="kana-quiz-sheet-desc">
-      <div class="kana-quiz-sheet-handle" aria-hidden="true"></div>
-      <div class="kana-quiz-sheet-head"><div><span class="eyebrow" id="kana-quiz-sheet-label">KANA QUIZ</span><h3 id="kana-quiz-sheet-title">문자 퀴즈 해볼까요?</h3><p class="kana-quiz-sheet-desc" id="kana-quiz-sheet-desc">문자를 보고 읽기를 골라보세요.</p></div><button class="kana-quiz-close icon-only-btn" type="button" data-kana-sheet-close aria-label="퀴즈 닫기"><span class="material-symbols-rounded" aria-hidden="true">close</span></button></div>
-      <div class="kana-quiz-sheet-hud"><div class="quiz-hud-item"><span>진행</span><strong id="kana-quiz-sheet-progress">1 / 1</strong></div><div class="quiz-hud-item"><span>남은 시간</span><strong id="kana-quiz-timer">0초</strong></div><div class="quiz-hud-item"><span>맞힌 수</span><strong id="kana-quiz-correct">0</strong></div><div class="quiz-hud-item"><span>연속 성공</span><strong id="kana-quiz-streak">0</strong></div></div>
-      <div class="kana-quiz-sheet-meta"><span id="kana-quiz-sheet-source">-</span></div>
-      <div class="kana-quiz-sheet-copy" id="kana-quiz-sheet-copy"><span class="eyebrow">QUESTION</span><p id="kana-quiz-sheet-prompt">문제를 데려오고 있어요.</p></div>
-      <div class="kana-quiz-sheet-display"><strong id="kana-quiz-sheet-display">-</strong><p id="kana-quiz-sheet-display-sub"></p></div>
-      <div class="kana-quiz-sheet-note" id="kana-quiz-sheet-note"></div>
-      <div class="kana-quiz-options" id="kana-quiz-options"></div>
-      <div class="quiz-result kana-quiz-result" id="kana-quiz-result" hidden><div class="quiz-result-grid"><article class="quiz-result-item"><span>이번 점수</span><strong id="kana-quiz-result-score">0 / 0</strong></article><article class="quiz-result-item"><span>정답률</span><strong id="kana-quiz-result-accuracy">0%</strong></article><article class="quiz-result-item"><span>아쉬운 문제</span><strong id="kana-quiz-result-wrong">0개</strong></article></div><p class="quiz-result-copy" id="kana-quiz-result-copy">결과를 정리하고 있어요.</p></div>
-      <p class="kana-quiz-feedback" id="kana-quiz-feedback"></p>
-      <p class="kana-quiz-explanation" id="kana-quiz-explanation"></p>
-      <div class="quiz-actions kana-quiz-actions"><button class="primary-btn" id="kana-quiz-next" type="button">다음으로 가볼까요?</button></div>
-    </section>
   </div>
   <script src="assets/js/theme.js?v=20260330a"></script><script src="assets/js/jlpt-vocab-data.js?v=20260330a"></script><script src="assets/js/vocab-registry.js?v=20260330a"></script><script src="assets/js/kana-strokes.js?v=20260330a"></script><script src="assets/js/app.js?v=20260330a"></script>
 </body>

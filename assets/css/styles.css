@@ -921,7 +921,7 @@ button {
 .characters-quiz-panel {
   display: grid;
   gap: 16px;
-  max-width: 780px;
+  max-width: none;
 }
 
 .characters-quiz-panel .kana-setup-shell,
@@ -931,6 +931,31 @@ button {
 
 .characters-quiz-panel .kana-setup-start {
   width: 100%;
+}
+
+.characters-quiz-panel .match-shell {
+  margin-top: 0;
+}
+
+.kana-quiz-board {
+  display: grid;
+  gap: 16px;
+}
+
+.kana-practice-card {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.kana-result-view {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.kana-result-view .match-result-item-main strong {
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.15;
 }
 
 .kana-library-grid {
@@ -1126,121 +1151,14 @@ button {
   white-space: nowrap;
 }
 
-body.is-kana-quiz-sheet-open {
-  overflow: hidden;
-}
-
-body.is-kana-quiz-sheet-open .page-shell {
-  filter: blur(3px);
-  pointer-events: none;
-  user-select: none;
-}
-
 .kana-quiz-sheet {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  display: grid;
-  align-items: end;
-  justify-items: center;
-  padding: 24px;
-  background: rgba(6, 10, 16, 0.78);
-  backdrop-filter: blur(8px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 180ms ease;
-}
-
-.kana-quiz-sheet.is-open {
-  opacity: 1;
-  pointer-events: auto;
+  margin-top: 0;
 }
 
 .kana-quiz-sheet[hidden] {
   display: none;
 }
 
-.kana-quiz-sheet-backdrop {
-  position: absolute;
-  inset: 0;
-  border: 0;
-  background: transparent;
-}
-
-.kana-quiz-sheet-panel {
-  position: relative;
-  z-index: 1;
-  width: min(980px, 100%);
-  max-height: min(86vh, 820px);
-  overflow: auto;
-  padding: 22px 22px 22px;
-  border: 1px solid var(--line-strong);
-  border-radius: 30px 30px 22px 22px;
-  background: linear-gradient(180deg, var(--surface-strong), var(--surface));
-  box-shadow: var(--shadow);
-  transform: translateY(28px);
-  transition: transform 220ms ease;
-}
-
-.kana-quiz-sheet.is-open .kana-quiz-sheet-panel {
-  transform: translateY(0);
-}
-
-.kana-quiz-sheet-handle {
-  width: 72px;
-  height: 5px;
-  margin: 0 auto 16px;
-  border-radius: 999px;
-  background: var(--line-strong);
-  opacity: 0.45;
-}
-
-.kana-quiz-sheet-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-  padding-right: 44px;
-}
-
-.kana-quiz-sheet-head h3 {
-  margin: 10px 0 0;
-  font-family: "Space Grotesk", sans-serif;
-  letter-spacing: -0.03em;
-  font-size: clamp(1.35rem, 2.4vw, 2rem);
-}
-
-.kana-quiz-close {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 38px;
-  height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface-strong);
-  color: var(--text);
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.kana-quiz-close .material-symbols-rounded {
-  font-size: 1.25rem;
-}
-
-.kana-quiz-close:hover,
-.kana-quiz-close:focus-visible {
-  border-color: var(--line-strong);
-  background: var(--surface);
-}
-
-.kana-quiz-sheet-desc,
-.kana-quiz-sheet-copy p,
-.kana-quiz-sheet-note,
 .kana-quiz-feedback,
 .kana-quiz-explanation {
   color: var(--muted);
@@ -1248,130 +1166,8 @@ body.is-kana-quiz-sheet-open .page-shell {
   white-space: pre-line;
 }
 
-.kana-quiz-sheet-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.kana-quiz-sheet-hud {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.kana-quiz-sheet-meta span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.88rem;
-}
-
-.kana-quiz-sheet-copy,
-.kana-quiz-sheet-display,
-.kana-quiz-sheet-note {
-  margin-top: 14px;
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  background: var(--surface);
-}
-
-.kana-quiz-sheet-copy p {
-  margin: 10px 0 0;
-}
-
-.kana-quiz-sheet-display {
-  display: grid;
-  align-content: center;
-  gap: 8px;
-  min-height: 140px;
-  margin-top: 16px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)),
-    var(--surface);
-}
-
-.kana-quiz-sheet-display strong {
-  display: block;
-  font-family: "Noto Sans JP", sans-serif;
-  font-size: clamp(2.25rem, 6vw, 4rem);
-  line-height: 1;
-  letter-spacing: -0.05em;
-  white-space: pre-line;
-}
-
-.kana-quiz-sheet-display p,
-.kana-quiz-sheet-note {
-  margin: 0;
-}
-
-.kana-quiz-sheet-display p {
-  display: none;
-}
-
-.kana-quiz-sheet-note {
-  min-height: 0;
-}
-
-.kana-quiz-sheet-copy[hidden],
-.kana-quiz-sheet-note[hidden] {
-  display: none;
-}
-
-.kana-quiz-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.kana-quiz-option {
-  width: 100%;
-  padding: 18px 20px;
-  text-align: left;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: var(--surface-strong);
-  font-family: "Noto Sans KR", sans-serif;
-  font-size: 1rem;
-  line-height: 1.75;
-  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
-  white-space: pre-line;
-}
-
-.kana-quiz-option:hover,
-.kana-quiz-option:focus-visible {
-  transform: translateY(-1px);
-  border-color: var(--line-strong);
-  background: var(--surface);
-}
-
-.kana-quiz-option.is-correct {
-  border-color: rgba(95, 174, 139, 0.9);
-  background: rgba(95, 174, 139, 0.14);
-}
-
-.kana-quiz-option.is-wrong {
-  border-color: rgba(222, 107, 72, 0.92);
-  background: rgba(222, 107, 72, 0.14);
-}
-
 .kana-quiz-actions {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
   margin-top: 18px;
-  padding-top: 14px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0), var(--surface) 32%);
 }
 
 .kana-table-body {
@@ -4809,32 +4605,7 @@ body::after {
   }
 
   .kana-quiz-sheet {
-    padding: 10px;
-    align-items: end;
-  }
-
-  .kana-quiz-sheet-panel {
-    width: 100%;
-    max-height: calc(100vh - 20px);
-    border-radius: 24px 24px 18px 18px;
-    padding: 18px;
-  }
-
-  .kana-quiz-sheet-head {
-    flex-direction: column;
-    padding-right: 40px;
-  }
-
-  .kana-quiz-sheet-hud {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .kana-quiz-options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .kana-quiz-sheet-display strong {
-    font-size: clamp(2rem, 14vw, 3.6rem);
+    margin-top: 14px;
   }
 
   .quiz-toggle-panel {

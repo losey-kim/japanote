@@ -1462,7 +1462,15 @@ const kanaQuizSheetState = {
   sessionIndex: 0,
   sessionItems: [],
   answered: false,
-  finished: false
+  finished: false,
+  results: [],
+  resultFilter: "all"
+};
+
+const kanaQuizResultFilterLabels = {
+  all: "전체",
+  correct: "정답",
+  wrong: "오답"
 };
 
 function getKanaQuizModeLabel(mode) {
@@ -1575,53 +1583,113 @@ function getKanaQuizDurationLabel(duration) {
   return Number(duration) <= 0 ? "천천히" : `${duration}초`;
 }
 
-function ensureKanaQuizResult() {
-  let result = document.getElementById("kana-quiz-result");
-
-  if (result) {
-    return result;
-  }
-
-  const feedback = document.getElementById("kana-quiz-feedback");
-
-  if (!feedback?.parentElement) {
-    return null;
-  }
-
-  result = document.createElement("div");
-  result.className = "quiz-result kana-quiz-result";
-  result.id = "kana-quiz-result";
-  result.hidden = true;
-  result.innerHTML =
-    '<div class="quiz-result-grid"><article class="quiz-result-item"><span>이번 점수</span><strong id="kana-quiz-result-score">0 / 0</strong></article><article class="quiz-result-item"><span>정답률</span><strong id="kana-quiz-result-accuracy">0%</strong></article><article class="quiz-result-item"><span>아쉬운 문제</span><strong id="kana-quiz-result-wrong">0개</strong></article></div><p class="quiz-result-copy" id="kana-quiz-result-copy">결과를 정리하고 있어요.</p>';
-  feedback.parentElement.insertBefore(result, feedback);
-
-  return result;
+function getKanaQuizResultFilter(value = kanaQuizSheetState.resultFilter) {
+  return Object.prototype.hasOwnProperty.call(kanaQuizResultFilterLabels, value) ? value : "all";
 }
 
-function renderKanaQuizResult() {
-  const result = ensureKanaQuizResult();
-  const score = document.getElementById("kana-quiz-result-score");
-  const accuracy = document.getElementById("kana-quiz-result-accuracy");
-  const wrong = document.getElementById("kana-quiz-result-wrong");
-  const copy = document.getElementById("kana-quiz-result-copy");
+function getKanaQuizResultCounts() {
+  return {
+    all: kanaQuizSheetState.results.length,
+    correct: kanaQuizSheetState.results.filter((item) => item.status === "correct").length,
+    wrong: kanaQuizSheetState.results.filter((item) => item.status === "wrong").length
+  };
+}
 
-  if (!result || !score || !accuracy || !wrong || !copy) {
+function getFilteredKanaQuizResults(filter = getKanaQuizResultFilter(kanaQuizSheetState.resultFilter)) {
+  const activeFilter = getKanaQuizResultFilter(filter);
+
+  if (activeFilter === "all") {
+    return [...kanaQuizSheetState.results];
+  }
+
+  return kanaQuizSheetState.results.filter((item) => item.status === activeFilter);
+}
+
+function setKanaQuizResult(current, selectedIndex, correct, timedOut = false) {
+  const reading = current.item.options[current.item.answer] || current.item.displaySub || "";
+  const selected = timedOut ? "" : current.item.options[selectedIndex] || "";
+  const result = {
+    id: current.item.id,
+    source: current.item.source,
+    char: current.item.display,
+    reading,
+    selected,
+    status: correct ? "correct" : "wrong",
+    timedOut
+  };
+  const existingIndex = kanaQuizSheetState.results.findIndex((item) => item.id === current.item.id);
+
+  if (existingIndex >= 0) {
+    kanaQuizSheetState.results[existingIndex] = result;
     return;
   }
 
-  const total = kanaQuizSheetState.sessionItems.length;
-  const correct = quizSessions.kana.correct;
-  const wrongCount = Math.max(0, total - correct);
+  kanaQuizSheetState.results.push(result);
+}
 
-  result.hidden = false;
-  score.textContent = `${correct} / ${total}`;
-  accuracy.textContent = `${getQuizAccuracyValue(correct, total)}%`;
-  wrong.textContent = `${wrongCount}개`;
-  copy.textContent =
-    wrongCount === 0
-      ? `${getKanaQuizModeLabel(kanaQuizSheetState.mode)} ${total}문제, 전부 맞혔어요!`
-      : `${getKanaQuizModeLabel(kanaQuizSheetState.mode)} ${total}문제까지 왔어요. 한 번 더 해볼까요?`;
+function renderKanaQuizResultFilterOptions(counts) {
+  const filterSelect = document.getElementById("kana-quiz-result-filter");
+
+  if (!filterSelect) {
+    return;
+  }
+
+  filterSelect.innerHTML = Object.keys(kanaQuizResultFilterLabels)
+    .map((filter) => `<option value="${filter}">${kanaQuizResultFilterLabels[filter]} (${counts[filter] ?? 0})</option>`)
+    .join("");
+  filterSelect.value = getKanaQuizResultFilter(kanaQuizSheetState.resultFilter);
+}
+
+function renderKanaQuizResults() {
+  const total = document.getElementById("kana-quiz-result-total");
+  const correct = document.getElementById("kana-quiz-result-correct-count");
+  const wrong = document.getElementById("kana-quiz-result-wrong-count");
+  const empty = document.getElementById("kana-quiz-result-empty");
+  const list = document.getElementById("kana-quiz-result-list");
+  const counts = getKanaQuizResultCounts();
+  const filteredResults = getFilteredKanaQuizResults();
+
+  if (!total || !correct || !wrong || !empty || !list) {
+    return;
+  }
+
+  total.textContent = String(counts.all);
+  correct.textContent = String(counts.correct);
+  wrong.textContent = String(counts.wrong);
+  renderKanaQuizResultFilterOptions(counts);
+
+  if (!filteredResults.length) {
+    empty.hidden = false;
+    empty.textContent = `${kanaQuizResultFilterLabels[getKanaQuizResultFilter(kanaQuizSheetState.resultFilter)]} 결과가 없어요.`;
+    list.innerHTML = "";
+    return;
+  }
+
+  empty.hidden = true;
+  list.innerHTML = filteredResults
+    .map((item) => {
+      const statusLabel = item.timedOut ? "시간초과" : item.status === "correct" ? "정답" : "오답";
+      const detail =
+        item.status === "correct"
+          ? `정답: ${formatQuizLineBreaks(item.reading)}`
+          : `선택: ${formatQuizLineBreaks(item.selected || "미응답")} · 정답: ${formatQuizLineBreaks(item.reading)}`;
+
+      return `
+        <article class="match-result-item is-${item.status}">
+          <div class="match-result-item-head">
+            <div class="match-result-item-badges">
+              <span class="match-result-badge is-${item.status}">${statusLabel}</span>
+              <span class="match-result-level">${formatQuizLineBreaks(item.source || getKanaQuizModeLabel(kanaQuizSheetState.mode))}</span>
+            </div>
+          </div>
+          <div class="match-result-item-main">
+            <strong>${formatQuizLineBreaks(item.char)} · ${formatQuizLineBreaks(item.reading)}</strong>
+            <p>${detail}</p>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
 }
 
 function renderKanaQuizSetup() {
@@ -1674,6 +1742,8 @@ function startKanaQuizSession(mode = kanaQuizSettings.mode) {
   kanaQuizSheetState.answered = false;
   kanaQuizSheetState.finished = false;
   kanaQuizSheetState.open = true;
+  kanaQuizSheetState.results = [];
+  kanaQuizSheetState.resultFilter = "all";
 
   quizSessions.kana.duration = Number(kanaQuizSettings.duration);
   quizSessions.kana.timeLeft = Number(kanaQuizSettings.duration);
@@ -1687,7 +1757,15 @@ function startKanaQuizSession(mode = kanaQuizSettings.mode) {
 }
 
 function openKanaQuizSheet(mode) {
+  state.charactersTab = "quiz";
+  saveState();
+  renderCharactersPageLayout();
   startKanaQuizSession(mode);
+
+  const quizPanel = document.getElementById("characters-tab-panel-quiz");
+  if (quizPanel) {
+    quizPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 function closeKanaQuizSheet() {
@@ -1697,7 +1775,10 @@ function closeKanaQuizSheet() {
 }
 
 function renderKanaQuizSheet() {
-  const sheet = document.getElementById("kana-quiz-sheet");
+  const practiceView = document.getElementById("kana-quiz-practice-view");
+  const card = document.getElementById("kana-quiz-card");
+  const empty = document.getElementById("kana-quiz-empty");
+  const resultView = document.getElementById("kana-quiz-result-view");
   const label = document.getElementById("kana-quiz-sheet-label");
   const title = document.getElementById("kana-quiz-sheet-title");
   const desc = document.getElementById("kana-quiz-sheet-desc");
@@ -1709,53 +1790,32 @@ function renderKanaQuizSheet() {
   const display = document.getElementById("kana-quiz-sheet-display");
   const displaySub = document.getElementById("kana-quiz-sheet-display-sub");
   const options = document.getElementById("kana-quiz-options");
-  const result = ensureKanaQuizResult();
   const feedback = document.getElementById("kana-quiz-feedback");
   const explanation = document.getElementById("kana-quiz-explanation");
   const next = document.getElementById("kana-quiz-next");
 
-  if (!sheet || !label || !title || !desc || !source || !progress || !promptBox || !note || !prompt || !display || !displaySub || !options || !result || !feedback || !explanation || !next) {
+  if (!practiceView || !card || !empty || !resultView || !label || !title || !desc || !source || !progress || !promptBox || !note || !prompt || !display || !displaySub || !options || !feedback || !explanation || !next) {
     return;
   }
 
   const current = getKanaQuizSheetCurrentItem();
 
-  sheet.hidden = !kanaQuizSheetState.open;
-  sheet.classList.toggle("is-open", kanaQuizSheetState.open);
-  sheet.setAttribute("aria-hidden", String(!kanaQuizSheetState.open));
-  document.body.classList.toggle("is-kana-quiz-sheet-open", kanaQuizSheetState.open);
+  empty.hidden = kanaQuizSheetState.open;
+  practiceView.hidden = !kanaQuizSheetState.open || kanaQuizSheetState.finished;
+  practiceView.setAttribute("aria-hidden", String(practiceView.hidden));
+  card.hidden = !kanaQuizSheetState.open || kanaQuizSheetState.finished;
+  resultView.hidden = !kanaQuizSheetState.open || !kanaQuizSheetState.finished;
+  resultView.setAttribute("aria-hidden", String(resultView.hidden));
 
   if (!kanaQuizSheetState.open) {
+    feedback.textContent = "";
+    explanation.textContent = "";
+    explanation.hidden = true;
     return;
   }
 
   if (kanaQuizSheetState.finished) {
-    const total = kanaQuizSheetState.sessionItems.length;
-    const modeLabel = getKanaQuizModeLabel(kanaQuizSheetState.mode);
-
-    label.textContent = `${modeLabel.toUpperCase()} QUIZ`;
-    title.textContent = `${modeLabel} 퀴즈 끝!`;
-    desc.textContent = "결과를 한 번 볼까요?";
-    source.textContent = [
-      getKanaQuizModeLabel(kanaQuizSettings.mode),
-      getKanaQuizCountLabel(kanaQuizSettings.count),
-      getKanaQuizDurationLabel(kanaQuizSettings.duration)
-    ].join(" · ");
-    progress.textContent = `${total} / ${total}`;
-    promptBox.hidden = true;
-    note.hidden = true;
-    note.textContent = "";
-    prompt.textContent = "";
-    display.textContent = "잘했어요!";
-    displaySub.textContent = "";
-    options.innerHTML = "";
-    options.hidden = true;
-    feedback.textContent = `${total}문제까지 풀었어요.`;
-    explanation.textContent = "";
-    explanation.hidden = true;
-    next.disabled = false;
-    next.textContent = "다시 해볼까요?";
-    renderKanaQuizResult();
+    renderKanaQuizResults();
     return;
   }
 
@@ -1773,9 +1833,9 @@ function renderKanaQuizSheet() {
     displaySub.textContent = "";
     options.innerHTML = "";
     options.hidden = false;
-    result.hidden = true;
     feedback.textContent = "";
     explanation.textContent = "";
+    explanation.hidden = true;
     next.disabled = true;
     return;
   }
@@ -1795,7 +1855,6 @@ function renderKanaQuizSheet() {
   feedback.textContent = "";
   explanation.textContent = "";
   explanation.hidden = true;
-  result.hidden = true;
   options.hidden = false;
   next.disabled = true;
   next.textContent =
@@ -1805,7 +1864,7 @@ function renderKanaQuizSheet() {
   current.item.options.forEach((option, optionIndex) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "kana-quiz-option";
+    button.className = "basic-practice-option kana-quiz-option";
     button.dataset.kanaQuizOption = String(optionIndex);
     button.textContent = formatQuizLineBreaks(option);
     button.addEventListener("click", () => handleKanaQuizSheetAnswer(optionIndex));
@@ -1853,6 +1912,7 @@ function handleKanaQuizSheetAnswer(index) {
     explanation.hidden = true;
   }
 
+  setKanaQuizResult(current, index, correct);
   finalizeKanaQuizAnswer(correct);
 }
 
@@ -1873,13 +1933,14 @@ function handleKanaQuizTimeout() {
   const feedback = document.getElementById("kana-quiz-feedback");
   const explanation = document.getElementById("kana-quiz-explanation");
   if (feedback) {
-    feedback.textContent = "시간이 끝났어요.";
+    feedback.textContent = "";
   }
   if (explanation) {
     explanation.textContent = "";
     explanation.hidden = true;
   }
 
+  setKanaQuizResult(current, -1, false, true);
   finalizeKanaQuizAnswer(false);
 }
 
@@ -4225,7 +4286,7 @@ function handleBasicPracticeTimeout() {
     }
   });
 
-  document.getElementById("basic-practice-feedback").textContent = "시간이 끝났어요.";
+  document.getElementById("basic-practice-feedback").textContent = "";
   document.getElementById("basic-practice-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -5485,7 +5546,7 @@ function finalizeVocabQuizQuestion(selectedIndex, timedOut = false) {
   feedback.textContent = correct
     ? "잘했어요!"
     : timedOut
-      ? "시간이 끝났어요."
+      ? ""
       : "아쉽지만 괜찮아요. 정답 같이 볼게요.";
   explanation.textContent = question.explanation || "";
   nextButton.disabled = false;
@@ -6470,7 +6531,7 @@ function handleGrammarPracticeTimeout() {
     }
   });
 
-  document.getElementById("grammar-practice-feedback").textContent = "시간이 끝났어요.";
+  document.getElementById("grammar-practice-feedback").textContent = "";
   document.getElementById("grammar-practice-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -7182,7 +7243,7 @@ function handleReadingTimeout() {
     }
   });
 
-  document.getElementById("reading-feedback").textContent = "시간이 끝났어요.";
+  document.getElementById("reading-feedback").textContent = "";
   document.getElementById("reading-explanation").textContent = current.explanation;
 
   updateStudyStreak();
@@ -7289,7 +7350,8 @@ function attachEventListeners() {
   const kanjiTabButtons = document.querySelectorAll("[data-kanji-tab]");
   const grammarPracticeNext = document.getElementById("grammar-practice-next");
   const kanaQuizNext = document.getElementById("kana-quiz-next");
-  const kanaQuizCloseButtons = document.querySelectorAll("[data-kana-sheet-close]");
+  const kanaQuizRestart = document.getElementById("kana-quiz-restart");
+  const kanaQuizResultFilter = document.getElementById("kana-quiz-result-filter");
   const kanaSetupToggle = document.getElementById("kana-setup-toggle");
   const kanaModeButtons = document.querySelectorAll("[data-kana-mode]");
   const kanaCountButtons = document.querySelectorAll("[data-kana-count]");
@@ -7712,6 +7774,17 @@ function attachEventListeners() {
       startKanaQuizSession(kanaQuizSettings.mode);
     });
   }
+  if (kanaQuizRestart) {
+    kanaQuizRestart.addEventListener("click", () => {
+      startKanaQuizSession(kanaQuizSettings.mode);
+    });
+  }
+  if (kanaQuizResultFilter) {
+    kanaQuizResultFilter.addEventListener("change", (event) => {
+      kanaQuizSheetState.resultFilter = getKanaQuizResultFilter(event.target.value);
+      renderKanaQuizResults();
+    });
+  }
   charactersTabButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const nextTab = getCharactersTab(button.dataset.charactersTab);
@@ -7750,9 +7823,6 @@ function attachEventListeners() {
       saveState();
       renderGrammarPageLayout();
     });
-  });
-  kanaQuizCloseButtons.forEach((button) => {
-    button.addEventListener("click", closeKanaQuizSheet);
   });
   writingModeButtons.forEach((button) => {
     button.addEventListener("click", () => {

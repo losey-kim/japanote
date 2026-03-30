@@ -73,6 +73,7 @@ const fallbackFlashcards = [
 let flashcards = [...fallbackFlashcards];
 let vocabListItems = [...fallbackFlashcards];
 const vocabPageSize = 20;
+const vocabQuizSessionSize = 12;
 
 const starterItems = [
   {
@@ -386,6 +387,186 @@ const basicPracticeSets = {
         options: ["みず", "か", "き", "ほん"],
         answer: 0,
         explanation: "水는 みず, 물입니다. 단어 카드와 같이 보면 더 빨리 익힙니다."
+      },
+      {
+        id: "bp-j6",
+        source: "한자 6",
+        title: "나무 한자",
+        note: "요일과 단어에서 자주 보임",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "木",
+        displaySub: "뜻: 나무",
+        options: ["き", "やま", "かわ", "て"],
+        answer: 0,
+        explanation: "木는 き, 나무입니다. 목요일(木曜日)에서도 자주 만납니다."
+      },
+      {
+        id: "bp-j7",
+        source: "한자 7",
+        title: "산 한자",
+        note: "지형 표현의 기본",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "山",
+        displaySub: "뜻: 산",
+        options: ["やま", "くち", "みず", "ひ"],
+        answer: 0,
+        explanation: "山은 やま, 산입니다. 富士山처럼 지명에서도 많이 보입니다."
+      },
+      {
+        id: "bp-j8",
+        source: "한자 8",
+        title: "강 한자",
+        note: "자연 표현과 함께 익히기",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "川",
+        displaySub: "뜻: 강",
+        options: ["かわ", "やま", "ひと", "て"],
+        answer: 0,
+        explanation: "川은 かわ, 강입니다. 산과 함께 자연 관련 단어에서 자주 보입니다."
+      },
+      {
+        id: "bp-j9",
+        source: "한자 9",
+        title: "입 한자",
+        note: "몸과 관련된 기초 한자",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "口",
+        displaySub: "뜻: 입",
+        options: ["くち", "め", "あめ", "つき"],
+        answer: 0,
+        explanation: "口는 くち, 입입니다. 입구라는 뜻의 入口에서도 같은 글자를 봅니다."
+      },
+      {
+        id: "bp-j10",
+        source: "한자 10",
+        title: "손 한자",
+        note: "몸 표현을 넓히는 한자",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "手",
+        displaySub: "뜻: 손",
+        options: ["て", "くち", "き", "かわ"],
+        answer: 0,
+        explanation: "手는 て, 손입니다. 上手처럼 익숙한 단어에서도 자주 보입니다."
+      },
+      {
+        id: "bp-j11",
+        source: "한자 11",
+        title: "눈 한자",
+        note: "몸과 관련된 핵심 한자",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "目",
+        displaySub: "뜻: 눈",
+        options: ["め", "みみ", "あし", "いし"],
+        answer: 0,
+        explanation: "目는 め, 눈입니다. 첫눈에 익혀두면 관련 단어를 볼 때 도움이 됩니다."
+      },
+      {
+        id: "bp-j12",
+        source: "한자 12",
+        title: "귀 한자",
+        note: "몸 표현 세트로 익히기",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "耳",
+        displaySub: "뜻: 귀",
+        options: ["みみ", "め", "はな", "あめ"],
+        answer: 0,
+        explanation: "耳는 みみ, 귀입니다. 目와 함께 몸 관련 기초 한자로 자주 묶어서 배웁니다."
+      },
+      {
+        id: "bp-j13",
+        source: "한자 13",
+        title: "발 한자",
+        note: "몸 표현을 넓히는 기본",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "足",
+        displaySub: "뜻: 발",
+        options: ["あし", "て", "くるま", "かわ"],
+        answer: 0,
+        explanation: "足는 あし, 발입니다. 걷기나 이동 관련 표현에서도 자주 보입니다."
+      },
+      {
+        id: "bp-j14",
+        source: "한자 14",
+        title: "비 한자",
+        note: "날씨 표현에서 자주 등장",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "雨",
+        displaySub: "뜻: 비",
+        options: ["あめ", "ゆき", "いし", "そら"],
+        answer: 0,
+        explanation: "雨는 あめ, 비입니다. 날씨 관련 기초 단어를 볼 때 매우 자주 나옵니다."
+      },
+      {
+        id: "bp-j15",
+        source: "한자 15",
+        title: "돌 한자",
+        note: "짧게 외우기 좋은 명사",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "石",
+        displaySub: "뜻: 돌",
+        options: ["いし", "き", "たけ", "かい"],
+        answer: 0,
+        explanation: "石는 いし, 돌입니다. 글자 모양도 단순해서 초반에 익히기 좋습니다."
+      },
+      {
+        id: "bp-j16",
+        source: "한자 16",
+        title: "꽃 한자",
+        note: "일상 단어와 같이 보기",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "花",
+        displaySub: "뜻: 꽃",
+        options: ["はな", "みず", "そら", "た"],
+        answer: 0,
+        explanation: "花는 はな, 꽃입니다. 회화에서도 자주 쓰이는 친숙한 한자입니다."
+      },
+      {
+        id: "bp-j17",
+        source: "한자 17",
+        title: "차 한자",
+        note: "이동 관련 단어의 기본",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "車",
+        displaySub: "뜻: 차, 자동차",
+        options: ["くるま", "かわ", "いと", "やま"],
+        answer: 0,
+        explanation: "車는 くるま, 차입니다. 실제 생활 단어와 연결해서 외우기 좋습니다."
+      },
+      {
+        id: "bp-j18",
+        source: "한자 18",
+        title: "하늘 한자",
+        note: "자연 표현 확장",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "空",
+        displaySub: "뜻: 하늘",
+        options: ["そら", "あめ", "かわ", "ひ"],
+        answer: 0,
+        explanation: "空는 そら, 하늘입니다. 날씨나 풍경 표현과 함께 자주 익힙니다."
+      },
+      {
+        id: "bp-j19",
+        source: "한자 19",
+        title: "밭 한자",
+        note: "기초 글자 모양 익히기",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "田",
+        displaySub: "뜻: 밭",
+        options: ["た", "いし", "たけ", "はな"],
+        answer: 0,
+        explanation: "田는 た, 밭입니다. 모양이 단순해서 초급 한자 감각을 잡기 좋습니다."
+      },
+      {
+        id: "bp-j20",
+        source: "한자 20",
+        title: "대나무 한자",
+        note: "자연 한자 마무리",
+        prompt: "이 한자, 어떻게 읽을까요?",
+        display: "竹",
+        displaySub: "뜻: 대나무",
+        options: ["たけ", "き", "いと", "くち"],
+        answer: 0,
+        explanation: "竹은 たけ, 대나무입니다. 자연 관련 한자를 넓힐 때 같이 보기 좋습니다."
       }
     ]
   },
@@ -503,7 +684,17 @@ const quizModeLabels = {
   meaning: "뜻 맞히기",
   reading: "읽기 맞히기"
 };
+const vocabQuizModeLabels = {
+  meaning: "뜻 맞히기",
+  word: "단어 맞히기"
+};
+const vocabQuizResultFilterLabels = {
+  all: "전체",
+  correct: "정답",
+  wrong: "오답"
+};
 const quizSessionSizeOptions = [10, 20];
+const vocabQuizCountOptions = [5, 10, 15, 20];
 const quizDurationOptions = [0, 10, 15, 20];
 const readingDurationOptions = [0, 45, 60, 90];
 const vocabPartAllValue = allLevelValue;
@@ -525,6 +716,27 @@ function normalizeQuizText(value) {
 
 function normalizeQuizDisplay(value) {
   return normalizeQuizText(value).replace(/\s*·\s*/g, " / ");
+}
+
+function normalizeStudyLevelValue(level, fallback = "") {
+  const text = normalizeQuizText(level);
+  const upper = text.toUpperCase();
+
+  if (!text) {
+    return fallback;
+  }
+
+  if (upper === allLevelValue.toUpperCase()) {
+    return allLevelValue;
+  }
+
+  const matchedLevel = upper.match(/^N?([1-5])$/);
+  return matchedLevel ? `N${matchedLevel[1]}` : text;
+}
+
+function formatStudyLevelLabel(level, fallback = "") {
+  const normalizedLevel = normalizeStudyLevelValue(level, fallback);
+  return normalizedLevel === allLevelValue ? "전체" : normalizedLevel;
 }
 
 function formatQuizLineBreaks(value) {
@@ -559,12 +771,16 @@ function getQuizSessionSize(value) {
   return Number(value) === 10 ? 10 : 20;
 }
 
-function getQuizMode(value) {
+function getQuizMode(value = state?.quizMode) {
   return value === "reading" ? "reading" : "meaning";
 }
 
+function getVocabQuizMode(value = state?.vocabQuizMode) {
+  return value === "word" ? "word" : "meaning";
+}
+
 function getLevelLabel(level) {
-  return level === allLevelValue ? "전체" : level;
+  return formatStudyLevelLabel(level, "N5");
 }
 
 function getLevelSummaryLabel(level) {
@@ -576,7 +792,8 @@ function getDurationLabel(duration) {
 }
 
 function getQuizLevel(level = state?.quizLevel) {
-  return selectableStudyLevels.includes(level) ? level : "N5";
+  const normalizedLevel = normalizeStudyLevelValue(level, "N5");
+  return selectableStudyLevels.includes(normalizedLevel) ? normalizedLevel : "N5";
 }
 
 function getQuizLevelLabel(level = state?.quizLevel) {
@@ -584,6 +801,16 @@ function getQuizLevelLabel(level = state?.quizLevel) {
 }
 
 function getQuizDuration(value = state?.quizDuration) {
+  const numericValue = Number(value);
+  return quizDurationOptions.includes(numericValue) ? numericValue : 15;
+}
+
+function getVocabQuizCount(value = state?.vocabQuizCount) {
+  const numericValue = Number(value);
+  return vocabQuizCountOptions.includes(numericValue) ? numericValue : 10;
+}
+
+function getVocabQuizDuration(value = state?.vocabQuizDuration) {
   const numericValue = Number(value);
   return quizDurationOptions.includes(numericValue) ? numericValue : 15;
 }
@@ -606,6 +833,14 @@ function getCharactersLibraryTab(value) {
 }
 
 function getGrammarTab(value) {
+  return value === "practice" ? "practice" : "list";
+}
+
+function getVocabTab(value = state?.vocabTab) {
+  return value === "quiz" ? "quiz" : "study";
+}
+
+function getKanjiTab(value = state?.kanjiTab) {
   return value === "practice" ? "practice" : "list";
 }
 
@@ -632,7 +867,7 @@ function buildDynamicQuizPool(items) {
   const normalizedItems = items
     .map((item) => ({
       id: normalizeQuizText(item.entry_id || item.id),
-      level: normalizeQuizText(item._level || item.level) || "N5",
+      level: formatStudyLevelLabel(item._level || item.level, "N5"),
       word: getQuizDisplayWord(item),
       reading: getQuizReading(item),
       meaning: getQuizMeaning(item),
@@ -671,7 +906,7 @@ function buildDynamicFlashcardPool(items, level = "N5") {
   const cards = items
     .map((item) => ({
       id: item.id,
-      level: normalizeQuizText(item.level) || normalizedLevel,
+      level: formatStudyLevelLabel(item.level, normalizedLevel),
       word: item.word,
       reading: item.reading,
       meaning: item.meaning,
@@ -687,7 +922,7 @@ function buildDynamicVocabListPool(items, level = "N5") {
   const cards = items
     .map((item) => ({
       id: item.id,
-      level: normalizeQuizText(item.level) || normalizedLevel,
+      level: formatStudyLevelLabel(item.level, normalizedLevel),
       word: item.word,
       reading: item.reading,
       meaning: item.meaning,
@@ -698,14 +933,50 @@ function buildDynamicVocabListPool(items, level = "N5") {
   return cards.length ? cards : getFallbackVocabItems(normalizedLevel);
 }
 
-function buildDynamicWordPracticeItems(items, level = "N5") {
+function buildWordPracticeQuestionSet(items, level = "N5", fallbackItems = [], config = {}) {
   const tones = ["tone-coral", "tone-mint", "tone-gold", "tone-sky"];
   const levelLabel = getLevelLabel(level);
-  const picked = shuffleQuizArray(items).slice(0, 12);
+  const mode = getVocabQuizMode(config.mode);
+  const count = Math.max(1, Number(config.count) || vocabQuizSessionSize);
+  const seedItems = shuffleQuizArray(items);
+  const questions = [];
 
-  const questions = picked
-    .map((item, index) => {
-      const distractors = uniqueQuizValues(
+  for (let index = 0; index < seedItems.length && questions.length < count; index += 1) {
+    const item = seedItems[index];
+    const questionIndex = questions.length;
+    let distractors = [];
+    let options = [];
+    let answer = -1;
+    let title = item.part ? `${item.part} 읽기` : `${levelLabel} 단어 읽기`;
+    let note = "단어를 보고 뜻을 떠올려봐요.";
+    let prompt = "이 단어 뜻, 어떤 걸까요?";
+    let display = item.reading;
+    let displaySub = item.word;
+    let explanation = `${item.reading}는 ${item.word}, 뜻은 ${item.meaning}입니다.`;
+
+    if (mode === "word") {
+      distractors = uniqueQuizValues(
+        shuffleQuizArray(
+          items
+            .filter((candidate) => candidate.id !== item.id && candidate.word !== item.word)
+            .map((candidate) => candidate.word)
+        )
+      ).slice(0, 3);
+
+      if (distractors.length < 3) {
+        continue;
+      }
+
+      options = shuffleQuizArray([item.word, ...distractors]);
+      answer = options.indexOf(item.word);
+      title = item.part ? `${item.part} 단어 맞히기` : `${levelLabel} 단어 맞히기`;
+      note = "뜻을 보고 단어를 떠올려봐요.";
+      prompt = "이 뜻에 맞는 일본어 단어는 어떤 걸까요?";
+      display = item.meaning;
+      displaySub = item.part || "";
+      explanation = `${item.meaning}는 ${item.word}, 읽기는 ${item.reading}입니다.`;
+    } else {
+      distractors = uniqueQuizValues(
         shuffleQuizArray(
           items
             .filter((candidate) => candidate.id !== item.id && candidate.meaning !== item.meaning)
@@ -714,33 +985,44 @@ function buildDynamicWordPracticeItems(items, level = "N5") {
       ).slice(0, 3);
 
       if (distractors.length < 3) {
-        return null;
+        continue;
       }
 
-      const options = shuffleQuizArray([item.meaning, ...distractors]);
-      const answer = options.indexOf(item.meaning);
+      options = shuffleQuizArray([item.meaning, ...distractors]);
+      answer = options.indexOf(item.meaning);
+    }
 
-      return {
-        id: `bp-dw-${item.id}-${index}`,
-        source: `${levelLabel} 단어 ${index + 1}`,
-        title: item.part ? `${item.part} 읽기` : `${levelLabel} 단어 읽기`,
-        note: `${levelLabel} 단어를 랜덤으로 만나봐요.`,
-        prompt: "이 단어 뜻, 어떤 걸까요?",
-        display: item.reading,
-        displaySub: item.word,
-        options,
-        answer,
-        explanation: `${item.reading}는 ${item.word}, 뜻은 ${item.meaning}입니다.`,
-        tone: tones[index % tones.length]
-      };
-    })
-    .filter(Boolean);
+    questions.push({
+      id: `bp-dw-${mode}-${item.id}-${questionIndex}`,
+      source: `${levelLabel} 단어 ${questionIndex + 1}`,
+      level: item.level || levelLabel,
+      title,
+      note,
+      prompt,
+      display,
+      displaySub,
+      options,
+      answer,
+      explanation,
+      sourceId: item.id,
+      mode,
+      word: item.word,
+      reading: item.reading,
+      meaning: item.meaning,
+      tone: tones[questionIndex % tones.length]
+    });
+  }
 
-  return questions.length ? questions : basicPracticeSets.words.items;
+  return questions.length ? questions : fallbackItems;
+}
+
+function buildDynamicWordPracticeItems(items, level = "N5") {
+  return buildWordPracticeQuestionSet(items, level, basicPracticeSets.words.items);
 }
 
 function getVocabLevel(level = state?.vocabLevel) {
-  return selectableStudyLevels.includes(level) ? level : "N5";
+  const normalizedLevel = normalizeStudyLevelValue(level, "N5");
+  return selectableStudyLevels.includes(normalizedLevel) ? normalizedLevel : "N5";
 }
 
 function getVocabLevelLabel(level = state?.vocabLevel) {
@@ -1023,7 +1305,7 @@ const quizHeadingCopy = {
   },
   N4: {
     title: "N4 단어 퀴즈로 감각 올려볼까요?",
-    description: "N4 단어를 뜻이랑 읽기로 번갈아 풀어보세요."
+    description: "N4 단어를 뜻이랑 단어로 번갈아 풀어보세요."
   },
   N3: {
     title: "N3 단어 퀴즈, 실전 느낌으로 가볼까요?",
@@ -3115,18 +3397,43 @@ function createQuizSession(mode, size, level = state.quizLevel) {
 }
 
 let activeQuizQuestions = [];
+let activeVocabQuizQuestions = [];
+let activeVocabQuizSignature = "";
+let activeVocabQuizResults = [];
+let starterKanjiQuestionOrder = [];
+let starterKanjiOptionOrders = {};
+const starterKanjiResultFilterLabels = {
+  all: "전체",
+  correct: "정답",
+  wrong: "오답"
+};
+const starterKanjiState = {
+  results: [],
+  showResults: false,
+  resultFilter: "all"
+};
 
 const readingSets = getLevelContentSets(readingContent.sets);
 
 const defaultState = {
   flashcardIndex: 0,
   flashcardRevealed: false,
+  vocabTab: "study",
   vocabLevel: "N5",
   vocabView: "card",
   vocabFilter: "all",
   vocabPartFilter: "all",
   vocabOptionsOpen: true,
   vocabPage: 1,
+  vocabQuizMode: "meaning",
+  vocabQuizCount: 10,
+  vocabQuizDuration: 15,
+  vocabQuizOptionsOpen: true,
+  vocabQuizStarted: false,
+  vocabQuizResultFilter: "all",
+  vocabQuizIndex: 0,
+  vocabQuizFinished: false,
+  kanjiTab: "list",
   starterDoneIds: [],
   basicPracticeTrack: "kana",
   basicPracticeIndexes: {
@@ -3218,8 +3525,12 @@ state.masteredIds = Array.from(new Set(Array.isArray(state.masteredIds) ? state.
 state.reviewIds = Array.from(
   new Set((Array.isArray(state.reviewIds) ? state.reviewIds : []).filter((id) => !state.masteredIds.includes(id)))
 );
+state.vocabTab = getVocabTab(state.vocabTab);
 state.vocabLevel = getVocabLevel(state.vocabLevel);
-state.vocabView = state.vocabView === "list" ? "list" : "card";
+state.vocabView = ["card", "list"].includes(state.vocabView) ? state.vocabView : "card";
+if (isVocabPagePath() && window.location.hash.replace(/^#/, "").toLowerCase() === "quiz") {
+  state.vocabTab = "quiz";
+}
 state.vocabFilter = ["all", "review", "mastered"].includes(state.vocabFilter)
   ? state.vocabFilter
   : "all";
@@ -3228,6 +3539,17 @@ state.vocabPartFilter =
     ? vocabPartAllValue
     : normalizeQuizText(state.vocabPartFilter);
 state.vocabPage = Number.isFinite(Number(state.vocabPage)) ? Math.max(1, Number(state.vocabPage)) : 1;
+state.vocabQuizMode = getVocabQuizMode(state.vocabQuizMode);
+state.vocabQuizCount = getVocabQuizCount(state.vocabQuizCount);
+state.vocabQuizDuration = getVocabQuizDuration(state.vocabQuizDuration);
+state.vocabQuizOptionsOpen = state.vocabQuizOptionsOpen !== false;
+state.vocabQuizStarted = false;
+state.vocabQuizResultFilter = ["all", "correct", "wrong"].includes(state.vocabQuizResultFilter)
+  ? state.vocabQuizResultFilter
+  : "all";
+state.vocabQuizIndex = 0;
+state.vocabQuizFinished = false;
+state.kanjiTab = getKanjiTab(state.kanjiTab);
 state.readingLevel = getReadingLevel(state.readingLevel);
 state.readingDuration = getReadingDuration(state.readingDuration);
 state.charactersTab = getCharactersTab(state.charactersTab ?? state.charactersPracticeTab);
@@ -3254,6 +3576,16 @@ const quizSessions = {
     timerElement: "basic-timer",
     correctElement: "basic-correct",
     streakElement: "basic-streak"
+  },
+  vocab: {
+    duration: state.vocabQuizDuration,
+    timeLeft: state.vocabQuizDuration,
+    correct: 0,
+    streak: 0,
+    timerId: null,
+    timerElement: "vocab-quiz-timer",
+    correctElement: "vocab-quiz-correct",
+    streakElement: "vocab-quiz-streak"
   },
   grammar: {
     duration: 25,
@@ -3319,17 +3651,25 @@ function renderQuizSessionHud(key) {
   const correct = document.getElementById(session.correctElement);
   const streak = document.getElementById(session.streakElement);
 
-  if (!timer || !correct || !streak) {
+  if (!timer && !correct && !streak) {
     return;
   }
 
-  timer.textContent = session.duration <= 0 ? "천천히" : `${session.timeLeft}초`;
-  timer.classList.toggle(
-    "is-warning",
-    session.duration > 0 && session.timeLeft <= Math.max(5, Math.floor(session.duration / 3))
-  );
-  correct.textContent = String(session.correct);
-  streak.textContent = String(session.streak);
+  if (timer) {
+    timer.textContent = session.duration <= 0 ? "천천히" : `${session.timeLeft}초`;
+    timer.classList.toggle(
+      "is-warning",
+      session.duration > 0 && session.timeLeft <= Math.max(5, Math.floor(session.duration / 3))
+    );
+  }
+
+  if (correct) {
+    correct.textContent = String(session.correct);
+  }
+
+  if (streak) {
+    streak.textContent = String(session.streak);
+  }
 }
 
 function setQuizSessionDuration(key, duration) {
@@ -3399,7 +3739,11 @@ function finalizeQuizSession(key, correct) {
 }
 
 function saveState() {
-  localStorage.setItem(storageKey, JSON.stringify(state));
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  } catch (error) {
+    // Ignore storage failures so UI interactions still work in restricted environments.
+  }
 }
 
 function getLocalDateKey() {
@@ -3463,14 +3807,18 @@ function renderStarterPath() {
     `;
 
     article.querySelector(".starter-learn").addEventListener("click", () => {
-      state.basicPracticeTrack = item.module;
-      saveState();
-
       if (item.module === "hiragana" || item.module === "katakana") {
         window.location.href = "characters.html";
         return;
       }
 
+      if (item.module === "kanji") {
+        window.location.href = "kanji.html";
+        return;
+      }
+
+      state.basicPracticeTrack = item.module;
+      saveState();
       renderBasicPractice();
       document.getElementById("basic-drill").scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -3501,7 +3849,7 @@ function getCurrentBasicPracticeSet() {
 
 function renderBasicPractice() {
   const switcher = document.getElementById("basic-practice-switcher");
-  const card = document.querySelector(".basic-practice-card");
+  const card = document.querySelector("#basic-drill .basic-practice-card");
   const optionsContainer = document.getElementById("basic-practice-options");
   const trackLabel = document.getElementById("basic-practice-track");
   const source = document.getElementById("basic-practice-source");
@@ -3592,7 +3940,7 @@ function renderBasicPractice() {
 
 function handleBasicPracticeAnswer(index) {
   const current = getCurrentBasicPracticeSet();
-  const options = document.querySelectorAll(".basic-practice-option");
+  const options = document.querySelectorAll("#basic-practice-options .basic-practice-option");
   const alreadyAnswered = Array.from(options).some((item) => item.disabled);
 
   if (alreadyAnswered) {
@@ -3604,6 +3952,9 @@ function handleBasicPracticeAnswer(index) {
 
   options.forEach((item, optionIndex) => {
     item.disabled = true;
+    if (optionIndex === index) {
+      item.classList.add("is-selected");
+    }
     if (optionIndex === current.answer) {
       item.classList.add("is-correct");
     }
@@ -3624,7 +3975,7 @@ function handleBasicPracticeAnswer(index) {
 
 function handleBasicPracticeTimeout() {
   const current = getCurrentBasicPracticeSet();
-  const options = document.querySelectorAll(".basic-practice-option");
+  const options = document.querySelectorAll("#basic-practice-options .basic-practice-option");
   const alreadyAnswered = Array.from(options).some((item) => item.disabled);
 
   if (alreadyAnswered) {
@@ -3655,6 +4006,435 @@ function nextBasicPracticeSet() {
     (state.basicPracticeIndexes[trackKey] + 1) % track.items.length;
   saveState();
   renderBasicPractice();
+}
+
+function resetStarterKanjiQuestionOrder() {
+  const track = basicPracticeSets.kanji;
+
+  if (!track?.items?.length) {
+    starterKanjiQuestionOrder = [];
+    starterKanjiOptionOrders = {};
+    return;
+  }
+
+  starterKanjiQuestionOrder = shuffleQuizArray(track.items.map((_, index) => index));
+  starterKanjiOptionOrders = {};
+}
+
+function resetStarterKanjiSessionState(resetIndex = false) {
+  starterKanjiState.results = [];
+  starterKanjiState.showResults = false;
+  starterKanjiState.resultFilter = "all";
+  resetStarterKanjiQuestionOrder();
+
+  if (resetIndex) {
+    state.basicPracticeIndexes.kanji = 0;
+  }
+}
+
+function ensureStarterKanjiQuestionOrder() {
+  const track = basicPracticeSets.kanji;
+
+  if (!track?.items?.length) {
+    starterKanjiQuestionOrder = [];
+    state.basicPracticeIndexes.kanji = 0;
+    return;
+  }
+
+  const hasValidOrder =
+    starterKanjiQuestionOrder.length === track.items.length &&
+    starterKanjiQuestionOrder.every(
+      (value, index, source) =>
+        Number.isInteger(value) &&
+        value >= 0 &&
+        value < track.items.length &&
+        source.indexOf(value) === index
+    );
+
+  if (!hasValidOrder) {
+    resetStarterKanjiQuestionOrder();
+  }
+
+  if (
+    !Number.isFinite(Number(state.basicPracticeIndexes.kanji)) ||
+    state.basicPracticeIndexes.kanji < 0 ||
+    state.basicPracticeIndexes.kanji >= track.items.length
+  ) {
+    state.basicPracticeIndexes.kanji = 0;
+  }
+}
+
+function getCurrentStarterKanjiPracticeSet() {
+  const track = basicPracticeSets.kanji;
+  ensureStarterKanjiQuestionOrder();
+
+  if (!track?.items?.length || !starterKanjiQuestionOrder.length) {
+    return null;
+  }
+
+  const questionIndex = starterKanjiQuestionOrder[state.basicPracticeIndexes.kanji];
+  return track.items[questionIndex] || null;
+}
+
+function getStarterKanjiOptionOrder(current) {
+  if (!current?.options?.length) {
+    return [];
+  }
+
+  const orderKey = current.id || `${current.source || "kanji"}-${current.display || "item"}`;
+  const existingOrder = starterKanjiOptionOrders[orderKey];
+  const hasValidOrder =
+    Array.isArray(existingOrder) &&
+    existingOrder.length === current.options.length &&
+    existingOrder.every(
+      (value, index, source) =>
+        Number.isInteger(value) &&
+        value >= 0 &&
+        value < current.options.length &&
+        source.indexOf(value) === index
+    );
+
+  if (!hasValidOrder) {
+    starterKanjiOptionOrders[orderKey] = shuffleQuizArray(current.options.map((_, index) => index));
+  }
+
+  return starterKanjiOptionOrders[orderKey];
+}
+
+function getStarterKanjiResultFilter(value = starterKanjiState.resultFilter) {
+  return Object.prototype.hasOwnProperty.call(starterKanjiResultFilterLabels, value) ? value : "all";
+}
+
+function getStarterKanjiResultCounts() {
+  return {
+    all: starterKanjiState.results.length,
+    correct: starterKanjiState.results.filter((item) => item.status === "correct").length,
+    wrong: starterKanjiState.results.filter((item) => item.status === "wrong").length
+  };
+}
+
+function getFilteredStarterKanjiResults(filter = getStarterKanjiResultFilter(starterKanjiState.resultFilter)) {
+  const activeFilter = getStarterKanjiResultFilter(filter);
+
+  if (activeFilter === "all") {
+    return [...starterKanjiState.results];
+  }
+
+  return starterKanjiState.results.filter((item) => item.status === activeFilter);
+}
+
+function setStarterKanjiResult(current, selectedIndex, correct) {
+  const reading = current.options[current.answer] || "";
+  const meaning = normalizeQuizText(current.displaySub).replace(/^뜻:\s*/, "");
+  const selected = current.options[selectedIndex] || "";
+  const result = {
+    id: current.id,
+    source: current.source,
+    char: current.display,
+    reading,
+    meaning,
+    selected,
+    status: correct ? "correct" : "wrong"
+  };
+  const currentResultIndex = starterKanjiState.results.findIndex((item) => item.id === current.id);
+
+  if (currentResultIndex >= 0) {
+    starterKanjiState.results[currentResultIndex] = result;
+    return;
+  }
+
+  starterKanjiState.results.push(result);
+}
+
+function renderStarterKanjiResultFilterOptions(counts) {
+  const filterSelect = document.getElementById("starter-kanji-result-filter");
+
+  if (!filterSelect) {
+    return;
+  }
+
+  filterSelect.innerHTML = Object.keys(starterKanjiResultFilterLabels)
+    .map((filter) => `<option value="${filter}">${starterKanjiResultFilterLabels[filter]} (${counts[filter] ?? 0})</option>`)
+    .join("");
+  filterSelect.value = getStarterKanjiResultFilter(starterKanjiState.resultFilter);
+}
+
+function renderStarterKanjiResults() {
+  const total = document.getElementById("starter-kanji-result-total");
+  const correct = document.getElementById("starter-kanji-result-correct");
+  const wrong = document.getElementById("starter-kanji-result-wrong");
+  const empty = document.getElementById("starter-kanji-result-empty");
+  const list = document.getElementById("starter-kanji-result-list");
+  const counts = getStarterKanjiResultCounts();
+  const filteredResults = getFilteredStarterKanjiResults();
+
+  if (!total || !correct || !wrong || !empty || !list) {
+    return;
+  }
+
+  total.textContent = String(counts.all);
+  correct.textContent = String(counts.correct);
+  wrong.textContent = String(counts.wrong);
+  renderStarterKanjiResultFilterOptions(counts);
+
+  if (!filteredResults.length) {
+    empty.hidden = false;
+    empty.textContent = `${starterKanjiResultFilterLabels[getStarterKanjiResultFilter(starterKanjiState.resultFilter)]} 결과가 없어요.`;
+    list.innerHTML = "";
+    return;
+  }
+
+  empty.hidden = true;
+  list.innerHTML = filteredResults
+    .map(
+      (item) => {
+        const statusLabel = item.status === "correct" ? "정답" : "오답";
+        const extraText =
+          item.status === "wrong"
+            ? `선택: ${formatQuizLineBreaks(item.selected)} · 정답: ${formatQuizLineBreaks(item.reading)}`
+            : `선택: ${formatQuizLineBreaks(item.selected)}`;
+
+        return `
+        <article class="match-result-item kanji-result-item is-${item.status}">
+          <div class="match-result-item-head">
+            <div class="match-result-item-badges">
+              <span class="match-result-badge is-${item.status}">${statusLabel}</span>
+              <span class="match-result-level">${formatQuizLineBreaks(item.source || "한자")}</span>
+            </div>
+          </div>
+          <div class="match-result-item-main">
+            <strong>${formatQuizLineBreaks(item.char)} · ${formatQuizLineBreaks(item.reading)}</strong>
+            <p>뜻: ${formatQuizLineBreaks(item.meaning)}</p>
+          </div>
+          <p class="vocab-quiz-result-extra">${extraText}</p>
+        </article>
+      `;
+      }
+    )
+    .join("");
+}
+
+function renderStarterKanjiPractice() {
+  const card = document.getElementById("starter-kanji-card");
+  const nextButton = document.getElementById("starter-kanji-next");
+  const optionsContainer = document.getElementById("starter-kanji-options");
+  const source = document.getElementById("starter-kanji-source");
+  const progress = document.getElementById("starter-kanji-progress");
+  const display = document.getElementById("starter-kanji-display");
+  const displaySub = document.getElementById("starter-kanji-display-sub");
+  const track = basicPracticeSets.kanji;
+  const current = getCurrentStarterKanjiPracticeSet();
+
+  if (!card || !nextButton || !optionsContainer || !source || !progress || !display || !displaySub) {
+    return;
+  }
+
+  if (!track?.items?.length || !current) {
+    optionsContainer.innerHTML = "";
+    delete optionsContainer.dataset.answered;
+    nextButton.disabled = true;
+    return;
+  }
+
+  source.textContent = formatQuizLineBreaks(current.source);
+  progress.textContent = `${state.basicPracticeIndexes.kanji + 1} / ${track.items.length}`;
+  display.textContent = formatQuizLineBreaks(current.display);
+  displaySub.textContent = formatQuizLineBreaks(current.displaySub || "");
+
+  card.className = `basic-practice-card kanji-practice-card ${current.tone || "tone-gold"}`;
+  nextButton.textContent =
+    state.basicPracticeIndexes.kanji >= track.items.length - 1 ? "결과 보기" : "다음 한자 볼까요?";
+  nextButton.disabled = true;
+
+  optionsContainer.innerHTML = "";
+  delete optionsContainer.dataset.answered;
+  getStarterKanjiOptionOrder(current).forEach((optionIndex) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "basic-practice-option";
+    button.dataset.optionIndex = String(optionIndex);
+    button.textContent = formatQuizLineBreaks(current.options[optionIndex]);
+    button.addEventListener("click", () => handleStarterKanjiPracticeAnswer(optionIndex));
+    optionsContainer.appendChild(button);
+  });
+}
+
+function renderKanjiList() {
+  const list = document.getElementById("kanji-list");
+  const track = basicPracticeSets.kanji;
+
+  if (!list) {
+    return;
+  }
+
+  if (!track?.items?.length) {
+    list.innerHTML = '<p class="vocab-list-empty">한자 리스트를 준비하고 있어요.</p>';
+    return;
+  }
+
+  list.innerHTML = track.items
+    .map((item, index) => {
+      const reading = item.options[item.answer] || "";
+      const meaning = normalizeQuizText(item.displaySub).replace(/^뜻:\s*/, "");
+
+      return `
+        <article class="vocab-list-card">
+          <div class="vocab-list-card-head">
+            <span class="vocab-list-index">${item.source || `한자 ${index + 1}`}</span>
+          </div>
+          <div class="kanji-list-main">
+            <strong class="kanji-list-char">${formatQuizLineBreaks(item.display)}</strong>
+            <p class="vocab-list-reading">${formatQuizLineBreaks(reading)}</p>
+          </div>
+          <p class="vocab-list-meaning">뜻: ${formatQuizLineBreaks(meaning)}</p>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderKanjiPageLayout() {
+  const activeTab = getKanjiTab(state.kanjiTab);
+  const practiceView = document.getElementById("starter-kanji-practice-view");
+  const resultView = document.getElementById("starter-kanji-result-view");
+
+  document.querySelectorAll("[data-kanji-tab]").forEach((button) => {
+    const isActive = button.dataset.kanjiTab === activeTab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+    button.setAttribute("tabindex", isActive ? "0" : "-1");
+  });
+
+  document.querySelectorAll("[data-kanji-tab-panel]").forEach((panel) => {
+    const isActive = panel.dataset.kanjiTabPanel === activeTab;
+    panel.hidden = !isActive;
+    panel.setAttribute("aria-hidden", String(!isActive));
+  });
+
+  if (activeTab === "list") {
+    renderKanjiList();
+    return;
+  }
+
+  if (practiceView) {
+    practiceView.hidden = starterKanjiState.showResults;
+  }
+
+  if (resultView) {
+    resultView.hidden = !starterKanjiState.showResults;
+  }
+
+  if (starterKanjiState.showResults) {
+    renderStarterKanjiResults();
+    return;
+  }
+
+  renderStarterKanjiPractice();
+}
+
+function setKanjiTab(tab) {
+  const nextTab = getKanjiTab(tab);
+
+  if (state.kanjiTab === nextTab) {
+    return;
+  }
+
+  state.kanjiTab = nextTab;
+  saveState();
+  renderKanjiPageLayout();
+
+  const activePanel = document.querySelector(`[data-kanji-tab-panel="${nextTab}"]`);
+  if (activePanel?.scrollIntoView) {
+    activePanel.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+}
+
+function handleStarterKanjiPracticeAnswer(index) {
+  const current = getCurrentStarterKanjiPracticeSet();
+  const nextButton = document.getElementById("starter-kanji-next");
+  const optionsContainer = document.getElementById("starter-kanji-options");
+  const options = document.querySelectorAll("#starter-kanji-options .basic-practice-option");
+  const alreadyAnswered = optionsContainer?.dataset.answered === "true";
+
+  if (!current || !nextButton || !optionsContainer || alreadyAnswered) {
+    return;
+  }
+
+  const correct = index === current.answer;
+  const totalQuestions = basicPracticeSets.kanji.items.length;
+
+  options.forEach((item) => {
+    const optionIndex = Number(item.dataset.optionIndex);
+
+    if (optionIndex === index) {
+      item.classList.add("is-selected");
+      item.setAttribute("aria-pressed", "true");
+    } else {
+      item.setAttribute("aria-pressed", "false");
+    }
+    if (optionIndex === current.answer) {
+      item.classList.add("is-correct");
+    }
+    if (optionIndex === index && !correct) {
+      item.classList.add("is-wrong");
+    }
+  });
+  optionsContainer.dataset.answered = "true";
+  window.requestAnimationFrame(() => {
+    options.forEach((item) => {
+      item.disabled = true;
+    });
+  });
+  setStarterKanjiResult(current, index, correct);
+
+  updateStudyStreak();
+  saveState();
+  renderStats();
+
+  nextButton.textContent =
+    starterKanjiState.results.length >= totalQuestions ? "결과 보기" : "다음 한자 볼까요?";
+  nextButton.disabled = false;
+}
+
+function nextStarterKanjiPracticeSet() {
+  const track = basicPracticeSets.kanji;
+  const optionsContainer = document.getElementById("starter-kanji-options");
+  const answered = optionsContainer?.dataset.answered === "true";
+
+  if (!track?.items?.length || !answered) {
+    return;
+  }
+
+  ensureStarterKanjiQuestionOrder();
+
+  if (starterKanjiState.results.length >= track.items.length || state.basicPracticeIndexes.kanji >= track.items.length - 1) {
+    starterKanjiState.showResults = true;
+    saveState();
+    renderKanjiPageLayout();
+    return;
+  }
+
+  state.basicPracticeIndexes.kanji += 1;
+
+  saveState();
+  renderStarterKanjiPractice();
+}
+
+function restartStarterKanjiPractice() {
+  resetStarterKanjiSessionState(true);
+  saveState();
+  renderKanjiPageLayout();
+}
+
+function setStarterKanjiResultFilter(filter) {
+  const nextFilter = getStarterKanjiResultFilter(filter);
+
+  if (starterKanjiState.resultFilter === nextFilter) {
+    return;
+  }
+
+  starterKanjiState.resultFilter = nextFilter;
+  renderStarterKanjiResults();
 }
 
 
@@ -3700,13 +4480,132 @@ function getVocabPartSummaryLabel(part = state.vocabPartFilter) {
   return activePart === vocabPartAllValue ? "전체 품사" : activePart;
 }
 
+function getVocabView(view = state.vocabView) {
+  return view === "list" ? "list" : "card";
+}
+
+function getVocabViewLabel(view = state.vocabView) {
+  const labels = {
+    card: "카드",
+    list: "리스트"
+  };
+
+  return labels[getVocabView(view)];
+}
+
 function getVocabOptionsSummaryText() {
   return [
     getVocabLevelLabel(),
-    state.vocabView === "list" ? "리스트" : "카드",
+    getVocabViewLabel(),
     vocabFilterLabels[getVocabFilter()],
     getVocabPartSummaryLabel()
   ].join(" · ");
+}
+
+function invalidateVocabQuizSession() {
+  activeVocabQuizQuestions = [];
+  activeVocabQuizSignature = "";
+  activeVocabQuizResults = [];
+  state.vocabQuizStarted = false;
+  state.vocabQuizResultFilter = "all";
+  state.vocabQuizIndex = 0;
+  state.vocabQuizFinished = false;
+  quizSessions.vocab.correct = 0;
+  quizSessions.vocab.streak = 0;
+  setQuizSessionDuration("vocab", getVocabQuizDuration());
+  stopQuizSessionTimer("vocab");
+}
+
+function isVocabPagePath() {
+  return window.location.pathname.endsWith("vocab.html") || window.location.pathname.endsWith("/vocab.html");
+}
+
+function getVocabQuizModeLabel(mode = state.vocabQuizMode) {
+  return vocabQuizModeLabels[getVocabQuizMode(mode)];
+}
+
+function getVocabQuizResultFilter(value = state.vocabQuizResultFilter) {
+  return ["all", "correct", "wrong"].includes(value) ? value : "all";
+}
+
+function getVocabQuizOptionsSummaryText() {
+  return [
+    getVocabQuizModeLabel(),
+    `${getVocabQuizCount()}문제`,
+    getDurationLabel(getVocabQuizDuration())
+  ].join(" · ");
+}
+
+function syncVocabLocationHash(tab = state.vocabTab) {
+  if (!isVocabPagePath()) {
+    return;
+  }
+
+  const nextHash = getVocabTab(tab) === "quiz" ? "#quiz" : "";
+  const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
+
+  if (`${window.location.pathname}${window.location.search}${window.location.hash}` === nextUrl) {
+    return;
+  }
+
+  try {
+    window.history.replaceState(null, "", nextUrl);
+  } catch (error) {
+    if (nextHash) {
+      window.location.hash = nextHash;
+      return;
+    }
+
+    if (window.location.hash) {
+      try {
+        window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+      } catch (innerError) {
+        window.location.hash = "";
+      }
+    }
+  }
+}
+
+function setVocabTab(tab) {
+  const nextTab = getVocabTab(tab);
+
+  if (state.vocabTab === nextTab) {
+    return;
+  }
+
+  state.vocabTab = nextTab;
+
+  if (nextTab !== "quiz") {
+    stopQuizSessionTimer("vocab");
+  }
+
+  renderVocabTabLayout();
+
+  saveState();
+
+  try {
+    renderVocabPage();
+  } catch (error) {
+    console.error("Failed to render vocab tab.", error);
+    renderVocabTabLayout();
+  }
+
+  const activePanel = document.querySelector(`[data-vocab-tab-panel="${nextTab}"]`);
+  if (activePanel?.scrollIntoView) {
+    activePanel.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+}
+
+function setVocabView(view) {
+  const nextView = getVocabView(view);
+
+  if (state.vocabView === nextView) {
+    return;
+  }
+
+  state.vocabView = nextView;
+  saveState();
+  renderVocabPage();
 }
 
 function getVocabEmptyMessage(filter = state.vocabFilter, part = state.vocabPartFilter) {
@@ -3786,6 +4685,7 @@ function setVocabLevel(level) {
   state.flashcardIndex = 0;
   state.flashcardRevealed = false;
   state.vocabPage = 1;
+  invalidateVocabQuizSession();
   refreshVocabPageContent(nextLevel);
   state.vocabPartFilter = getVocabPartFilter(state.vocabPartFilter);
   saveState();
@@ -3803,6 +4703,7 @@ function setVocabFilter(filter) {
   state.flashcardIndex = 0;
   state.flashcardRevealed = false;
   state.vocabPage = 1;
+  invalidateVocabQuizSession();
   saveState();
   renderVocabPage();
 }
@@ -3818,6 +4719,7 @@ function setVocabPartFilter(part) {
   state.flashcardIndex = 0;
   state.flashcardRevealed = false;
   state.vocabPage = 1;
+  invalidateVocabQuizSession();
   saveState();
   renderVocabPage();
 }
@@ -3848,12 +4750,407 @@ function getVisibleVocabList() {
   return filterVocabItems(vocabListItems);
 }
 
+function getVocabQuizItems() {
+  return getVisibleVocabList();
+}
+
 function getVocabPageCount(items) {
   return Math.max(1, Math.ceil(items.length / vocabPageSize));
 }
 
 function clampVocabPage(items) {
   state.vocabPage = Math.min(Math.max(state.vocabPage, 1), getVocabPageCount(items));
+}
+
+function getVocabQuizSignature(items = getVocabQuizItems()) {
+  return [
+    getVocabLevel(),
+    getVocabFilter(),
+    getVocabPartFilter(),
+    getVocabQuizMode(),
+    getVocabQuizCount(),
+    items.map((item) => item.id).join("|")
+  ].join("::");
+}
+
+function getVocabQuizSourceLabel() {
+  return [getVocabLevelLabel(), vocabFilterLabels[getVocabFilter()], getVocabPartSummaryLabel()].join(" · ");
+}
+
+function getCurrentVocabQuizQuestion() {
+  return activeVocabQuizQuestions[state.vocabQuizIndex] || activeVocabQuizQuestions[0] || null;
+}
+
+function resetVocabQuizSessionStats() {
+  quizSessions.vocab.correct = 0;
+  quizSessions.vocab.streak = 0;
+  setQuizSessionDuration("vocab", getVocabQuizDuration());
+  renderQuizSessionHud("vocab");
+}
+
+function startNewVocabQuizSession(force = false) {
+  const items = getVocabQuizItems();
+  const nextSignature = getVocabQuizSignature(items);
+
+  if (!force && nextSignature === activeVocabQuizSignature && activeVocabQuizQuestions.length) {
+    state.vocabQuizStarted = true;
+    return true;
+  }
+
+  const nextQuestions = buildWordPracticeQuestionSet(items, getVocabLevel(), [], {
+    mode: getVocabQuizMode(),
+    count: getVocabQuizCount()
+  });
+
+  activeVocabQuizSignature = nextSignature;
+  activeVocabQuizQuestions = nextQuestions;
+  activeVocabQuizResults = [];
+  state.vocabQuizStarted = nextQuestions.length > 0;
+  state.vocabQuizResultFilter = "all";
+  state.vocabQuizIndex = 0;
+  state.vocabQuizFinished = false;
+  resetVocabQuizSessionStats();
+  saveState();
+  return nextQuestions.length > 0;
+}
+
+function ensureVocabQuizSession(force = false) {
+  if (!state.vocabQuizStarted) {
+    return false;
+  }
+
+  const nextSignature = getVocabQuizSignature();
+
+  if (
+    force ||
+    nextSignature !== activeVocabQuizSignature ||
+    (activeVocabQuizQuestions.length > 0 && state.vocabQuizIndex >= activeVocabQuizQuestions.length)
+  ) {
+    return startNewVocabQuizSession(true);
+  }
+
+  return true;
+}
+
+function getVocabQuizEmptyText(items = getVocabQuizItems()) {
+  if (!items.length) {
+    return `${getVocabEmptyMessage()} 퀴즈는 단어가 준비되면 같이 풀어봐요.`;
+  }
+
+  if (items.length < 4) {
+    return "선택한 조건의 단어가 4개보다 적어서 퀴즈를 만들기 어려워요. 묶음이나 품사를 조금 넓혀보세요.";
+  }
+
+  return "선택한 단어로 퀴즈를 만들기 어려워요. 다른 묶음으로 바꿔보세요.";
+}
+
+function saveWordToReviewList(id) {
+  if (!id) {
+    return;
+  }
+
+  if (!state.reviewIds.includes(id)) {
+    state.reviewIds.push(id);
+  }
+
+  state.masteredIds = state.masteredIds.filter((itemId) => itemId !== id);
+}
+
+function removeWordFromReviewList(id) {
+  if (!id) {
+    return;
+  }
+
+  state.reviewIds = state.reviewIds.filter((itemId) => itemId !== id);
+}
+
+function isWordSavedToReviewList(id) {
+  return Boolean(id) && state.reviewIds.includes(id);
+}
+
+function getVocabQuizResultCounts() {
+  return {
+    all: activeVocabQuizResults.length,
+    correct: activeVocabQuizResults.filter((item) => item.status === "correct").length,
+    wrong: activeVocabQuizResults.filter((item) => item.status === "wrong").length
+  };
+}
+
+function getFilteredVocabQuizResults() {
+  const activeFilter = getVocabQuizResultFilter();
+
+  if (activeFilter === "all") {
+    return activeVocabQuizResults;
+  }
+
+  return activeVocabQuizResults.filter((item) => item.status === activeFilter);
+}
+
+function renderVocabQuizResultFilterOptions(counts) {
+  const filterSelect = document.getElementById("vocab-quiz-result-filter");
+
+  if (!filterSelect) {
+    return;
+  }
+
+  filterSelect.innerHTML = Object.keys(vocabQuizResultFilterLabels)
+    .map(
+      (filter) =>
+        `<option value="${filter}">${vocabQuizResultFilterLabels[filter]} (${counts[filter] ?? 0})</option>`
+    )
+    .join("");
+  filterSelect.value = getVocabQuizResultFilter();
+}
+
+function renderVocabQuizBulkActionButton(results) {
+  const bulkActionButton = document.getElementById("vocab-quiz-result-bulk-action");
+  const bulkActionLabel = document.getElementById("vocab-quiz-result-bulk-label");
+  const bulkActionIcon = bulkActionButton?.querySelector(".material-symbols-rounded");
+
+  if (!bulkActionButton || !bulkActionLabel || !bulkActionIcon) {
+    return;
+  }
+
+  const uniqueIds = Array.from(new Set(results.map((item) => item.id).filter(Boolean)));
+  const allSaved = uniqueIds.length > 0 && uniqueIds.every((id) => isWordSavedToReviewList(id));
+  const actionLabel = allSaved ? "전체 제거" : "전체 저장";
+  const actionTitle =
+    uniqueIds.length === 0
+      ? "현재 필터에는 저장할 단어가 없어요."
+      : allSaved
+        ? "현재 필터의 단어를 다시 볼게요 목록에서 모두 제거해요."
+        : "현재 필터의 단어를 다시 볼게요 목록에 모두 저장해요.";
+
+  bulkActionButton.disabled = uniqueIds.length === 0;
+  bulkActionButton.dataset.vocabQuizBulkAction = allSaved ? "remove" : "save";
+  bulkActionButton.setAttribute("aria-label", actionTitle);
+  bulkActionButton.title = actionTitle;
+  bulkActionLabel.textContent = actionLabel;
+  bulkActionIcon.textContent = allSaved ? "delete_sweep" : "bookmark_add";
+}
+
+function recordVocabQuizResult(question, selectedIndex, correct, timedOut = false) {
+  if (!question) {
+    return;
+  }
+
+  activeVocabQuizResults.push({
+    id: question.sourceId || question.id,
+    status: correct ? "correct" : "wrong",
+    level: question.level || getVocabLevelLabel(),
+    mode: getVocabQuizMode(question.mode),
+    word: question.word || "",
+    reading: question.reading || "",
+    meaning: question.meaning || "",
+    selectedOption: selectedIndex >= 0 ? question.options[selectedIndex] || "" : "",
+    answerOption: question.options[question.answer] || "",
+    timedOut
+  });
+}
+
+function renderVocabQuizResults() {
+  const total = document.getElementById("vocab-quiz-result-total");
+  const correct = document.getElementById("vocab-quiz-result-correct");
+  const wrong = document.getElementById("vocab-quiz-result-wrong");
+  const empty = document.getElementById("vocab-quiz-result-empty");
+  const list = document.getElementById("vocab-quiz-result-list");
+  const filterSelect = document.getElementById("vocab-quiz-result-filter");
+  const bulkActionButton = document.getElementById("vocab-quiz-result-bulk-action");
+  const counts = getVocabQuizResultCounts();
+  const filteredResults = getFilteredVocabQuizResults();
+
+  if (!total || !correct || !wrong || !empty || !list || !filterSelect || !bulkActionButton) {
+    return;
+  }
+
+  total.textContent = String(counts.all);
+  correct.textContent = String(counts.correct);
+  wrong.textContent = String(counts.wrong);
+  renderVocabQuizResultFilterOptions(counts);
+  renderVocabQuizBulkActionButton(filteredResults);
+
+  if (!filteredResults.length) {
+    empty.hidden = false;
+    empty.textContent = `${vocabQuizResultFilterLabels[getVocabQuizResultFilter()]} 결과가 없어요.`;
+    list.innerHTML = "";
+    return;
+  }
+
+  empty.hidden = true;
+  list.innerHTML = "";
+
+  filteredResults.forEach((item) => {
+    const article = document.createElement("article");
+    const head = document.createElement("div");
+    const badges = document.createElement("div");
+    const statusBadge = document.createElement("span");
+    const levelBadge = document.createElement("span");
+    const actionButton = document.createElement("button");
+    const actionIcon = document.createElement("span");
+    const main = document.createElement("div");
+    const title = document.createElement("strong");
+    const meaning = document.createElement("p");
+    const extra = document.createElement("p");
+    const statusLabel = item.status === "correct" ? "정답" : "오답";
+    const saved = isWordSavedToReviewList(item.id);
+    const actionLabel = saved ? "다시 볼게요에서 제거" : "다시 볼게요에 저장";
+    let extraText = `${vocabQuizModeLabels[item.mode] || getVocabQuizModeLabel(item.mode)} 성공`;
+
+    if (item.status === "wrong") {
+      extraText = item.timedOut
+        ? `시간 종료 · 정답: ${item.answerOption}`
+        : `선택: ${item.selectedOption} · 정답: ${item.answerOption}`;
+    }
+
+    article.className = `match-result-item is-${item.status}`;
+    head.className = "match-result-item-head";
+    badges.className = "match-result-item-badges";
+    statusBadge.className = `match-result-badge is-${item.status}`;
+    statusBadge.textContent = statusLabel;
+    levelBadge.className = "match-result-level";
+    levelBadge.textContent = item.level || getVocabLevelLabel();
+    actionButton.className = `secondary-btn match-save-btn icon-only-btn${saved ? " is-saved" : ""}`;
+    actionButton.type = "button";
+    actionButton.dataset.vocabQuizSave = item.id;
+    actionButton.setAttribute("aria-label", actionLabel);
+    actionButton.setAttribute("aria-pressed", saved ? "true" : "false");
+    actionButton.title = actionLabel;
+    actionIcon.className = "material-symbols-rounded";
+    actionIcon.setAttribute("aria-hidden", "true");
+    actionIcon.textContent = saved ? "delete" : "bookmark_add";
+    main.className = "match-result-item-main";
+    title.textContent = item.reading ? `${item.word} · ${item.reading}` : item.word;
+    meaning.textContent = item.meaning;
+    extra.className = "vocab-quiz-result-extra";
+    extra.textContent = extraText;
+
+    actionButton.appendChild(actionIcon);
+    badges.append(statusBadge, levelBadge);
+    head.append(badges, actionButton);
+    main.append(title, meaning);
+    article.append(head, main, extra);
+    list.appendChild(article);
+  });
+}
+
+function revealVocabQuizAnswer(question, selectedIndex, correct) {
+  const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
+
+  options.forEach((button, optionIndex) => {
+    button.disabled = true;
+
+    if (optionIndex === selectedIndex) {
+      button.classList.add("is-selected");
+    }
+
+    if (optionIndex === question.answer) {
+      button.classList.add("is-correct");
+    }
+
+    if (!correct && optionIndex === selectedIndex) {
+      button.classList.add("is-wrong");
+    }
+  });
+}
+
+function finalizeVocabQuizQuestion(selectedIndex, timedOut = false) {
+  const question = getCurrentVocabQuizQuestion();
+  const feedback = document.getElementById("vocab-quiz-feedback");
+  const explanation = document.getElementById("vocab-quiz-explanation");
+  const nextButton = document.getElementById("vocab-quiz-next");
+
+  if (!question || !feedback || !explanation || !nextButton) {
+    return;
+  }
+
+  const correct = selectedIndex === question.answer;
+  const isLastQuestion = state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1;
+
+  finalizeQuizSession("vocab", correct);
+  state.quizAnsweredCount += 1;
+
+  if (correct) {
+    state.quizCorrectCount += 1;
+  }
+
+  recordVocabQuizResult(question, selectedIndex, correct, timedOut);
+  revealVocabQuizAnswer(question, selectedIndex, correct);
+  feedback.textContent = correct
+    ? "잘했어요!"
+    : timedOut
+      ? "시간이 끝났어요."
+      : "아쉽지만 괜찮아요. 정답 같이 볼게요.";
+  explanation.textContent = question.explanation || "";
+  nextButton.disabled = false;
+  nextButton.hidden = false;
+  nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음으로 가볼까요?";
+
+  updateStudyStreak();
+  saveState();
+  renderStats();
+}
+
+function handleVocabQuizAnswer(index) {
+  const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
+  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+
+  if (alreadyAnswered) {
+    return;
+  }
+
+  finalizeVocabQuizQuestion(index, false);
+}
+
+function handleVocabQuizTimeout() {
+  const question = getCurrentVocabQuizQuestion();
+  const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
+  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+
+  if (alreadyAnswered || !question) {
+    return;
+  }
+
+  finalizeVocabQuizQuestion(-1, true);
+}
+
+function nextVocabQuizQuestion() {
+  if (state.vocabQuizFinished) {
+    invalidateVocabQuizSession();
+    saveState();
+    renderVocabPage();
+    return;
+  }
+
+  const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
+  const answered = Array.from(options).length > 0 && Array.from(options).every((item) => item.disabled);
+
+  if (!answered) {
+    return;
+  }
+
+  if (state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1) {
+    state.vocabQuizFinished = true;
+    stopQuizSessionTimer("vocab");
+    saveState();
+    renderVocabQuiz();
+    return;
+  }
+
+  state.vocabQuizIndex += 1;
+  saveState();
+  renderVocabQuiz();
+}
+
+function restartVocabQuiz() {
+  if (state.vocabQuizStarted) {
+    invalidateVocabQuizSession();
+    saveState();
+    renderVocabPage();
+    return;
+  }
+
+  startNewVocabQuizSession(true);
+  renderVocabPage();
 }
 
 function renderFlashcard() {
@@ -3915,7 +5212,7 @@ function renderFlashcard() {
     return;
   }
 
-  level.textContent = formatQuizLineBreaks(card.level);
+  level.textContent = formatStudyLevelLabel(card.level, "N5");
   word.textContent = formatQuizLineBreaks(card.word);
   reading.textContent = formatQuizLineBreaks(card.reading);
   meaning.textContent = formatQuizLineBreaks(card.meaning);
@@ -4011,36 +5308,86 @@ function renderVocabList() {
     .join("");
 }
 
-function renderVocabPage() {
-  const cardView = document.getElementById("vocab-card-view");
-  const listView = document.getElementById("vocab-list-view");
-  const summary = document.getElementById("vocab-summary");
+function renderVocabTabLayout() {
+  const activeTab = getVocabTab();
+
+  document.querySelectorAll("[data-vocab-tab]").forEach((button) => {
+    const active = button.dataset.vocabTab === activeTab;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
+  });
+
+  document.querySelectorAll("[data-vocab-tab-panel]").forEach((panel) => {
+    const active = panel.dataset.vocabTabPanel === activeTab;
+    panel.hidden = !active;
+    panel.setAttribute("aria-hidden", String(!active));
+  });
+}
+
+function populateVocabFilterSelect(select, counts) {
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  Object.entries(vocabFilterLabels).forEach(([filter, label]) => {
+    const option = document.createElement("option");
+    option.value = filter;
+    option.textContent = `${label} (${counts[filter] ?? 0})`;
+    select.appendChild(option);
+  });
+
+  select.value = getVocabFilter();
+}
+
+function populateVocabLevelSelect(select) {
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  selectableStudyLevels.forEach((level) => {
+    const option = document.createElement("option");
+    option.value = level;
+    option.textContent = level === allLevelValue ? "전체" : level;
+    select.appendChild(option);
+  });
+
+  select.value = getVocabLevel();
+}
+
+function populateVocabPartSelect(select, availableParts, activePart) {
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  const partOptions = [{ value: vocabPartAllValue, count: vocabListItems.length }, ...availableParts];
+  partOptions.forEach((partOption) => {
+    const option = document.createElement("option");
+    const label = partOption.value === vocabPartAllValue ? "전체 품사" : partOption.value;
+
+    option.value = partOption.value;
+    option.textContent = `${label} (${partOption.count})`;
+    select.appendChild(option);
+  });
+
+  select.value = activePart;
+}
+
+function renderVocabStudyControls(counts, availableParts, activePart) {
   const optionsShell = document.getElementById("vocab-options-shell");
   const optionsToggle = document.getElementById("vocab-options-toggle");
   const optionsPanel = document.getElementById("vocab-options-panel");
   const optionsSummary = document.getElementById("vocab-options-summary");
-  const partFilterGroup = document.getElementById("vocab-part-filter-group");
-  const headingTitle = document.getElementById("vocab-heading-title");
-  const headingCopy = document.getElementById("vocab-heading-copy");
-  const items = getVisibleVocabList();
-  const counts = getVocabFilterCounts();
-  const activeLevel = getVocabLevel();
-  const activePart = getVocabPartFilter();
-  const heading = vocabHeadingCopy[activeLevel] || vocabHeadingCopy.N5;
-  const availableParts = getAvailableVocabParts();
+  const filterSelect = document.getElementById("vocab-filter-select");
+  const partSelect = document.getElementById("vocab-part-select");
+  const activeView = getVocabView();
   const isOptionsOpen = state.vocabOptionsOpen !== false;
-
-  if (headingTitle) {
-    headingTitle.textContent = heading.title;
-  }
-
-  if (headingCopy) {
-    headingCopy.textContent = heading.description;
-  }
-
-  if (summary) {
-    summary.textContent = getVocabSummaryText(items.length);
-  }
 
   if (optionsSummary) {
     optionsSummary.textContent = getVocabOptionsSummaryText();
@@ -4059,65 +5406,286 @@ function renderVocabPage() {
     optionsPanel.setAttribute("aria-hidden", String(!isOptionsOpen));
   }
 
+  document.querySelectorAll("[data-vocab-view]").forEach((button) => {
+    const active = button.dataset.vocabView === activeView;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  populateVocabFilterSelect(filterSelect, counts);
+  populateVocabPartSelect(partSelect, availableParts, activePart);
+}
+
+function renderVocabQuizControls(counts, availableParts, activePart) {
+  const optionsShell = document.getElementById("vocab-quiz-options-shell");
+  const optionsToggle = document.getElementById("vocab-quiz-options-toggle");
+  const optionsPanel = document.getElementById("vocab-quiz-options-panel");
+  const optionsSummary = document.getElementById("vocab-quiz-options-summary");
+  const levelSelect = document.getElementById("vocab-quiz-level-select");
+  const filterSelect = document.getElementById("vocab-quiz-filter-select");
+  const partSelect = document.getElementById("vocab-quiz-part-select");
+  const modeButtons = document.querySelectorAll("[data-vocab-quiz-mode]");
+  const countButtons = document.querySelectorAll("[data-vocab-quiz-count]");
+  const timeButtons = document.querySelectorAll("[data-vocab-quiz-time]");
+  const isOptionsOpen = state.vocabQuizOptionsOpen !== false;
+  const activeMode = getVocabQuizMode();
+  const activeCount = getVocabQuizCount();
+  const activeDuration = getVocabQuizDuration();
+  const isSettingsLocked = state.vocabQuizStarted && !state.vocabQuizFinished;
+  const isFilterLocked = state.vocabQuizStarted && !state.vocabQuizFinished;
+  const shouldShowOptionsPanel = !isSettingsLocked && isOptionsOpen;
+
+  if (optionsSummary) {
+    optionsSummary.textContent = getVocabQuizOptionsSummaryText();
+  }
+
+  if (optionsShell) {
+    optionsShell.classList.toggle("is-open", shouldShowOptionsPanel);
+  }
+
+  if (optionsToggle) {
+    optionsToggle.disabled = isSettingsLocked;
+    optionsToggle.setAttribute("aria-expanded", String(shouldShowOptionsPanel));
+  }
+
+  if (optionsPanel) {
+    optionsPanel.hidden = !shouldShowOptionsPanel;
+    optionsPanel.setAttribute("aria-hidden", String(!shouldShowOptionsPanel));
+  }
+
+  modeButtons.forEach((button) => {
+    const active = button.dataset.vocabQuizMode === activeMode;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  countButtons.forEach((button) => {
+    const active = Number(button.dataset.vocabQuizCount) === activeCount;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  timeButtons.forEach((button) => {
+    const active = Number(button.dataset.vocabQuizTime) === activeDuration;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  populateVocabLevelSelect(levelSelect);
+  populateVocabFilterSelect(filterSelect, counts);
+  populateVocabPartSelect(partSelect, availableParts, activePart);
+
+  if (levelSelect) {
+    levelSelect.disabled = isFilterLocked;
+  }
+
+  if (filterSelect) {
+    filterSelect.disabled = isFilterLocked;
+  }
+
+  if (partSelect) {
+    partSelect.disabled = isFilterLocked;
+  }
+}
+
+function renderVocabQuiz() {
+  const view = document.getElementById("vocab-quiz");
+  const resultView = document.getElementById("vocab-quiz-result-view");
+  const empty = document.getElementById("vocab-quiz-empty");
+  const card = document.getElementById("vocab-quiz-card");
+  const track = document.getElementById("vocab-quiz-track");
+  const source = document.getElementById("vocab-quiz-source");
+  const progress = document.getElementById("vocab-quiz-progress-side");
+  const title = document.getElementById("vocab-quiz-title");
+  const note = document.getElementById("vocab-quiz-note");
+  const prompt = document.getElementById("vocab-quiz-prompt");
+  const display = document.getElementById("vocab-quiz-display");
+  const displaySub = document.getElementById("vocab-quiz-display-sub");
+  const options = document.getElementById("vocab-quiz-options");
+  const feedback = document.getElementById("vocab-quiz-feedback");
+  const explanation = document.getElementById("vocab-quiz-explanation");
+  const restart = document.getElementById("vocab-quiz-restart");
+  const restartLabel = document.getElementById("vocab-quiz-restart-label");
+  const next = document.getElementById("vocab-quiz-next");
+  const items = getVocabQuizItems();
+  const canStart = items.length >= 4;
+
+  if (
+    !view ||
+    !resultView ||
+    !empty ||
+    !card ||
+    !track ||
+    !source ||
+    !progress ||
+    !title ||
+    !note ||
+    !prompt ||
+    !display ||
+    !displaySub ||
+    !options ||
+    !feedback ||
+    !explanation ||
+    !restart ||
+    !restartLabel ||
+    !next
+  ) {
+    return;
+  }
+
+  if (!state.vocabQuizStarted) {
+    stopQuizSessionTimer("vocab");
+    quizSessions.vocab.correct = 0;
+    quizSessions.vocab.streak = 0;
+    setQuizSessionDuration("vocab", getVocabQuizDuration());
+    view.hidden = false;
+    resultView.hidden = true;
+    empty.hidden = false;
+    empty.textContent = canStart
+      ? "설정을 마쳤다면 시작하기를 눌러주세요."
+      : getVocabQuizEmptyText(items);
+    card.hidden = true;
+    progress.textContent = `0 / ${getVocabQuizCount()}`;
+    restart.classList.add("primary-btn");
+    restart.classList.remove("secondary-btn");
+    restart.disabled = !canStart;
+    restartLabel.textContent = "시작하기";
+    next.hidden = true;
+    next.disabled = true;
+    renderQuizSessionHud("vocab");
+    return;
+  }
+
+  ensureVocabQuizSession();
+  const question = getCurrentVocabQuizQuestion();
+
+  if (!question) {
+    stopQuizSessionTimer("vocab");
+    setQuizSessionDuration("vocab", getVocabQuizDuration());
+    view.hidden = false;
+    resultView.hidden = true;
+    empty.hidden = false;
+    empty.textContent = getVocabQuizEmptyText(items);
+    card.hidden = true;
+    progress.textContent = "0 / 0";
+    restart.classList.add("primary-btn");
+    restart.classList.remove("secondary-btn");
+    restart.disabled = !canStart;
+    restartLabel.textContent = "시작하기";
+    state.vocabQuizStarted = false;
+    renderQuizSessionHud("vocab");
+    return;
+  }
+
+  view.hidden = false;
+  resultView.hidden = true;
+  empty.hidden = true;
+  card.hidden = false;
+  track.textContent = getVocabQuizModeLabel();
+  source.textContent = getVocabQuizSourceLabel();
+  restart.classList.add("secondary-btn");
+  restart.classList.remove("primary-btn");
+  restart.disabled = false;
+  restartLabel.textContent = "다시하기";
+
+  if (state.vocabQuizFinished) {
+    const total = activeVocabQuizQuestions.length;
+
+    stopQuizSessionTimer("vocab");
+    renderQuizSessionHud("vocab");
+    view.hidden = true;
+    resultView.hidden = false;
+    progress.textContent = `${total} / ${total}`;
+    next.hidden = true;
+    next.disabled = false;
+    restartLabel.textContent = "다시하기";
+    renderVocabQuizResults();
+    return;
+  }
+
+  renderQuizSessionHud("vocab");
+  card.className = `basic-practice-card vocab-quiz-card ${question.tone || "tone-coral"}`;
+  progress.textContent = `${state.vocabQuizIndex + 1} / ${activeVocabQuizQuestions.length}`;
+  title.textContent = formatQuizLineBreaks(question.title);
+  note.textContent = formatQuizLineBreaks(question.note);
+  prompt.textContent = formatQuizLineBreaks(question.prompt);
+  display.textContent = formatQuizLineBreaks(question.display);
+  displaySub.textContent = formatQuizLineBreaks(question.displaySub || "");
+  feedback.textContent = "";
+  explanation.textContent = "";
+  next.hidden = false;
+  next.disabled = true;
+  next.textContent =
+    state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1 ? "결과 볼까요?" : "다음으로 가볼까요?";
+
+  options.innerHTML = "";
+  question.options.forEach((option, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "basic-practice-option";
+    button.textContent = formatQuizLineBreaks(option);
+    button.addEventListener("click", () => handleVocabQuizAnswer(index));
+    options.appendChild(button);
+  });
+
+  resetQuizSessionTimer("vocab", handleVocabQuizTimeout);
+}
+
+function renderVocabPage() {
+  const cardView = document.getElementById("vocab-card-view");
+  const listView = document.getElementById("vocab-list-view");
+  const summary = document.getElementById("vocab-summary");
+  const headingTitle = document.getElementById("vocab-heading-title");
+  const headingCopy = document.getElementById("vocab-heading-copy");
+  const items = getVisibleVocabList();
+  const counts = getVocabFilterCounts();
+  const activeLevel = getVocabLevel();
+  const activePart = getVocabPartFilter();
+  const activeTab = getVocabTab();
+  const headingMap = activeTab === "quiz" ? quizHeadingCopy : vocabHeadingCopy;
+  const heading = headingMap[activeLevel] || headingMap.N5;
+  const availableParts = getAvailableVocabParts();
+
+  if (headingTitle) {
+    headingTitle.textContent = heading.title;
+  }
+
+  if (headingCopy) {
+    headingCopy.textContent = heading.description;
+  }
+
+  if (summary) {
+    summary.textContent = getVocabSummaryText(items.length);
+  }
+
   document.querySelectorAll("[data-vocab-level]").forEach((button) => {
     const active = button.dataset.vocabLevel === activeLevel;
     button.classList.toggle("is-active", active);
     button.setAttribute("aria-pressed", active ? "true" : "false");
   });
 
-  document.querySelectorAll("[data-vocab-view]").forEach((button) => {
-    const active = button.dataset.vocabView === state.vocabView;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-  });
-
-  document.querySelectorAll("[data-vocab-filter]").forEach((button) => {
-    const filter = getVocabFilter(button.dataset.vocabFilter);
-    const active = filter === getVocabFilter();
-    const count = button.querySelector("[data-vocab-filter-count]");
-
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-
-    if (count) {
-      count.textContent = String(counts[filter]);
-    }
-  });
-
-  if (partFilterGroup) {
-    partFilterGroup.innerHTML = "";
-
-    const partOptions = [{ value: vocabPartAllValue, count: vocabListItems.length }, ...availableParts];
-    partOptions.forEach((partOption) => {
-      const active = partOption.value === activePart;
-      const button = document.createElement("button");
-      const label = partOption.value === vocabPartAllValue ? "전체 품사" : partOption.value;
-      const count = document.createElement("strong");
-      const text = document.createElement("span");
-
-      button.type = "button";
-      button.className = `secondary-btn vocab-filter-button${active ? " is-active" : ""}`;
-      button.dataset.vocabPartFilter = partOption.value;
-      button.setAttribute("aria-pressed", active ? "true" : "false");
-
-      text.textContent = label;
-      count.textContent = String(partOption.count);
-
-      button.append(text, count);
-      partFilterGroup.appendChild(button);
-    });
-  }
+  renderVocabTabLayout();
+  renderVocabStudyControls(counts, availableParts, activePart);
+  renderVocabQuizControls(counts, availableParts, activePart);
 
   if (cardView) {
-    cardView.hidden = state.vocabView !== "card";
+    cardView.hidden = getVocabView() !== "card";
   }
 
   if (listView) {
-    listView.hidden = state.vocabView !== "list";
+    listView.hidden = getVocabView() !== "list";
   }
 
   renderFlashcard();
   renderVocabList();
+
+  if (activeTab === "quiz") {
+    syncVocabLocationHash("quiz");
+    renderVocabQuiz();
+  } else {
+    stopQuizSessionTimer("vocab");
+    syncVocabLocationHash("study");
+  }
 }
 
 function toggleFlashcardReveal() {
@@ -5094,13 +6662,26 @@ function attachEventListeners() {
   const flashcardNext = document.getElementById("flashcard-next");
   const flashcardAgain = document.getElementById("flashcard-again");
   const flashcardMastered = document.getElementById("flashcard-mastered");
+  const vocabTabButtons = document.querySelectorAll("[data-vocab-tab]");
   const vocabOptionsToggle = document.getElementById("vocab-options-toggle");
   const vocabLevelButtons = document.querySelectorAll("[data-vocab-level]");
   const vocabViewButtons = document.querySelectorAll("[data-vocab-view]");
-  const vocabFilterButtons = document.querySelectorAll("[data-vocab-filter]");
-  const vocabPartFilterGroup = document.getElementById("vocab-part-filter-group");
+  const vocabFilterSelect = document.getElementById("vocab-filter-select");
+  const vocabPartSelect = document.getElementById("vocab-part-select");
   const vocabPagePrev = document.getElementById("vocab-page-prev");
   const vocabPageNext = document.getElementById("vocab-page-next");
+  const vocabQuizOptionsToggle = document.getElementById("vocab-quiz-options-toggle");
+  const vocabQuizModeButtons = document.querySelectorAll("[data-vocab-quiz-mode]");
+  const vocabQuizCountButtons = document.querySelectorAll("[data-vocab-quiz-count]");
+  const vocabQuizTimeButtons = document.querySelectorAll("[data-vocab-quiz-time]");
+  const vocabQuizLevelSelect = document.getElementById("vocab-quiz-level-select");
+  const vocabQuizFilterSelect = document.getElementById("vocab-quiz-filter-select");
+  const vocabQuizPartSelect = document.getElementById("vocab-quiz-part-select");
+  const vocabQuizResultFilter = document.getElementById("vocab-quiz-result-filter");
+  const vocabQuizResultBulkAction = document.getElementById("vocab-quiz-result-bulk-action");
+  const vocabQuizResultList = document.getElementById("vocab-quiz-result-list");
+  const vocabQuizNext = document.getElementById("vocab-quiz-next");
+  const vocabQuizRestart = document.getElementById("vocab-quiz-restart");
   const quizNext = document.getElementById("quiz-next");
   const quizRestart = document.getElementById("quiz-restart");
   const quizClearMistakes = document.getElementById("quiz-clear-mistakes");
@@ -5112,6 +6693,10 @@ function attachEventListeners() {
   const readingOptionsToggle = document.getElementById("reading-options-toggle");
   const readingNext = document.getElementById("reading-next");
   const basicPracticeNext = document.getElementById("basic-practice-next");
+  const starterKanjiNext = document.getElementById("starter-kanji-next");
+  const starterKanjiRestart = document.getElementById("starter-kanji-restart");
+  const starterKanjiResultFilter = document.getElementById("starter-kanji-result-filter");
+  const kanjiTabButtons = document.querySelectorAll("[data-kanji-tab]");
   const grammarPracticeNext = document.getElementById("grammar-practice-next");
   const kanaQuizNext = document.getElementById("kana-quiz-next");
   const kanaQuizCloseButtons = document.querySelectorAll("[data-kana-sheet-close]");
@@ -5150,6 +6735,11 @@ function attachEventListeners() {
   if (flashcardMastered) {
     flashcardMastered.addEventListener("click", markFlashcardMastered);
   }
+  vocabTabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setVocabTab(button.dataset.vocabTab);
+    });
+  });
   vocabLevelButtons.forEach((button) => {
     button.addEventListener("click", () => {
       setVocabLevel(button.dataset.vocabLevel);
@@ -5164,31 +6754,17 @@ function attachEventListeners() {
   }
   vocabViewButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const nextView = button.dataset.vocabView === "list" ? "list" : "card";
-
-      if (state.vocabView === nextView) {
-        return;
-      }
-
-      state.vocabView = nextView;
-      saveState();
-      renderVocabPage();
+      setVocabView(button.dataset.vocabView);
     });
   });
-  vocabFilterButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setVocabFilter(button.dataset.vocabFilter);
+  if (vocabFilterSelect) {
+    vocabFilterSelect.addEventListener("change", () => {
+      setVocabFilter(vocabFilterSelect.value);
     });
-  });
-  if (vocabPartFilterGroup) {
-    vocabPartFilterGroup.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-vocab-part-filter]");
-
-      if (!button) {
-        return;
-      }
-
-      setVocabPartFilter(button.dataset.vocabPartFilter);
+  }
+  if (vocabPartSelect) {
+    vocabPartSelect.addEventListener("change", () => {
+      setVocabPartFilter(vocabPartSelect.value);
     });
   }
   if (vocabPagePrev) {
@@ -5204,6 +6780,124 @@ function attachEventListeners() {
       saveState();
       renderVocabPage();
     });
+  }
+  if (vocabQuizOptionsToggle) {
+    vocabQuizOptionsToggle.addEventListener("click", () => {
+      state.vocabQuizOptionsOpen = !state.vocabQuizOptionsOpen;
+      saveState();
+      renderVocabPage();
+    });
+  }
+  vocabQuizModeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextMode = getVocabQuizMode(button.dataset.vocabQuizMode);
+
+      if (state.vocabQuizMode === nextMode) {
+        return;
+      }
+
+      state.vocabQuizMode = nextMode;
+      invalidateVocabQuizSession();
+      saveState();
+      renderVocabPage();
+    });
+  });
+  vocabQuizCountButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextCount = getVocabQuizCount(button.dataset.vocabQuizCount);
+
+      if (state.vocabQuizCount === nextCount) {
+        return;
+      }
+
+      state.vocabQuizCount = nextCount;
+      invalidateVocabQuizSession();
+      saveState();
+      renderVocabPage();
+    });
+  });
+  vocabQuizTimeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextDuration = getVocabQuizDuration(button.dataset.vocabQuizTime);
+
+      if (state.vocabQuizDuration === nextDuration) {
+        return;
+      }
+
+      state.vocabQuizDuration = nextDuration;
+      invalidateVocabQuizSession();
+      saveState();
+      renderVocabPage();
+    });
+  });
+  if (vocabQuizLevelSelect) {
+    vocabQuizLevelSelect.addEventListener("change", () => {
+      setVocabLevel(vocabQuizLevelSelect.value);
+    });
+  }
+  if (vocabQuizFilterSelect) {
+    vocabQuizFilterSelect.addEventListener("change", () => {
+      setVocabFilter(vocabQuizFilterSelect.value);
+    });
+  }
+  if (vocabQuizPartSelect) {
+    vocabQuizPartSelect.addEventListener("change", () => {
+      setVocabPartFilter(vocabQuizPartSelect.value);
+    });
+  }
+  if (vocabQuizResultFilter) {
+    vocabQuizResultFilter.addEventListener("change", () => {
+      state.vocabQuizResultFilter = getVocabQuizResultFilter(vocabQuizResultFilter.value);
+      saveState();
+      renderVocabQuizResults();
+    });
+  }
+  if (vocabQuizResultBulkAction) {
+    vocabQuizResultBulkAction.addEventListener("click", () => {
+      const filteredResults = getFilteredVocabQuizResults();
+      const uniqueIds = Array.from(new Set(filteredResults.map((item) => item.id).filter(Boolean)));
+
+      if (!uniqueIds.length) {
+        return;
+      }
+
+      if (vocabQuizResultBulkAction.dataset.vocabQuizBulkAction === "remove") {
+        uniqueIds.forEach((id) => {
+          removeWordFromReviewList(id);
+        });
+      } else {
+        uniqueIds.forEach((id) => {
+          saveWordToReviewList(id);
+        });
+      }
+
+      saveState();
+      renderVocabPage();
+    });
+  }
+  if (vocabQuizResultList) {
+    vocabQuizResultList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-vocab-quiz-save]");
+
+      if (!button) {
+        return;
+      }
+
+      if (isWordSavedToReviewList(button.dataset.vocabQuizSave)) {
+        removeWordFromReviewList(button.dataset.vocabQuizSave);
+      } else {
+        saveWordToReviewList(button.dataset.vocabQuizSave);
+      }
+
+      saveState();
+      renderVocabPage();
+    });
+  }
+  if (vocabQuizNext) {
+    vocabQuizNext.addEventListener("click", nextVocabQuizQuestion);
+  }
+  if (vocabQuizRestart) {
+    vocabQuizRestart.addEventListener("click", restartVocabQuiz);
   }
   if (quizNext) {
     quizNext.addEventListener("click", nextQuiz);
@@ -5268,6 +6962,22 @@ function attachEventListeners() {
   if (basicPracticeNext) {
     basicPracticeNext.addEventListener("click", nextBasicPracticeSet);
   }
+  if (starterKanjiNext) {
+    starterKanjiNext.addEventListener("click", nextStarterKanjiPracticeSet);
+  }
+  if (starterKanjiRestart) {
+    starterKanjiRestart.addEventListener("click", restartStarterKanjiPractice);
+  }
+  if (starterKanjiResultFilter) {
+    starterKanjiResultFilter.addEventListener("change", (event) => {
+      setStarterKanjiResultFilter(event.target.value);
+    });
+  }
+  kanjiTabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setKanjiTab(button.dataset.kanjiTab);
+    });
+  });
   if (grammarPracticeNext) {
     grammarPracticeNext.addEventListener("click", nextGrammarPracticeSet);
   }
@@ -5421,6 +7131,7 @@ function attachEventListeners() {
 function renderAll() {
   renderReadingPractice();
   renderStarterPath();
+  renderKanjiPageLayout();
   renderKanaQuizSetup();
   renderKanaLibrary();
   renderWritingPractice();

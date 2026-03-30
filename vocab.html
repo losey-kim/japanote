@@ -15,7 +15,7 @@
   <meta name="twitter:title" content="Japanote">
   <meta name="twitter:description" content="문자부터 퀴즈까지, 오늘도 가볍게 일본어 해봐요.">
   <meta name="twitter:image" content="https://losey-kim.github.io/Japanote/assets/images/social-preview.png">
-  <title>Japanote - 단어 카드</title>
+  <title>Japanote - 단어</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -27,80 +27,220 @@
   <div class="page-shell">
     <header class="topbar">
       <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span><div><p class="brand-name">Japanote</p><p class="brand-sub">오늘도 가볍게 일본어, 같이 해봐요</p></div></a>
-      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="vocab.html" aria-current="page">단어</a><a href="grammar.html">문법</a><a href="reading.html">독해</a><a href="quiz.html">퀴즈</a><a href="match.html">매칭</a></nav>
+      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="kanji.html">한자</a><a href="vocab.html" aria-current="page">단어</a><a href="grammar.html">문법</a><a href="reading.html">독해</a><a href="match.html">매칭</a></nav>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="테마 바꿔보기" title="테마 바꿔보기"></button>
     </header>
     <main>
       <section id="flashcards" class="content-section two-column">
         <div class="section-heading"><span>VOCAB TRAINER</span><h2 id="vocab-heading-title">N5 단어, 카드로 익혀봐요</h2><p class="section-copy" id="vocab-heading-copy">카드를 넘기며 읽기랑 뜻을 같이 익혀봐요.</p></div>
-        <div class="flashcard-panel">
-          <div class="study-options-shell" id="vocab-options-shell">
-            <button class="study-options-toggle" id="vocab-options-toggle" type="button" aria-expanded="true" aria-controls="vocab-options-panel">
-              <div class="study-options-toggle-copy"><strong>단어 옵션</strong><p class="study-options-toggle-summary" id="vocab-options-summary">N5 · 카드 · 전체 품사</p></div>
-              <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-            </button>
-            <div class="study-options-panel study-options-panel-wide" id="vocab-options-panel">
-              <div class="study-options-group">
-                <span>어느 난이도를 볼까요?</span>
-                <div class="vocab-level-switcher" role="tablist" aria-label="단어 레벨 고르기">
-                  <button class="level-button is-active" type="button" data-vocab-level="N5" aria-pressed="true">N5</button>
-                  <button class="level-button" type="button" data-vocab-level="N4" aria-pressed="false">N4</button>
-                  <button class="level-button" type="button" data-vocab-level="N3" aria-pressed="false">N3</button>
-                  <button class="level-button" type="button" data-vocab-level="all" aria-pressed="false">전체</button>
+        <div class="vocab-tab-list" role="tablist" aria-label="단어 학습 탭">
+          <button class="level-button vocab-tab-button is-active" type="button" data-vocab-tab="study" id="vocab-tab-study" role="tab" aria-selected="true" aria-controls="vocab-tab-panel-study">학습</button>
+          <button class="level-button vocab-tab-button" type="button" data-vocab-tab="quiz" id="vocab-tab-quiz" role="tab" aria-selected="false" aria-controls="vocab-tab-panel-quiz" tabindex="-1">퀴즈</button>
+        </div>
+        <div class="vocab-tab-panels">
+          <section class="vocab-tab-panel" id="vocab-tab-panel-study" data-vocab-tab-panel="study" role="tabpanel" aria-labelledby="vocab-tab-study">
+            <div class="flashcard-panel">
+              <div class="study-options-shell" id="vocab-options-shell">
+                <button class="study-options-toggle" id="vocab-options-toggle" type="button" aria-expanded="true" aria-controls="vocab-options-panel">
+                  <div class="study-options-toggle-copy"><strong>학습 설정</strong><p class="study-options-toggle-summary" id="vocab-options-summary">N5 · 카드 · 전체 품사</p></div>
+                  <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                </button>
+                <div class="study-options-panel study-options-panel-wide" id="vocab-options-panel">
+                  <div class="study-options-group">
+                    <span>어느 난이도를 볼까요?</span>
+                    <div class="vocab-level-switcher" role="tablist" aria-label="단어 레벨 고르기">
+                      <button class="level-button is-active" type="button" data-vocab-level="N5" aria-pressed="true">N5</button>
+                      <button class="level-button" type="button" data-vocab-level="N4" aria-pressed="false">N4</button>
+                      <button class="level-button" type="button" data-vocab-level="N3" aria-pressed="false">N3</button>
+                      <button class="level-button" type="button" data-vocab-level="all" aria-pressed="false">전체</button>
+                    </div>
+                  </div>
+                  <div class="study-options-group">
+                    <span>어떻게 볼까요?</span>
+                    <div class="vocab-view-toggle" role="tablist" aria-label="단어 보는 방식 고르기">
+                      <button class="level-button button-with-icon is-active" type="button" data-vocab-view="card" aria-pressed="true" aria-label="카드로 보기"><span class="material-symbols-rounded" aria-hidden="true">style</span><span>카드</span></button>
+                      <button class="level-button button-with-icon" type="button" data-vocab-view="list" aria-pressed="false" aria-label="리스트로 보기"><span class="material-symbols-rounded" aria-hidden="true">view_list</span><span>리스트</span></button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="study-options-group">
-                <span>어떻게 볼까요?</span>
-                <div class="vocab-view-toggle" role="tablist" aria-label="단어 보는 방식 고르기">
-                  <button class="level-button button-with-icon is-active" type="button" data-vocab-view="card" aria-pressed="true" aria-label="카드로 보기"><span class="material-symbols-rounded" aria-hidden="true">style</span><span>카드</span></button>
-                  <button class="level-button button-with-icon" type="button" data-vocab-view="list" aria-pressed="false" aria-label="리스트로 보기"><span class="material-symbols-rounded" aria-hidden="true">view_list</span><span>리스트</span></button>
-                </div>
+              <div class="vocab-select-toolbar" aria-label="단어 필터">
+                <label class="vocab-select-field" for="vocab-filter-select">
+                  <span>어떤 묶음으로 볼까요?</span>
+                  <div class="vocab-select-wrap">
+                    <select class="vocab-select" id="vocab-filter-select" aria-label="단어 묶음 고르기">
+                      <option value="all">전체</option>
+                      <option value="review">다시 보기</option>
+                      <option value="mastered">익힌 단어</option>
+                    </select>
+                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                  </div>
+                </label>
+                <label class="vocab-select-field" for="vocab-part-select">
+                  <span>품사별로 골라볼까요?</span>
+                  <div class="vocab-select-wrap">
+                    <select class="vocab-select" id="vocab-part-select" aria-label="품사별로 보기">
+                      <option value="all">전체 품사</option>
+                    </select>
+                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                  </div>
+                </label>
               </div>
-              <div class="study-options-group">
-                <span>어떤 묶음으로 볼까요?</span>
-                <div class="vocab-filter-toggle" role="group" aria-label="단어 묶음 고르기">
-                  <button class="secondary-btn vocab-filter-button is-active" type="button" data-vocab-filter="all" aria-pressed="true"><span>전체</span><strong data-vocab-filter-count="all">0</strong></button>
-                  <button class="secondary-btn vocab-filter-button" type="button" data-vocab-filter="review" aria-pressed="false"><span>다시 보기</span><strong data-vocab-filter-count="review">0</strong></button>
-                  <button class="secondary-btn vocab-filter-button" type="button" data-vocab-filter="mastered" aria-pressed="false"><span>익힌 단어</span><strong data-vocab-filter-count="mastered">0</strong></button>
-                </div>
+              <p class="vocab-summary" id="vocab-summary">0개 준비됐어요</p>
+
+              <div class="vocab-card-view" id="vocab-card-view">
+                <article class="flashcard" id="flashcard" aria-live="polite">
+                  <button class="flashcard-toggle" id="flashcard-toggle" type="button" aria-controls="flashcard-meaning" aria-expanded="false">
+                    <span class="flashcard-level" id="flashcard-level">N5</span>
+                    <div class="flashcard-copy">
+                      <strong class="flashcard-word" id="flashcard-word">준비 중</strong>
+                      <p class="flashcard-reading" id="flashcard-reading">단어를 준비하고 있어요.</p>
+                      <p class="flashcard-meaning" id="flashcard-meaning">뜻도 곧 보여드릴게요.</p>
+                    </div>
+                    <span class="flashcard-hint" id="flashcard-hint">눌러서 뜻을 확인해보세요.</span>
+                  </button>
+                  <div class="flashcard-inline-nav" aria-label="단어 넘기기">
+                    <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="flashcard-prev" type="button" aria-label="이전 카드" title="이전 카드"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span></button>
+                    <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="flashcard-next" type="button" aria-label="다음 카드" title="다음 카드"><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
+                  </div>
+                </article>
+                <div class="flashcard-actions"><button class="secondary-btn" id="flashcard-again" type="button">다시 볼래요</button><button class="primary-btn" id="flashcard-mastered" type="button">익혔어요!</button></div>
               </div>
-              <div class="study-options-group study-options-group-full">
-                <span>품사별로 골라볼까요?</span>
-                <div class="vocab-part-toggle" id="vocab-part-filter-group" role="group" aria-label="품사별로 보기">
-                  <button class="secondary-btn vocab-filter-button is-active" type="button" data-vocab-part-filter="all" aria-pressed="true">전체 품사</button>
+
+              <div class="vocab-list-view" id="vocab-list-view" hidden>
+                <div class="vocab-list" id="vocab-list"></div>
+                <div class="vocab-pagination">
+                  <button class="secondary-btn button-with-icon" id="vocab-page-prev" type="button"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span><span>이전</span></button>
+                  <span class="vocab-page-info" id="vocab-page-info">1 / 1</span>
+                  <button class="secondary-btn button-with-icon" id="vocab-page-next" type="button"><span>다음</span><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
                 </div>
               </div>
             </div>
-          </div>
-          <p class="vocab-summary" id="vocab-summary">0개 준비됐어요</p>
+          </section>
 
-          <div class="vocab-card-view" id="vocab-card-view">
-            <article class="flashcard" id="flashcard" aria-live="polite">
-              <button class="flashcard-toggle" id="flashcard-toggle" type="button" aria-controls="flashcard-meaning" aria-expanded="false">
-                <span class="flashcard-level" id="flashcard-level">N5</span>
-                <div class="flashcard-copy">
-                  <strong class="flashcard-word" id="flashcard-word">준비 중</strong>
-                  <p class="flashcard-reading" id="flashcard-reading">단어를 준비하고 있어요.</p>
-                  <p class="flashcard-meaning" id="flashcard-meaning">뜻도 곧 보여드릴게요.</p>
+          <section class="vocab-tab-panel" id="vocab-tab-panel-quiz" data-vocab-tab-panel="quiz" role="tabpanel" aria-labelledby="vocab-tab-quiz" hidden aria-hidden="true">
+            <div class="match-shell vocab-quiz-shell">
+              <aside class="match-sidebar vocab-quiz-sidebar">
+                <div class="match-sidebar-head"><span class="eyebrow">QUIZ HUD</span><h3>단어 퀴즈</h3></div>
+                <div class="study-options-shell match-options-shell" id="vocab-quiz-options-shell">
+                  <button class="study-options-toggle" id="vocab-quiz-options-toggle" type="button" aria-expanded="true" aria-controls="vocab-quiz-options-panel">
+                    <div class="study-options-toggle-copy"><strong>퀴즈 설정</strong><p class="study-options-toggle-summary" id="vocab-quiz-options-summary">뜻 맞히기 · 10문제 · 15초</p></div>
+                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                  </button>
+                  <div class="study-options-panel study-options-panel-wide" id="vocab-quiz-options-panel">
+                    <div class="study-options-group">
+                      <span>어떤 문제로 풀까요?</span>
+                      <div class="match-toggle-group" role="group" aria-label="단어 퀴즈 방식 고르기">
+                        <button class="level-button is-active" type="button" data-vocab-quiz-mode="meaning" aria-pressed="true">뜻 맞히기</button>
+                        <button class="level-button" type="button" data-vocab-quiz-mode="word" aria-pressed="false">단어 맞히기</button>
+                      </div>
+                    </div>
+                    <div class="study-options-group">
+                      <span>총 몇 문제로 할까요?</span>
+                      <div class="match-toggle-group" role="group" aria-label="단어 퀴즈 문제 수 고르기">
+                        <button class="level-button" type="button" data-vocab-quiz-count="5" aria-pressed="false">5문제</button>
+                        <button class="level-button is-active" type="button" data-vocab-quiz-count="10" aria-pressed="true">10문제</button>
+                        <button class="level-button" type="button" data-vocab-quiz-count="15" aria-pressed="false">15문제</button>
+                        <button class="level-button" type="button" data-vocab-quiz-count="20" aria-pressed="false">20문제</button>
+                      </div>
+                    </div>
+                    <div class="study-options-group">
+                      <span>시간은 어떻게 할까요?</span>
+                      <div class="match-toggle-group" role="group" aria-label="단어 퀴즈 시간 고르기">
+                        <button class="level-button" type="button" data-vocab-quiz-time="0" aria-pressed="false">천천히</button>
+                        <button class="level-button" type="button" data-vocab-quiz-time="10" aria-pressed="false">10초</button>
+                        <button class="level-button is-active" type="button" data-vocab-quiz-time="15" aria-pressed="true">15초</button>
+                        <button class="level-button" type="button" data-vocab-quiz-time="20" aria-pressed="false">20초</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <span class="flashcard-hint" id="flashcard-hint">눌러서 뜻을 확인해보세요.</span>
-              </button>
-              <div class="flashcard-inline-nav" aria-label="단어 넘기기">
-                <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="flashcard-prev" type="button" aria-label="이전 카드" title="이전 카드"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span></button>
-                <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="flashcard-next" type="button" aria-label="다음 카드" title="다음 카드"><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
-              </div>
-            </article>
-            <div class="flashcard-actions"><button class="secondary-btn" id="flashcard-again" type="button">다시 볼래요</button><button class="primary-btn" id="flashcard-mastered" type="button">익혔어요!</button></div>
-          </div>
+                <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="단어 퀴즈 필터">
+                  <label class="vocab-select-field" for="vocab-quiz-level-select">
+                    <span>난이도</span>
+                    <div class="vocab-select-wrap">
+                      <select class="vocab-select" id="vocab-quiz-level-select" aria-label="단어 퀴즈 난이도 고르기">
+                        <option value="N5">N5</option>
+                        <option value="N4">N4</option>
+                        <option value="N3">N3</option>
+                        <option value="all">전체</option>
+                      </select>
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </div>
+                  </label>
+                  <label class="vocab-select-field" for="vocab-quiz-filter-select">
+                    <span>묶음</span>
+                    <div class="vocab-select-wrap">
+                      <select class="vocab-select" id="vocab-quiz-filter-select" aria-label="단어 퀴즈 묶음 고르기">
+                        <option value="all">전체</option>
+                        <option value="review">다시 보기</option>
+                        <option value="mastered">익힌 단어</option>
+                      </select>
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </div>
+                  </label>
+                  <label class="vocab-select-field" for="vocab-quiz-part-select">
+                    <span>품사</span>
+                    <div class="vocab-select-wrap">
+                      <select class="vocab-select" id="vocab-quiz-part-select" aria-label="단어 퀴즈 품사 고르기">
+                        <option value="all">전체 품사</option>
+                      </select>
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </div>
+                  </label>
+                </div>
+                <div class="match-stats-grid vocab-quiz-stats-grid">
+                  <div class="match-stat-card"><span>진행</span><strong id="vocab-quiz-progress-side">0 / 0</strong></div>
+                  <div class="match-stat-card"><span>남은 시간</span><strong id="vocab-quiz-timer">15초</strong></div>
+                </div>
+                <div class="match-actions">
+                  <button class="primary-btn button-with-icon" id="vocab-quiz-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span id="vocab-quiz-restart-label">시작하기</span></button>
+                </div>
+              </aside>
 
-          <div class="vocab-list-view" id="vocab-list-view" hidden>
-            <div class="vocab-list" id="vocab-list"></div>
-            <div class="vocab-pagination">
-              <button class="secondary-btn button-with-icon" id="vocab-page-prev" type="button"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span><span>이전</span></button>
-              <span class="vocab-page-info" id="vocab-page-info">1 / 1</span>
-              <button class="secondary-btn button-with-icon" id="vocab-page-next" type="button"><span>다음</span><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
+              <div class="match-board vocab-quiz-board">
+                <div class="vocab-quiz-view" id="vocab-quiz">
+                  <p class="vocab-list-empty" id="vocab-quiz-empty" hidden>퀴즈를 준비하고 있어요.</p>
+                  <article class="basic-practice-card vocab-quiz-card" id="vocab-quiz-card">
+                    <div class="basic-practice-meta"><span id="vocab-quiz-track">단어</span><span id="vocab-quiz-source">N5 단어</span></div>
+                    <div class="basic-practice-header"><div><span class="eyebrow">VOCAB QUIZ</span><h3 id="vocab-quiz-title">단어 퀴즈</h3></div><p class="basic-practice-note" id="vocab-quiz-note">선택한 단어로 바로 풀어볼게요.</p></div>
+                    <div class="basic-practice-prompt-box"><span class="eyebrow">QUESTION</span><p id="vocab-quiz-prompt">문제를 준비하고 있어요.</p></div>
+                    <div class="basic-practice-display-box"><strong id="vocab-quiz-display">-</strong><p id="vocab-quiz-display-sub"></p></div>
+                    <div class="basic-practice-options" id="vocab-quiz-options"></div>
+                    <p class="basic-practice-feedback" id="vocab-quiz-feedback"></p>
+                    <p class="basic-practice-explanation" id="vocab-quiz-explanation"></p>
+                    <div class="quiz-actions"><button class="primary-btn" id="vocab-quiz-next" type="button">다음으로 가볼까요?</button></div>
+                  </article>
+                </div>
+                <div class="match-result-view" id="vocab-quiz-result-view" hidden>
+                  <p class="match-result-title">결과보기</p>
+                  <div class="match-result-grid">
+                    <article class="match-result-stat"><span>전체</span><strong id="vocab-quiz-result-total">0</strong></article>
+                    <article class="match-result-stat"><span>정답</span><strong id="vocab-quiz-result-correct">0</strong></article>
+                    <article class="match-result-stat"><span>오답</span><strong id="vocab-quiz-result-wrong">0</strong></article>
+                  </div>
+                  <div class="match-result-filters">
+                    <label class="match-result-filter-field" for="vocab-quiz-result-filter">
+                      <div class="match-result-filter-select-wrap">
+                        <select class="match-result-filter-select" id="vocab-quiz-result-filter" aria-label="단어 퀴즈 결과 필터">
+                          <option value="all">전체</option>
+                          <option value="correct">정답</option>
+                          <option value="wrong">오답</option>
+                        </select>
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                      </div>
+                    </label>
+                    <button class="secondary-btn button-with-icon match-result-bulk-btn" id="vocab-quiz-result-bulk-action" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">bookmark_add</span>
+                      <span id="vocab-quiz-result-bulk-label">전체 저장</span>
+                    </button>
+                  </div>
+                  <p class="match-result-empty" id="vocab-quiz-result-empty" hidden>보여줄 결과가 아직 없어요.</p>
+                  <div class="match-result-list" id="vocab-quiz-result-list"></div>
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </section>
     </main>

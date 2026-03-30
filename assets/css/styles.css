@@ -976,6 +976,15 @@ button {
   opacity: 0.88;
 }
 
+.study-options-toggle:disabled {
+  opacity: 0.56;
+  cursor: default;
+}
+
+.study-options-toggle:disabled:hover {
+  opacity: 0.56;
+}
+
 .kana-setup-toggle-copy,
 .study-options-toggle-copy {
   display: grid;
@@ -2022,6 +2031,47 @@ body.is-kana-quiz-sheet-open .page-shell {
   margin-top: 22px;
 }
 
+.kanji-practice-card {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.kanji-tab-list {
+  margin-inline: auto;
+}
+
+.kanji-tab-panel {
+  min-width: 0;
+}
+
+.kanji-list {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.kanji-list-main {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.kanji-list-char {
+  display: block;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: clamp(2.7rem, 6vw, 4rem);
+  line-height: 1.1;
+}
+
+.kanji-result-view {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.kanji-result-view .match-result-item-main strong {
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.15;
+}
+
 .basic-practice-meta {
   display: flex;
   flex-wrap: wrap;
@@ -2154,6 +2204,9 @@ body.is-kana-quiz-sheet-open .page-shell {
   border: 1px solid rgba(25, 21, 22, 0.08);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.8);
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text);
   font-family: "Noto Sans KR", sans-serif;
   font-size: 1rem;
   line-height: 1.75;
@@ -2168,14 +2221,25 @@ body.is-kana-quiz-sheet-open .page-shell {
   background: rgba(255, 255, 255, 0.96);
 }
 
-.basic-practice-option.is-correct {
-  border-color: rgba(95, 174, 139, 0.9);
-  background: rgba(95, 174, 139, 0.14);
+.basic-practice-option.is-selected,
+.basic-practice-option.is-selected:disabled {
+  border-color: rgba(93, 133, 207, 0.72);
+  background: rgba(93, 133, 207, 0.12);
+  box-shadow: 0 0 0 1px rgba(93, 133, 207, 0.18);
 }
 
-.basic-practice-option.is-wrong {
+.basic-practice-option.is-correct,
+.basic-practice-option.is-correct:disabled {
+  border-color: rgba(95, 174, 139, 0.9);
+  background: rgba(95, 174, 139, 0.14);
+  box-shadow: 0 0 0 1px rgba(95, 174, 139, 0.18);
+}
+
+.basic-practice-option.is-wrong,
+.basic-practice-option.is-wrong:disabled {
   border-color: rgba(222, 107, 72, 0.92);
   background: rgba(222, 107, 72, 0.14);
+  box-shadow: 0 0 0 1px rgba(222, 107, 72, 0.16);
 }
 
 .basic-practice-feedback,
@@ -2239,6 +2303,24 @@ body.is-kana-quiz-sheet-open .page-shell {
   min-width: 0;
 }
 
+.vocab-tab-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, 360px);
+  margin-bottom: 24px;
+}
+
+.vocab-tab-button {
+  width: 100%;
+}
+
+.vocab-tab-panels,
+.vocab-tab-panel {
+  display: grid;
+  gap: 18px;
+}
+
 .vocab-view-toggle {
   display: inline-grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2247,6 +2329,59 @@ body.is-kana-quiz-sheet-open .page-shell {
 
 .vocab-view-toggle .button-with-icon {
   gap: 6px;
+}
+
+.vocab-select-toolbar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.vocab-select-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.vocab-select-field > span {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vocab-select-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.vocab-select {
+  width: 100%;
+  padding: 14px 46px 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface-strong);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.vocab-select:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.vocab-select-wrap .material-symbols-rounded {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
 }
 
 .vocab-filter-toggle {
@@ -2292,6 +2427,78 @@ body.is-kana-quiz-sheet-open .page-shell {
 .vocab-list-view {
   display: grid;
   gap: 16px;
+}
+
+.vocab-quiz-view {
+  display: grid;
+  gap: 16px;
+  scroll-margin-top: 24px;
+}
+
+.vocab-quiz-card {
+  box-shadow: none;
+}
+
+.vocab-quiz-card .basic-practice-meta,
+.vocab-quiz-card .basic-practice-header,
+.vocab-quiz-card .basic-practice-prompt-box {
+  display: none;
+}
+
+.vocab-quiz-card .basic-practice-feedback,
+.vocab-quiz-card .basic-practice-explanation {
+  display: none;
+}
+
+.vocab-quiz-card .basic-practice-display-box {
+  margin-top: 0;
+}
+
+.vocab-quiz-result-extra {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.basic-practice-option:disabled {
+  opacity: 1;
+  color: var(--text);
+  -webkit-text-fill-color: currentColor;
+}
+
+.vocab-quiz-shell {
+  margin-top: 0;
+}
+
+.vocab-quiz-sidebar {
+  align-content: start;
+}
+
+.vocab-select-toolbar.vocab-select-toolbar-sidebar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.vocab-select-toolbar.vocab-select-toolbar-sidebar .vocab-select-field > span {
+  letter-spacing: 0.04em;
+}
+
+.vocab-select-toolbar.vocab-select-toolbar-sidebar .vocab-select {
+  padding: 14px 40px 14px 14px;
+}
+
+.vocab-select-toolbar.vocab-select-toolbar-sidebar .vocab-select-wrap .material-symbols-rounded {
+  right: 12px;
+}
+
+.vocab-quiz-stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vocab-quiz-board {
+  align-content: start;
 }
 
 .vocab-list {
@@ -4362,6 +4569,10 @@ body::after {
     width: 100%;
   }
 
+  .vocab-select-toolbar {
+    grid-template-columns: 1fr;
+  }
+
   .vocab-filter-toggle,
   .vocab-part-toggle {
     width: 100%;
@@ -5081,6 +5292,12 @@ body::after {
     color: #e7fff7;
   }
 
+  html:not([data-theme="light"]) .basic-practice-option.is-selected {
+    background: rgba(79, 123, 230, 0.22);
+    border-color: rgba(145, 175, 255, 0.4);
+    color: #eef3ff;
+  }
+
   html:not([data-theme="light"]) .quiz-option.is-wrong,
   html:not([data-theme="light"]) .basic-practice-option.is-wrong,
   html:not([data-theme="light"]) .grammar-practice-option.is-wrong,
@@ -5347,6 +5564,12 @@ html[data-theme="dark"] .match-card.is-matched {
   color: #e7fff7;
 }
 
+html[data-theme="dark"] .basic-practice-option.is-selected {
+  background: rgba(79, 123, 230, 0.22);
+  border-color: rgba(145, 175, 255, 0.4);
+  color: #eef3ff;
+}
+
 html[data-theme="dark"] .quiz-option.is-wrong,
 html[data-theme="dark"] .basic-practice-option.is-wrong,
 html[data-theme="dark"] .grammar-practice-option.is-wrong,
@@ -5566,8 +5789,8 @@ html[data-theme="dark"] .reading-feedback {
   html[data-theme="dark"] .match-card:focus-visible,
   html[data-theme="dark"] .basic-practice-option:hover,
   html[data-theme="dark"] .basic-practice-option:focus-visible,
-  html[data-theme="dark"] .grammar-practice-option:hover,
-  html[data-theme="dark"] .grammar-practice-option:focus-visible,
+  html[data-theme="dark"] .grammar-practice-option:not(.is-correct):not(.is-wrong):hover,
+  html[data-theme="dark"] .grammar-practice-option:not(.is-correct):not(.is-wrong):focus-visible,
   html[data-theme="dark"] .reading-option:hover,
   html[data-theme="dark"] .reading-option:focus-visible,
   html[data-theme="dark"] .quiz-option:hover,

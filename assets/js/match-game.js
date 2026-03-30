@@ -630,11 +630,20 @@ function renderMatchResults() {
 }
 
 function renderMatchScreen() {
+  const board = document.getElementById("match-board");
   const playView = document.getElementById("match-play-view");
   const resultView = document.getElementById("match-result-view");
+  const feedback = document.getElementById("match-feedback");
+  const hasVisibleFeedback = Boolean(feedback?.textContent);
+  const shouldShowPlayView = !matchState.showResults && (matchState.hasStarted || hasVisibleFeedback);
+  const shouldShowBoard = shouldShowPlayView || matchState.showResults;
+
+  if (board) {
+    board.hidden = !shouldShowBoard;
+  }
 
   if (playView) {
-    playView.hidden = matchState.showResults;
+    playView.hidden = !shouldShowPlayView;
   }
 
   if (resultView) {

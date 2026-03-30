@@ -27,14 +27,14 @@
   <div class="page-shell">
     <header class="topbar">
       <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span><div><p class="brand-name">Japanote</p><p class="brand-sub">오늘도 가볍게 일본어, 같이 해봐요</p></div></a>
-      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="vocab.html">단어</a><a href="grammar.html">문법</a><a href="reading.html">독해</a><a href="quiz.html">퀴즈</a><a href="match.html" aria-current="page">매칭</a></nav>
+      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="vocab.html">단어</a><a href="grammar.html">문법</a><a href="reading.html">독해</a><a href="match.html" aria-current="page">매칭</a></nav>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="테마 바꿔보기" title="테마 바꿔보기"></button>
     </header>
     <main>
       <section class="content-section">
         <div class="match-shell">
           <aside class="match-sidebar">
-            <div class="match-sidebar-head"><span class="eyebrow">ROUND HUD</span><h3>이번 라운드</h3></div>
+            <div class="match-sidebar-head"><span class="eyebrow">ROUND HUD</span></div>
             <div class="study-options-shell match-options-shell" id="match-options-shell">
               <button class="study-options-toggle" id="match-options-toggle" type="button" aria-expanded="true" aria-controls="match-options-panel">
                 <div class="study-options-toggle-copy"><strong>매칭 설정</strong><p class="study-options-toggle-summary" id="match-options-summary">N5 · 5문제 · 15초</p></div>
@@ -78,7 +78,7 @@
               <button class="primary-btn button-with-icon" id="match-new-round" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span id="match-new-round-label">시작하기</span></button>
             </div>
           </aside>
-          <div class="match-board">
+          <div class="match-board" id="match-board" hidden>
             <div class="match-play-view" id="match-play-view">
               <div class="match-feedback" id="match-feedback" hidden></div>
               <div class="match-columns">

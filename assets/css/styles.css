@@ -1742,7 +1742,11 @@ body.is-kana-quiz-sheet-open .page-shell {
 }
 
 .writing-practice-stage.is-guide-hidden .writing-character-svg g[data-strokesvg="shadows"] {
-  opacity: 0.12;
+  opacity: 0;
+}
+
+.writing-practice-stage.is-guide-hidden:not(.is-answer-visible) .writing-character-svg g[data-strokesvg="strokes"] path {
+  opacity: 0 !important;
 }
 
 .writing-practice-stage.is-answer-visible .writing-character-svg {

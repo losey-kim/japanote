@@ -1592,6 +1592,8 @@ const writingPracticeSettings = {
   order: "sequence"
 };
 
+const writingPracticeSvgTemplateCache = new Map();
+
 const writingPracticeState = {
   sessionItems: [],
   sessionIndex: 0,
@@ -1609,6 +1611,8 @@ const writingPracticeState = {
   tip: "가이드가 잘 보이도록 천천히 크게 써보세요.",
   slotEntries: [],
   targetCanvas: document.createElement("canvas"),
+  overlayHasInk: false,
+  overlayBounds: null,
   hasVectorGuide: false,
   renderSeed: 0
 };
@@ -1623,12 +1627,10 @@ function getWritingPracticeDefaultTip() {
 
 function beginWritingPracticeTransition() {
   writingPracticeState.isTransitioning = true;
-  updateWritingPracticeControls();
 }
 
 function endWritingPracticeTransition() {
   writingPracticeState.isTransitioning = false;
-  updateWritingPracticeControls();
 }
 
 function getWritingPracticeModeLabel(mode = writingPracticeSettings.mode) {
@@ -1649,25 +1651,30 @@ function renderWritingPracticeSetup() {
   const setupPanel = document.getElementById("writing-setup-panel");
   const setupSummary = document.getElementById("writing-setup-summary");
   const isOpen = state.writingSetupOpen !== false;
+  const summaryText = [
+    getWritingPracticeModeLabel(writingPracticeSettings.mode),
+    getWritingPracticeOrderLabel(writingPracticeSettings.order)
+  ].join(" · ");
 
-  if (setupSummary) {
-    setupSummary.textContent = [
-      getWritingPracticeModeLabel(writingPracticeSettings.mode),
-      getWritingPracticeOrderLabel(writingPracticeSettings.order)
-    ].join(" · ");
+  if (setupSummary && setupSummary.textContent !== summaryText) {
+    setupSummary.textContent = summaryText;
   }
 
   if (setupShell) {
     setupShell.classList.toggle("is-open", isOpen);
   }
 
-  if (setupToggle) {
+  if (setupToggle && setupToggle.getAttribute("aria-expanded") !== String(isOpen)) {
     setupToggle.setAttribute("aria-expanded", String(isOpen));
   }
 
   if (setupPanel) {
-    setupPanel.hidden = !isOpen;
-    setupPanel.setAttribute("aria-hidden", String(!isOpen));
+    if (setupPanel.hidden === isOpen) {
+      setupPanel.hidden = !isOpen;
+    }
+    if (setupPanel.getAttribute("aria-hidden") !== String(!isOpen)) {
+      setupPanel.setAttribute("aria-hidden", String(!isOpen));
+    }
   }
 }
 
@@ -1786,6 +1793,12 @@ function parseWritingPracticeSvg(rawSvg) {
     return null;
   }
 
+  const cachedTemplate = writingPracticeSvgTemplateCache.get(rawSvg);
+
+  if (cachedTemplate) {
+    return cachedTemplate.cloneNode(true);
+  }
+
   const parsed = new DOMParser().parseFromString(rawSvg.trim(), "image/svg+xml");
   const svg = parsed.documentElement;
 
@@ -1793,7 +1806,9 @@ function parseWritingPracticeSvg(rawSvg) {
     return null;
   }
 
-  return document.importNode(svg, true);
+  const template = document.importNode(svg, true);
+  writingPracticeSvgTemplateCache.set(rawSvg, template);
+  return template.cloneNode(true);
 }
 
 function getWritingSvgViewBox(svg, fallbackViewBox = { x: 0, y: 0, width: 1024, height: 1024 }) {
@@ -1836,7 +1851,10 @@ function getWritingSvgViewBox(svg, fallbackViewBox = { x: 0, y: 0, width: 1024, 
   });
 
   if (!hasMeasuredBounds) {
-    return baseViewBox;
+    return {
+      viewBox: baseViewBox,
+      hasMeasuredBounds
+    };
   }
 
   const contentWidth = Math.max(1, maxX - minX);
@@ -1845,20 +1863,24 @@ function getWritingSvgViewBox(svg, fallbackViewBox = { x: 0, y: 0, width: 1024, 
   const padY = Math.max(28, contentHeight * 0.1);
 
   return {
-    x: minX - padX,
-    y: minY - padY,
-    width: contentWidth + padX * 2,
-    height: contentHeight + padY * 2
+    viewBox: {
+      x: minX - padX,
+      y: minY - padY,
+      width: contentWidth + padX * 2,
+      height: contentHeight + padY * 2
+    },
+    hasMeasuredBounds
   };
 }
 
 function applyWritingSvgViewBox(entry) {
-  if (!entry?.svg) {
+  if (!entry?.svg || entry.viewBoxMeasured) {
     return;
   }
 
-  const nextViewBox = getWritingSvgViewBox(entry.svg, entry.baseViewBox || entry.viewBox);
+  const { viewBox: nextViewBox, hasMeasuredBounds } = getWritingSvgViewBox(entry.svg, entry.baseViewBox || entry.viewBox);
   entry.viewBox = nextViewBox;
+  entry.viewBoxMeasured = hasMeasuredBounds;
   entry.svg.setAttribute("viewBox", `${nextViewBox.x} ${nextViewBox.y} ${nextViewBox.width} ${nextViewBox.height}`);
 }
 
@@ -1951,7 +1973,9 @@ function buildWritingPracticeStage(current) {
         svg: null,
         baseViewBox: { x: 0, y: 0, width: 1024, height: 1024 },
         viewBox: { x: 0, y: 0, width: 1024, height: 1024 },
+        viewBoxMeasured: true,
         shadowPaths: [],
+        shadowMasks: [],
         strokeEntries: []
       });
       return;
@@ -1971,7 +1995,9 @@ function buildWritingPracticeStage(current) {
         svg: null,
         baseViewBox: { x: 0, y: 0, width: 1024, height: 1024 },
         viewBox: { x: 0, y: 0, width: 1024, height: 1024 },
+        viewBoxMeasured: true,
         shadowPaths: [],
+        shadowMasks: [],
         strokeEntries: []
       });
       return;
@@ -1994,11 +2020,18 @@ function buildWritingPracticeStage(current) {
     const shadowPaths = Array.from(svg.querySelectorAll('g[data-strokesvg="shadows"] path'))
       .map((path) => path.getAttribute("d"))
       .filter(Boolean);
+    const shadowMasks = shadowPaths.map((pathData) => {
+      try {
+        return new Path2D(pathData);
+      } catch (error) {
+        return null;
+      }
+    }).filter(Boolean);
 
     writingPracticeState.hasVectorGuide = writingPracticeState.hasVectorGuide || shadowPaths.length > 0;
 
     layer.appendChild(slot);
-    const viewBox = getWritingSvgViewBox(svg, baseViewBox);
+    const { viewBox, hasMeasuredBounds } = getWritingSvgViewBox(svg, baseViewBox);
     svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
     const strokeEntries = collectWritingStrokeEntries(svg);
 
@@ -2008,7 +2041,9 @@ function buildWritingPracticeStage(current) {
       svg,
       baseViewBox,
       viewBox,
+      viewBoxMeasured: hasMeasuredBounds,
       shadowPaths,
+      shadowMasks,
       strokeEntries
     });
   });
@@ -2045,34 +2080,54 @@ function updateWritingPracticeControls() {
   const nextButton = document.getElementById("writing-practice-next");
   const isBusy = writingPracticeState.isAnimating || writingPracticeState.isTransitioning;
 
+  const syncButtonState = (button, label, disabled) => {
+    if (!button) {
+      return;
+    }
+
+    if (typeof label === "string" && button.textContent !== label) {
+      button.textContent = label;
+    }
+
+    if (button.disabled !== disabled) {
+      button.disabled = disabled;
+    }
+  };
+
   if (guideToggle) {
-    guideToggle.textContent = writingPracticeState.guideVisible ? "가이드 숨기기" : "가이드 보기";
-    guideToggle.disabled = !writingPracticeState.hasVectorGuide || isBusy;
+    syncButtonState(
+      guideToggle,
+      writingPracticeState.guideVisible ? "가이드 숨기기" : "가이드 보기",
+      !writingPracticeState.hasVectorGuide || isBusy
+    );
   }
 
   if (revealToggle) {
-    revealToggle.textContent = writingPracticeState.answerVisible ? "정답 가리기" : "정답 보기";
-    revealToggle.disabled = !writingPracticeState.hasVectorGuide || isBusy;
+    syncButtonState(
+      revealToggle,
+      writingPracticeState.answerVisible ? "정답 가리기" : "정답 보기",
+      !writingPracticeState.hasVectorGuide || isBusy
+    );
   }
 
   if (prevButton) {
-    prevButton.disabled = !writingPracticeState.sessionItems.length || isBusy;
+    syncButtonState(prevButton, null, !writingPracticeState.sessionItems.length || isBusy);
   }
 
   if (clearButton) {
-    clearButton.disabled = writingPracticeState.strokes.length === 0 || isBusy;
+    syncButtonState(clearButton, null, writingPracticeState.strokes.length === 0 || isBusy);
   }
 
   if (scoreButton) {
-    scoreButton.disabled = !writingPracticeState.hasVectorGuide || isBusy;
+    syncButtonState(scoreButton, null, !writingPracticeState.hasVectorGuide || isBusy);
   }
 
   if (replayButton) {
-    replayButton.disabled = !writingPracticeState.hasVectorGuide || isBusy;
+    syncButtonState(replayButton, null, !writingPracticeState.hasVectorGuide || isBusy);
   }
 
   if (nextButton) {
-    nextButton.disabled = !writingPracticeState.sessionItems.length || isBusy;
+    syncButtonState(nextButton, null, !writingPracticeState.sessionItems.length || isBusy);
   }
 }
 
@@ -2210,6 +2265,54 @@ function drawWritingStroke(ctx, canvas, points) {
   ctx.stroke();
 }
 
+function getWritingOverlayBounds(canvas, strokes) {
+  if (!canvas || !strokes.length) {
+    return null;
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  strokes.forEach((stroke) => {
+    stroke.forEach((point) => {
+      const x = point.x * canvas.width;
+      const y = point.y * canvas.height;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    });
+  });
+
+  if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
+    return null;
+  }
+
+  const padding = getWritingBrushWidth(canvas);
+
+  return {
+    x: Math.max(0, minX - padding),
+    y: Math.max(0, minY - padding),
+    width: Math.min(canvas.width, maxX + padding) - Math.max(0, minX - padding),
+    height: Math.min(canvas.height, maxY + padding) - Math.max(0, minY - padding)
+  };
+}
+
+function clearWritingOverlayRegion(ctx, canvas, bounds) {
+  if (!ctx || !canvas) {
+    return;
+  }
+
+  if (!bounds) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
+
+  ctx.clearRect(bounds.x, bounds.y, bounds.width, bounds.height);
+}
+
 function renderWritingOverlay() {
   const canvas = document.getElementById("writing-overlay-canvas");
   const ctx = canvas?.getContext("2d");
@@ -2218,7 +2321,32 @@ function renderWritingOverlay() {
     return;
   }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const hasStrokes = writingPracticeState.strokes.some((stroke) => stroke.length);
+
+  if (!hasStrokes && !writingPracticeState.overlayHasInk) {
+    return;
+  }
+
+  const nextBounds = hasStrokes ? getWritingOverlayBounds(canvas, writingPracticeState.strokes) : null;
+  const previousBounds = writingPracticeState.overlayBounds;
+  const clearBounds =
+    previousBounds && nextBounds
+      ? {
+          x: Math.min(previousBounds.x, nextBounds.x),
+          y: Math.min(previousBounds.y, nextBounds.y),
+          width: Math.max(previousBounds.x + previousBounds.width, nextBounds.x + nextBounds.width) - Math.min(previousBounds.x, nextBounds.x),
+          height: Math.max(previousBounds.y + previousBounds.height, nextBounds.y + nextBounds.height) - Math.min(previousBounds.y, nextBounds.y)
+        }
+      : previousBounds || nextBounds;
+
+  clearWritingOverlayRegion(ctx, canvas, clearBounds);
+
+  if (!hasStrokes) {
+    writingPracticeState.overlayHasInk = false;
+    writingPracticeState.overlayBounds = null;
+    return;
+  }
+
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.strokeStyle = "rgba(30, 35, 49, 0.94)";
@@ -2228,6 +2356,8 @@ function renderWritingOverlay() {
   writingPracticeState.strokes.forEach((stroke) => {
     drawWritingStroke(ctx, canvas, stroke);
   });
+  writingPracticeState.overlayHasInk = true;
+  writingPracticeState.overlayBounds = nextBounds;
 }
 
 function renderWritingPracticeTargetMask() {
@@ -2272,8 +2402,8 @@ function renderWritingPracticeTargetMask() {
     ctx.save();
     ctx.translate(offsetX, offsetY);
     ctx.scale(scale, scale);
-    entry.shadowPaths.forEach((pathData) => {
-      ctx.fill(new Path2D(pathData));
+    entry.shadowMasks.forEach((mask) => {
+      ctx.fill(mask);
     });
     ctx.restore();
   });
@@ -2292,18 +2422,20 @@ function syncWritingPracticeCanvas() {
     return;
   }
 
-  const ratio = window.devicePixelRatio || 1;
+  const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
   const nextWidth = Math.max(1, Math.round(rect.width * ratio));
   const nextHeight = Math.max(1, Math.round(rect.height * ratio));
+  const resized = canvas.width !== nextWidth || canvas.height !== nextHeight;
 
-  if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+  if (resized) {
     canvas.width = nextWidth;
     canvas.height = nextHeight;
+    writingPracticeState.overlayHasInk = false;
+    writingPracticeState.overlayBounds = null;
   }
 
   refreshWritingPracticeViewBoxes();
   renderWritingOverlay();
-  renderWritingPracticeTargetMask();
 }
 
 function scheduleWritingPracticeLayout(replay = false) {
@@ -2576,8 +2708,9 @@ async function replayWritingStrokeAnimation() {
         path.style.strokeDasharray = `${length}`;
         path.style.strokeDashoffset = `${length}`;
         path.style.opacity = "1";
-        path.getBoundingClientRect();
       });
+
+      strokeEntry.paths[0]?.getBoundingClientRect();
 
       strokeEntry.paths.forEach((path) => {
         path.style.transition = `stroke-dashoffset ${strokeEntry.duration}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease`;
@@ -2730,7 +2863,10 @@ function renderWritingPractice() {
 
   buildWritingPracticeStage(current);
   updateWritingPracticePanel();
-  scheduleWritingPracticeLayout(false);
+
+  if (getCharactersTab(state.charactersTab) === "writing") {
+    scheduleWritingPracticeLayout(false);
+  }
 }
 
 function createQuizMeta(item, mode, promptKind) {
@@ -5159,7 +5295,7 @@ function attachEventListeners() {
     writingCanvas.addEventListener("pointercancel", finishWritingPointer);
   }
   window.addEventListener("resize", () => {
-    if (!document.getElementById("writing-practice-shell")) {
+    if (!document.getElementById("writing-practice-shell") || getCharactersTab(state.charactersTab) !== "writing") {
       return;
     }
 

@@ -2,6 +2,7 @@
   const studyStateKey = "jlpt-compass-state";
   const matchStateKey = "japanote-match-state";
   const themeStorageKey = "japanote-theme";
+  const authStorageKey = "japanote-supabase-auth";
   const supportedKeys = new Set([studyStateKey, matchStateKey, themeStorageKey]);
   const defaultConfig = {
     enabled: false,
@@ -18,6 +19,7 @@
     ...defaultConfig,
     ...rawConfig
   };
+
   config.enabled = Boolean(config.enabled && config.url && config.anonKey && config.stateTable);
 
   const localValues = {
@@ -30,13 +32,17 @@
   let currentSession = null;
   let currentUser = null;
   let authPanelOpen = false;
-  let isLoadingRemoteState = false;
+  let authPanelFrame = 0;
+  let authPanelIdSequence = 0;
+  let pendingAuthPullTimer = null;
   let pendingSaveTimer = null;
+  let isLoadingRemoteState = false;
+  let authUrlErrorVisible = false;
   let status = {
     code: config.enabled ? "ready" : "local-only",
     summary: config.enabled ? "클라우드 준비" : "이 기기만 저장",
     detail: config.enabled
-      ? "이메일 로그인 후 기기 간으로 학습 상태를 동기화할 수 있어요."
+      ? "이메일 로그인 후 같은 데이터를 여러 기기에서 볼 수 있어요."
       : "Supabase 설정이 비어 있어서 현재는 이 기기 브라우저에만 저장해요.",
     busy: false
   };
@@ -80,14 +86,75 @@
 
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      // Ignore storage failures so offline/local usage still works.
+      // Keep the in-memory state even if localStorage is unavailable.
     }
+  }
+
+  function hasHttpOrigin() {
+    return window.location.protocol === "http:" || window.location.protocol === "https:";
+  }
+
+  function getConfiguredRedirectOrigin() {
+    if (!config.emailRedirectTo) {
+      return "";
+    }
+
+    try {
+      return new URL(config.emailRedirectTo).origin;
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function shouldUseCurrentOriginRedirect() {
+    if (!hasHttpOrigin()) {
+      return false;
+    }
+
+    const configuredOrigin = getConfiguredRedirectOrigin();
+
+    if (!configuredOrigin) {
+      return true;
+    }
+
+    return window.location.origin !== configuredOrigin;
+  }
+
+  function getCurrentPageUrl() {
+    try {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.hash = "";
+      currentUrl.search = "";
+      return currentUrl.toString();
+    } catch (error) {
+      return window.location.href.split("#")[0].split("?")[0];
+    }
+  }
+
+  function getEmailRedirectUrl() {
+    const currentPageUrl = getCurrentPageUrl();
+
+    if (shouldUseCurrentOriginRedirect()) {
+      return currentPageUrl;
+    }
+
+    return config.emailRedirectTo || currentPageUrl;
   }
 
   function setStatus(code, summary, detail, busy = false) {
     status = { code, summary, detail, busy };
     renderAuthUi();
     dispatchStatusEvent();
+  }
+
+  function setReadyStatus() {
+    authUrlErrorVisible = false;
+    setStatus("ready", "클라우드 준비", "이메일 로그인 후 같은 데이터를 여러 기기에서 볼 수 있어요.");
+  }
+
+  function syncCurrentSession(session) {
+    currentSession = session || null;
+    currentUser = session?.user || null;
   }
 
   function dispatchStorageUpdate(key, value, source) {
@@ -186,26 +253,18 @@
       return;
     }
 
-    if (remoteState.study_state && typeof remoteState.study_state === "object") {
-      writeValue(studyStateKey, remoteState.study_state, {
-        remote: false,
-        source: "remote"
-      });
-    }
-
-    if (remoteState.match_state && typeof remoteState.match_state === "object") {
-      writeValue(matchStateKey, remoteState.match_state, {
-        remote: false,
-        source: "remote"
-      });
-    }
-
-    if (typeof remoteState.theme_mode === "string" && remoteState.theme_mode) {
-      writeValue(themeStorageKey, remoteState.theme_mode, {
-        remote: false,
-        source: "remote"
-      });
-    }
+    writeValue(studyStateKey, remoteState.study_state || {}, {
+      remote: false,
+      source: "remote"
+    });
+    writeValue(matchStateKey, remoteState.match_state || {}, {
+      remote: false,
+      source: "remote"
+    });
+    writeValue(themeStorageKey, remoteState.theme_mode || "system", {
+      remote: false,
+      source: "remote"
+    });
   }
 
   async function pullRemoteState(detail = "클라우드 데이터를 확인하고 있어요.") {
@@ -271,11 +330,55 @@
     }
   }
 
+  function scheduleRemotePull(detail) {
+    if (!config.enabled || !currentUser) {
+      return;
+    }
+
+    window.clearTimeout(pendingAuthPullTimer);
+    pendingAuthPullTimer = window.setTimeout(() => {
+      pendingAuthPullTimer = null;
+      pullRemoteState(detail);
+    }, 0);
+  }
+
+  function getFriendlyAuthErrorMessage(error) {
+    const rawMessage = String(error?.message || "").trim();
+    const lowerMessage = rawMessage.toLowerCase();
+
+    if (!rawMessage) {
+      return "인증 처리 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.";
+    }
+
+    if (lowerMessage.includes("email rate limit exceeded")) {
+      return "이메일을 너무 자주 보내서 잠시 제한됐어요. 조금 기다린 뒤 다시 시도해 주세요.";
+    }
+
+    if (lowerMessage.includes("email link is invalid or has expired") || lowerMessage.includes("otp_expired")) {
+      return "로그인 링크가 만료됐거나 이미 사용됐어요. 새 링크를 다시 보내 주세요.";
+    }
+
+    if (lowerMessage.includes("invalid login credentials")) {
+      return "로그인 정보가 맞지 않아요. 다시 확인해 주세요.";
+    }
+
+    if (lowerMessage.includes("user already registered")) {
+      return "이미 등록된 이메일이에요. 바로 로그인해 보세요.";
+    }
+
+    if (lowerMessage.includes("signup is disabled")) {
+      return "현재 새 로그인 요청을 받을 수 없어요. 인증 설정을 확인해 주세요.";
+    }
+
+    return rawMessage;
+  }
+
   async function signInWithEmail(email) {
     if (!config.enabled || !client) {
       return { ok: false };
     }
 
+    authUrlErrorVisible = false;
     const normalizedEmail = String(email || "").trim();
 
     if (!normalizedEmail) {
@@ -285,13 +388,11 @@
 
     setStatus("sending-link", "로그인 링크 전송", "이메일로 매직 링크를 보내는 중이에요.", true);
 
-    const redirectTo = config.emailRedirectTo || window.location.href.split("#")[0];
-
     try {
       const { error } = await client.auth.signInWithOtp({
         email: normalizedEmail,
         options: {
-          emailRedirectTo: redirectTo
+          emailRedirectTo: getEmailRedirectUrl()
         }
       });
 
@@ -302,15 +403,11 @@
       setStatus(
         "link-sent",
         "링크 전송됨",
-        "받은 편지함에서 Supabase 로그인 링크를 열면 현재 페이지로 다시 돌아와요."
+        "받은 편지함에서 가장 최근에 온 로그인 링크를 열어 주세요."
       );
       return { ok: true };
     } catch (error) {
-      setStatus(
-        "error",
-        "링크 전송 실패",
-        error?.message || "로그인 링크를 보내지 못했어요. 인증 설정을 확인해 주세요."
-      );
+      setStatus("error", "링크 전송 실패", getFriendlyAuthErrorMessage(error));
       return { ok: false, error };
     }
   }
@@ -322,7 +419,8 @@
 
     try {
       await client.auth.signOut();
-      setStatus("ready", "로그아웃됨", "이제 이 기기의 로컬 저장 데이터로 계속 학습해요.");
+      syncCurrentSession(null);
+      setReadyStatus();
     } catch (error) {
       setStatus("error", "로그아웃 실패", error?.message || "로그아웃 처리 중 문제가 발생했어요.");
     }
@@ -334,7 +432,7 @@
     }
 
     if (currentUser?.email) {
-      return "동기화 중";
+      return status.busy ? "동기화 중" : "연결됨";
     }
 
     if (status.code === "link-sent") {
@@ -368,6 +466,128 @@
     return "cloud_sync";
   }
 
+  function getPanelForRoot(root) {
+    const panelId = root?.dataset?.authPanelId;
+    return panelId ? document.getElementById(panelId) : null;
+  }
+
+  function ensurePanelPortal(root) {
+    if (!root) {
+      return null;
+    }
+
+    const existingPanel = getPanelForRoot(root);
+    if (existingPanel) {
+      return existingPanel;
+    }
+
+    const inlinePanel = root.querySelector("[data-auth-panel]");
+    if (!inlinePanel) {
+      return null;
+    }
+
+    authPanelIdSequence += 1;
+    inlinePanel.id = inlinePanel.id || `auth-panel-${authPanelIdSequence}`;
+    root.dataset.authPanelId = inlinePanel.id;
+    document.body.appendChild(inlinePanel);
+    return inlinePanel;
+  }
+
+  function resetAuthPanelPosition(panel) {
+    if (!panel) {
+      return;
+    }
+
+    panel.style.removeProperty("left");
+    panel.style.removeProperty("top");
+    panel.style.removeProperty("right");
+    panel.style.removeProperty("visibility");
+  }
+
+  function positionAuthPanel(root, panel) {
+    const toggle = root?.querySelector("[data-auth-toggle]");
+
+    if (!toggle || !panel || panel.hidden) {
+      resetAuthPanelPosition(panel);
+      return;
+    }
+
+    const viewportPadding = 12;
+    const panelOffset = 12;
+    const toggleRect = toggle.getBoundingClientRect();
+
+    panel.style.visibility = "hidden";
+    panel.style.left = "0px";
+    panel.style.top = "0px";
+    panel.style.right = "auto";
+
+    const panelRect = panel.getBoundingClientRect();
+    const panelWidth = Math.min(panelRect.width || 360, window.innerWidth - viewportPadding * 2);
+    const preferredLeft = toggleRect.right - panelWidth;
+    const left = Math.min(
+      window.innerWidth - viewportPadding - panelWidth,
+      Math.max(viewportPadding, preferredLeft)
+    );
+    const panelHeight = panelRect.height || 0;
+    const preferredTop = toggleRect.bottom + panelOffset;
+    const maxTop = Math.max(viewportPadding, window.innerHeight - viewportPadding - panelHeight);
+    const top = Math.max(viewportPadding, Math.min(preferredTop, maxTop));
+
+    panel.style.left = `${Math.round(left)}px`;
+    panel.style.top = `${Math.round(top)}px`;
+    panel.style.visibility = "";
+  }
+
+  function updateOpenAuthPanelPosition() {
+    if (!authPanelOpen) {
+      if (authPanelFrame) {
+        window.cancelAnimationFrame(authPanelFrame);
+        authPanelFrame = 0;
+      }
+      return;
+    }
+
+    if (authPanelFrame) {
+      return;
+    }
+
+    authPanelFrame = window.requestAnimationFrame(() => {
+      authPanelFrame = 0;
+      document.querySelectorAll("[data-auth-root]").forEach((root) => {
+        positionAuthPanel(root, getPanelForRoot(root) || ensurePanelPortal(root));
+      });
+    });
+  }
+
+  function buildAuthMarkup() {
+    return [
+      '<button class="secondary-btn button-with-icon auth-toggle" type="button" data-auth-toggle aria-expanded="false">',
+      '<span class="material-symbols-rounded" data-auth-icon aria-hidden="true">cloud_sync</span>',
+      '<span data-auth-summary>클라우드 연결</span>',
+      "</button>",
+      '<div class="auth-panel" data-auth-panel hidden>',
+      '<p class="auth-panel-title">기기 간 동기화</p>',
+      '<p class="auth-panel-status" data-auth-status></p>',
+      '<p class="auth-panel-copy" data-auth-detail></p>',
+      '<form class="auth-form" data-auth-form>',
+      '<label class="auth-field" for="auth-email-input">',
+      "<span>이메일</span>",
+      '<input id="auth-email-input" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com" data-auth-email>',
+      "</label>",
+      '<button class="secondary-btn auth-submit" type="submit" data-auth-submit>로그인 링크 보내기</button>',
+      "</form>",
+      '<div class="auth-user" data-auth-user hidden>',
+      '<span class="material-symbols-rounded" aria-hidden="true">person</span>',
+      '<strong data-auth-user-email></strong>',
+      "</div>",
+      '<div class="auth-actions" data-auth-actions>',
+      '<button class="secondary-btn auth-action-button" type="button" data-auth-signout>로그아웃</button>',
+      "</div>",
+      '<p class="auth-panel-help" data-auth-help></p>',
+      "</div>"
+    ].join("");
+  }
+
   function ensureAuthRoots() {
     document.querySelectorAll(".topbar").forEach((header) => {
       let root = header.querySelector("[data-auth-root]");
@@ -376,53 +596,26 @@
         root = document.createElement("div");
         root.className = "topbar-auth";
         root.setAttribute("data-auth-root", "");
-        root.innerHTML = [
-          '<button class="secondary-btn button-with-icon auth-toggle" type="button" data-auth-toggle>',
-          '<span class="material-symbols-rounded" data-auth-icon aria-hidden="true">cloud_sync</span>',
-          '<span data-auth-summary>클라우드 연결</span>',
-          "</button>",
-          '<div class="auth-panel" data-auth-panel hidden>',
-          '<p class="auth-panel-title">기기 간 동기화</p>',
-          '<p class="auth-panel-status" data-auth-status></p>',
-          '<p class="auth-panel-copy" data-auth-detail></p>',
-          '<form class="auth-form" data-auth-form>',
-          '<label class="auth-field" for="auth-email-input">',
-          "<span>이메일</span>",
-          '<input id="auth-email-input" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com" data-auth-email>',
-          "</label>",
-          '<button class="secondary-btn auth-submit" type="submit" data-auth-submit>로그인 링크 보내기</button>',
-          "</form>",
-          '<div class="auth-user" data-auth-user hidden>',
-          '<span class="material-symbols-rounded" aria-hidden="true">person</span>',
-          '<strong data-auth-user-email></strong>',
-          "</div>",
-          '<div class="auth-actions" data-auth-actions>',
-          '<button class="secondary-btn auth-action-button" type="button" data-auth-refresh>클라우드 불러오기</button>',
-          '<button class="secondary-btn auth-action-button" type="button" data-auth-push>지금 동기화</button>',
-          '<button class="secondary-btn auth-action-button" type="button" data-auth-signout>로그아웃</button>',
-          "</div>",
-          '<p class="auth-panel-help" data-auth-help></p>',
-          "</div>"
-        ].join("");
+        root.innerHTML = buildAuthMarkup();
         header.appendChild(root);
       }
+
+      const panel = ensurePanelPortal(root);
 
       if (root.dataset.authBound === "true") {
         return;
       }
 
       const toggle = root.querySelector("[data-auth-toggle]");
-      const panel = root.querySelector("[data-auth-panel]");
-      const form = root.querySelector("[data-auth-form]");
-      const emailInput = root.querySelector("[data-auth-email]");
-      const refreshButton = root.querySelector("[data-auth-refresh]");
-      const pushButton = root.querySelector("[data-auth-push]");
-      const signoutButton = root.querySelector("[data-auth-signout]");
+      const form = panel?.querySelector("[data-auth-form]");
+      const emailInput = panel?.querySelector("[data-auth-email]");
+      const signoutButton = panel?.querySelector("[data-auth-signout]");
 
       if (toggle && panel) {
+        toggle.setAttribute("aria-controls", panel.id);
         toggle.addEventListener("click", () => {
           authPanelOpen = !authPanelOpen;
-          panel.hidden = !authPanelOpen;
+          renderAuthUi();
         });
       }
 
@@ -431,18 +624,6 @@
           event.preventDefault();
           await signInWithEmail(emailInput.value);
           renderAuthUi();
-        });
-      }
-
-      if (refreshButton) {
-        refreshButton.addEventListener("click", async () => {
-          await pullRemoteState("클라우드에 저장된 데이터를 다시 불러오고 있어요.");
-        });
-      }
-
-      if (pushButton) {
-        pushButton.addEventListener("click", async () => {
-          await pushRemoteState("현재 화면의 학습 상태를 클라우드에 저장하고 있어요.");
         });
       }
 
@@ -460,19 +641,18 @@
     ensureAuthRoots();
 
     document.querySelectorAll("[data-auth-root]").forEach((root) => {
-      const panel = root.querySelector("[data-auth-panel]");
+      const panel = ensurePanelPortal(root);
       const icon = root.querySelector("[data-auth-icon]");
       const summary = root.querySelector("[data-auth-summary]");
-      const statusNode = root.querySelector("[data-auth-status]");
-      const detailNode = root.querySelector("[data-auth-detail]");
-      const helpNode = root.querySelector("[data-auth-help]");
-      const form = root.querySelector("[data-auth-form]");
-      const submitButton = root.querySelector("[data-auth-submit]");
-      const refreshButton = root.querySelector("[data-auth-refresh]");
-      const pushButton = root.querySelector("[data-auth-push]");
-      const signoutButton = root.querySelector("[data-auth-signout]");
-      const userNode = root.querySelector("[data-auth-user]");
-      const userEmailNode = root.querySelector("[data-auth-user-email]");
+      const toggle = root.querySelector("[data-auth-toggle]");
+      const statusNode = panel?.querySelector("[data-auth-status]");
+      const detailNode = panel?.querySelector("[data-auth-detail]");
+      const helpNode = panel?.querySelector("[data-auth-help]");
+      const form = panel?.querySelector("[data-auth-form]");
+      const submitButton = panel?.querySelector("[data-auth-submit]");
+      const signoutButton = panel?.querySelector("[data-auth-signout]");
+      const userNode = panel?.querySelector("[data-auth-user]");
+      const userEmailNode = panel?.querySelector("[data-auth-user-email]");
 
       if (panel) {
         panel.hidden = !authPanelOpen;
@@ -483,6 +663,9 @@
       if (summary) {
         summary.textContent = getSummaryLabel();
       }
+      if (toggle) {
+        toggle.setAttribute("aria-expanded", String(authPanelOpen));
+      }
       if (statusNode) {
         statusNode.textContent = status.summary;
       }
@@ -490,8 +673,9 @@
         detailNode.textContent = status.detail;
       }
       if (helpNode) {
+        helpNode.hidden = config.enabled;
         helpNode.textContent = config.enabled
-          ? "Supabase Auth의 Site URL과 Redirect URL에 현재 사이트 주소를 등록해 두세요."
+          ? ""
           : "assets/js/supabase-config.js 에 프로젝트 URL과 anon key를 넣은 뒤 enabled를 true로 바꾸세요.";
       }
       if (form) {
@@ -499,14 +683,6 @@
       }
       if (submitButton) {
         submitButton.disabled = status.busy;
-      }
-      if (refreshButton) {
-        refreshButton.hidden = !Boolean(currentUser?.email);
-        refreshButton.disabled = status.busy;
-      }
-      if (pushButton) {
-        pushButton.hidden = !Boolean(currentUser?.email);
-        pushButton.disabled = status.busy;
       }
       if (signoutButton) {
         signoutButton.hidden = !Boolean(currentUser?.email);
@@ -518,6 +694,9 @@
       if (userEmailNode) {
         userEmailNode.textContent = currentUser?.email || "";
       }
+      if (panel) {
+        positionAuthPanel(root, panel);
+      }
     });
   }
 
@@ -528,8 +707,9 @@
       }
 
       const authRoot = event.target.closest("[data-auth-root]");
+      const authPanel = event.target.closest("[data-auth-panel]");
 
-      if (authRoot) {
+      if (authRoot || authPanel) {
         return;
       }
 
@@ -538,10 +718,98 @@
     });
   }
 
+  function attachViewportHandlers() {
+    window.addEventListener("resize", updateOpenAuthPanelPosition);
+    window.addEventListener("scroll", updateOpenAuthPanelPosition, true);
+  }
+
+  function readAuthResponseParams() {
+    const values = [];
+
+    if (window.location.hash.length > 1) {
+      values.push(window.location.hash.slice(1));
+    }
+    if (window.location.search.length > 1) {
+      values.push(window.location.search.slice(1));
+    }
+
+    for (const rawValue of values) {
+      const params = new URLSearchParams(rawValue);
+      if (params.has("error") || params.has("error_code")) {
+        return params;
+      }
+    }
+
+    return null;
+  }
+
+  function clearAuthResponseParams() {
+    if (!hasHttpOrigin()) {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    let changed = false;
+    const authKeys = [
+      "error",
+      "error_code",
+      "error_description",
+      "access_token",
+      "refresh_token",
+      "expires_at",
+      "expires_in",
+      "provider_token",
+      "provider_refresh_token",
+      "token_type",
+      "code"
+    ];
+
+    for (const key of authKeys) {
+      if (url.searchParams.has(key)) {
+        url.searchParams.delete(key);
+        changed = true;
+      }
+    }
+
+    if (window.location.hash.length > 1) {
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      for (const key of authKeys) {
+        if (hashParams.has(key)) {
+          hashParams.delete(key);
+          changed = true;
+        }
+      }
+      url.hash = hashParams.toString() ? `#${hashParams.toString()}` : "";
+    }
+
+    if (changed) {
+      window.history.replaceState({}, document.title, url.toString());
+    }
+  }
+
+  function maybeShowAuthUrlError() {
+    const params = readAuthResponseParams();
+    if (!params || currentUser) {
+      return false;
+    }
+
+    authUrlErrorVisible = true;
+    setStatus(
+      "error",
+      "로그인 링크 오류",
+      getFriendlyAuthErrorMessage({
+        message: params.get("error_description") || params.get("error") || params.get("error_code") || "auth_error"
+      })
+    );
+    clearAuthResponseParams();
+    return true;
+  }
+
   async function initializeSupabase() {
     ensureAuthRoots();
     renderAuthUi();
     attachDismissHandler();
+    attachViewportHandlers();
 
     if (!config.enabled) {
       return;
@@ -557,42 +825,34 @@
         autoRefreshToken: true,
         detectSessionInUrl: true,
         persistSession: true,
-        storageKey: "japanote-supabase-auth"
+        storageKey: authStorageKey
       }
     });
 
-    client.auth.onAuthStateChange(async (event, session) => {
-      currentSession = session || null;
-      currentUser = session?.user || null;
+    client.auth.onAuthStateChange((event, session) => {
+      syncCurrentSession(session);
 
       if (!currentUser) {
-        setStatus("ready", "클라우드 준비", "이메일 로그인 후 같은 데이터를 여러 기기에서 볼 수 있어요.");
+        if (!authUrlErrorVisible && !maybeShowAuthUrlError()) {
+          setReadyStatus();
+        } else {
+          renderAuthUi();
+        }
         return;
       }
 
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        await pullRemoteState("클라우드에 저장된 학습 상태를 연결하고 있어요.");
-      }
-
+      authUrlErrorVisible = false;
+      clearAuthResponseParams();
       renderAuthUi();
+
+      if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        scheduleRemotePull("클라우드에 저장된 학습 상태를 연결하고 있어요.");
+      }
     });
 
-    const { data, error } = await client.auth.getSession();
-
-    if (error) {
-      setStatus("error", "세션 확인 실패", error.message || "Supabase 세션을 확인하지 못했어요.");
-      return;
+    if (!maybeShowAuthUrlError()) {
+      setReadyStatus();
     }
-
-    currentSession = data?.session || null;
-    currentUser = currentSession?.user || null;
-
-    if (currentUser) {
-      await pullRemoteState("기존 클라우드 상태를 불러오고 있어요.");
-      return;
-    }
-
-    setStatus("ready", "클라우드 준비", "이메일 로그인 후 같은 데이터를 여러 기기에서 볼 수 있어요.");
   }
 
   globalThis.japanoteSync = {

@@ -1917,6 +1917,7 @@ body.is-kana-quiz-sheet-open .page-shell {
 }
 
 @media (max-width: 540px) {
+  .grammar-tab-list,
   .characters-library-switcher,
   .kana-setup-buttons,
   .writing-practice-order-switcher {
@@ -2784,6 +2785,41 @@ body.is-kana-quiz-sheet-open .page-shell {
   gap: 16px;
 }
 
+.grammar-tab-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, 360px);
+  margin-bottom: 24px;
+}
+
+.grammar-tab-button {
+  width: 100%;
+}
+
+.grammar-tab-panels,
+.grammar-tab-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.grammar-panel-copy {
+  max-width: 62ch;
+}
+
+.grammar-panel-copy h3 {
+  margin: 12px 0 0;
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: -0.03em;
+  font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+}
+
+.grammar-panel-copy p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
 .grammar-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -2944,8 +2980,13 @@ body.is-kana-quiz-sheet-open .page-shell {
   transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
 }
 
-.grammar-practice-option:hover,
-.grammar-practice-option:focus-visible {
+.grammar-practice-option:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.grammar-practice-option:not(.is-correct):not(.is-wrong):hover,
+.grammar-practice-option:not(.is-correct):not(.is-wrong):focus-visible {
   transform: translateY(-1px);
   border-color: rgba(25, 21, 22, 0.18);
   background: rgba(255, 255, 255, 0.96);
@@ -4097,8 +4138,8 @@ body::after {
 
 .basic-practice-option:hover,
 .basic-practice-option:focus-visible,
-.grammar-practice-option:hover,
-.grammar-practice-option:focus-visible,
+.grammar-practice-option:not(.is-correct):not(.is-wrong):hover,
+.grammar-practice-option:not(.is-correct):not(.is-wrong):focus-visible,
 .reading-option:hover,
 .reading-option:focus-visible,
 .quiz-option:hover,
@@ -4276,6 +4317,10 @@ body::after {
 
   .starter-checklist-head {
     align-items: flex-start;
+  }
+
+  .grammar-tab-list {
+    width: 100%;
   }
 
   .starter-item-actions {
@@ -5001,8 +5046,8 @@ body::after {
   html:not([data-theme="light"]) .match-card:focus-visible,
   html:not([data-theme="light"]) .basic-practice-option:hover,
   html:not([data-theme="light"]) .basic-practice-option:focus-visible,
-  html:not([data-theme="light"]) .grammar-practice-option:hover,
-  html:not([data-theme="light"]) .grammar-practice-option:focus-visible,
+  html:not([data-theme="light"]) .grammar-practice-option:not(.is-correct):not(.is-wrong):hover,
+  html:not([data-theme="light"]) .grammar-practice-option:not(.is-correct):not(.is-wrong):focus-visible,
   html:not([data-theme="light"]) .reading-option:hover,
   html:not([data-theme="light"]) .reading-option:focus-visible,
   html:not([data-theme="light"]) .quiz-option:hover,
@@ -5267,8 +5312,8 @@ html[data-theme="dark"] .match-card:hover,
 html[data-theme="dark"] .match-card:focus-visible,
 html[data-theme="dark"] .basic-practice-option:hover,
 html[data-theme="dark"] .basic-practice-option:focus-visible,
-html[data-theme="dark"] .grammar-practice-option:hover,
-html[data-theme="dark"] .grammar-practice-option:focus-visible,
+html[data-theme="dark"] .grammar-practice-option:not(.is-correct):not(.is-wrong):hover,
+html[data-theme="dark"] .grammar-practice-option:not(.is-correct):not(.is-wrong):focus-visible,
 html[data-theme="dark"] .reading-option:hover,
 html[data-theme="dark"] .reading-option:focus-visible,
 html[data-theme="dark"] .quiz-option:hover,
@@ -5507,8 +5552,8 @@ html[data-theme="dark"] .reading-feedback {
   html:not([data-theme="light"]) .match-card:focus-visible,
   html:not([data-theme="light"]) .basic-practice-option:hover,
   html:not([data-theme="light"]) .basic-practice-option:focus-visible,
-  html:not([data-theme="light"]) .grammar-practice-option:hover,
-  html:not([data-theme="light"]) .grammar-practice-option:focus-visible,
+  html:not([data-theme="light"]) .grammar-practice-option:not(.is-correct):not(.is-wrong):hover,
+  html:not([data-theme="light"]) .grammar-practice-option:not(.is-correct):not(.is-wrong):focus-visible,
   html:not([data-theme="light"]) .reading-option:hover,
   html:not([data-theme="light"]) .reading-option:focus-visible,
   html:not([data-theme="light"]) .quiz-option:hover,

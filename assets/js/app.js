@@ -605,6 +605,10 @@ function getCharactersLibraryTab(value) {
   return value === "katakana" ? "katakana" : "hiragana";
 }
 
+function getGrammarTab(value) {
+  return value === "practice" ? "practice" : "list";
+}
+
 function getWritingPracticeOrder(value) {
   return value === "random" ? "random" : "sequence";
 }
@@ -3135,6 +3139,7 @@ const defaultState = {
   masteredIds: [],
   reviewIds: [],
   grammarDoneIds: [],
+  grammarTab: "list",
   grammarPracticeLevel: "N5",
   grammarPracticeIndexes: { N5: 0, N4: 0, N3: 0 },
   quizIndex: 0,
@@ -3227,6 +3232,7 @@ state.readingLevel = getReadingLevel(state.readingLevel);
 state.readingDuration = getReadingDuration(state.readingDuration);
 state.charactersTab = getCharactersTab(state.charactersTab ?? state.charactersPracticeTab);
 state.charactersLibraryTab = getCharactersLibraryTab(state.charactersLibraryTab);
+state.grammarTab = getGrammarTab(state.grammarTab);
 state.kanaSetupOpen = state.kanaSetupOpen !== false;
 state.writingSetupOpen = state.writingSetupOpen !== false;
 state.quizOptionsOpen = state.quizOptionsOpen !== false;
@@ -4218,6 +4224,31 @@ function renderGrammar() {
   });
 }
 
+function renderGrammarPageLayout() {
+  const activeTab = getGrammarTab(state.grammarTab);
+
+  document.querySelectorAll("[data-grammar-tab]").forEach((button) => {
+    const isActive = button.dataset.grammarTab === activeTab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+    button.setAttribute("tabindex", isActive ? "0" : "-1");
+  });
+
+  document.querySelectorAll("[data-grammar-tab-panel]").forEach((panel) => {
+    const isActive = panel.dataset.grammarTabPanel === activeTab;
+    panel.hidden = !isActive;
+    panel.setAttribute("aria-hidden", String(!isActive));
+  });
+
+  if (activeTab === "practice") {
+    renderGrammarPractice();
+    return;
+  }
+
+  stopQuizSessionTimer("grammar");
+  renderQuizSessionHud("grammar");
+}
+
 function getCurrentGrammarPracticeSet() {
   const sets = grammarPracticeSets[state.grammarPracticeLevel];
   const currentIndex = state.grammarPracticeIndexes[state.grammarPracticeLevel] % sets.length;
@@ -5091,6 +5122,7 @@ function attachEventListeners() {
   const kanaSetupStart = document.getElementById("kana-setup-start");
   const charactersTabButtons = document.querySelectorAll("[data-characters-tab]");
   const charactersLibraryTabButtons = document.querySelectorAll("[data-characters-library-tab]");
+  const grammarTabButtons = document.querySelectorAll("[data-grammar-tab]");
   const writingSetupToggle = document.getElementById("writing-setup-toggle");
   const writingModeButtons = document.querySelectorAll("[data-writing-mode]");
   const writingOrderButtons = document.querySelectorAll("[data-writing-order]");
@@ -5298,6 +5330,19 @@ function attachEventListeners() {
       renderCharactersPageLayout();
     });
   });
+  grammarTabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextTab = getGrammarTab(button.dataset.grammarTab);
+
+      if (state.grammarTab === nextTab) {
+        return;
+      }
+
+      state.grammarTab = nextTab;
+      saveState();
+      renderGrammarPageLayout();
+    });
+  });
   kanaQuizCloseButtons.forEach((button) => {
     button.addEventListener("click", closeKanaQuizSheet);
   });
@@ -5385,7 +5430,7 @@ function renderAll() {
   renderQuizSessionHud("kana");
   renderVocabPage();
   renderGrammar();
-  renderGrammarPractice();
+  renderGrammarPageLayout();
   renderQuiz();
   renderStats();
 }

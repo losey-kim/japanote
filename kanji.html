@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="기초 한자를 읽기와 뜻으로 가볍게 익혀봐요.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Japanote">
+  <meta property="og:title" content="Japanote">
+  <meta property="og:description" content="기초 한자를 읽기와 뜻으로 가볍게 익혀봐요.">
+  <meta property="og:url" content="https://losey-kim.github.io/Japanote/kanji.html">
+  <meta property="og:image" content="https://losey-kim.github.io/Japanote/assets/images/social-preview.png">
+  <meta property="og:image:alt" content="Japanote 로고">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Japanote">
+  <meta name="twitter:description" content="기초 한자를 읽기와 뜻으로 가볍게 익혀봐요.">
+  <meta name="twitter:image" content="https://losey-kim.github.io/Japanote/assets/images/social-preview.png">
+  <title>Japanote - 한자</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span><div><p class="brand-name">Japanote</p><p class="brand-sub">오늘도 가볍게 일본어, 같이 해봐요</p></div></a>
+      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="kanji.html" aria-current="page">한자</a><a href="vocab.html">단어</a><a href="grammar.html">문법</a><a href="reading.html">독해</a><a href="match.html">매칭</a></nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="테마 바꿔보기" title="테마 바꿔보기"></button>
+    </header>
+    <main>
+      <section class="content-section">
+        <div class="vocab-tab-list kanji-tab-list" role="tablist" aria-label="한자 학습 탭">
+          <button class="level-button vocab-tab-button is-active" type="button" data-kanji-tab="list" id="kanji-tab-list" role="tab" aria-selected="true" aria-controls="kanji-tab-panel-list">리스트</button>
+          <button class="level-button vocab-tab-button" type="button" data-kanji-tab="practice" id="kanji-tab-practice" role="tab" aria-selected="false" aria-controls="kanji-tab-panel-practice" tabindex="-1">문제</button>
+        </div>
+        <div class="vocab-tab-panels kanji-tab-panels">
+          <section class="vocab-tab-panel kanji-tab-panel" id="kanji-tab-panel-list" data-kanji-tab-panel="list" role="tabpanel" aria-labelledby="kanji-tab-list">
+            <div class="vocab-list kanji-list" id="kanji-list"></div>
+          </section>
+          <section class="vocab-tab-panel kanji-tab-panel" id="kanji-tab-panel-practice" data-kanji-tab-panel="practice" role="tabpanel" aria-labelledby="kanji-tab-practice" hidden aria-hidden="true">
+            <div class="study-options-shell match-options-shell kanji-options-shell" id="starter-kanji-options-shell">
+              <button class="study-options-toggle" id="starter-kanji-options-toggle" type="button" aria-expanded="true" aria-controls="starter-kanji-options-panel">
+                <div class="study-options-toggle-copy"><strong>퀴즈 설정</strong><p class="study-options-toggle-summary" id="starter-kanji-options-summary">10문제 · 15초</p></div>
+                <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+              </button>
+              <div class="study-options-panel study-options-panel-wide" id="starter-kanji-options-panel">
+                <div class="study-options-group">
+                  <span>총 몇 문제로 할까요?</span>
+                  <div class="match-toggle-group" role="group" aria-label="한자 퀴즈 문제 수 고르기">
+                    <button class="level-button" type="button" data-starter-kanji-count="5" aria-pressed="false">5문제</button>
+                    <button class="level-button is-active" type="button" data-starter-kanji-count="10" aria-pressed="true">10문제</button>
+                    <button class="level-button" type="button" data-starter-kanji-count="15" aria-pressed="false">15문제</button>
+                    <button class="level-button" type="button" data-starter-kanji-count="20" aria-pressed="false">20문제</button>
+                  </div>
+                </div>
+                <div class="study-options-group">
+                  <span>시간은 어떻게 할까요?</span>
+                  <div class="match-toggle-group" role="group" aria-label="한자 퀴즈 시간 고르기">
+                    <button class="level-button" type="button" data-starter-kanji-time="0" aria-pressed="false">천천히</button>
+                    <button class="level-button" type="button" data-starter-kanji-time="10" aria-pressed="false">10초</button>
+                    <button class="level-button is-active" type="button" data-starter-kanji-time="15" aria-pressed="true">15초</button>
+                    <button class="level-button" type="button" data-starter-kanji-time="20" aria-pressed="false">20초</button>
+                  </div>
+                </div>
+              </div>
+              <div class="match-actions">
+                <button class="primary-btn button-with-icon" id="starter-kanji-start" type="button"><span class="material-symbols-rounded" aria-hidden="true">play_arrow</span><span id="starter-kanji-start-label">시작하기</span></button>
+              </div>
+            </div>
+            <p class="vocab-list-empty" id="starter-kanji-empty" hidden>설정을 마쳤다면 시작하기를 눌러주세요.</p>
+            <div id="starter-kanji-practice-view">
+              <article class="basic-practice-card tone-gold kanji-practice-card" id="starter-kanji-card">
+                <div class="basic-practice-meta"><span>한자</span><span id="starter-kanji-source">한자 1</span><span id="starter-kanji-progress">1 / 5</span></div>
+                <div class="quiz-hud"><div class="quiz-hud-item"><span>남은 시간</span><strong id="starter-kanji-timer">15초</strong></div><div class="quiz-hud-item"><span>맞힌 수</span><strong id="starter-kanji-correct">0</strong></div></div>
+                <div class="basic-practice-display-box"><strong id="starter-kanji-display">-</strong><p id="starter-kanji-display-sub"></p></div>
+                <div class="basic-practice-options" id="starter-kanji-options"></div>
+                <div class="quiz-actions"><button class="primary-btn" id="starter-kanji-next" type="button">다음 한자 볼까요?</button></div>
+              </article>
+            </div>
+            <div class="match-result-view kanji-result-view" id="starter-kanji-result-view" hidden>
+              <p class="match-result-title">결과보기</p>
+              <div class="match-result-grid">
+                <article class="match-result-stat"><span>전체</span><strong id="starter-kanji-result-total">0</strong></article>
+                <article class="match-result-stat"><span>정답</span><strong id="starter-kanji-result-correct">0</strong></article>
+                <article class="match-result-stat"><span>오답</span><strong id="starter-kanji-result-wrong">0</strong></article>
+              </div>
+              <div class="match-result-filters">
+                <label class="match-result-filter-field" for="starter-kanji-result-filter">
+                  <div class="match-result-filter-select-wrap">
+                    <select class="match-result-filter-select" id="starter-kanji-result-filter" aria-label="한자 결과 필터">
+                      <option value="all">전체</option>
+                      <option value="correct">정답</option>
+                      <option value="wrong">오답</option>
+                    </select>
+                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                  </div>
+                </label>
+              </div>
+              <p class="match-result-empty" id="starter-kanji-result-empty" hidden>보여줄 결과가 아직 없어요.</p>
+              <div class="match-result-list" id="starter-kanji-result-list"></div>
+              <div class="quiz-actions"><button class="primary-btn" id="starter-kanji-restart" type="button">다시하기</button></div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="assets/js/theme.js"></script><script src="assets/js/jlpt-vocab-data.js"></script><script src="assets/js/vocab-registry.js"></script><script src="assets/js/app.js"></script>
+</body>
+</html>

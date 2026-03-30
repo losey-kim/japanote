@@ -27,23 +27,23 @@
   <div class="page-shell">
     <header class="topbar">
       <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span><div><p class="brand-name">Japanote</p><p class="brand-sub">오늘도 가볍게 일본어, 같이 해봐요</p></div></a>
-      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="vocab.html">단어</a><a href="grammar.html" aria-current="page">문법</a><a href="reading.html">독해</a><a href="quiz.html">퀴즈</a><a href="match.html">매칭</a></nav>
+      <nav class="nav-links"><a href="index.html">홈</a><a href="starter.html">첫걸음</a><a href="characters.html">문자</a><a href="kanji.html">한자</a><a href="vocab.html">단어</a><a href="grammar.html" aria-current="page">문법</a><a href="reading.html">독해</a><a href="match.html">매칭</a></nav>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="테마 바꿔보기" title="테마 바꿔보기"></button>
     </header>
     <main>
       <section id="grammar" class="content-section two-column">
         <div class="section-heading">
           <span>GRAMMAR STUDIO</span>
-          <h2>臾몃쾿? 由ъ뒪?몃줈 蹂닿퀬, 臾몄젣????뿉??諛붾줈 ??댁슂</h2>
-          <p class="section-copy">?먯＜ ?곕뒗 臾명삎? 泥댄겕由ъ뒪?몃줈 ?묎퀬, 臾몄젣 ??대뒗 ?곕줈 ?꾪솚?댁꽌 吏묒쨷?????덇쾶 ?섎댋?댁슂.</p>
+          <h2>문법은 리스트로 보고, 문제는 탭에서 바로 풀어요</h2>
+          <p class="section-copy">자주 쓰는 문형은 체크리스트로 훑고, 문제 풀이는 따로 전환해서 집중할 수 있게 나눴어요.</p>
         </div>
 
-        <div class="grammar-tab-list" role="tablist" aria-label="臾몃쾿 ?숈뒿 ??>
+        <div class="grammar-tab-list" role="tablist" aria-label="문법 학습 탭">
           <button class="level-button grammar-tab-button is-active" type="button" data-grammar-tab="list" id="grammar-tab-list" role="tab" aria-selected="true" aria-controls="grammar-tab-panel-list">
-            <span>由ъ뒪??/span>
+            <span>리스트</span>
           </button>
           <button class="level-button grammar-tab-button" type="button" data-grammar-tab="practice" id="grammar-tab-practice" role="tab" aria-selected="false" aria-controls="grammar-tab-panel-practice" tabindex="-1">
-            <span>臾몄젣</span>
+            <span>문제</span>
           </button>
         </div>
 
@@ -51,24 +51,24 @@
           <section class="grammar-tab-panel" id="grammar-tab-panel-list" data-grammar-tab-panel="list" role="tabpanel" aria-labelledby="grammar-tab-list">
             <div class="grammar-panel-copy">
               <span class="eyebrow">GRAMMAR CHECKLIST</span>
-              <h3>?먯＜ ?곕뒗 臾명삎遺??鍮좊Ⅴ寃?泥댄겕?대킄??/h3>
-              <p>?룰컝由щ뒗 ?쒗쁽???뚮윭媛硫?吏꾨룄瑜??쒖떆?대몢硫??ㅼ떆 蹂닿린 ?명빐??</p>
+              <h3>자주 쓰는 문형부터 빠르게 체크해봐요</h3>
+              <p>헷갈리는 표현을 눌러가며 진도를 표시해두면 다시 보기 편해요.</p>
             </div>
             <div class="grammar-grid" id="grammar-grid"></div>
           </section>
 
           <section class="grammar-tab-panel" id="grammar-tab-panel-practice" data-grammar-tab-panel="practice" role="tabpanel" aria-labelledby="grammar-tab-practice" hidden aria-hidden="true">
             <div class="grammar-practice-shell">
-              <div class="grammar-practice-copy"><span class="eyebrow">GRAMMAR DRILL</span><h3>臾몃쾿 臾몄젣 諛붾줈 ??대킄??/h3><p>臾몄옣留?蹂닿퀬 媛먯쑝濡?怨⑤씪蹂댁꽭??</p><div class="grammar-practice-level-switcher" id="grammar-practice-level-switcher" role="tablist" aria-label="臾몃쾿 ?덈꺼 怨좊Ⅴ湲?></div></div>
+              <div class="grammar-practice-copy"><span class="eyebrow">GRAMMAR DRILL</span><h3>문법 문제 바로 풀어봐요</h3><p>문장만 보고 감으로 골라보세요.</p><div class="grammar-practice-level-switcher" id="grammar-practice-level-switcher" role="tablist" aria-label="문법 레벨 고르기"></div></div>
               <article class="grammar-practice-card">
                 <div class="grammar-practice-meta"><span id="grammar-practice-level">N5</span><span id="grammar-practice-source">N5G 1</span><span id="grammar-practice-progress">1 / 4</span></div>
-                <div class="quiz-hud"><div class="quiz-hud-item"><span>?⑥? ?쒓컙</span><strong id="grammar-timer">25珥?/strong></div><div class="quiz-hud-item"><span>留욏엺 ??/span><strong id="grammar-correct">0</strong></div><div class="quiz-hud-item"><span>?곗냽 ?깃났</span><strong id="grammar-streak">0</strong></div></div>
-                <div class="grammar-practice-header"><div><span class="eyebrow">GRAMMAR SET</span><h3 id="grammar-practice-title">臾몃쾿 ?곗뒿</h3></div><p class="grammar-practice-note" id="grammar-practice-note"></p></div>
-                <div class="grammar-practice-question"><span class="eyebrow">SENTENCE</span><p id="grammar-practice-sentence">臾몄옣???곕젮?ㅺ퀬 ?덉뼱??</p></div>
+                <div class="quiz-hud"><div class="quiz-hud-item"><span>남은 시간</span><strong id="grammar-timer">25초</strong></div><div class="quiz-hud-item"><span>맞힌 수</span><strong id="grammar-correct">0</strong></div><div class="quiz-hud-item"><span>연속 성공</span><strong id="grammar-streak">0</strong></div></div>
+                <div class="grammar-practice-header"><div><span class="eyebrow">GRAMMAR SET</span><h3 id="grammar-practice-title">문법 연습</h3></div><p class="grammar-practice-note" id="grammar-practice-note"></p></div>
+                <div class="grammar-practice-question"><span class="eyebrow">SENTENCE</span><p id="grammar-practice-sentence">문장을 데려오고 있어요.</p></div>
                 <div class="grammar-practice-options" id="grammar-practice-options"></div>
                 <p class="grammar-practice-feedback" id="grammar-practice-feedback"></p>
                 <p class="grammar-practice-explanation" id="grammar-practice-explanation"></p>
-                <div class="quiz-actions"><button class="primary-btn" id="grammar-practice-next" type="button">?ㅼ쓬?쇰줈 媛蹂쇨퉴??</button></div>
+                <div class="quiz-actions"><button class="primary-btn" id="grammar-practice-next" type="button">다음으로 가볼까요?</button></div>
               </article>
             </div>
           </section>

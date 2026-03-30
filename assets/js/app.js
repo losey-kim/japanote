@@ -2219,7 +2219,8 @@ const writingPracticeState = {
   overlayHasInk: false,
   overlayBounds: null,
   hasVectorGuide: false,
-  renderSeed: 0
+  renderSeed: 0,
+  layoutObserver: null
 };
 
 function getWritingPracticeDefaultFeedback() {
@@ -2510,6 +2511,93 @@ function refreshWritingPracticeViewBoxes() {
   });
 }
 
+function collectWritingTargetClipMasks(svg, path) {
+  const clipValue = path.getAttribute("clip-path");
+
+  if (!clipValue || !clipValue.startsWith("url(#") || !clipValue.endsWith(")")) {
+    return [];
+  }
+
+  const clipId = clipValue.slice(5, -1);
+  const clipElement = svg.querySelector(`[id="${clipId}"]`);
+
+  if (!clipElement) {
+    return [];
+  }
+
+  const clipPaths = Array.from(clipElement.querySelectorAll("path"));
+
+  clipElement.querySelectorAll("use").forEach((useElement) => {
+    const href = useElement.getAttribute("href") || useElement.getAttribute("xlink:href");
+
+    if (!href || !href.startsWith("#")) {
+      return;
+    }
+
+    const referencedPath = svg.querySelector(`[id="${href.slice(1)}"]`);
+
+    if (referencedPath instanceof SVGPathElement) {
+      clipPaths.push(referencedPath);
+    }
+  });
+
+  return clipPaths
+    .map((clipPath) => clipPath.getAttribute("d"))
+    .filter(Boolean)
+    .map((pathData) => {
+      try {
+        return new Path2D(pathData);
+      } catch (error) {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function collectWritingTargetSegments(svg) {
+  const strokesGroup = svg.querySelector('g[data-strokesvg="strokes"]');
+
+  if (!strokesGroup) {
+    return [];
+  }
+
+  return Array.from(strokesGroup.querySelectorAll("path"))
+    .map((path) => {
+      const pathData = path.getAttribute("d");
+
+      if (!pathData) {
+        return null;
+      }
+
+      try {
+        return {
+          pathMask: new Path2D(pathData),
+          clipMasks: collectWritingTargetClipMasks(svg, path)
+        };
+      } catch (error) {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function getWritingTargetStrokeWidth(svg) {
+  const strokesGroup = svg.querySelector('g[data-strokesvg="strokes"]');
+
+  if (!strokesGroup) {
+    return 128;
+  }
+
+  const inlineWidth = Number.parseFloat(strokesGroup.style?.strokeWidth || "");
+
+  if (Number.isFinite(inlineWidth) && inlineWidth > 0) {
+    return inlineWidth;
+  }
+
+  const attributeWidth = Number.parseFloat(strokesGroup.getAttribute("stroke-width") || "");
+  return Number.isFinite(attributeWidth) && attributeWidth > 0 ? attributeWidth : 128;
+}
+
 function collectWritingStrokeEntries(svg) {
   const strokesGroup = svg.querySelector('g[data-strokesvg="strokes"]');
 
@@ -2608,7 +2696,8 @@ function buildWritingPracticeStage(current) {
           viewBox: { x: 0, y: 0, width: 1024, height: 1024 },
           viewBoxMeasured: true,
           shadowPaths: [],
-          shadowMasks: [],
+          targetSegments: [],
+          targetStrokeWidth: 128,
           strokeEntries: []
         });
         return;
@@ -2631,7 +2720,8 @@ function buildWritingPracticeStage(current) {
           viewBox: { x: 0, y: 0, width: 1024, height: 1024 },
           viewBoxMeasured: true,
           shadowPaths: [],
-          shadowMasks: [],
+          targetSegments: [],
+          targetStrokeWidth: 128,
           strokeEntries: []
         });
         return;
@@ -2654,13 +2744,8 @@ function buildWritingPracticeStage(current) {
       const shadowPaths = Array.from(svg.querySelectorAll('g[data-strokesvg="shadows"] path'))
         .map((path) => path.getAttribute("d"))
         .filter(Boolean);
-      const shadowMasks = shadowPaths.map((pathData) => {
-        try {
-          return new Path2D(pathData);
-        } catch (error) {
-          return null;
-        }
-      }).filter(Boolean);
+      const targetSegments = collectWritingTargetSegments(svg);
+      const targetStrokeWidth = getWritingTargetStrokeWidth(svg);
 
       writingPracticeState.hasVectorGuide = writingPracticeState.hasVectorGuide || shadowPaths.length > 0;
 
@@ -2678,7 +2763,8 @@ function buildWritingPracticeStage(current) {
         viewBox,
         viewBoxMeasured: hasMeasuredBounds,
         shadowPaths,
-        shadowMasks,
+        targetSegments,
+        targetStrokeWidth,
         strokeEntries
       });
     });
@@ -2815,7 +2901,8 @@ function updateWritingPracticePanel() {
       score.textContent = "-";
     }
     if (feedback) {
-      feedback.textContent = getWritingPracticeDefaultFeedback();
+      feedback.hidden = true;
+      feedback.textContent = "";
     }
     if (prompt) {
       prompt.textContent = "가이드를 따라 천천히 써보고, 끝나면 점수를 확인해봐요.";
@@ -2858,7 +2945,8 @@ function updateWritingPracticePanel() {
     score.textContent = writingPracticeState.score === null ? "-" : `${writingPracticeState.score}점`;
   }
   if (feedback) {
-    feedback.textContent = writingPracticeState.feedback;
+    feedback.hidden = writingPracticeState.score === null;
+    feedback.textContent = writingPracticeState.score === null ? "" : writingPracticeState.feedback;
   }
   if (prompt) {
     prompt.textContent = `「${current.char}」를 칸 안에 맞춰 써보고, 끝나면 점수를 확인해봐요.`;
@@ -2890,7 +2978,7 @@ function getWritingCanvasScaleRatio(canvas) {
 function getWritingBrushWidth(canvas) {
   const referenceRect = getWritingCanvasReferenceRect(canvas);
   const scaleRatio = getWritingCanvasScaleRatio(canvas);
-  const cssBrushWidth = clampValue(Math.round(Math.min(referenceRect.width, referenceRect.height) * 0.015), 5, 12);
+  const cssBrushWidth = clampValue(Math.round(Math.min(referenceRect.width, referenceRect.height) * 0.018), 6, 14);
   return Math.max(1, Math.round(cssBrushWidth * scaleRatio));
 }
 
@@ -3050,7 +3138,7 @@ function renderWritingPracticeTargetMask() {
   ctx.fillStyle = "#ffffff";
 
   writingPracticeState.slotEntries.forEach((entry) => {
-    if (!entry.svg || !entry.shadowPaths.length) {
+    if (!entry.svg || !entry.targetSegments.length) {
       return;
     }
 
@@ -3067,12 +3155,26 @@ function renderWritingPracticeTargetMask() {
     const scale = Math.min(width / entry.viewBox.width, height / entry.viewBox.height);
     const offsetX = x + (width - entry.viewBox.width * scale) / 2 - entry.viewBox.x * scale;
     const offsetY = y + (height - entry.viewBox.height * scale) / 2 - entry.viewBox.y * scale;
+    const guideStrokeWidth = (entry.targetStrokeWidth || 128) * scale;
+    const targetStrokeWidth = Math.max(getWritingBrushWidth(canvas) * 2.2, guideStrokeWidth * 0.34);
 
     ctx.save();
     ctx.translate(offsetX, offsetY);
     ctx.scale(scale, scale);
-    entry.shadowMasks.forEach((mask) => {
-      ctx.fill(mask);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = Math.max(1, targetStrokeWidth / Math.max(scale, 0.0001));
+    entry.targetSegments.forEach((segment) => {
+      ctx.save();
+
+      if (segment.clipMasks.length) {
+        segment.clipMasks.forEach((clipMask) => {
+          ctx.clip(clipMask);
+        });
+      }
+
+      ctx.stroke(segment.pathMask);
+      ctx.restore();
     });
     ctx.restore();
   });
@@ -3086,15 +3188,14 @@ function syncWritingPracticeCanvas() {
   }
 
   const rect = canvas.getBoundingClientRect();
-  const referenceRect = getWritingCanvasReferenceRect(canvas);
 
   if (!rect.width || !rect.height) {
     return;
   }
 
   const ratio = Math.min(window.devicePixelRatio || 1, 1.25);
-  const nextWidth = Math.max(1, Math.round(Math.max(referenceRect.width, rect.width * 0.82) * ratio));
-  const nextHeight = Math.max(1, Math.round(Math.max(referenceRect.height, rect.height * 0.82) * ratio));
+  const nextWidth = Math.max(1, Math.round(rect.width * ratio));
+  const nextHeight = Math.max(1, Math.round(rect.height * ratio));
   const resized = canvas.width !== nextWidth || canvas.height !== nextHeight;
 
   if (resized) {
@@ -3106,6 +3207,26 @@ function syncWritingPracticeCanvas() {
 
   refreshWritingPracticeViewBoxes();
   renderWritingOverlay();
+}
+
+function observeWritingPracticeLayout() {
+  if (writingPracticeState.layoutObserver || typeof ResizeObserver !== "function") {
+    return;
+  }
+
+  writingPracticeState.layoutObserver = new ResizeObserver(() => {
+    if (!document.getElementById("writing-practice-shell") || getCharactersTab(state.charactersTab) !== "writing") {
+      return;
+    }
+
+    scheduleWritingPracticeLayout(false);
+  });
+
+  const stage = document.getElementById("writing-practice-stage");
+
+  if (stage) {
+    writingPracticeState.layoutObserver.observe(stage);
+  }
 }
 
 function scheduleWritingPracticeLayout(replay = false) {
@@ -3193,6 +3314,83 @@ function getWritingPracticeScoreResult(score, coverage, precision) {
   };
 }
 
+function buildWritingPracticeMask(data) {
+  const mask = new Uint8Array(Math.floor(data.length / 4));
+  let activePixels = 0;
+
+  for (let dataIndex = 3, maskIndex = 0; dataIndex < data.length; dataIndex += 4, maskIndex += 1) {
+    const isActive = data[dataIndex] > 32 ? 1 : 0;
+    mask[maskIndex] = isActive;
+    activePixels += isActive;
+  }
+
+  return {
+    mask,
+    activePixels
+  };
+}
+
+function buildWritingPracticeIntegralMask(mask, width, height) {
+  const stride = width + 1;
+  const integral = new Uint32Array((width + 1) * (height + 1));
+
+  for (let y = 1; y <= height; y += 1) {
+    let rowSum = 0;
+    const maskRowOffset = (y - 1) * width;
+    const integralRowOffset = y * stride;
+    const previousRowOffset = (y - 1) * stride;
+
+    for (let x = 1; x <= width; x += 1) {
+      rowSum += mask[maskRowOffset + x - 1];
+      integral[integralRowOffset + x] = integral[previousRowOffset + x] + rowSum;
+    }
+  }
+
+  return integral;
+}
+
+function hasWritingPracticeMaskHit(integral, width, height, x, y, radius) {
+  const stride = width + 1;
+  const left = Math.max(0, x - radius);
+  const top = Math.max(0, y - radius);
+  const right = Math.min(width - 1, x + radius);
+  const bottom = Math.min(height - 1, y + radius);
+  const x1 = left;
+  const y1 = top;
+  const x2 = right + 1;
+  const y2 = bottom + 1;
+  const sum =
+    integral[y2 * stride + x2] -
+    integral[y1 * stride + x2] -
+    integral[y2 * stride + x1] +
+    integral[y1 * stride + x1];
+
+  return sum > 0;
+}
+
+function countWritingPracticeMaskMatches(mask, activePixels, targetIntegral, width, height, radius) {
+  if (!activePixels) {
+    return 0;
+  }
+
+  let matches = 0;
+  let index = 0;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1, index += 1) {
+      if (!mask[index]) {
+        continue;
+      }
+
+      if (hasWritingPracticeMaskHit(targetIntegral, width, height, x, y, radius)) {
+        matches += 1;
+      }
+    }
+  }
+
+  return matches;
+}
+
 function scoreWritingPractice() {
   if (writingPracticeState.isAnimating || writingPracticeState.isTransitioning) {
     return;
@@ -3217,24 +3415,8 @@ function scoreWritingPractice() {
 
   const userData = userCtx.getImageData(0, 0, canvas.width, canvas.height).data;
   const targetData = targetCtx.getImageData(0, 0, canvas.width, canvas.height).data;
-  let targetPixels = 0;
-  let userPixels = 0;
-  let overlapPixels = 0;
-
-  for (let index = 3; index < targetData.length; index += 4) {
-    const targetOn = targetData[index] > 32;
-    const userOn = userData[index] > 32;
-
-    if (targetOn) {
-      targetPixels += 1;
-    }
-    if (userOn) {
-      userPixels += 1;
-    }
-    if (targetOn && userOn) {
-      overlapPixels += 1;
-    }
-  }
+  const { mask: userMask, activePixels: userPixels } = buildWritingPracticeMask(userData);
+  const { mask: targetMask, activePixels: targetPixels } = buildWritingPracticeMask(targetData);
 
   if (!targetPixels || !userPixels) {
     writingPracticeState.feedback = "아직 비교할 선이 충분하지 않아요. 조금 더 크게 써보세요.";
@@ -3243,10 +3425,17 @@ function scoreWritingPractice() {
     return;
   }
 
-  const coverage = overlapPixels / targetPixels;
-  const precision = overlapPixels / userPixels;
-  const score = clampValue(Math.round((coverage * 0.68 + precision * 0.32) * 100), 0, 100);
-  const result = getWritingPracticeScoreResult(score, coverage, precision);
+  const toleranceRadius = clampValue(Math.round(getWritingBrushWidth(canvas) * 0.9), 6, 16);
+  const userIntegral = buildWritingPracticeIntegralMask(userMask, canvas.width, canvas.height);
+  const targetIntegral = buildWritingPracticeIntegralMask(targetMask, canvas.width, canvas.height);
+  const coveredTargetPixels = countWritingPracticeMaskMatches(targetMask, targetPixels, userIntegral, canvas.width, canvas.height, toleranceRadius);
+  const alignedUserPixels = countWritingPracticeMaskMatches(userMask, userPixels, targetIntegral, canvas.width, canvas.height, toleranceRadius);
+  const coverage = coveredTargetPixels / targetPixels;
+  const precision = alignedUserPixels / userPixels;
+  const easedCoverage = Math.sqrt(coverage);
+  const easedPrecision = Math.sqrt(precision);
+  const score = clampValue(Math.round((easedCoverage * 0.58 + easedPrecision * 0.42) * 100), 0, 100);
+  const result = getWritingPracticeScoreResult(score, easedCoverage, easedPrecision);
 
   writingPracticeState.score = result.score;
   writingPracticeState.feedback = result.feedback;
@@ -8044,6 +8233,7 @@ function attachEventListeners() {
     writingCanvas.addEventListener("pointerup", finishWritingPointer);
     writingCanvas.addEventListener("pointercancel", finishWritingPointer);
   }
+  observeWritingPracticeLayout();
   window.addEventListener("resize", () => {
     if (!document.getElementById("writing-practice-shell") || getCharactersTab(state.charactersTab) !== "writing") {
       return;

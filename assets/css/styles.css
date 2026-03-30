@@ -1725,16 +1725,25 @@ body.is-kana-quiz-sheet-open .page-shell {
 
 .writing-character-slot.is-compound .writing-character-glyph.is-leading {
   top: 18%;
-  left: 10%;
-  width: 54%;
-  height: 64%;
+  left: 8%;
+  width: 58%;
+  height: 68%;
 }
 
 .writing-character-slot.is-compound .writing-character-glyph.is-small {
-  top: 28%;
-  right: 10%;
-  width: 22%;
-  height: 22%;
+  top: auto;
+  bottom: 25%;
+  right: 5%;
+  width: 50%;
+  height: 50%;
+}
+
+.writing-character-slot.is-compound .writing-character-glyph.is-small[data-char="ょ"],
+.writing-character-slot.is-compound .writing-character-glyph.is-small[data-char="ョ"] {
+  bottom: 0%;
+  right: 12%;
+  width: 70%;
+  height: 70%;
 }
 
 .writing-character-glyph > svg,
@@ -1790,11 +1799,11 @@ body.is-kana-quiz-sheet-open .page-shell {
 }
 
 .writing-character-slot.is-compound .writing-character-fallback {
-  font-size: clamp(4rem, 8vw, 5.8rem);
+  font-size: clamp(4.2rem, 8.4vw, 6rem);
 }
 
 .writing-character-slot.is-compound .writing-character-glyph.is-small .writing-character-fallback {
-  font-size: clamp(2.2rem, 4.6vw, 3.2rem);
+  font-size: clamp(3rem, 6vw, 4.2rem);
 }
 
 #writing-overlay-canvas {

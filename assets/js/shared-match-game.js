@@ -1,4 +1,88 @@
 (function (global) {
+  function getSyncStore() {
+    if (global.japanoteSync && typeof global.japanoteSync.readValue === "function") {
+      return global.japanoteSync;
+    }
+
+    return null;
+  }
+
+  function loadStoredObject(storageKey, defaults = {}) {
+    const syncStore = getSyncStore();
+    const baseValue = defaults && typeof defaults === "object" && !Array.isArray(defaults) ? { ...defaults } : {};
+
+    if (syncStore) {
+      const saved = syncStore.readValue(storageKey, null);
+
+      if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+        return {
+          ...baseValue,
+          ...saved
+        };
+      }
+    }
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+      if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+        return {
+          ...baseValue,
+          ...saved
+        };
+      }
+    } catch (error) {
+      return baseValue;
+    }
+
+    return baseValue;
+  }
+
+  function saveStoredObject(storageKey, value) {
+    const syncStore = getSyncStore();
+
+    if (syncStore) {
+      syncStore.writeValue(storageKey, value);
+      return;
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify(value));
+  }
+
+  function replaceObjectContents(target, nextState) {
+    Object.keys(target).forEach((key) => {
+      delete target[key];
+    });
+
+    Object.assign(target, nextState);
+  }
+
+  function dispatchStorageUpdated(key, value, source = "local") {
+    window.dispatchEvent(
+      new CustomEvent("japanote:storage-updated", {
+        detail: {
+          key,
+          value,
+          source
+        }
+      })
+    );
+  }
+
+  function attachStorageUpdateListener(handlersByKey, source = "remote") {
+    window.addEventListener("japanote:storage-updated", (event) => {
+      if (event.detail?.source !== source) {
+        return;
+      }
+
+      const handler = handlersByKey[event.detail.key];
+
+      if (typeof handler === "function") {
+        handler(event.detail.value);
+      }
+    });
+  }
+
   function syncToggleButtonGroup(selector, activeValue, getValue) {
     document.querySelectorAll(selector).forEach((button) => {
       const value = typeof getValue === "function" ? getValue(button) : button.value;
@@ -370,6 +454,11 @@
   }
 
   global.japanoteSharedMatchGame = {
+    loadStoredObject,
+    saveStoredObject,
+    replaceObjectContents,
+    dispatchStorageUpdated,
+    attachStorageUpdateListener,
     renderActionCopy,
     renderTimer,
     renderStats,

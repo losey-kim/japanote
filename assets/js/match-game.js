@@ -2,14 +2,6 @@ const matchStorageKey = "japanote-match-state";
 const studyStateStorageKey = "jlpt-compass-state";
 const sharedMatchGame = globalThis.japanoteSharedMatchGame;
 
-function getMatchSyncStore() {
-  if (globalThis.japanoteSync && typeof globalThis.japanoteSync.readValue === "function") {
-    return globalThis.japanoteSync;
-  }
-
-  return null;
-}
-
 const matchSourceLevels = ["N5", "N4", "N3"];
 const matchLevelOptions = [...matchSourceLevels, "all"];
 const matchDurationOptions = [0, 10, 15, 20];
@@ -51,67 +43,21 @@ const matchFilterLabels = {
 };
 
 function loadMatchPreferences() {
-  const syncStore = getMatchSyncStore();
-
-  if (syncStore) {
-    const saved = syncStore.readValue(matchStorageKey, null);
-
-    if (saved && typeof saved === "object") {
-      return {
-        ...defaultMatchPreferences,
-        ...saved
-      };
-    }
-  }
-
-  try {
-    const saved = JSON.parse(localStorage.getItem(matchStorageKey) || "{}");
-    return {
-      ...defaultMatchPreferences,
-      ...saved
-    };
-  } catch (error) {
-    return { ...defaultMatchPreferences };
-  }
+  return sharedMatchGame.loadStoredObject(matchStorageKey, defaultMatchPreferences);
 }
 
 const matchPreferences = loadMatchPreferences();
 
 function saveMatchPreferences() {
-  const syncStore = getMatchSyncStore();
-
-  if (syncStore) {
-    syncStore.writeValue(matchStorageKey, matchPreferences);
-    return;
-  }
-
-  localStorage.setItem(matchStorageKey, JSON.stringify(matchPreferences));
+  sharedMatchGame.saveStoredObject(matchStorageKey, matchPreferences);
 }
 
 function loadSharedStudyState() {
-  const syncStore = getMatchSyncStore();
-
-  if (syncStore) {
-    const saved = syncStore.readValue(studyStateStorageKey, null);
-    return saved && typeof saved === "object" ? saved : {};
-  }
-
-  try {
-    return JSON.parse(localStorage.getItem(studyStateStorageKey) || "{}");
-  } catch (error) {
-    return {};
-  }
+  return sharedMatchGame.loadStoredObject(studyStateStorageKey);
 }
 
 function saveSharedStudyState(studyState) {
-  const syncStore = getMatchSyncStore();
-
-  if (syncStore) {
-    syncStore.writeValue(studyStateStorageKey, studyState);
-    return;
-  }
-
-  localStorage.setItem(studyStateStorageKey, JSON.stringify(studyState));
+  sharedMatchGame.saveStoredObject(studyStateStorageKey, studyState);
 }
 
 function saveWordToMemorizationList(id) {
@@ -1248,23 +1194,14 @@ function attachMatchEventListeners() {
 
 renderMatchSettings();
 attachMatchEventListeners();
-window.addEventListener("japanote:storage-updated", (event) => {
-  if (event.detail?.source !== "remote") {
-    return;
-  }
-
-  if (event.detail.key === matchStorageKey) {
+sharedMatchGame.attachStorageUpdateListener({
+  [matchStorageKey]: () => {
     const nextPreferences = loadMatchPreferences();
-    Object.keys(matchPreferences).forEach((key) => {
-      delete matchPreferences[key];
-    });
-    Object.assign(matchPreferences, nextPreferences);
+    sharedMatchGame.replaceObjectContents(matchPreferences, nextPreferences);
     renderMatchSettings();
     enterMatchReadyState();
-    return;
-  }
-
-  if (event.detail.key === studyStateStorageKey) {
+  },
+  [studyStateStorageKey]: () => {
     renderMatchSettings();
     enterMatchReadyState();
   }

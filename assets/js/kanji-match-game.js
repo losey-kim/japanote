@@ -2,14 +2,6 @@ const kanjiMatchStorageKey = "japanote-kanji-match-state";
 const kanjiStudyStateStorageKey = "jlpt-compass-state";
 const sharedMatchGame = globalThis.japanoteSharedMatchGame;
 
-function getKanjiMatchSyncStore() {
-  if (globalThis.japanoteSync && typeof globalThis.japanoteSync.readValue === "function") {
-    return globalThis.japanoteSync;
-  }
-
-  return null;
-}
-
 const kanjiMatchGradeOptions = ["all", "1", "2", "3", "4", "5", "6"];
 const kanjiMatchDurationOptions = [0, 10, 15, 20];
 const kanjiMatchTotalCountOptions = [5, 10, 15, 20];
@@ -66,47 +58,21 @@ function shuffleKanjiMatchItems(items) {
 }
 
 function loadKanjiMatchPreferences() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(kanjiMatchStorageKey) || "{}");
-    return {
-      ...defaultKanjiMatchPreferences,
-      ...saved
-    };
-  } catch (error) {
-    return { ...defaultKanjiMatchPreferences };
-  }
+  return sharedMatchGame.loadStoredObject(kanjiMatchStorageKey, defaultKanjiMatchPreferences);
 }
 
 const kanjiMatchPreferences = loadKanjiMatchPreferences();
 
 function saveKanjiMatchPreferences() {
-  localStorage.setItem(kanjiMatchStorageKey, JSON.stringify(kanjiMatchPreferences));
+  sharedMatchGame.saveStoredObject(kanjiMatchStorageKey, kanjiMatchPreferences);
 }
 
 function loadKanjiSharedStudyState() {
-  const syncStore = getKanjiMatchSyncStore();
-
-  if (syncStore) {
-    const saved = syncStore.readValue(kanjiStudyStateStorageKey, null);
-    return saved && typeof saved === "object" ? saved : {};
-  }
-
-  try {
-    return JSON.parse(localStorage.getItem(kanjiStudyStateStorageKey) || "{}");
-  } catch (error) {
-    return {};
-  }
+  return sharedMatchGame.loadStoredObject(kanjiStudyStateStorageKey);
 }
 
 function saveKanjiSharedStudyState(studyState) {
-  const syncStore = getKanjiMatchSyncStore();
-
-  if (syncStore) {
-    syncStore.writeValue(kanjiStudyStateStorageKey, studyState);
-    return;
-  }
-
-  localStorage.setItem(kanjiStudyStateStorageKey, JSON.stringify(studyState));
+  sharedMatchGame.saveStoredObject(kanjiStudyStateStorageKey, studyState);
 }
 
 function syncKanjiStudyStateToApp() {
@@ -115,15 +81,7 @@ function syncKanjiStudyStateToApp() {
     return;
   }
 
-  window.dispatchEvent(
-    new CustomEvent("japanote:storage-updated", {
-      detail: {
-        key: kanjiStudyStateStorageKey,
-        value: loadKanjiSharedStudyState(),
-        source: "local"
-      }
-    })
-  );
+  sharedMatchGame.dispatchStorageUpdated(kanjiStudyStateStorageKey, loadKanjiSharedStudyState(), "local");
 }
 
 function saveKanjiToMemorizationList(id) {
@@ -1122,23 +1080,14 @@ if (document.getElementById("kanji-match-new-round")) {
   renderKanjiMatchSettings();
   renderKanjiMatchActionCopy();
   attachKanjiMatchEventListeners();
-  window.addEventListener("japanote:storage-updated", (event) => {
-    if (event.detail?.source !== "remote") {
-      return;
-    }
-
-    if (event.detail.key === kanjiMatchStorageKey) {
+  sharedMatchGame.attachStorageUpdateListener({
+    [kanjiMatchStorageKey]: () => {
       const nextPreferences = loadKanjiMatchPreferences();
-      Object.keys(kanjiMatchPreferences).forEach((key) => {
-        delete kanjiMatchPreferences[key];
-      });
-      Object.assign(kanjiMatchPreferences, nextPreferences);
+      sharedMatchGame.replaceObjectContents(kanjiMatchPreferences, nextPreferences);
       renderKanjiMatchSettings();
       enterKanjiMatchReadyState();
-      return;
-    }
-
-    if (event.detail.key === kanjiStudyStateStorageKey) {
+    },
+    [kanjiStudyStateStorageKey]: () => {
       renderKanjiMatchSettings();
       enterKanjiMatchReadyState();
     }

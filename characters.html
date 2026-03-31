@@ -153,6 +153,13 @@
                     <div class="kana-setup-group"><span>순서</span><div class="writing-practice-order-switcher" aria-label="따라쓰기 순서 선택"><button class="level-button is-active" type="button" data-writing-order="sequence">순서대로</button><button class="level-button" type="button" data-writing-order="random">랜덤</button></div></div>
                   </div>
                 </div>
+                
+                <p class="writing-practice-feedback" id="writing-practice-feedback" hidden></p>
+              </article>
+              <article class="writing-practice-card">
+                <div class="writing-practice-card-head">
+                  <div><span class="eyebrow">WRITING STAGE</span><h3 id="writing-practice-title">문자 따라쓰기</h3></div>
+                </div>
                 <div class="writing-practice-meta">
                   <span id="writing-practice-source">히라가나 · 기본음</span>
                   <span id="writing-practice-progress">1 / 1</span>
@@ -168,16 +175,6 @@
                   </div>
                   <div><span>점수</span><strong id="writing-practice-score">-</strong></div>
                 </div>
-                <p class="writing-practice-feedback" id="writing-practice-feedback" hidden></p>
-              </article>
-              <article class="writing-practice-card">
-                <div class="writing-practice-card-head">
-                  <div><span class="eyebrow">WRITING STAGE</span><h3 id="writing-practice-title">문자 따라쓰기</h3></div>
-                </div>
-                <div class="writing-practice-head-actions">
-                  <button class="secondary-btn" id="writing-practice-replay" type="button">획순 볼까요?</button>
-                  <button class="primary-btn" id="writing-practice-score-btn" type="button">점수 확인해볼까요?</button>
-                </div>
                 <div class="writing-practice-stage-shell">
                   <div class="writing-practice-stage" id="writing-practice-stage">
                     <div class="writing-svg-layer" id="writing-svg-layer" aria-hidden="true"></div>
@@ -186,9 +183,10 @@
                   </div>
                 </div>
                 <div class="writing-practice-actions">
-                  <div class="writing-practice-actions-row writing-practice-actions-row-duo">
-                    <button class="secondary-btn" id="writing-guide-toggle" type="button">가이드 숨길래요</button>
-                    <button class="secondary-btn" id="writing-practice-reveal" type="button">정답 볼래요</button>
+                  <div class="writing-practice-actions-row writing-practice-actions-row-trio">
+                    <button class="secondary-btn" id="writing-practice-replay" type="button">획순</button>
+                    <button class="secondary-btn" id="writing-guide-toggle" type="button">가이드</button>
+                    <button class="primary-btn" id="writing-practice-score-btn" type="button">점수</button>
                   </div>
                   <div class="writing-practice-actions-row writing-practice-actions-row-trio">
                     <button class="secondary-btn" id="writing-practice-prev" type="button">앞 글자</button>

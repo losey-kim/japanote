@@ -366,21 +366,16 @@
         <div class="match-board vocab-quiz-board">
           <div class="vocab-quiz-view" id="vocab-quiz">
             <p class="vocab-list-empty" id="vocab-quiz-empty" hidden>퀴즈를 준비하고 있어요.</p>
-            ${createStatsGrid({
-              id: "vocab-quiz-stats",
-              className: "match-stats-grid vocab-quiz-stats-grid",
-              hidden: true,
-              items: [
-                { label: "진행", valueId: "vocab-quiz-progress-side", value: "0 / 0" },
-                { label: "남은 시간", valueId: "vocab-quiz-timer", value: "15초" }
-              ]
-            })}
             ${createChoiceQuizCard({
               articleId: "vocab-quiz-card",
               className: "basic-practice-card vocab-quiz-card",
               metaItems: [
-                { id: "vocab-quiz-track", text: "단어" },
-                { id: "vocab-quiz-source", text: "N5 단어" }
+                { id: "vocab-quiz-track", text: "?⑥뼱" },
+                { id: "vocab-quiz-source", text: "N5 ?⑥뼱" }
+              ],
+              hudItems: [
+                { label: "진행", valueId: "vocab-quiz-progress", value: "0 / 0" },
+                { label: "남은 시간", valueId: "vocab-quiz-timer", value: "15초" }
               ],
               header: {
                 className: "basic-practice-header",
@@ -648,12 +643,6 @@
               options: [{ value: "all", label: "전체 품사" }]
             })}
           </div>
-          ${createStatsGrid({
-            items: [
-              { label: "진행", valueId: "match-progress", value: "0 / 5" },
-              { label: "남은 시간", valueId: "match-timer", value: "15초" }
-            ]
-          })}
           ${createActionButton({
             id: "match-new-round",
             labelId: "match-new-round-label",
@@ -663,6 +652,10 @@
         <div class="match-board" id="match-board" hidden>
           <p class="vocab-list-empty" id="match-empty" hidden>준비됐다면 시작해볼까요?</p>
           <div class="match-play-view" id="match-play-view">
+            <div class="quiz-hud match-play-hud">
+              <div class="quiz-hud-item"><span>진행</span><strong id="match-progress">0 / 5</strong></div>
+              <div class="quiz-hud-item"><span>남은 시간</span><strong id="match-timer">15초</strong></div>
+            </div>
             <div class="match-feedback" id="match-feedback" hidden></div>
             <div class="match-columns">
               <section class="match-column"><div class="match-column-head"><h3>읽기 카드</h3></div><div class="match-card-list" id="match-left-list"></div></section>
@@ -757,13 +750,6 @@
               ]
             })}
           </div>
-          ${createStatsGrid({
-            id: "kanji-match-stats",
-            items: [
-              { label: "진행", valueId: "kanji-match-progress", value: "0 / 5" },
-              { label: "남은 시간", valueId: "kanji-match-timer", value: "15초" }
-            ]
-          })}
           ${createActionButton({
             id: "kanji-match-new-round",
             labelId: "kanji-match-new-round-label",
@@ -773,6 +759,10 @@
         <div class="match-board" id="kanji-match-board" hidden>
           <p class="vocab-list-empty" id="kanji-match-empty" hidden>준비됐다면 시작해볼까요?</p>
           <div class="match-play-view" id="kanji-match-play-view">
+            <div class="quiz-hud match-play-hud">
+              <div class="quiz-hud-item"><span>진행</span><strong id="kanji-match-progress">0 / 5</strong></div>
+              <div class="quiz-hud-item"><span>남은 시간</span><strong id="kanji-match-timer">15초</strong></div>
+            </div>
             <div class="match-feedback" id="kanji-match-feedback" hidden></div>
             <div class="match-columns">
               <section class="match-column"><div class="match-column-head"><h3>한자 카드</h3></div><div class="match-card-list" id="kanji-match-left-list"></div></section>

@@ -13,7 +13,7 @@ const matchSourceLevels = ["N5", "N4", "N3"];
 const matchLevelOptions = [...matchSourceLevels, "all"];
 const matchDurationOptions = [0, 10, 15, 20];
 const matchTotalCountOptions = [5, 10, 15, 20];
-const matchFilterOptions = ["all", "review", "mastered"];
+const matchFilterOptions = ["all", "review", "mastered", "unmarked"];
 const matchResultFilterOptions = ["all", "correct", "wrong"];
 const matchPageSize = 5;
 const matchWrongFlashDuration = 520;
@@ -45,7 +45,8 @@ const matchResultFilterLabels = {
 const matchFilterLabels = {
   all: "전체",
   review: "다시 볼래요",
-  mastered: "익혔어요"
+  mastered: "익혔어요",
+  unmarked: "아직 안 정했어요"
 };
 
 function loadMatchPreferences() {
@@ -362,6 +363,10 @@ function filterMatchPool(items, filter = matchPreferences.filter, part = matchPr
     return filteredByPart.filter((item) => masteredIds.includes(item.id));
   }
 
+  if (activeFilter === "unmarked") {
+    return filteredByPart.filter((item) => !reviewIds.includes(item.id) && !masteredIds.includes(item.id));
+  }
+
   return filteredByPart;
 }
 
@@ -370,7 +375,8 @@ function getMatchFilterCounts(items = getBaseMatchPool()) {
   return {
     all: filterMatchPool(items, "all", activePart).length,
     review: filterMatchPool(items, "review", activePart).length,
-    mastered: filterMatchPool(items, "mastered", activePart).length
+    mastered: filterMatchPool(items, "mastered", activePart).length,
+    unmarked: filterMatchPool(items, "unmarked", activePart).length
   };
 }
 
@@ -545,11 +551,26 @@ function renderMatchTimer() {
     return;
   }
 
+  const warning = activeDuration > 0 && matchState.timeLeft <= Math.max(10, Math.floor(activeDuration / 3));
+  const progress = activeDuration > 0 ? Math.max(0, Math.min(1, matchState.timeLeft / activeDuration)) : 0;
+  const timerItem = timer.closest(".quiz-hud-item");
+
   timer.textContent = activeDuration <= 0 ? "천천히" : `${matchState.timeLeft}초`;
-  timer.classList.toggle(
-    "is-warning",
-    activeDuration > 0 && matchState.timeLeft <= Math.max(10, Math.floor(activeDuration / 3))
-  );
+  timer.classList.toggle("is-warning", warning);
+
+  if (!timerItem) {
+    return;
+  }
+
+  if (typeof updateQuizTimerItem === "function") {
+    updateQuizTimerItem(timerItem, progress, warning, activeDuration <= 0);
+    return;
+  }
+
+  timerItem.classList.add("is-timer");
+  timerItem.classList.toggle("is-warning", warning);
+  timerItem.classList.toggle("is-static", activeDuration <= 0);
+  timerItem.style.setProperty("--timer-progress", progress.toFixed(3));
 }
 
 function renderMatchStats() {

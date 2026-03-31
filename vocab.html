@@ -51,37 +51,13 @@
           <p class="section-copy" id="vocab-heading-copy" hidden></p>
         </div>
         <div class="vocab-tab-list" role="tablist" aria-label="단어 학습 탭">
-          <button class="level-button vocab-tab-button is-active" type="button" data-vocab-tab="study" id="vocab-tab-study" role="tab" aria-selected="true" aria-controls="vocab-tab-panel-study">익히기</button>
+          <button class="level-button vocab-tab-button is-active" type="button" data-vocab-tab="study" id="vocab-tab-study" role="tab" aria-selected="true" aria-controls="vocab-tab-panel-study">목록</button>
           <button class="level-button vocab-tab-button" type="button" data-vocab-tab="quiz" id="vocab-tab-quiz" role="tab" aria-selected="false" aria-controls="vocab-tab-panel-quiz" tabindex="-1">퀴즈</button>
           <button class="level-button vocab-tab-button" type="button" data-vocab-tab="match" id="vocab-tab-match" role="tab" aria-selected="false" aria-controls="vocab-tab-panel-match" tabindex="-1">짝맞추기</button>
         </div>
         <div class="vocab-tab-panels">
           <section class="vocab-tab-panel" id="vocab-tab-panel-study" data-vocab-tab-panel="study" role="tabpanel" aria-labelledby="vocab-tab-study">
             <div class="flashcard-panel">
-              <div class="study-options-shell" id="vocab-options-shell">
-                <button class="study-options-toggle" id="vocab-options-toggle" type="button" aria-expanded="true" aria-controls="vocab-options-panel">
-                  <div class="study-options-toggle-copy"><strong>어떻게 익혀볼까요?</strong><p class="study-options-toggle-summary" id="vocab-options-summary">N5 · 카드 · 전체 품사</p></div>
-                  <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-                </button>
-                <div class="study-options-panel study-options-panel-wide" id="vocab-options-panel">
-                  <div class="study-options-group">
-                    <span>어느 레벨을 볼까요?</span>
-                    <div class="vocab-level-switcher" role="tablist" aria-label="단어 레벨 고르기">
-                      <button class="level-button is-active" type="button" data-vocab-level="N5" aria-pressed="true">N5</button>
-                      <button class="level-button" type="button" data-vocab-level="N4" aria-pressed="false">N4</button>
-                      <button class="level-button" type="button" data-vocab-level="N3" aria-pressed="false">N3</button>
-                      <button class="level-button" type="button" data-vocab-level="all" aria-pressed="false">전체</button>
-                    </div>
-                  </div>
-                  <div class="study-options-group">
-                    <span>어떻게 볼까요?</span>
-                    <div class="vocab-view-toggle" role="tablist" aria-label="단어 보기 방식 고르기">
-                      <button class="level-button button-with-icon is-active" type="button" data-vocab-view="card" aria-pressed="true" aria-label="카드로 보기"><span class="material-symbols-rounded" aria-hidden="true">style</span><span>카드</span></button>
-                      <button class="level-button button-with-icon" type="button" data-vocab-view="list" aria-pressed="false" aria-label="목록으로 보기"><span class="material-symbols-rounded" aria-hidden="true">view_list</span><span>목록</span></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div class="vocab-select-toolbar" aria-label="단어 필터">
                 <label class="vocab-select-field" for="vocab-level-select">
                   <span>레벨</span>
@@ -102,6 +78,7 @@
                       <option value="all">전체</option>
                       <option value="review">다시 볼래요</option>
                       <option value="mastered">익혔어요</option>
+                      <option value="unmarked">아직 안 정했어요</option>
                     </select>
                     <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
                   </div>
@@ -116,7 +93,17 @@
                   </div>
                 </label>
               </div>
-              <p class="vocab-summary" id="vocab-summary">0개 모였어요</p>
+              <div class="study-panel-head">
+                <p class="vocab-summary" id="vocab-summary">0개 모였어요</p>
+                <div class="study-view-switch" role="tablist" aria-label="단어 보기 방식 고르기">
+                  <button class="study-view-button is-active" type="button" data-vocab-view="card" aria-pressed="true" aria-label="카드로 보기" title="카드로 보기">
+                    <span class="material-symbols-rounded" aria-hidden="true">style</span>
+                  </button>
+                  <button class="study-view-button" type="button" data-vocab-view="list" aria-pressed="false" aria-label="목록으로 보기" title="목록으로 보기">
+                    <span class="material-symbols-rounded" aria-hidden="true">view_list</span>
+                  </button>
+                </div>
+              </div>
 
               <div class="vocab-card-view" id="vocab-card-view">
                 <article class="flashcard" id="flashcard" aria-live="polite">

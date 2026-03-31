@@ -1971,8 +1971,8 @@ button {
 }
 
 .kanji-options-shell {
-  width: min(760px, 100%);
-  margin: 0 auto 18px;
+  width: 100%;
+  margin: 0 0 18px;
 }
 
 .kanji-tab-list {
@@ -1984,13 +1984,13 @@ button {
 }
 
 .kanji-list {
-  width: min(760px, 100%);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
 
 .kanji-filter-toolbar {
-  width: min(760px, 100%);
-  margin: 0 auto 16px;
+  width: 100%;
+  margin: 0 0 18px;
 }
 
 .kanji-list-head-meta {
@@ -2002,27 +2002,30 @@ button {
 
 .kanji-list-main {
   margin-top: 14px;
-  text-align: center;
+  text-align: left;
 }
 
+.vocab-list-actions,
 .kanji-status-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 18px;
 }
 
+.vocab-list-actions > *,
 .kanji-status-actions > * {
-  flex: 1 1 160px;
   min-width: 0;
 }
 
+.vocab-status-btn.is-selected-review,
 .kanji-status-btn.is-selected-review {
   color: white;
   background: var(--coral);
   border-color: rgba(222, 107, 72, 0.3);
 }
 
+.vocab-status-btn.is-selected-mastered,
 .kanji-status-btn.is-selected-mastered {
   color: white;
   background: var(--mint);
@@ -2037,8 +2040,8 @@ button {
 .kanji-list-char {
   display: block;
   font-family: "Noto Sans JP", sans-serif;
-  font-size: clamp(2.7rem, 6vw, 4rem);
-  line-height: 1.1;
+  font-size: clamp(1.95rem, 4.8vw, 2.75rem);
+  line-height: 1.15;
 }
 
 .kanji-list-meaning {
@@ -2050,8 +2053,8 @@ button {
 }
 
 .kanji-result-view {
-  width: min(760px, 100%);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
 
 .kanji-result-view .match-result-item-main strong {
@@ -2335,12 +2338,12 @@ button {
 .vocab-card-view {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .vocab-card-view .flashcard-actions {
   margin-top: 0;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   justify-content: space-between;
 }
 
@@ -2377,19 +2380,65 @@ button {
   gap: 6px;
 }
 
+.study-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.study-panel-head .vocab-summary {
+  margin: 0;
+}
+
+.study-view-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(25, 21, 22, 0.04);
+}
+
+.study-view-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.study-view-button:hover {
+  transform: translateY(-1px);
+}
+
+.study-view-button:focus-visible {
+  outline: 2px solid rgba(93, 133, 207, 0.34);
+  outline-offset: 2px;
+}
+
+.study-view-button.is-active {
+  color: white;
+  background: var(--text);
+}
+
+.study-view-button .material-symbols-rounded {
+  font-size: 1.3rem;
+}
+
 .vocab-select-toolbar {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 18px;
-}
-
-#vocab-options-panel .study-options-group:first-child {
-  display: none;
-}
-
-#vocab-options-panel .study-options-group:last-child {
-  grid-column: 1 / -1;
 }
 
 .vocab-select-field {
@@ -2684,11 +2733,11 @@ button {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
-  height: 380px;
-  min-height: 380px;
-  padding: 32px;
+  height: 336px;
+  min-height: 336px;
+  padding: 20px;
   border: 1px solid rgba(25, 21, 22, 0.08);
   border-radius: var(--radius-lg);
   text-align: left;
@@ -2703,9 +2752,9 @@ button {
 }
 
 .flashcard-toggle {
-  display: grid;
+  display: flex;
   flex: 1 1 auto;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  flex-direction: column;
   align-items: flex-start;
   gap: 12px;
   min-height: 0;
@@ -2729,7 +2778,7 @@ button {
 .flashcard-copy {
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 4px;
   min-height: 0;
   overflow: hidden;
 }
@@ -2738,9 +2787,9 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   margin-top: auto;
-  padding-top: 12px;
+  padding-top: 6px;
   border-top: 1px solid var(--line);
 }
 
@@ -3046,6 +3095,7 @@ button {
 .flashcard-hint {
   display: inline-flex;
   color: var(--muted);
+  margin-top: auto;
 }
 
 .flashcard-nav-btn {
@@ -3613,6 +3663,11 @@ button {
 .match-result-view {
   display: grid;
   gap: 16px;
+}
+
+.match-play-hud {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0;
 }
 
 .match-feedback {
@@ -4621,8 +4676,9 @@ body::after {
   }
 
   .flashcard {
-    height: 380px;
-    min-height: 380px;
+    height: 312px;
+    min-height: 312px;
+    padding: 18px;
   }
 
   .vocab-card-view {
@@ -4637,10 +4693,17 @@ body::after {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .vocab-toolbar,
-  .vocab-pagination {
+  .vocab-toolbar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .study-panel-head {
+    align-items: flex-start;
+  }
+
+  .study-view-switch {
+    margin-left: auto;
   }
 
   .vocab-view-toggle {

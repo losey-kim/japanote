@@ -82,7 +82,51 @@ const fallbackFlashcards = [
 let flashcards = [...fallbackFlashcards];
 let vocabListItems = [...fallbackFlashcards];
 const vocabPageSize = 20;
+const kanjiPageSize = 20;
 const vocabQuizSessionSize = 12;
+const studyCardOrderCache = {
+  vocab: { signature: "", ids: [] },
+  kanji: { signature: "", ids: [] }
+};
+
+function buildStudyCardSignature(items) {
+  return Array.isArray(items) ? items.map((item) => item?.id || "").join("|") : "";
+}
+
+function shuffleStudyCardIds(ids) {
+  const nextIds = [...ids];
+
+  for (let index = nextIds.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [nextIds[index], nextIds[swapIndex]] = [nextIds[swapIndex], nextIds[index]];
+  }
+
+  return nextIds;
+}
+
+function getOrderedStudyCards(key, items) {
+  const source = Array.isArray(items) ? items : [];
+  const orderState = studyCardOrderCache[key];
+
+  if (!orderState || source.length <= 1) {
+    return source;
+  }
+
+  const signature = buildStudyCardSignature(source);
+
+  if (orderState.signature !== signature) {
+    orderState.signature = signature;
+    orderState.ids = shuffleStudyCardIds(source.map((item) => item.id));
+  }
+
+  const orderMap = new Map(orderState.ids.map((id, index) => [id, index]));
+
+  return [...source].sort((left, right) => {
+    const leftIndex = orderMap.get(left.id) ?? Number.MAX_SAFE_INTEGER;
+    const rightIndex = orderMap.get(right.id) ?? Number.MAX_SAFE_INTEGER;
+    return leftIndex - rightIndex;
+  });
+}
 
 const starterItems = [
   {
@@ -878,6 +922,22 @@ function getKanjiCollectionSummaryLabel(filter = state?.kanjiCollectionFilter) {
   return kanjiCollectionFilterLabels[getKanjiCollectionFilter(filter)] || kanjiCollectionFilterLabels.all;
 }
 
+function getKanjiView(view = state?.kanjiView) {
+  return view === "list" ? "list" : "card";
+}
+
+function getKanjiViewLabel(view = state?.kanjiView) {
+  return getKanjiView(view) === "list" ? "목록" : "카드";
+}
+
+function getKanjiOptionsSummaryText() {
+  return [
+    getKanjiGradeSummaryLabel(),
+    getKanjiViewLabel(),
+    getKanjiCollectionSummaryLabel()
+  ].join(" · ");
+}
+
 function getStarterKanjiQuizField(value, fallback = "display") {
   return kanjiQuizFieldOptions.includes(value) ? value : fallback;
 }
@@ -1669,7 +1729,8 @@ function getKanaQuizModeLabel(mode) {
 const vocabFilterLabels = {
   all: "전체",
   review: "다시 볼래요",
-  mastered: "익혔어요"
+  mastered: "익혔어요",
+  unmarked: "아직 안 정했어요"
 };
 
 const vocabHeadingCopy = {
@@ -4059,7 +4120,8 @@ const starterKanjiResultFilterLabels = {
 const kanjiCollectionFilterLabels = {
   all: "전체",
   review: "다시 볼래요",
-  mastered: "익혔어요"
+  mastered: "익혔어요",
+  unmarked: "아직 안 정했어요"
 };
 const starterKanjiState = {
   results: [],
@@ -4099,9 +4161,14 @@ const defaultState = {
   kanjiMatchCount: 5,
   kanjiMatchDuration: 15,
   kanjiMatchOptionsOpen: true,
+  kanjiOptionsOpen: true,
   kanjiTab: "list",
+  kanjiView: "card",
   kanjiGrade: allLevelValue,
   kanjiCollectionFilter: "all",
+  kanjiPage: 1,
+  kanjiFlashcardIndex: 0,
+  kanjiFlashcardRevealed: false,
   kanjiReviewIds: [],
   kanjiMasteredIds: [],
   starterDoneIds: [],
@@ -4244,7 +4311,7 @@ function normalizeLoadedState(inputState) {
       nextState.vocabTab = hashTab;
     }
   }
-  nextState.vocabFilter = ["all", "review", "mastered"].includes(nextState.vocabFilter)
+  nextState.vocabFilter = ["all", "review", "mastered", "unmarked"].includes(nextState.vocabFilter)
     ? nextState.vocabFilter
     : "all";
   nextState.vocabPartFilter =
@@ -4283,9 +4350,16 @@ function normalizeLoadedState(inputState) {
     : 5;
   nextState.kanjiMatchDuration = getQuizDuration(nextState.kanjiMatchDuration);
   nextState.kanjiMatchOptionsOpen = nextState.kanjiMatchOptionsOpen !== false;
+  nextState.kanjiOptionsOpen = nextState.kanjiOptionsOpen !== false;
   nextState.kanjiTab = getKanjiTab(nextState.kanjiTab);
+  nextState.kanjiView = ["card", "list"].includes(nextState.kanjiView) ? nextState.kanjiView : "card";
   nextState.kanjiGrade = getKanjiGrade(nextState.kanjiGrade);
   nextState.kanjiCollectionFilter = getKanjiCollectionFilter(nextState.kanjiCollectionFilter);
+  nextState.kanjiPage = Number.isFinite(Number(nextState.kanjiPage)) ? Math.max(1, Number(nextState.kanjiPage)) : 1;
+  nextState.kanjiFlashcardIndex = Number.isFinite(Number(nextState.kanjiFlashcardIndex))
+    ? Math.max(0, Number(nextState.kanjiFlashcardIndex))
+    : 0;
+  nextState.kanjiFlashcardRevealed = nextState.kanjiFlashcardRevealed === true;
   nextState.grammarPracticeOptionsOpen = nextState.grammarPracticeOptionsOpen !== false;
   nextState.grammarPracticeStarted = false;
   nextState.readingLevel = getReadingLevel(nextState.readingLevel);
@@ -4888,6 +4962,10 @@ function getKanjiCollectionItems(collectionFilter = state?.kanjiCollectionFilter
     return items.filter((item) => isKanjiSavedToMasteredList(item.id));
   }
 
+  if (activeCollectionFilter === "unmarked") {
+    return items.filter((item) => !isKanjiSavedToReviewList(item.id) && !isKanjiSavedToMasteredList(item.id));
+  }
+
   return items;
 }
 
@@ -4901,7 +4979,8 @@ function getKanjiCollectionCounts(items = basicPracticeSets.kanji?.items || []) 
   return {
     all: items.length,
     review: items.filter((item) => isKanjiSavedToReviewList(item.id)).length,
-    mastered: items.filter((item) => isKanjiSavedToMasteredList(item.id)).length
+    mastered: items.filter((item) => isKanjiSavedToMasteredList(item.id)).length,
+    unmarked: items.filter((item) => !isKanjiSavedToReviewList(item.id) && !isKanjiSavedToMasteredList(item.id)).length
   };
 }
 
@@ -5166,6 +5245,10 @@ function getKanjiEmptyMessage(collectionFilter = state?.kanjiCollectionFilter, g
     return activeGrade === allLevelValue ? "익혔어요 한자가 아직 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 익혔어요 한자가 아직 없어요.`;
   }
 
+  if (activeCollectionFilter === "unmarked") {
+    return activeGrade === allLevelValue ? "아직 안 정한 한자가 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 아직 안 정한 한자가 없어요.`;
+  }
+
   return activeGrade === allLevelValue ? "한자를 준비하고 있어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 한자를 준비하고 있어요.`;
 }
 
@@ -5288,6 +5371,121 @@ function createKanjiStatusButtonsMarkup(id) {
       <button class="secondary-btn kanji-status-btn${review ? " is-selected-review" : ""}" type="button" data-kanji-review="${id}" aria-pressed="${review ? "true" : "false"}">다시 볼래요</button>
       <button class="secondary-btn kanji-status-btn${mastered ? " is-selected-mastered" : ""}" type="button" data-kanji-mastered="${id}" aria-pressed="${mastered ? "true" : "false"}">익혔어요!</button>
     </div>
+  `;
+}
+
+function createStudyStatusBadgesMarkup(review, mastered) {
+  return [
+    review ? '<span class="vocab-review-badge">다시 볼래요</span>' : "",
+    mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""
+  ]
+    .filter(Boolean)
+    .join("");
+}
+
+function applyStudyActionButtonState(button, selected, selectedClass, idleClass, disabled) {
+  if (!button) {
+    return;
+  }
+
+  button.disabled = disabled;
+  button.classList.toggle(selectedClass, selected);
+  button.classList.toggle(idleClass, !selected);
+}
+
+function renderStudyFlashcardComponent({
+  flashcard,
+  toggle,
+  prev,
+  next,
+  level,
+  word,
+  reading,
+  meaning,
+  hint,
+  hasCards,
+  isRevealed,
+  revealWhenEmpty = false,
+  levelText,
+  wordText,
+  readingText = "",
+  meaningText = "",
+  hintText = "",
+  hideReading = false,
+  toggleOpenLabel,
+  toggleClosedLabel,
+  toggleEmptyLabel,
+  prevDisabled = false,
+  nextDisabled = false,
+  actionButtons = []
+}) {
+  if (!flashcard || !toggle || !level || !word || !reading || !meaning || !hint) {
+    return;
+  }
+
+  level.textContent = formatQuizLineBreaks(levelText || "");
+  word.textContent = formatQuizLineBreaks(wordText || "");
+  reading.textContent = formatQuizLineBreaks(readingText || "");
+  reading.hidden = hideReading || !normalizeQuizText(readingText || "");
+  meaning.textContent = formatQuizLineBreaks(meaningText || "");
+  hint.textContent = hintText;
+
+  flashcard.classList.toggle("is-revealed", isRevealed || (revealWhenEmpty && !hasCards));
+  flashcard.classList.toggle("is-empty", !hasCards);
+  toggle.disabled = !hasCards;
+  toggle.setAttribute("aria-expanded", String(isRevealed));
+  toggle.setAttribute(
+    "aria-label",
+    hasCards ? (isRevealed ? toggleOpenLabel : toggleClosedLabel) : toggleEmptyLabel
+  );
+
+  if (prev) {
+    prev.disabled = !hasCards || prevDisabled;
+  }
+
+  if (next) {
+    next.disabled = !hasCards || nextDisabled;
+  }
+
+  actionButtons.forEach((action) => {
+    applyStudyActionButtonState(
+      action.button,
+      action.selected,
+      action.selectedClass,
+      action.idleClass,
+      !hasCards || action.disabled === true
+    );
+  });
+}
+
+function createStudyListCardMarkup({
+  index,
+  headMetaMarkup = "",
+  badgesMarkup = "",
+  mainClassName = "vocab-list-main",
+  titleClassName = "vocab-list-word",
+  titleText = "",
+  subtitleClassName = "vocab-list-reading",
+  subtitleText = "",
+  descriptionMarkup = "",
+  actionsMarkup = ""
+}) {
+  return `
+    <article class="vocab-list-card">
+      <div class="vocab-list-card-head">
+        <div class="kanji-list-head-meta">
+          <span class="vocab-list-index">${index}</span>
+          ${headMetaMarkup}
+        </div>
+        <div class="vocab-status-badges">${badgesMarkup}</div>
+      </div>
+      <div class="${mainClassName}">
+        <strong class="${titleClassName}">${titleText}</strong>
+        <p class="${subtitleClassName}">${subtitleText}</p>
+      </div>
+      ${descriptionMarkup}
+      ${actionsMarkup}
+    </article>
   `;
 }
 
@@ -5537,7 +5735,6 @@ function renderKanjiList() {
           <div class="vocab-list-card-head">
             <div class="kanji-list-head-meta">
               <span class="vocab-list-index">${index + 1}</span>
-              <span class="kanji-grade-badge">${item.gradeLabel}</span>
             </div>
             <div class="vocab-status-badges">${badges}</div>
           </div>
@@ -5552,13 +5749,237 @@ function renderKanjiList() {
     .join("");
 }
 
+function getKanjiSummaryText(count, collectionFilter = state?.kanjiCollectionFilter, grade = state?.kanjiGrade) {
+  const activeCollectionFilter = getKanjiCollectionFilter(collectionFilter);
+  const collectionLabel = getKanjiCollectionSummaryLabel(activeCollectionFilter);
+  const gradeLabel = getKanjiGradeSummaryLabel(grade);
+  const subject = activeCollectionFilter === "all" ? "한자" : `${collectionLabel} 한자`;
+
+  return `${gradeLabel} ${subject} ${count}개를 보고 있어요`;
+}
+
+function getVisibleKanjiCards() {
+  return getOrderedStudyCards("kanji", getVisibleKanjiItems());
+}
+
+function getKanjiPageCount(items) {
+  return Math.max(1, Math.ceil((Array.isArray(items) ? items.length : 0) / kanjiPageSize));
+}
+
+function clampKanjiPage(items) {
+  state.kanjiPage = Math.min(Math.max(state.kanjiPage, 1), getKanjiPageCount(items));
+}
+
+function resetKanjiStudyPointers() {
+  state.kanjiPage = 1;
+  state.kanjiFlashcardIndex = 0;
+  state.kanjiFlashcardRevealed = false;
+}
+
+function syncKanjiFlashcardIndexAfterUpdate(currentCardId, previousIndex) {
+  const nextCards = getVisibleKanjiCards();
+  const currentVisibleIndex = nextCards.findIndex((item) => item.id === currentCardId);
+
+  if (!nextCards.length) {
+    state.kanjiFlashcardIndex = 0;
+    return;
+  }
+
+  if (currentVisibleIndex !== -1) {
+    state.kanjiFlashcardIndex =
+      nextCards.length > 1 ? (currentVisibleIndex + 1) % nextCards.length : currentVisibleIndex;
+    return;
+  }
+
+  state.kanjiFlashcardIndex = Math.min(previousIndex, nextCards.length - 1);
+}
+
+function getKanjiFlashcardPlaceholder() {
+  const activeCollectionFilter = getKanjiCollectionFilter();
+
+  return {
+    id: "kanji-empty",
+    gradeLabel: getKanjiGradeSummaryLabel(),
+    display: "漢字",
+    statusText: getKanjiEmptyMessage(),
+    readingsDisplay:
+      activeCollectionFilter === "review"
+        ? "다른 학년이나 모아보기로 바꿔보세요."
+        : activeCollectionFilter === "mastered"
+          ? "아직 익힌 한자가 없어요."
+          : "학년별 한자를 차근차근 익혀볼 수 있어요."
+  };
+}
+
+function renderKanjiStudyControls() {
+  const summary = document.getElementById("kanji-summary");
+  const collectionSelect = document.getElementById("kanji-collection-select");
+  const gradeSelect = document.getElementById("kanji-grade-select");
+  const collectionCounts = getKanjiCollectionCounts();
+  const gradeCounts = getKanjiGradeCounts(getKanjiCollectionItems());
+  const activeView = getKanjiView();
+  const visibleItems = getVisibleKanjiItems();
+
+  if (summary) {
+    summary.textContent = getKanjiSummaryText(visibleItems.length);
+  }
+
+  document.querySelectorAll("[data-kanji-view]").forEach((button) => {
+    const active = button.dataset.kanjiView === activeView;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  populateKanjiCollectionSelect(collectionSelect, collectionCounts, getKanjiCollectionFilter());
+  populateKanjiGradeSelect(gradeSelect, gradeCounts, getKanjiGrade());
+}
+
+function renderKanjiFlashcard() {
+  const flashcard = document.getElementById("kanji-flashcard");
+  const toggle = document.getElementById("kanji-flashcard-toggle");
+  const prev = document.getElementById("kanji-flashcard-prev");
+  const next = document.getElementById("kanji-flashcard-next");
+  const reviewButton = document.getElementById("kanji-flashcard-review");
+  const masteredButton = document.getElementById("kanji-flashcard-mastered");
+  const level = document.getElementById("kanji-flashcard-level");
+  const word = document.getElementById("kanji-flashcard-word");
+  const reading = document.getElementById("kanji-flashcard-reading");
+  const meaning = document.getElementById("kanji-flashcard-meaning");
+  const hint = document.getElementById("kanji-flashcard-hint");
+  const cards = getVisibleKanjiCards();
+
+  if (
+    !flashcard ||
+    !toggle ||
+    !prev ||
+    !next ||
+    !reviewButton ||
+    !masteredButton ||
+    !level ||
+    !word ||
+    !reading ||
+    !meaning ||
+    !hint
+  ) {
+    return;
+  }
+
+  const hasCards = cards.length > 0;
+  const currentIndex = hasCards ? state.kanjiFlashcardIndex % cards.length : 0;
+  const currentCard = hasCards ? cards[currentIndex] : getKanjiFlashcardPlaceholder();
+  const review = hasCards && isKanjiSavedToReviewList(currentCard.id);
+  const mastered = hasCards && isKanjiSavedToMasteredList(currentCard.id);
+  const isRevealed = hasCards && state.kanjiFlashcardRevealed;
+  const hintText = hasCards
+    ? isRevealed
+      ? review
+        ? "다시 볼래요에 담긴 한자예요"
+        : mastered
+          ? "익혔어요에 담긴 한자예요"
+          : "저장 상태를 바로 바꿔볼 수 있어요"
+      : "눌러서 읽기를 확인해볼까요?"
+    : "필터를 바꾸면 다른 한자를 바로 볼 수 있어요.";
+
+  renderStudyFlashcardComponent({
+    flashcard,
+    toggle,
+    prev,
+    next,
+    level,
+    word,
+    reading,
+    meaning,
+    hint,
+    hasCards,
+    isRevealed,
+    revealWhenEmpty: true,
+    levelText: currentCard.gradeLabel || "한자",
+    wordText: currentCard.display || "漢字",
+    meaningText: hasCards
+      ? currentCard.readingsDisplay || currentCard.reading || ""
+      : currentCard.statusText || getKanjiEmptyMessage(),
+    hintText,
+    hideReading: true,
+    toggleOpenLabel: "읽기를 다시 접어둘까요?",
+    toggleClosedLabel: "읽기를 확인해볼까요?",
+    toggleEmptyLabel: "표시할 한자가 없어요",
+    prevDisabled: cards.length <= 1,
+    nextDisabled: cards.length <= 1,
+    actionButtons: [
+      {
+        button: reviewButton,
+        selected: review,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      },
+      {
+        button: masteredButton,
+        selected: mastered,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      }
+    ]
+  });
+}
+
+function renderKanjiList() {
+  const list = document.getElementById("kanji-list");
+  const pageInfo = document.getElementById("kanji-page-info");
+  const prev = document.getElementById("kanji-page-prev");
+  const next = document.getElementById("kanji-page-next");
+  const items = getVisibleKanjiItems();
+
+  if (!list || !pageInfo || !prev || !next) {
+    return;
+  }
+
+  const previousPage = state.kanjiPage;
+  clampKanjiPage(items);
+  if (state.kanjiPage !== previousPage) {
+    saveState();
+  }
+
+  const pageCount = getKanjiPageCount(items);
+  const startIndex = (state.kanjiPage - 1) * kanjiPageSize;
+  const pageItems = items.slice(startIndex, startIndex + kanjiPageSize);
+
+  pageInfo.textContent = `${state.kanjiPage} / ${pageCount}`;
+  prev.disabled = state.kanjiPage <= 1;
+  next.disabled = state.kanjiPage >= pageCount;
+
+  if (!pageItems.length) {
+    list.innerHTML = `<p class="vocab-list-empty">${getKanjiEmptyMessage()}</p>`;
+    return;
+  }
+
+  list.innerHTML = pageItems
+    .map((item, index) => {
+      const review = isKanjiSavedToReviewList(item.id);
+      const mastered = isKanjiSavedToMasteredList(item.id);
+
+      return createStudyListCardMarkup({
+        index: startIndex + index + 1,
+        badgesMarkup: createStudyStatusBadgesMarkup(review, mastered),
+        mainClassName: "vocab-list-main kanji-list-main",
+        titleClassName: "vocab-list-word kanji-list-char",
+        titleText: formatQuizLineBreaks(item.display),
+        subtitleText: formatQuizLineBreaks(item.readingsDisplay || item.reading),
+        actionsMarkup: createKanjiStatusButtonsMarkup(item.id)
+      });
+    })
+    .join("");
+}
+
 function renderKanjiPageLayout() {
   const activeTab = getKanjiTab(state.kanjiTab);
+  const cardView = document.getElementById("kanji-card-view");
+  const listView = document.getElementById("kanji-list-view");
   const empty = document.getElementById("starter-kanji-empty");
   const practiceView = document.getElementById("starter-kanji-practice-view");
   const resultView = document.getElementById("starter-kanji-result-view");
 
   renderStarterKanjiControls();
+  renderKanjiStudyControls();
 
   document.querySelectorAll("[data-kanji-tab]").forEach((button) => {
     const isActive = button.dataset.kanjiTab === activeTab;
@@ -5576,6 +5997,13 @@ function renderKanjiPageLayout() {
   if (activeTab === "list") {
     stopQuizSessionTimer("starterKanji");
     renderQuizSessionHud("starterKanji");
+    if (cardView) {
+      cardView.hidden = getKanjiView() !== "card";
+    }
+    if (listView) {
+      listView.hidden = getKanjiView() !== "list";
+    }
+    renderKanjiFlashcard();
     renderKanjiList();
     return;
   }
@@ -5772,6 +6200,7 @@ function setKanjiGrade(grade) {
   }
 
   state.kanjiGrade = nextGrade;
+  resetKanjiStudyPointers();
   invalidateStarterKanjiSession();
   saveState();
   renderKanjiPageLayout();
@@ -5785,9 +6214,81 @@ function setKanjiCollectionFilter(filter) {
   }
 
   state.kanjiCollectionFilter = nextFilter;
+  resetKanjiStudyPointers();
   invalidateStarterKanjiSession();
   saveState();
   renderKanjiPageLayout();
+}
+
+function setKanjiView(view) {
+  const nextView = getKanjiView(view);
+
+  if (state.kanjiView === nextView) {
+    return;
+  }
+
+  state.kanjiView = nextView;
+  saveState();
+  renderKanjiPageLayout();
+}
+
+function toggleKanjiFlashcardReveal() {
+  state.kanjiFlashcardRevealed = !state.kanjiFlashcardRevealed;
+  updateStudyStreak();
+  saveState();
+  renderKanjiPageLayout();
+  renderStats();
+}
+
+function moveKanjiFlashcard(step) {
+  const cards = getVisibleKanjiCards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  state.kanjiFlashcardIndex = (state.kanjiFlashcardIndex + step + cards.length) % cards.length;
+  state.kanjiFlashcardRevealed = false;
+  saveState();
+  renderKanjiPageLayout();
+}
+
+function markKanjiFlashcardForReview() {
+  const cards = getVisibleKanjiCards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = state.kanjiFlashcardIndex % cards.length;
+  const currentCard = cards[currentIndex];
+
+  saveKanjiToReviewList(currentCard.id);
+  updateStudyStreak();
+  state.kanjiFlashcardRevealed = false;
+  syncKanjiFlashcardIndexAfterUpdate(currentCard.id, currentIndex);
+  saveState();
+  renderKanjiPageLayout();
+  renderStats();
+}
+
+function markKanjiFlashcardMastered() {
+  const cards = getVisibleKanjiCards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = state.kanjiFlashcardIndex % cards.length;
+  const currentCard = cards[currentIndex];
+
+  saveKanjiToMasteredList(currentCard.id);
+  updateStudyStreak();
+  state.kanjiFlashcardRevealed = false;
+  syncKanjiFlashcardIndexAfterUpdate(currentCard.id, currentIndex);
+  saveState();
+  renderKanjiPageLayout();
+  renderStats();
 }
 
 function setStarterKanjiResultFilter(filter) {
@@ -5989,6 +6490,10 @@ function getVocabEmptyMessage(filter = state.vocabFilter, part = state.vocabPart
     return `익힌 ${partLabel}가 아직 없어요.`;
   }
 
+  if (activeFilter === "unmarked") {
+    return `아직 안 정한 ${partLabel}가 없어요.`;
+  }
+
   return `${partLabel}가 아직 없어요.`;
 }
 
@@ -6013,6 +6518,10 @@ function filterVocabItems(items, filter = state.vocabFilter, partFilter = state.
     return filteredByPart.filter((item) => state.masteredIds.includes(item.id));
   }
 
+  if (activeFilter === "unmarked") {
+    return filteredByPart.filter((item) => !state.reviewIds.includes(item.id) && !state.masteredIds.includes(item.id));
+  }
+
   return filteredByPart;
 }
 
@@ -6020,7 +6529,8 @@ function getVocabFilterCounts() {
   return {
     all: filterVocabItems(vocabListItems, "all", state.vocabPartFilter).length,
     review: filterVocabItems(vocabListItems, "review", state.vocabPartFilter).length,
-    mastered: filterVocabItems(vocabListItems, "mastered", state.vocabPartFilter).length
+    mastered: filterVocabItems(vocabListItems, "mastered", state.vocabPartFilter).length,
+    unmarked: filterVocabItems(vocabListItems, "unmarked", state.vocabPartFilter).length
   };
 }
 
@@ -6037,6 +6547,10 @@ function getVocabSummaryText(count) {
 
   if (activeFilter === "mastered") {
     return `${levelLabel} 익힌 ${partLabel} ${count}개 모였어요`;
+  }
+
+  if (activeFilter === "unmarked") {
+    return `${levelLabel} 아직 안 정한 ${partLabel} ${count}개예요`;
   }
 
   return `${levelLabel} ${activePart === vocabPartAllValue ? "단어" : partLabel} ${count}개예요`;
@@ -6111,7 +6625,7 @@ function syncFlashcardIndexAfterVocabUpdate(currentCardId, previousIndex) {
 }
 
 function getVisibleFlashcards() {
-  return filterVocabItems(flashcards);
+  return getOrderedStudyCards("vocab", filterVocabItems(flashcards));
 }
 
 function getVisibleVocabList() {
@@ -6236,6 +6750,42 @@ function removeWordFromReviewList(id) {
 
 function isWordSavedToReviewList(id) {
   return Boolean(id) && state.reviewIds.includes(id);
+}
+
+function saveWordToMasteredList(id) {
+  if (!id) {
+    return;
+  }
+
+  if (!state.masteredIds.includes(id)) {
+    state.masteredIds.push(id);
+  }
+
+  state.reviewIds = state.reviewIds.filter((itemId) => itemId !== id);
+}
+
+function removeWordFromMasteredList(id) {
+  if (!id) {
+    return;
+  }
+
+  state.masteredIds = state.masteredIds.filter((itemId) => itemId !== id);
+}
+
+function isWordSavedToMasteredList(id) {
+  return Boolean(id) && state.masteredIds.includes(id);
+}
+
+function createVocabStatusButtonsMarkup(id) {
+  const review = isWordSavedToReviewList(id);
+  const mastered = isWordSavedToMasteredList(id);
+
+  return `
+    <div class="vocab-list-actions">
+      <button class="secondary-btn vocab-status-btn${review ? " is-selected-review" : ""}" type="button" data-word-review="${id}" aria-pressed="${review ? "true" : "false"}">다시 볼래요</button>
+      <button class="secondary-btn vocab-status-btn${mastered ? " is-selected-mastered" : ""}" type="button" data-word-mastered="${id}" aria-pressed="${mastered ? "true" : "false"}">익혔어요!</button>
+    </div>
+  `;
 }
 
 function getVocabQuizResultCounts() {
@@ -6514,7 +7064,7 @@ function restartVocabQuiz() {
   renderVocabPage();
 }
 
-function renderFlashcard() {
+function renderFlashcardLegacy() {
   const activeFilter = getVocabFilter();
   const activeLevel = getVocabLevel();
   const activePart = getVocabPartFilter();
@@ -6552,7 +7102,20 @@ function renderFlashcard() {
       id: "empty-mastered"
     }
   };
-  const source = cards.length ? cards : [emptyCardMap[activeFilter]];
+  const fallbackCard =
+    activeFilter === "unmarked"
+      ? {
+          level: "UNMARKED",
+          word: activePart === vocabPartAllValue ? "아직 안 정한 단어가 없어요." : `아직 안 정한 ${activePart} 단어가 없어요.`,
+          reading: "아직 안 정한 단어를 모두 확인했어요.",
+          meaning:
+            activePart === vocabPartAllValue
+              ? "다시 볼래요나 익혔어요를 빼면 여기서 다시 볼 수 있어요."
+              : "다른 품사를 고르거나 상태를 바꾸면 여기서 다시 볼 수 있어요.",
+          id: "empty-unmarked"
+        }
+      : emptyCardMap[activeFilter] || emptyCardMap.all;
+  const source = cards.length ? cards : [fallbackCard];
   const currentIndex = state.flashcardIndex % source.length;
   const card = source[currentIndex];
   const hasCards = cards.length > 0;
@@ -6608,6 +7171,195 @@ function renderFlashcard() {
   }
 }
 
+function renderVocabListLegacy() {
+  const list = document.getElementById("vocab-list");
+  const pageInfo = document.getElementById("vocab-page-info");
+  const prev = document.getElementById("vocab-page-prev");
+  const next = document.getElementById("vocab-page-next");
+  const summary = document.getElementById("vocab-summary");
+  const activeFilter = getVocabFilter();
+  const items = getVisibleVocabList();
+
+  if (!list || !pageInfo || !prev || !next || !summary) {
+    return;
+  }
+
+  const previousPage = state.vocabPage;
+  clampVocabPage(items);
+  if (state.vocabPage !== previousPage) {
+    saveState();
+  }
+
+  const pageCount = getVocabPageCount(items);
+  const startIndex = (state.vocabPage - 1) * vocabPageSize;
+  const pageItems = items.slice(startIndex, startIndex + vocabPageSize);
+
+  summary.textContent = getVocabSummaryText(items.length);
+  pageInfo.textContent = `${state.vocabPage} / ${pageCount}`;
+  prev.disabled = state.vocabPage <= 1;
+  next.disabled = state.vocabPage >= pageCount;
+
+  if (!pageItems.length) {
+    list.innerHTML = `<p class="vocab-list-empty">${getVocabEmptyMessage(activeFilter)}</p>`;
+    return;
+  }
+
+  list.innerHTML = pageItems
+    .map((item, index) => {
+      const review = isWordSavedToReviewList(item.id);
+      const mastered = isWordSavedToMasteredList(item.id);
+      const badges = [
+        review ? '<span class="vocab-review-badge">다시 볼래요</span>' : "",
+        mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""
+      ]
+        .filter(Boolean)
+        .join("");
+
+      return `
+        <article class="vocab-list-card">
+          <div class="vocab-list-card-head">
+            <span class="vocab-list-index">${startIndex + index + 1}</span>
+            <div class="vocab-status-badges">${badges}</div>
+          </div>
+          <div class="vocab-list-main">
+            <strong class="vocab-list-word">${formatQuizLineBreaks(item.word)}</strong>
+            <p class="vocab-list-reading">${formatQuizLineBreaks(item.reading)}</p>
+          </div>
+          <p class="vocab-list-meaning">${formatQuizLineBreaks(item.meaning)}</p>
+          ${createVocabStatusButtonsMarkup(item.id)}
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderFlashcard() {
+  const activeFilter = getVocabFilter();
+  const activeLevel = getVocabLevel();
+  const activePart = getVocabPartFilter();
+  const cards = getVisibleFlashcards();
+  const flashcard = document.getElementById("flashcard");
+  const flashcardToggle = document.getElementById("flashcard-toggle");
+  const flashcardPrev = document.getElementById("flashcard-prev");
+  const flashcardNext = document.getElementById("flashcard-next");
+  const flashcardAgain = document.getElementById("flashcard-again");
+  const flashcardMastered = document.getElementById("flashcard-mastered");
+  const level = document.getElementById("flashcard-level");
+  const word = document.getElementById("flashcard-word");
+  const reading = document.getElementById("flashcard-reading");
+  const meaning = document.getElementById("flashcard-meaning");
+  const hint = document.getElementById("flashcard-hint");
+
+  if (!flashcard || !flashcardToggle || !level || !word || !reading || !meaning || !hint) {
+    return;
+  }
+
+  const emptyWordLabel = activePart === vocabPartAllValue ? "아직 단어가 없어요" : `아직 ${activePart} 단어가 없어요`;
+  const emptyReadingLabel =
+    activePart === vocabPartAllValue ? "단어가 채워지면 여기서 바로 볼 수 있어요." : `${activePart} 단어가 채워지면 여기서 바로 볼 수 있어요.`;
+  const emptyMeaningLabel =
+    activePart === vocabPartAllValue ? "필터를 바꾸면 다른 단어를 먼저 볼 수 있어요." : "다른 품사나 모아보기를 고르면 바로 이어서 볼 수 있어요.";
+  const emptyCardMap = {
+    all: {
+      level: activeLevel,
+      word: emptyWordLabel,
+      reading: emptyReadingLabel,
+      meaning: emptyMeaningLabel,
+      id: "empty-all"
+    },
+    review: {
+      level: "REVIEW",
+      word: activePart === vocabPartAllValue ? "다시 볼래요 단어가 없어요" : `다시 볼래요 ${activePart} 단어가 없어요`,
+      reading: "조금 더 담아두면 여기서 모아 볼 수 있어요.",
+      meaning:
+        activePart === vocabPartAllValue
+          ? "카드에서 다시 볼래요를 누르면 여기로 모여요."
+          : "다른 품사를 고르거나 상태를 바꾸면 바로 이어서 볼 수 있어요.",
+      id: "empty-review"
+    },
+    mastered: {
+      level: "MASTERED",
+      word: activePart === vocabPartAllValue ? "익혔어요 단어가 없어요" : `익혔어요 ${activePart} 단어가 없어요`,
+      reading: "아직 담아둔 단어가 없어요.",
+      meaning:
+        activePart === vocabPartAllValue
+          ? "카드에서 익혔어요를 누르면 여기로 모여요."
+          : "선택한 품사에서 익힌 단어가 생기면 여기서 다시 볼 수 있어요.",
+      id: "empty-mastered"
+    },
+    unmarked: {
+      level: "UNMARKED",
+      word: activePart === vocabPartAllValue ? "아직 안 정한 단어가 없어요" : `아직 안 정한 ${activePart} 단어가 없어요`,
+      reading: "상태를 고르지 않은 단어를 따로 모아 보고 있어요.",
+      meaning:
+        activePart === vocabPartAllValue
+          ? "다시 볼래요나 익혔어요를 누르면 이 목록에서 빠져요."
+          : "다른 품사나 상태를 고르면 바로 다른 카드로 이어집니다.",
+      id: "empty-unmarked"
+    }
+  };
+  const hasCards = cards.length > 0;
+  const currentIndex = hasCards ? state.flashcardIndex % cards.length : 0;
+  const currentCard = hasCards ? cards[currentIndex] : emptyCardMap[activeFilter] || emptyCardMap.all;
+  const review = hasCards && isWordSavedToReviewList(currentCard.id);
+  const mastered = hasCards && isWordSavedToMasteredList(currentCard.id);
+  const isRevealed = hasCards && state.flashcardRevealed;
+  const hintText = hasCards
+    ? isRevealed
+      ? review
+        ? "다시 볼래요에 담긴 단어예요"
+        : mastered
+          ? "익혔어요에 담긴 단어예요"
+          : "지금 상태를 바로 정할 수 있어요"
+      : "눌러서 뜻을 확인해볼까요?"
+    : activeFilter === "review"
+      ? "다시 볼래요 상태를 담아두면 여기서 모아 볼 수 있어요."
+      : activeFilter === "mastered"
+        ? "익혔어요 상태를 담아두면 여기서 다시 볼 수 있어요."
+        : activeFilter === "unmarked"
+          ? "아직 안 정한 단어만 따로 보고 있어요."
+          : "필터를 바꾸면 다른 단어를 먼저 볼 수 있어요.";
+
+  renderStudyFlashcardComponent({
+    flashcard,
+    toggle: flashcardToggle,
+    prev: flashcardPrev,
+    next: flashcardNext,
+    level,
+    word,
+    reading,
+    meaning,
+    hint,
+    hasCards,
+    isRevealed,
+    revealWhenEmpty: true,
+    levelText: formatStudyLevelLabel(currentCard.level, "N5"),
+    wordText: currentCard.word || "",
+    readingText: currentCard.reading || "",
+    meaningText: currentCard.meaning || "",
+    hintText,
+    toggleOpenLabel: "뜻을 다시 가릴까요?",
+    toggleClosedLabel: "뜻을 확인해볼까요?",
+    toggleEmptyLabel: "지금 볼 수 있는 단어가 없어요",
+    prevDisabled: cards.length <= 1,
+    nextDisabled: cards.length <= 1,
+    actionButtons: [
+      {
+        button: flashcardAgain,
+        selected: review,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      },
+      {
+        button: flashcardMastered,
+        selected: mastered,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      }
+    ]
+  });
+}
+
 function renderVocabList() {
   const list = document.getElementById("vocab-list");
   const pageInfo = document.getElementById("vocab-page-info");
@@ -6643,28 +7395,17 @@ function renderVocabList() {
 
   list.innerHTML = pageItems
     .map((item, index) => {
-      const review = state.reviewIds.includes(item.id);
-      const mastered = state.masteredIds.includes(item.id);
-      const badges = [
-        review ? '<span class="vocab-review-badge">다시 볼래요</span>' : "",
-        mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""
-      ]
-        .filter(Boolean)
-        .join("");
+      const review = isWordSavedToReviewList(item.id);
+      const mastered = isWordSavedToMasteredList(item.id);
 
-      return `
-        <article class="vocab-list-card">
-          <div class="vocab-list-card-head">
-            <span class="vocab-list-index">${startIndex + index + 1}</span>
-            <div class="vocab-status-badges">${badges}</div>
-          </div>
-          <div class="vocab-list-main">
-            <strong class="vocab-list-word">${formatQuizLineBreaks(item.word)}</strong>
-            <p class="vocab-list-reading">${formatQuizLineBreaks(item.reading)}</p>
-          </div>
-          <p class="vocab-list-meaning">${formatQuizLineBreaks(item.meaning)}</p>
-        </article>
-      `;
+      return createStudyListCardMarkup({
+        index: startIndex + index + 1,
+        badgesMarkup: createStudyStatusBadgesMarkup(review, mastered),
+        titleText: formatQuizLineBreaks(item.word),
+        subtitleText: formatQuizLineBreaks(item.reading),
+        descriptionMarkup: `<p class="vocab-list-meaning">${formatQuizLineBreaks(item.meaning)}</p>`,
+        actionsMarkup: createVocabStatusButtonsMarkup(item.id)
+      });
     })
     .join("");
 }
@@ -6759,32 +7500,10 @@ function populateVocabQuizFieldSelect(select, activeField) {
 }
 
 function renderVocabStudyControls(counts, availableParts, activePart) {
-  const optionsShell = document.getElementById("vocab-options-shell");
-  const optionsToggle = document.getElementById("vocab-options-toggle");
-  const optionsPanel = document.getElementById("vocab-options-panel");
-  const optionsSummary = document.getElementById("vocab-options-summary");
   const levelSelect = document.getElementById("vocab-level-select");
   const filterSelect = document.getElementById("vocab-filter-select");
   const partSelect = document.getElementById("vocab-part-select");
   const activeView = getVocabView();
-  const isOptionsOpen = state.vocabOptionsOpen !== false;
-
-  if (optionsSummary) {
-    optionsSummary.textContent = getVocabOptionsSummaryText();
-  }
-
-  if (optionsShell) {
-    optionsShell.classList.toggle("is-open", isOptionsOpen);
-  }
-
-  if (optionsToggle) {
-    optionsToggle.setAttribute("aria-expanded", String(isOptionsOpen));
-  }
-
-  if (optionsPanel) {
-    optionsPanel.hidden = !isOptionsOpen;
-    optionsPanel.setAttribute("aria-hidden", String(!isOptionsOpen));
-  }
 
   document.querySelectorAll("[data-vocab-view]").forEach((button) => {
     const active = button.dataset.vocabView === activeView;
@@ -6879,11 +7598,10 @@ function renderVocabQuiz() {
   const view = document.getElementById("vocab-quiz");
   const resultView = document.getElementById("vocab-quiz-result-view");
   const empty = document.getElementById("vocab-quiz-empty");
-  const stats = document.getElementById("vocab-quiz-stats");
   const card = document.getElementById("vocab-quiz-card");
   const track = document.getElementById("vocab-quiz-track");
   const source = document.getElementById("vocab-quiz-source");
-  const progress = document.getElementById("vocab-quiz-progress-side");
+  const progress = document.getElementById("vocab-quiz-progress");
   const title = document.getElementById("vocab-quiz-title");
   const note = document.getElementById("vocab-quiz-note");
   const prompt = document.getElementById("vocab-quiz-prompt");
@@ -6932,9 +7650,6 @@ function renderVocabQuiz() {
     empty.textContent = canStart
       ? "준비됐다면 시작해볼까요?"
       : getVocabQuizEmptyText(items);
-    if (stats) {
-      stats.hidden = true;
-    }
     card.hidden = true;
     progress.textContent = `0 / ${getVocabQuizCount()}`;
     restart.classList.add("primary-btn");
@@ -6958,9 +7673,6 @@ function renderVocabQuiz() {
     resultView.hidden = true;
     empty.hidden = false;
     empty.textContent = getVocabQuizEmptyText(items);
-    if (stats) {
-      stats.hidden = true;
-    }
     card.hidden = true;
     progress.textContent = "0 / 0";
     restart.classList.add("primary-btn");
@@ -6976,9 +7688,6 @@ function renderVocabQuiz() {
   view.hidden = false;
   resultView.hidden = true;
   empty.hidden = true;
-  if (stats) {
-    stats.hidden = false;
-  }
   card.hidden = false;
   track.textContent = getVocabQuizConfigLabel();
   source.textContent = getVocabQuizSourceLabel();
@@ -6995,9 +7704,6 @@ function renderVocabQuiz() {
     renderQuizSessionHud("vocab");
     view.hidden = true;
     resultView.hidden = false;
-    if (stats) {
-      stats.hidden = true;
-    }
     progress.textContent = `${total} / ${total}`;
     next.hidden = true;
     next.disabled = false;
@@ -7063,12 +7769,6 @@ function renderVocabPage() {
     summary.textContent = getVocabSummaryText(items.length);
   }
 
-  document.querySelectorAll("[data-vocab-level]").forEach((button) => {
-    const active = button.dataset.vocabLevel === activeLevel;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-  });
-
   renderVocabTabLayout();
   renderVocabStudyControls(counts, availableParts, activePart);
   renderVocabQuizControls(counts, availableParts, activePart);
@@ -7122,11 +7822,7 @@ function markFlashcardForReview() {
   const currentIndex = state.flashcardIndex % cards.length;
   const currentCard = cards[currentIndex];
 
-  if (!state.reviewIds.includes(currentCard.id)) {
-    state.reviewIds.push(currentCard.id);
-  }
-
-  state.masteredIds = state.masteredIds.filter((id) => id !== currentCard.id);
+  saveWordToReviewList(currentCard.id);
   updateStudyStreak();
   state.flashcardRevealed = false;
   syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
@@ -7143,11 +7839,7 @@ function markFlashcardMastered() {
   const currentIndex = state.flashcardIndex % cards.length;
   const currentCard = cards[currentIndex];
 
-  if (!state.masteredIds.includes(currentCard.id)) {
-    state.masteredIds.push(currentCard.id);
-  }
-
-  state.reviewIds = state.reviewIds.filter((id) => id !== currentCard.id);
+  saveWordToMasteredList(currentCard.id);
   updateStudyStreak();
   state.flashcardRevealed = false;
   syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
@@ -8198,12 +8890,11 @@ function attachEventListeners() {
   const flashcardAgain = document.getElementById("flashcard-again");
   const flashcardMastered = document.getElementById("flashcard-mastered");
   const vocabTabButtons = document.querySelectorAll("[data-vocab-tab]");
-  const vocabOptionsToggle = document.getElementById("vocab-options-toggle");
-  const vocabLevelButtons = document.querySelectorAll("[data-vocab-level]");
   const vocabViewButtons = document.querySelectorAll("[data-vocab-view]");
   const vocabLevelSelect = document.getElementById("vocab-level-select");
   const vocabFilterSelect = document.getElementById("vocab-filter-select");
   const vocabPartSelect = document.getElementById("vocab-part-select");
+  const vocabList = document.getElementById("vocab-list");
   const vocabPagePrev = document.getElementById("vocab-page-prev");
   const vocabPageNext = document.getElementById("vocab-page-next");
   const vocabQuizOptionsToggle = document.getElementById("vocab-quiz-options-toggle");
@@ -8234,8 +8925,18 @@ function attachEventListeners() {
   const readingNext = document.getElementById("reading-next");
   const basicPracticeNext = document.getElementById("basic-practice-next");
   const kanjiList = document.getElementById("kanji-list");
+  const kanjiOptionsToggle = document.getElementById("kanji-options-toggle");
+  const kanjiGradeButtons = document.querySelectorAll("[data-kanji-grade-option]");
+  const kanjiViewButtons = document.querySelectorAll("[data-kanji-view]");
   const kanjiCollectionSelect = document.getElementById("kanji-collection-select");
   const kanjiGradeSelect = document.getElementById("kanji-grade-select");
+  const kanjiPagePrev = document.getElementById("kanji-page-prev");
+  const kanjiPageNext = document.getElementById("kanji-page-next");
+  const kanjiFlashcardToggle = document.getElementById("kanji-flashcard-toggle");
+  const kanjiFlashcardPrev = document.getElementById("kanji-flashcard-prev");
+  const kanjiFlashcardNext = document.getElementById("kanji-flashcard-next");
+  const kanjiFlashcardReview = document.getElementById("kanji-flashcard-review");
+  const kanjiFlashcardMastered = document.getElementById("kanji-flashcard-mastered");
   const starterKanjiOptionsToggle = document.getElementById("starter-kanji-options-toggle");
   const starterKanjiQuestionField = document.getElementById("starter-kanji-question-field");
   const starterKanjiOptionField = document.getElementById("starter-kanji-option-field");
@@ -8289,26 +8990,42 @@ function attachEventListeners() {
   if (flashcardMastered) {
     flashcardMastered.addEventListener("click", markFlashcardMastered);
   }
+  if (vocabList) {
+    vocabList.addEventListener("click", (event) => {
+      const reviewButton = event.target.closest("[data-word-review]");
+      const masteredButton = event.target.closest("[data-word-mastered]");
+
+      if (!reviewButton && !masteredButton) {
+        return;
+      }
+
+      if (reviewButton) {
+        if (isWordSavedToReviewList(reviewButton.dataset.wordReview)) {
+          removeWordFromReviewList(reviewButton.dataset.wordReview);
+        } else {
+          saveWordToReviewList(reviewButton.dataset.wordReview);
+        }
+      } else if (masteredButton) {
+        if (isWordSavedToMasteredList(masteredButton.dataset.wordMastered)) {
+          removeWordFromMasteredList(masteredButton.dataset.wordMastered);
+        } else {
+          saveWordToMasteredList(masteredButton.dataset.wordMastered);
+        }
+      }
+
+      updateStudyStreak();
+      saveState();
+      renderAll();
+    });
+  }
   vocabTabButtons.forEach((button) => {
     button.addEventListener("click", () => {
       setVocabTab(button.dataset.vocabTab);
     });
   });
-  vocabLevelButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setVocabLevel(button.dataset.vocabLevel);
-    });
-  });
   if (vocabLevelSelect) {
     vocabLevelSelect.addEventListener("change", () => {
       setVocabLevel(vocabLevelSelect.value);
-    });
-  }
-  if (vocabOptionsToggle) {
-    vocabOptionsToggle.addEventListener("click", () => {
-      state.vocabOptionsOpen = !state.vocabOptionsOpen;
-      saveState();
-      renderVocabPage();
     });
   }
   vocabViewButtons.forEach((button) => {
@@ -8571,6 +9288,66 @@ function attachEventListeners() {
   if (basicPracticeNext) {
     basicPracticeNext.addEventListener("click", nextBasicPracticeSet);
   }
+  if (kanjiOptionsToggle) {
+    kanjiOptionsToggle.addEventListener("click", () => {
+      state.kanjiOptionsOpen = !state.kanjiOptionsOpen;
+      saveState();
+      renderKanjiStudyControls();
+    });
+  }
+  kanjiGradeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setKanjiGrade(button.dataset.kanjiGradeOption);
+    });
+  });
+  kanjiViewButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setKanjiView(button.dataset.kanjiView);
+    });
+  });
+  if (kanjiFlashcardToggle) {
+    kanjiFlashcardToggle.addEventListener("click", toggleKanjiFlashcardReveal);
+  }
+  if (kanjiFlashcardPrev) {
+    kanjiFlashcardPrev.addEventListener("click", () => {
+      moveKanjiFlashcard(-1);
+    });
+  }
+  if (kanjiFlashcardNext) {
+    kanjiFlashcardNext.addEventListener("click", () => {
+      moveKanjiFlashcard(1);
+    });
+  }
+  if (kanjiFlashcardReview) {
+    kanjiFlashcardReview.addEventListener("click", markKanjiFlashcardForReview);
+  }
+  if (kanjiFlashcardMastered) {
+    kanjiFlashcardMastered.addEventListener("click", markKanjiFlashcardMastered);
+  }
+  if (kanjiPagePrev) {
+    kanjiPagePrev.addEventListener("click", () => {
+      if (state.kanjiPage <= 1) {
+        return;
+      }
+
+      state.kanjiPage -= 1;
+      saveState();
+      renderKanjiPageLayout();
+    });
+  }
+  if (kanjiPageNext) {
+    kanjiPageNext.addEventListener("click", () => {
+      const pageCount = getKanjiPageCount(getVisibleKanjiItems());
+
+      if (state.kanjiPage >= pageCount) {
+        return;
+      }
+
+      state.kanjiPage += 1;
+      saveState();
+      renderKanjiPageLayout();
+    });
+  }
   if (kanjiList) {
     kanjiList.addEventListener("click", (event) => {
       const reviewButton = event.target.closest("[data-kanji-review]");
@@ -8594,7 +9371,9 @@ function attachEventListeners() {
         }
       }
 
+      updateStudyStreak();
       saveState();
+      renderStats();
       renderKanjiPageLayout();
     });
   }

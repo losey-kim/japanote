@@ -12,7 +12,7 @@ function getKanjiMatchSyncStore() {
 const kanjiMatchGradeOptions = ["all", "1", "2", "3", "4", "5", "6"];
 const kanjiMatchDurationOptions = [0, 10, 15, 20];
 const kanjiMatchTotalCountOptions = [5, 10, 15, 20];
-const kanjiMatchFilterOptions = ["all", "review", "mastered"];
+const kanjiMatchFilterOptions = ["all", "review", "mastered", "unmarked"];
 const kanjiMatchResultFilterOptions = ["all", "correct", "wrong"];
 const kanjiMatchPageSize = 5;
 const kanjiMatchWrongFlashDuration = 520;
@@ -35,7 +35,8 @@ const kanjiMatchResultFilterLabels = {
 const kanjiMatchFilterLabels = {
   all: "전체",
   review: "다시 볼래요",
-  mastered: "익혔어요"
+  mastered: "익혔어요",
+  unmarked: "아직 안 정했어요"
 };
 
 function normalizeKanjiMatchText(value) {
@@ -258,6 +259,10 @@ function filterKanjiMatchPool(items, filter = kanjiMatchPreferences.filter, grad
     return filteredByGrade.filter((item) => masteredIds.includes(item.id));
   }
 
+  if (activeFilter === "unmarked") {
+    return filteredByGrade.filter((item) => !reviewIds.includes(item.id) && !masteredIds.includes(item.id));
+  }
+
   return filteredByGrade;
 }
 
@@ -266,7 +271,8 @@ function getKanjiMatchFilterCounts(items = getBaseKanjiMatchPool()) {
   return {
     all: filterKanjiMatchPool(items, "all", activeGrade).length,
     review: filterKanjiMatchPool(items, "review", activeGrade).length,
-    mastered: filterKanjiMatchPool(items, "mastered", activeGrade).length
+    mastered: filterKanjiMatchPool(items, "mastered", activeGrade).length,
+    unmarked: filterKanjiMatchPool(items, "unmarked", activeGrade).length
   };
 }
 
@@ -492,11 +498,27 @@ function renderKanjiMatchTimer() {
     return;
   }
 
+  const warning =
+    activeDuration > 0 && kanjiMatchState.timeLeft <= Math.max(10, Math.floor(activeDuration / 3));
+  const progress = activeDuration > 0 ? Math.max(0, Math.min(1, kanjiMatchState.timeLeft / activeDuration)) : 0;
+  const timerItem = timer.closest(".quiz-hud-item");
+
   timer.textContent = activeDuration <= 0 ? "천천히" : `${kanjiMatchState.timeLeft}초`;
-  timer.classList.toggle(
-    "is-warning",
-    activeDuration > 0 && kanjiMatchState.timeLeft <= Math.max(10, Math.floor(activeDuration / 3))
-  );
+  timer.classList.toggle("is-warning", warning);
+
+  if (!timerItem) {
+    return;
+  }
+
+  if (typeof updateQuizTimerItem === "function") {
+    updateQuizTimerItem(timerItem, progress, warning, activeDuration <= 0);
+    return;
+  }
+
+  timerItem.classList.add("is-timer");
+  timerItem.classList.toggle("is-warning", warning);
+  timerItem.classList.toggle("is-static", activeDuration <= 0);
+  timerItem.style.setProperty("--timer-progress", progress.toFixed(3));
 }
 
 function renderKanjiMatchStats() {

@@ -128,6 +128,318 @@
     `;
   }
 
+  function createStudyViewSwitch({ ariaLabel, buttons = [] }) {
+    const buttonMarkup = buttons
+      .map((button) => {
+        const attributes = renderAttributes(button.attributes || {});
+        const spacing = attributes ? ` ${attributes}` : "";
+        const className = ["study-view-button", button.className].filter(Boolean).join(" ");
+
+        return `
+          <button class="${escapeHtml(className)}" type="button"${spacing}>
+            <span class="material-symbols-rounded" aria-hidden="true">${escapeHtml(button.icon)}</span>
+          </button>
+        `;
+      })
+      .join("");
+
+    return `<div class="study-view-switch" role="tablist" aria-label="${escapeHtml(ariaLabel)}">${buttonMarkup}</div>`;
+  }
+
+  function createStudyFlashcardBlock({
+    viewId,
+    viewClassName = "vocab-card-view",
+    articleClassName = "flashcard",
+    articleId,
+    toggleId,
+    meaningId,
+    levelId,
+    levelText,
+    wordId,
+    wordText,
+    readingId,
+    readingText,
+    readingHidden = false,
+    meaningText,
+    hintId,
+    hintText,
+    navAriaLabel,
+    prevButton,
+    nextButton,
+    actionButtons = []
+  }) {
+    const actionMarkup = actionButtons
+      .map((button) => `<button class="${escapeHtml(button.className)}" id="${escapeHtml(button.id)}" type="button">${escapeHtml(button.label)}</button>`)
+      .join("");
+
+    return `
+      <div class="${escapeHtml(viewClassName)}" id="${escapeHtml(viewId)}">
+        <article class="${escapeHtml(articleClassName)}" id="${escapeHtml(articleId)}" aria-live="polite">
+          <button class="flashcard-toggle" id="${escapeHtml(toggleId)}" type="button" aria-controls="${escapeHtml(meaningId)}" aria-expanded="false">
+            <span class="flashcard-level" id="${escapeHtml(levelId)}">${escapeHtml(levelText)}</span>
+            <div class="flashcard-copy">
+              <strong class="flashcard-word${articleClassName.includes("kanji-flashcard") ? " kanji-flashcard-word" : ""}" id="${escapeHtml(wordId)}">${escapeHtml(wordText)}</strong>
+              <p class="flashcard-reading${articleClassName.includes("kanji-flashcard") ? " kanji-flashcard-reading" : ""}" id="${escapeHtml(readingId)}"${readingHidden ? " hidden" : ""}>${escapeHtml(readingText)}</p>
+              <p class="flashcard-meaning${articleClassName.includes("kanji-flashcard") ? " kanji-flashcard-meaning" : ""}" id="${escapeHtml(meaningId)}">${escapeHtml(meaningText)}</p>
+            </div>
+            <span class="flashcard-hint" id="${escapeHtml(hintId)}">${escapeHtml(hintText)}</span>
+          </button>
+          <div class="flashcard-inline-nav" aria-label="${escapeHtml(navAriaLabel)}">
+            <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="${escapeHtml(prevButton.id)}" type="button" aria-label="${escapeHtml(prevButton.ariaLabel)}" title="${escapeHtml(prevButton.title)}"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span></button>
+            <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="${escapeHtml(nextButton.id)}" type="button" aria-label="${escapeHtml(nextButton.ariaLabel)}" title="${escapeHtml(nextButton.title)}"><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
+          </div>
+        </article>
+        <div class="flashcard-actions">
+          ${actionMarkup}
+        </div>
+      </div>
+    `;
+  }
+
+  function createStudyListBlock({
+    viewId,
+    viewClassName = "vocab-list-view",
+    listClassName = "vocab-list",
+    listId,
+    prevId,
+    pageInfoId,
+    nextId
+  }) {
+    return `
+      <div class="${escapeHtml(viewClassName)}" id="${escapeHtml(viewId)}" hidden>
+        <div class="${escapeHtml(listClassName)}" id="${escapeHtml(listId)}"></div>
+        <div class="vocab-pagination">
+          <button class="secondary-btn button-with-icon" id="${escapeHtml(prevId)}" type="button"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span><span>이전</span></button>
+          <span class="vocab-page-info" id="${escapeHtml(pageInfoId)}">1 / 1</span>
+          <button class="secondary-btn button-with-icon" id="${escapeHtml(nextId)}" type="button"><span>다음</span><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
+        </div>
+      </div>
+    `;
+  }
+
+  function createStudyCatalogLayout({
+    toolbarClassName = "vocab-select-toolbar",
+    toolbarAriaLabel,
+    selectFields = [],
+    summaryId,
+    summaryText,
+    viewSwitchAriaLabel,
+    viewButtons,
+    flashcard,
+    listView
+  }) {
+    return `
+      <div class="flashcard-panel">
+        <div class="${escapeHtml(toolbarClassName)}" aria-label="${escapeHtml(toolbarAriaLabel)}">
+          ${selectFields.join("")}
+        </div>
+        <div class="study-panel-head">
+          <p class="vocab-summary" id="${escapeHtml(summaryId)}">${escapeHtml(summaryText)}</p>
+          ${createStudyViewSwitch({ ariaLabel: viewSwitchAriaLabel, buttons: viewButtons })}
+        </div>
+        ${createStudyFlashcardBlock(flashcard)}
+        ${createStudyListBlock(listView)}
+      </div>
+    `;
+  }
+
+  function createVocabCatalogLayout() {
+    return createStudyCatalogLayout({
+      toolbarAriaLabel: "단어 필터",
+      selectFields: [
+        createSelectField({
+          id: "vocab-level-select",
+          label: "레벨",
+          ariaLabel: "단어 레벨 고르기",
+          options: [
+            { value: "N5", label: "N5" },
+            { value: "N4", label: "N4" },
+            { value: "N3", label: "N3" },
+            { value: "all", label: "전체" }
+          ]
+        }),
+        createSelectField({
+          id: "vocab-filter-select",
+          label: "모아보기",
+          ariaLabel: "단어 모아보기 고르기",
+          options: [
+            { value: "all", label: "전체" },
+            { value: "review", label: "다시 볼래요" },
+            { value: "mastered", label: "익혔어요" },
+            { value: "unmarked", label: "아직 안 정했어요" }
+          ]
+        }),
+        createSelectField({
+          id: "vocab-part-select",
+          label: "품사",
+          ariaLabel: "품사별로 보기",
+          options: [{ value: "all", label: "전체 품사" }]
+        })
+      ],
+      summaryId: "vocab-summary",
+      summaryText: "0개 모였어요",
+      viewSwitchAriaLabel: "단어 보기 방식 고르기",
+      viewButtons: [
+        {
+          icon: "style",
+          className: "is-active",
+          attributes: {
+            "data-vocab-view": "card",
+            "aria-pressed": "true",
+            "aria-label": "카드로 보기",
+            title: "카드로 보기"
+          }
+        },
+        {
+          icon: "view_list",
+          attributes: {
+            "data-vocab-view": "list",
+            "aria-pressed": "false",
+            "aria-label": "목록으로 보기",
+            title: "목록으로 보기"
+          }
+        }
+      ],
+      flashcard: {
+        viewId: "vocab-card-view",
+        articleId: "flashcard",
+        toggleId: "flashcard-toggle",
+        meaningId: "flashcard-meaning",
+        levelId: "flashcard-level",
+        levelText: "N5",
+        wordId: "flashcard-word",
+        wordText: "불러오는 중이에요",
+        readingId: "flashcard-reading",
+        readingText: "단어를 불러오고 있어요.",
+        meaningText: "뜻도 곧 보여줄게요.",
+        hintId: "flashcard-hint",
+        hintText: "눌러서 뜻을 확인해봐요.",
+        navAriaLabel: "단어 넘기기",
+        prevButton: {
+          id: "flashcard-prev",
+          ariaLabel: "이전 카드",
+          title: "이전 카드"
+        },
+        nextButton: {
+          id: "flashcard-next",
+          ariaLabel: "다음 카드",
+          title: "다음 카드"
+        },
+        actionButtons: [
+          { id: "flashcard-again", className: "secondary-btn", label: "다시 볼래요" },
+          { id: "flashcard-mastered", className: "primary-btn", label: "익혔어요!" }
+        ]
+      },
+      listView: {
+        viewId: "vocab-list-view",
+        listId: "vocab-list",
+        prevId: "vocab-page-prev",
+        pageInfoId: "vocab-page-info",
+        nextId: "vocab-page-next"
+      }
+    });
+  }
+
+  function createKanjiCatalogLayout() {
+    return createStudyCatalogLayout({
+      toolbarClassName: "vocab-select-toolbar kanji-filter-toolbar",
+      toolbarAriaLabel: "한자 필터",
+      selectFields: [
+        createSelectField({
+          id: "kanji-collection-select",
+          label: "모아보기",
+          ariaLabel: "한자 모아보기 고르기",
+          options: [
+            { value: "all", label: "전체" },
+            { value: "review", label: "다시 볼래요" },
+            { value: "mastered", label: "익혔어요" },
+            { value: "unmarked", label: "아직 안 정했어요" }
+          ]
+        }),
+        createSelectField({
+          id: "kanji-grade-select",
+          label: "학년",
+          ariaLabel: "한자 학년 고르기",
+          options: [
+            { value: "all", label: "전체" },
+            { value: "1", label: "1학년" },
+            { value: "2", label: "2학년" },
+            { value: "3", label: "3학년" },
+            { value: "4", label: "4학년" },
+            { value: "5", label: "5학년" },
+            { value: "6", label: "6학년" }
+          ]
+        })
+      ],
+      summaryId: "kanji-summary",
+      summaryText: "0개 한자를 준비하고 있어요",
+      viewSwitchAriaLabel: "한자 보기 방식 고르기",
+      viewButtons: [
+        {
+          icon: "style",
+          className: "is-active",
+          attributes: {
+            "data-kanji-view": "card",
+            "aria-pressed": "true",
+            "aria-label": "카드로 보기",
+            title: "카드로 보기"
+          }
+        },
+        {
+          icon: "view_list",
+          attributes: {
+            "data-kanji-view": "list",
+            "aria-pressed": "false",
+            "aria-label": "목록으로 보기",
+            title: "목록으로 보기"
+          }
+        }
+      ],
+      flashcard: {
+        viewId: "kanji-card-view",
+        viewClassName: "vocab-card-view kanji-card-view",
+        articleClassName: "flashcard kanji-flashcard",
+        articleId: "kanji-flashcard",
+        toggleId: "kanji-flashcard-toggle",
+        meaningId: "kanji-flashcard-meaning",
+        levelId: "kanji-flashcard-level",
+        levelText: "한자",
+        wordId: "kanji-flashcard-word",
+        wordText: "漢字",
+        readingId: "kanji-flashcard-reading",
+        readingText: "",
+        readingHidden: true,
+        meaningText: "かんじ",
+        hintId: "kanji-flashcard-hint",
+        hintText: "눌러서 읽기를 확인해볼까요?",
+        navAriaLabel: "한자 익히기",
+        prevButton: {
+          id: "kanji-flashcard-prev",
+          ariaLabel: "이전 한자",
+          title: "이전 한자"
+        },
+        nextButton: {
+          id: "kanji-flashcard-next",
+          ariaLabel: "다음 한자",
+          title: "다음 한자"
+        },
+        actionButtons: [
+          { id: "kanji-flashcard-review", className: "secondary-btn", label: "다시 볼래요" },
+          { id: "kanji-flashcard-mastered", className: "primary-btn", label: "익혔어요!" }
+        ]
+      },
+      listView: {
+        viewId: "kanji-list-view",
+        viewClassName: "vocab-list-view kanji-list-view",
+        listClassName: "vocab-list kanji-list",
+        listId: "kanji-list",
+        prevId: "kanji-page-prev",
+        pageInfoId: "kanji-page-info",
+        nextId: "kanji-page-next"
+      }
+    });
+  }
+
   function createChoiceQuizCard({
     articleId,
     className,
@@ -909,6 +1221,17 @@
     }
   }
 
+  function createStudyLayout(kind) {
+    switch (kind) {
+      case "vocab-catalog":
+        return createVocabCatalogLayout();
+      case "kanji-catalog":
+        return createKanjiCatalogLayout();
+      default:
+        return "";
+    }
+  }
+
   function mountSharedQuizLayouts() {
     document.querySelectorAll("[data-shared-quiz-layout]").forEach((container) => {
       if (container.dataset.sharedQuizMounted === "true") {
@@ -926,13 +1249,35 @@
     });
   }
 
+  function mountSharedStudyLayouts() {
+    document.querySelectorAll("[data-shared-study-layout]").forEach((container) => {
+      if (container.dataset.sharedStudyMounted === "true") {
+        return;
+      }
+
+      const markup = createStudyLayout(container.dataset.sharedStudyLayout);
+
+      if (!markup) {
+        return;
+      }
+
+      container.innerHTML = markup;
+      container.dataset.sharedStudyMounted = "true";
+    });
+  }
+
   global.japanoteSharedQuizLayouts = {
-    mount: mountSharedQuizLayouts
+    mount: mountSharedQuizLayouts,
+    mountStudy: mountSharedStudyLayouts
   };
 
   mountSharedQuizLayouts();
+  mountSharedStudyLayouts();
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", mountSharedQuizLayouts, { once: true });
+    document.addEventListener("DOMContentLoaded", () => {
+      mountSharedQuizLayouts();
+      mountSharedStudyLayouts();
+    }, { once: true });
   }
 })(globalThis);

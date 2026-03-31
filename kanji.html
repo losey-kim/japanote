@@ -52,77 +52,7 @@
         </div>
         <div class="vocab-tab-panels kanji-tab-panels">
           <section class="vocab-tab-panel kanji-tab-panel" id="kanji-tab-panel-list" data-kanji-tab-panel="list" role="tabpanel" aria-labelledby="kanji-tab-list">
-            <div class="flashcard-panel">
-              <div class="vocab-select-toolbar kanji-filter-toolbar" aria-label="한자 필터">
-                <label class="vocab-select-field" for="kanji-collection-select">
-                  <span>모아보기</span>
-                  <div class="vocab-select-wrap">
-                    <select class="vocab-select" id="kanji-collection-select" aria-label="한자 모아보기 고르기">
-                      <option value="all">전체</option>
-                      <option value="review">다시 볼래요</option>
-                      <option value="mastered">익혔어요</option>
-                      <option value="unmarked">아직 안 정했어요</option>
-                    </select>
-                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-                  </div>
-                </label>
-                <label class="vocab-select-field" for="kanji-grade-select">
-                  <span>학년</span>
-                  <div class="vocab-select-wrap">
-                    <select class="vocab-select" id="kanji-grade-select" aria-label="한자 학년 고르기">
-                      <option value="all">전체</option>
-                      <option value="1">1학년</option>
-                      <option value="2">2학년</option>
-                      <option value="3">3학년</option>
-                      <option value="4">4학년</option>
-                      <option value="5">5학년</option>
-                      <option value="6">6학년</option>
-                    </select>
-                    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-                  </div>
-                </label>
-              </div>
-              <div class="study-panel-head">
-                <p class="vocab-summary" id="kanji-summary">0개 한자를 준비하고 있어요</p>
-                <div class="study-view-switch" role="tablist" aria-label="한자 보기 방식 고르기">
-                  <button class="study-view-button is-active" type="button" data-kanji-view="card" aria-pressed="true" aria-label="카드로 보기" title="카드로 보기">
-                    <span class="material-symbols-rounded" aria-hidden="true">style</span>
-                  </button>
-                  <button class="study-view-button" type="button" data-kanji-view="list" aria-pressed="false" aria-label="목록으로 보기" title="목록으로 보기">
-                    <span class="material-symbols-rounded" aria-hidden="true">view_list</span>
-                  </button>
-                </div>
-              </div>
-              <div class="vocab-card-view kanji-card-view" id="kanji-card-view">
-                <article class="flashcard kanji-flashcard" id="kanji-flashcard" aria-live="polite">
-                  <button class="flashcard-toggle" id="kanji-flashcard-toggle" type="button" aria-controls="kanji-flashcard-meaning" aria-expanded="false">
-                    <span class="flashcard-level" id="kanji-flashcard-level">한자</span>
-                    <div class="flashcard-copy">
-                      <strong class="flashcard-word kanji-flashcard-word" id="kanji-flashcard-word">漢字</strong>
-                      <p class="flashcard-reading kanji-flashcard-reading" id="kanji-flashcard-reading" hidden></p>
-                      <p class="flashcard-meaning kanji-flashcard-meaning" id="kanji-flashcard-meaning">かんじ</p>
-                    </div>
-                    <span class="flashcard-hint" id="kanji-flashcard-hint">눌러서 읽기를 확인해볼까요?</span>
-                  </button>
-                  <div class="flashcard-inline-nav" aria-label="한자 익히기">
-                    <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="kanji-flashcard-prev" type="button" aria-label="이전 한자" title="이전 한자"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span></button>
-                    <button class="secondary-btn flashcard-nav-btn icon-only-btn" id="kanji-flashcard-next" type="button" aria-label="다음 한자" title="다음 한자"><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
-                  </div>
-                </article>
-                <div class="flashcard-actions">
-                  <button class="secondary-btn" id="kanji-flashcard-review" type="button">다시 볼래요</button>
-                  <button class="primary-btn" id="kanji-flashcard-mastered" type="button">익혔어요!</button>
-                </div>
-              </div>
-              <div class="vocab-list-view kanji-list-view" id="kanji-list-view" hidden>
-                <div class="vocab-list kanji-list" id="kanji-list"></div>
-                <div class="vocab-pagination">
-                  <button class="secondary-btn button-with-icon" id="kanji-page-prev" type="button"><span class="material-symbols-rounded" aria-hidden="true">chevron_left</span><span>이전</span></button>
-                  <span class="vocab-page-info" id="kanji-page-info">1 / 1</span>
-                  <button class="secondary-btn button-with-icon" id="kanji-page-next" type="button"><span>다음</span><span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></button>
-                </div>
-              </div>
-            </div>
+            <div data-shared-study-layout="kanji-catalog"></div>
           </section>
           <section class="vocab-tab-panel kanji-tab-panel" id="kanji-tab-panel-practice" data-kanji-tab-panel="practice" role="tabpanel" aria-labelledby="kanji-tab-practice" hidden aria-hidden="true">
             <div data-shared-quiz-layout="starter-kanji-practice"></div>

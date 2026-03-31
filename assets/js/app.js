@@ -5362,18 +5362,6 @@ function getStarterKanjiResultDetail(item) {
   return parts.join(" · ");
 }
 
-function createKanjiStatusButtonsMarkup(id) {
-  const review = isKanjiSavedToReviewList(id);
-  const mastered = isKanjiSavedToMasteredList(id);
-
-  return `
-    <div class="kanji-status-actions">
-      <button class="secondary-btn kanji-status-btn${review ? " is-selected-review" : ""}" type="button" data-kanji-review="${id}" aria-pressed="${review ? "true" : "false"}">다시 볼래요</button>
-      <button class="secondary-btn kanji-status-btn${mastered ? " is-selected-mastered" : ""}" type="button" data-kanji-mastered="${id}" aria-pressed="${mastered ? "true" : "false"}">익혔어요!</button>
-    </div>
-  `;
-}
-
 function createStudyStatusBadgesMarkup(review, mastered) {
   return [
     review ? '<span class="vocab-review-badge">다시 볼래요</span>' : "",
@@ -5381,6 +5369,35 @@ function createStudyStatusBadgesMarkup(review, mastered) {
   ]
     .filter(Boolean)
     .join("");
+}
+
+function createStudyStatusButtonsMarkup({
+  id,
+  groupClassName,
+  buttonClassName,
+  reviewAttribute,
+  masteredAttribute,
+  reviewSelected,
+  masteredSelected
+}) {
+  return `
+    <div class="${groupClassName}">
+      <button class="secondary-btn ${buttonClassName}${reviewSelected ? " is-selected-review" : ""}" type="button" ${reviewAttribute}="${id}" aria-pressed="${reviewSelected ? "true" : "false"}">다시 볼래요</button>
+      <button class="secondary-btn ${buttonClassName}${masteredSelected ? " is-selected-mastered" : ""}" type="button" ${masteredAttribute}="${id}" aria-pressed="${masteredSelected ? "true" : "false"}">익혔어요!</button>
+    </div>
+  `;
+}
+
+function createKanjiStatusButtonsMarkup(id) {
+  return createStudyStatusButtonsMarkup({
+    id,
+    groupClassName: "kanji-status-actions",
+    buttonClassName: "kanji-status-btn",
+    reviewAttribute: "data-kanji-review",
+    masteredAttribute: "data-kanji-mastered",
+    reviewSelected: isKanjiSavedToReviewList(id),
+    masteredSelected: isKanjiSavedToMasteredList(id)
+  });
 }
 
 function applyStudyActionButtonState(button, selected, selectedClass, idleClass, disabled) {
@@ -5487,6 +5504,99 @@ function createStudyListCardMarkup({
       ${actionsMarkup}
     </article>
   `;
+}
+
+function syncStudyViewButtons(selector, attributeName, activeValue) {
+  document.querySelectorAll(selector).forEach((button) => {
+    const active = button.getAttribute(attributeName) === activeValue;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function renderPagedStudyList({
+  list,
+  pageInfo,
+  prev,
+  next,
+  items,
+  page,
+  pageSize,
+  emptyMessage,
+  onPageChange,
+  renderItem
+}) {
+  if (!list || !pageInfo || !prev || !next) {
+    return;
+  }
+
+  const safeItems = Array.isArray(items) ? items : [];
+  const pageCount = Math.max(1, Math.ceil(safeItems.length / pageSize));
+  const activePage = Math.min(Math.max(page, 1), pageCount);
+  const startIndex = (activePage - 1) * pageSize;
+  const pageItems = safeItems.slice(startIndex, startIndex + pageSize);
+
+  if (activePage !== page && typeof onPageChange === "function") {
+    onPageChange(activePage);
+  }
+
+  pageInfo.textContent = `${activePage} / ${pageCount}`;
+  prev.disabled = activePage <= 1;
+  next.disabled = activePage >= pageCount;
+
+  if (!pageItems.length) {
+    list.innerHTML = `<p class="vocab-list-empty">${emptyMessage}</p>`;
+    return;
+  }
+
+  list.innerHTML = pageItems
+    .map((item, index) => renderItem(item, startIndex + index + 1))
+    .join("");
+}
+
+function toggleStudyFlashcardReveal(revealedKey, render) {
+  state[revealedKey] = !state[revealedKey];
+  updateStudyStreak();
+  saveState();
+  render();
+}
+
+function moveStudyFlashcard(step, { getCards, indexKey, revealedKey, render }) {
+  const cards = getCards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  state[indexKey] = (state[indexKey] + step + cards.length) % cards.length;
+  state[revealedKey] = false;
+  saveState();
+  render();
+}
+
+function markStudyFlashcardStatus({
+  getCards,
+  indexKey,
+  revealedKey,
+  saveItem,
+  syncIndexAfterUpdate,
+  render
+}) {
+  const cards = getCards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = state[indexKey] % cards.length;
+  const currentCard = cards[currentIndex];
+
+  saveItem(currentCard.id);
+  updateStudyStreak();
+  state[revealedKey] = false;
+  syncIndexAfterUpdate(currentCard.id, currentIndex);
+  saveState();
+  render();
 }
 
 function renderStarterKanjiResults() {
@@ -5699,56 +5809,6 @@ function renderStarterKanjiPractice() {
   resetQuizSessionTimer("starterKanji", handleStarterKanjiPracticeTimeout);
 }
 
-function renderKanjiList() {
-  const list = document.getElementById("kanji-list");
-  const collectionSelect = document.getElementById("kanji-collection-select");
-  const gradeSelect = document.getElementById("kanji-grade-select");
-  const items = getVisibleKanjiItems();
-  const collectionCounts = getKanjiCollectionCounts();
-  const gradeCounts = getKanjiGradeCounts(getKanjiCollectionItems());
-
-  populateKanjiCollectionSelect(collectionSelect, collectionCounts, getKanjiCollectionFilter());
-  populateKanjiGradeSelect(gradeSelect, gradeCounts, getKanjiGrade());
-
-  if (!list) {
-    return;
-  }
-
-  if (!items.length) {
-    list.innerHTML = `<p class="vocab-list-empty">${getKanjiEmptyMessage()}</p>`;
-    return;
-  }
-
-  list.innerHTML = items
-    .map((item, index) => {
-      const review = isKanjiSavedToReviewList(item.id);
-      const mastered = isKanjiSavedToMasteredList(item.id);
-      const badges = [
-        review ? '<span class="vocab-review-badge">다시 볼래요</span>' : "",
-        mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""
-      ]
-        .filter(Boolean)
-        .join("");
-
-      return `
-        <article class="vocab-list-card">
-          <div class="vocab-list-card-head">
-            <div class="kanji-list-head-meta">
-              <span class="vocab-list-index">${index + 1}</span>
-            </div>
-            <div class="vocab-status-badges">${badges}</div>
-          </div>
-          <div class="kanji-list-main">
-            <strong class="kanji-list-char">${formatQuizLineBreaks(item.display)}</strong>
-            <p class="vocab-list-reading">${formatQuizLineBreaks(item.readingsDisplay || item.reading)}</p>
-          </div>
-          ${createKanjiStatusButtonsMarkup(item.id)}
-        </article>
-      `;
-    })
-    .join("");
-}
-
 function getKanjiSummaryText(count, collectionFilter = state?.kanjiCollectionFilter, grade = state?.kanjiGrade) {
   const activeCollectionFilter = getKanjiCollectionFilter(collectionFilter);
   const collectionLabel = getKanjiCollectionSummaryLabel(activeCollectionFilter);
@@ -5824,12 +5884,7 @@ function renderKanjiStudyControls() {
     summary.textContent = getKanjiSummaryText(visibleItems.length);
   }
 
-  document.querySelectorAll("[data-kanji-view]").forEach((button) => {
-    const active = button.dataset.kanjiView === activeView;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-
+  syncStudyViewButtons("[data-kanji-view]", "data-kanji-view", activeView);
   populateKanjiCollectionSelect(collectionSelect, collectionCounts, getKanjiCollectionFilter());
   populateKanjiGradeSelect(gradeSelect, gradeCounts, getKanjiGrade());
 }
@@ -5929,36 +5984,25 @@ function renderKanjiList() {
   const next = document.getElementById("kanji-page-next");
   const items = getVisibleKanjiItems();
 
-  if (!list || !pageInfo || !prev || !next) {
-    return;
-  }
-
-  const previousPage = state.kanjiPage;
-  clampKanjiPage(items);
-  if (state.kanjiPage !== previousPage) {
-    saveState();
-  }
-
-  const pageCount = getKanjiPageCount(items);
-  const startIndex = (state.kanjiPage - 1) * kanjiPageSize;
-  const pageItems = items.slice(startIndex, startIndex + kanjiPageSize);
-
-  pageInfo.textContent = `${state.kanjiPage} / ${pageCount}`;
-  prev.disabled = state.kanjiPage <= 1;
-  next.disabled = state.kanjiPage >= pageCount;
-
-  if (!pageItems.length) {
-    list.innerHTML = `<p class="vocab-list-empty">${getKanjiEmptyMessage()}</p>`;
-    return;
-  }
-
-  list.innerHTML = pageItems
-    .map((item, index) => {
+  renderPagedStudyList({
+    list,
+    pageInfo,
+    prev,
+    next,
+    items,
+    page: state.kanjiPage,
+    pageSize: kanjiPageSize,
+    emptyMessage: getKanjiEmptyMessage(),
+    onPageChange: (page) => {
+      state.kanjiPage = page;
+      saveState();
+    },
+    renderItem: (item, displayIndex) => {
       const review = isKanjiSavedToReviewList(item.id);
       const mastered = isKanjiSavedToMasteredList(item.id);
 
       return createStudyListCardMarkup({
-        index: startIndex + index + 1,
+        index: displayIndex,
         badgesMarkup: createStudyStatusBadgesMarkup(review, mastered),
         mainClassName: "vocab-list-main kanji-list-main",
         titleClassName: "vocab-list-word kanji-list-char",
@@ -5966,8 +6010,8 @@ function renderKanjiList() {
         subtitleText: formatQuizLineBreaks(item.readingsDisplay || item.reading),
         actionsMarkup: createKanjiStatusButtonsMarkup(item.id)
       });
-    })
-    .join("");
+    }
+  });
 }
 
 function renderKanjiPageLayout() {
@@ -6233,62 +6277,47 @@ function setKanjiView(view) {
 }
 
 function toggleKanjiFlashcardReveal() {
-  state.kanjiFlashcardRevealed = !state.kanjiFlashcardRevealed;
-  updateStudyStreak();
-  saveState();
-  renderKanjiPageLayout();
-  renderStats();
+  toggleStudyFlashcardReveal("kanjiFlashcardRevealed", () => {
+    renderKanjiPageLayout();
+    renderStats();
+  });
 }
 
 function moveKanjiFlashcard(step) {
-  const cards = getVisibleKanjiCards();
-
-  if (!cards.length) {
-    return;
-  }
-
-  state.kanjiFlashcardIndex = (state.kanjiFlashcardIndex + step + cards.length) % cards.length;
-  state.kanjiFlashcardRevealed = false;
-  saveState();
-  renderKanjiPageLayout();
+  moveStudyFlashcard(step, {
+    getCards: getVisibleKanjiCards,
+    indexKey: "kanjiFlashcardIndex",
+    revealedKey: "kanjiFlashcardRevealed",
+    render: renderKanjiPageLayout
+  });
 }
 
 function markKanjiFlashcardForReview() {
-  const cards = getVisibleKanjiCards();
-
-  if (!cards.length) {
-    return;
-  }
-
-  const currentIndex = state.kanjiFlashcardIndex % cards.length;
-  const currentCard = cards[currentIndex];
-
-  saveKanjiToReviewList(currentCard.id);
-  updateStudyStreak();
-  state.kanjiFlashcardRevealed = false;
-  syncKanjiFlashcardIndexAfterUpdate(currentCard.id, currentIndex);
-  saveState();
-  renderKanjiPageLayout();
-  renderStats();
+  markStudyFlashcardStatus({
+    getCards: getVisibleKanjiCards,
+    indexKey: "kanjiFlashcardIndex",
+    revealedKey: "kanjiFlashcardRevealed",
+    saveItem: saveKanjiToReviewList,
+    syncIndexAfterUpdate: syncKanjiFlashcardIndexAfterUpdate,
+    render: () => {
+      renderKanjiPageLayout();
+      renderStats();
+    }
+  });
 }
 
 function markKanjiFlashcardMastered() {
-  const cards = getVisibleKanjiCards();
-
-  if (!cards.length) {
-    return;
-  }
-
-  const currentIndex = state.kanjiFlashcardIndex % cards.length;
-  const currentCard = cards[currentIndex];
-
-  saveKanjiToMasteredList(currentCard.id);
-  updateStudyStreak();
-  state.kanjiFlashcardRevealed = false;
-  syncKanjiFlashcardIndexAfterUpdate(currentCard.id, currentIndex);
-  saveState();
-  renderKanjiPageLayout();
-  renderStats();
+  markStudyFlashcardStatus({
+    getCards: getVisibleKanjiCards,
+    indexKey: "kanjiFlashcardIndex",
+    revealedKey: "kanjiFlashcardRevealed",
+    saveItem: saveKanjiToMasteredList,
+    syncIndexAfterUpdate: syncKanjiFlashcardIndexAfterUpdate,
+    render: () => {
+      renderKanjiPageLayout();
+      renderStats();
+    }
+  });
 }
 
 function setStarterKanjiResultFilter(filter) {
@@ -6356,15 +6385,6 @@ function getVocabViewLabel(view = state.vocabView) {
   };
 
   return labels[getVocabView(view)];
-}
-
-function getVocabOptionsSummaryText() {
-  return [
-    getVocabLevelLabel(),
-    getVocabViewLabel(),
-    vocabFilterLabels[getVocabFilter()],
-    getVocabPartSummaryLabel()
-  ].join(" · ");
 }
 
 function invalidateVocabQuizSession() {
@@ -6777,15 +6797,15 @@ function isWordSavedToMasteredList(id) {
 }
 
 function createVocabStatusButtonsMarkup(id) {
-  const review = isWordSavedToReviewList(id);
-  const mastered = isWordSavedToMasteredList(id);
-
-  return `
-    <div class="vocab-list-actions">
-      <button class="secondary-btn vocab-status-btn${review ? " is-selected-review" : ""}" type="button" data-word-review="${id}" aria-pressed="${review ? "true" : "false"}">다시 볼래요</button>
-      <button class="secondary-btn vocab-status-btn${mastered ? " is-selected-mastered" : ""}" type="button" data-word-mastered="${id}" aria-pressed="${mastered ? "true" : "false"}">익혔어요!</button>
-    </div>
-  `;
+  return createStudyStatusButtonsMarkup({
+    id,
+    groupClassName: "vocab-list-actions",
+    buttonClassName: "vocab-status-btn",
+    reviewAttribute: "data-word-review",
+    masteredAttribute: "data-word-mastered",
+    reviewSelected: isWordSavedToReviewList(id),
+    masteredSelected: isWordSavedToMasteredList(id)
+  });
 }
 
 function getVocabQuizResultCounts() {
@@ -7064,175 +7084,6 @@ function restartVocabQuiz() {
   renderVocabPage();
 }
 
-function renderFlashcardLegacy() {
-  const activeFilter = getVocabFilter();
-  const activeLevel = getVocabLevel();
-  const activePart = getVocabPartFilter();
-  const emptyWordLabel = activePart === vocabPartAllValue ? "아직 단어가 없어요" : `${activePart} 단어가 아직 없어요`;
-  const emptyReadingLabel = activePart === vocabPartAllValue ? "단어가 들어오면 같이 볼게요." : `${activePart} 단어가 들어오면 같이 볼게요.`;
-  const emptyMeaningLabel =
-    activePart === vocabPartAllValue ? "조금만 기다려주세요." : "다른 품사도 같이 골라볼 수 있어요.";
-  const cards = getVisibleFlashcards();
-  const emptyCardMap = {
-    all: {
-      level: activeLevel,
-      word: emptyWordLabel,
-      reading: emptyReadingLabel,
-      meaning: emptyMeaningLabel,
-      id: "empty-all"
-    },
-    review: {
-      level: "REVIEW",
-      word: activePart === vocabPartAllValue ? "다시 볼 단어가 없어요" : `다시 볼 ${activePart} 단어가 없어요`,
-      reading: "잘하고 있어요.",
-      meaning:
-        activePart === vocabPartAllValue
-          ? "헷갈린 단어가 생기면 여기 모아둘게요."
-          : "다른 품사를 고르면 다시 볼 단어를 더 볼 수 있어요.",
-      id: "empty-review"
-    },
-    mastered: {
-      level: "MASTERED",
-      word: activePart === vocabPartAllValue ? "익힌 단어가 아직 없어요" : `익힌 ${activePart} 단어가 아직 없어요`,
-      reading: "하나씩 쌓아봐요.",
-      meaning:
-        activePart === vocabPartAllValue
-          ? "익혔어요!를 누른 단어가 여기 모여요."
-          : "선택한 품사에서 익힌 단어가 생기면 여기 모여요.",
-      id: "empty-mastered"
-    }
-  };
-  const fallbackCard =
-    activeFilter === "unmarked"
-      ? {
-          level: "UNMARKED",
-          word: activePart === vocabPartAllValue ? "아직 안 정한 단어가 없어요." : `아직 안 정한 ${activePart} 단어가 없어요.`,
-          reading: "아직 안 정한 단어를 모두 확인했어요.",
-          meaning:
-            activePart === vocabPartAllValue
-              ? "다시 볼래요나 익혔어요를 빼면 여기서 다시 볼 수 있어요."
-              : "다른 품사를 고르거나 상태를 바꾸면 여기서 다시 볼 수 있어요.",
-          id: "empty-unmarked"
-        }
-      : emptyCardMap[activeFilter] || emptyCardMap.all;
-  const source = cards.length ? cards : [fallbackCard];
-  const currentIndex = state.flashcardIndex % source.length;
-  const card = source[currentIndex];
-  const hasCards = cards.length > 0;
-  const isRevealed = hasCards && state.flashcardRevealed;
-  const flashcard = document.getElementById("flashcard");
-  const flashcardToggle = document.getElementById("flashcard-toggle");
-  const flashcardPrev = document.getElementById("flashcard-prev");
-  const flashcardNext = document.getElementById("flashcard-next");
-  const flashcardAgain = document.getElementById("flashcard-again");
-  const flashcardMastered = document.getElementById("flashcard-mastered");
-  const level = document.getElementById("flashcard-level");
-  const word = document.getElementById("flashcard-word");
-  const reading = document.getElementById("flashcard-reading");
-  const meaning = document.getElementById("flashcard-meaning");
-  const hint = document.getElementById("flashcard-hint");
-
-  if (!flashcard || !flashcardToggle || !level || !word || !reading || !meaning || !hint) {
-    return;
-  }
-
-  level.textContent = formatStudyLevelLabel(card.level, "N5");
-  word.textContent = formatQuizLineBreaks(card.word);
-  reading.textContent = formatQuizLineBreaks(card.reading);
-  meaning.textContent = formatQuizLineBreaks(card.meaning);
-  hint.textContent = hasCards
-    ? isRevealed
-      ? "뜻까지 확인했어요."
-      : "눌러서 뜻을 확인해봐요."
-    : activeFilter === "review"
-      ? "헷갈린 단어가 생기면 여기서 다시 볼 수 있어요."
-      : activeFilter === "mastered"
-        ? "익힌 단어가 쌓이면 여기서 모아볼 수 있어요."
-        : "단어가 준비되면 여기서 같이 익혀봐요.";
-  flashcard.classList.toggle("is-revealed", isRevealed);
-  flashcardToggle.disabled = !hasCards;
-  flashcardToggle.setAttribute("aria-expanded", String(isRevealed));
-  flashcardToggle.setAttribute(
-    "aria-label",
-    hasCards ? (isRevealed ? "뜻 다시 접어둘게요" : "뜻 확인해볼까요?") : "단어를 준비하고 있어요"
-  );
-
-  if (flashcardPrev) {
-    flashcardPrev.disabled = cards.length <= 1;
-  }
-  if (flashcardNext) {
-    flashcardNext.disabled = cards.length <= 1;
-  }
-  if (flashcardAgain) {
-    flashcardAgain.disabled = !hasCards;
-  }
-  if (flashcardMastered) {
-    flashcardMastered.disabled = !hasCards;
-  }
-}
-
-function renderVocabListLegacy() {
-  const list = document.getElementById("vocab-list");
-  const pageInfo = document.getElementById("vocab-page-info");
-  const prev = document.getElementById("vocab-page-prev");
-  const next = document.getElementById("vocab-page-next");
-  const summary = document.getElementById("vocab-summary");
-  const activeFilter = getVocabFilter();
-  const items = getVisibleVocabList();
-
-  if (!list || !pageInfo || !prev || !next || !summary) {
-    return;
-  }
-
-  const previousPage = state.vocabPage;
-  clampVocabPage(items);
-  if (state.vocabPage !== previousPage) {
-    saveState();
-  }
-
-  const pageCount = getVocabPageCount(items);
-  const startIndex = (state.vocabPage - 1) * vocabPageSize;
-  const pageItems = items.slice(startIndex, startIndex + vocabPageSize);
-
-  summary.textContent = getVocabSummaryText(items.length);
-  pageInfo.textContent = `${state.vocabPage} / ${pageCount}`;
-  prev.disabled = state.vocabPage <= 1;
-  next.disabled = state.vocabPage >= pageCount;
-
-  if (!pageItems.length) {
-    list.innerHTML = `<p class="vocab-list-empty">${getVocabEmptyMessage(activeFilter)}</p>`;
-    return;
-  }
-
-  list.innerHTML = pageItems
-    .map((item, index) => {
-      const review = isWordSavedToReviewList(item.id);
-      const mastered = isWordSavedToMasteredList(item.id);
-      const badges = [
-        review ? '<span class="vocab-review-badge">다시 볼래요</span>' : "",
-        mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""
-      ]
-        .filter(Boolean)
-        .join("");
-
-      return `
-        <article class="vocab-list-card">
-          <div class="vocab-list-card-head">
-            <span class="vocab-list-index">${startIndex + index + 1}</span>
-            <div class="vocab-status-badges">${badges}</div>
-          </div>
-          <div class="vocab-list-main">
-            <strong class="vocab-list-word">${formatQuizLineBreaks(item.word)}</strong>
-            <p class="vocab-list-reading">${formatQuizLineBreaks(item.reading)}</p>
-          </div>
-          <p class="vocab-list-meaning">${formatQuizLineBreaks(item.meaning)}</p>
-          ${createVocabStatusButtonsMarkup(item.id)}
-        </article>
-      `;
-    })
-    .join("");
-}
-
 function renderFlashcard() {
   const activeFilter = getVocabFilter();
   const activeLevel = getVocabLevel();
@@ -7365,49 +7216,36 @@ function renderVocabList() {
   const pageInfo = document.getElementById("vocab-page-info");
   const prev = document.getElementById("vocab-page-prev");
   const next = document.getElementById("vocab-page-next");
-  const summary = document.getElementById("vocab-summary");
   const activeFilter = getVocabFilter();
   const items = getVisibleVocabList();
 
-  if (!list || !pageInfo || !prev || !next || !summary) {
-    return;
-  }
-
-  const previousPage = state.vocabPage;
-  clampVocabPage(items);
-  if (state.vocabPage !== previousPage) {
-    saveState();
-  }
-
-  const pageCount = getVocabPageCount(items);
-  const startIndex = (state.vocabPage - 1) * vocabPageSize;
-  const pageItems = items.slice(startIndex, startIndex + vocabPageSize);
-
-  summary.textContent = getVocabSummaryText(items.length);
-  pageInfo.textContent = `${state.vocabPage} / ${pageCount}`;
-  prev.disabled = state.vocabPage <= 1;
-  next.disabled = state.vocabPage >= pageCount;
-
-  if (!pageItems.length) {
-    list.innerHTML = `<p class="vocab-list-empty">${getVocabEmptyMessage(activeFilter)}</p>`;
-    return;
-  }
-
-  list.innerHTML = pageItems
-    .map((item, index) => {
+  renderPagedStudyList({
+    list,
+    pageInfo,
+    prev,
+    next,
+    items,
+    page: state.vocabPage,
+    pageSize: vocabPageSize,
+    emptyMessage: getVocabEmptyMessage(activeFilter),
+    onPageChange: (page) => {
+      state.vocabPage = page;
+      saveState();
+    },
+    renderItem: (item, displayIndex) => {
       const review = isWordSavedToReviewList(item.id);
       const mastered = isWordSavedToMasteredList(item.id);
 
       return createStudyListCardMarkup({
-        index: startIndex + index + 1,
+        index: displayIndex,
         badgesMarkup: createStudyStatusBadgesMarkup(review, mastered),
         titleText: formatQuizLineBreaks(item.word),
         subtitleText: formatQuizLineBreaks(item.reading),
         descriptionMarkup: `<p class="vocab-list-meaning">${formatQuizLineBreaks(item.meaning)}</p>`,
         actionsMarkup: createVocabStatusButtonsMarkup(item.id)
       });
-    })
-    .join("");
+    }
+  });
 }
 
 function renderVocabTabLayout() {
@@ -7505,12 +7343,7 @@ function renderVocabStudyControls(counts, availableParts, activePart) {
   const partSelect = document.getElementById("vocab-part-select");
   const activeView = getVocabView();
 
-  document.querySelectorAll("[data-vocab-view]").forEach((button) => {
-    const active = button.dataset.vocabView === activeView;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-
+  syncStudyViewButtons("[data-vocab-view]", "data-vocab-view", activeView);
   populateVocabLevelSelect(levelSelect);
   populateVocabFilterSelect(filterSelect, counts);
   populateVocabPartSelect(partSelect, availableParts, activePart);
@@ -7794,57 +7627,41 @@ function renderVocabPage() {
 }
 
 function toggleFlashcardReveal() {
-  state.flashcardRevealed = !state.flashcardRevealed;
-  updateStudyStreak();
-  saveState();
-  renderVocabPage();
-  renderStats();
+  toggleStudyFlashcardReveal("flashcardRevealed", () => {
+    renderVocabPage();
+    renderStats();
+  });
 }
 
 function moveFlashcard(step) {
-  const cards = getVisibleFlashcards();
-  if (!cards.length) {
-    return;
-  }
-
-  state.flashcardIndex = (state.flashcardIndex + step + cards.length) % cards.length;
-  state.flashcardRevealed = false;
-  saveState();
-  renderVocabPage();
+  moveStudyFlashcard(step, {
+    getCards: getVisibleFlashcards,
+    indexKey: "flashcardIndex",
+    revealedKey: "flashcardRevealed",
+    render: renderVocabPage
+  });
 }
 
 function markFlashcardForReview() {
-  const cards = getVisibleFlashcards();
-  if (!cards.length) {
-    return;
-  }
-
-  const currentIndex = state.flashcardIndex % cards.length;
-  const currentCard = cards[currentIndex];
-
-  saveWordToReviewList(currentCard.id);
-  updateStudyStreak();
-  state.flashcardRevealed = false;
-  syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
-  saveState();
-  renderAll();
+  markStudyFlashcardStatus({
+    getCards: getVisibleFlashcards,
+    indexKey: "flashcardIndex",
+    revealedKey: "flashcardRevealed",
+    saveItem: saveWordToReviewList,
+    syncIndexAfterUpdate: syncFlashcardIndexAfterVocabUpdate,
+    render: renderAll
+  });
 }
 
 function markFlashcardMastered() {
-  const cards = getVisibleFlashcards();
-  if (!cards.length) {
-    return;
-  }
-
-  const currentIndex = state.flashcardIndex % cards.length;
-  const currentCard = cards[currentIndex];
-
-  saveWordToMasteredList(currentCard.id);
-  updateStudyStreak();
-  state.flashcardRevealed = false;
-  syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
-  saveState();
-  renderAll();
+  markStudyFlashcardStatus({
+    getCards: getVisibleFlashcards,
+    indexKey: "flashcardIndex",
+    revealedKey: "flashcardRevealed",
+    saveItem: saveWordToMasteredList,
+    syncIndexAfterUpdate: syncFlashcardIndexAfterVocabUpdate,
+    render: renderAll
+  });
 }
 
 function renderGrammar() {

@@ -1959,39 +1959,26 @@ function renderKanaQuizSetup() {
   const setupPanel = document.getElementById("kana-setup-panel");
   const setupSummary = document.getElementById("kana-setup-summary");
   const isOpen = state.kanaSetupOpen === true;
+  const modeButtons = document.querySelectorAll("[data-kana-mode]");
+  const countButtons = document.querySelectorAll("[data-kana-count]");
+  const timeButtons = document.querySelectorAll("[data-kana-time]");
+  const summaryText = [
+    getKanaQuizModeLabel(kanaQuizSettings.mode),
+    getKanaQuizCountLabel(kanaQuizSettings.count),
+    getKanaQuizDurationLabel(kanaQuizSettings.duration)
+  ].join(" · ");
 
-  document.querySelectorAll("[data-kana-mode]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.kanaMode === kanaQuizSettings.mode);
+  syncSelectionButtonState(modeButtons, (button) => button.dataset.kanaMode, kanaQuizSettings.mode);
+  syncSelectionButtonState(countButtons, (button) => button.dataset.kanaCount, String(kanaQuizSettings.count));
+  syncSelectionButtonState(timeButtons, (button) => Number(button.dataset.kanaTime), kanaQuizSettings.duration);
+  renderOpenableSettingsSection({
+    shell: setupShell,
+    toggle: setupToggle,
+    panel: setupPanel,
+    summary: setupSummary,
+    summaryText,
+    isOpen
   });
-
-  document.querySelectorAll("[data-kana-count]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.kanaCount === String(kanaQuizSettings.count));
-  });
-
-  document.querySelectorAll("[data-kana-time]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.kanaTime === String(kanaQuizSettings.duration));
-  });
-
-  if (setupSummary) {
-    setupSummary.textContent = [
-      getKanaQuizModeLabel(kanaQuizSettings.mode),
-      getKanaQuizCountLabel(kanaQuizSettings.count),
-      getKanaQuizDurationLabel(kanaQuizSettings.duration)
-    ].join(" · ");
-  }
-
-  if (setupShell) {
-    setupShell.classList.toggle("is-open", isOpen);
-  }
-
-  if (setupToggle) {
-    setupToggle.setAttribute("aria-expanded", String(isOpen));
-  }
-
-  if (setupPanel) {
-    setupPanel.hidden = !isOpen;
-    setupPanel.setAttribute("aria-hidden", String(!isOpen));
-  }
 }
 
 function startKanaQuizSession(mode = kanaQuizSettings.mode) {
@@ -2474,26 +2461,14 @@ function renderWritingPracticeSetup() {
     getWritingPracticeOrderLabel(writingPracticeSettings.order)
   ].join(" · ");
 
-  if (setupSummary && setupSummary.textContent !== summaryText) {
-    setupSummary.textContent = summaryText;
-  }
-
-  if (setupShell) {
-    setupShell.classList.toggle("is-open", isOpen);
-  }
-
-  if (setupToggle && setupToggle.getAttribute("aria-expanded") !== String(isOpen)) {
-    setupToggle.setAttribute("aria-expanded", String(isOpen));
-  }
-
-  if (setupPanel) {
-    if (setupPanel.hidden === isOpen) {
-      setupPanel.hidden = !isOpen;
-    }
-    if (setupPanel.getAttribute("aria-hidden") !== String(!isOpen)) {
-      setupPanel.setAttribute("aria-hidden", String(!isOpen));
-    }
-  }
+  renderOpenableSettingsSection({
+    shell: setupShell,
+    toggle: setupToggle,
+    panel: setupPanel,
+    summary: setupSummary,
+    summaryText,
+    isOpen
+  });
 }
 
 function buildWritingPracticePool(script) {
@@ -3080,13 +3055,16 @@ function updateWritingPracticePanel() {
   const prompt = document.getElementById("writing-practice-prompt");
   const tip = document.getElementById("writing-practice-tip");
 
-  document.querySelectorAll("[data-writing-mode]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.writingMode === writingPracticeSettings.mode);
-  });
-
-  document.querySelectorAll("[data-writing-order]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.writingOrder === writingPracticeSettings.order);
-  });
+  syncSelectionButtonState(
+    document.querySelectorAll("[data-writing-mode]"),
+    (button) => button.dataset.writingMode,
+    writingPracticeSettings.mode
+  );
+  syncSelectionButtonState(
+    document.querySelectorAll("[data-writing-order]"),
+    (button) => button.dataset.writingOrder,
+    writingPracticeSettings.order
+  );
 
   renderWritingPracticeSetup();
 
@@ -5711,6 +5689,27 @@ function renderCollapsibleSettingsSection({
   }
 }
 
+function renderOpenableSettingsSection({ shell, toggle, panel, summary, summaryText, isOpen }) {
+  renderCollapsibleSettingsSection({
+    shell,
+    toggle,
+    panel,
+    summary,
+    summaryText,
+    isLocked: false,
+    shouldShowPanel: isOpen
+  });
+}
+
+function syncSelectionButtonState(buttons, getValue, activeValue) {
+  buttons.forEach((button) => {
+    const active = getValue(button) === activeValue;
+
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
 function renderRestartableActionButton(button, label, isStarted, canStart) {
   if (button) {
     button.classList.toggle("primary-btn", !isStarted);
@@ -5810,6 +5809,29 @@ function renderStudyOptionsControls({
   });
 }
 
+function renderStudyCatalogControls({
+  summary,
+  summaryText,
+  viewSelector,
+  viewAttribute,
+  activeView,
+  selectConfigs = []
+}) {
+  if (summary) {
+    summary.textContent = summaryText;
+  }
+
+  if (viewSelector && viewAttribute) {
+    syncStudyViewButtons(viewSelector, viewAttribute, activeView);
+  }
+
+  selectConfigs.forEach(({ element, populate }) => {
+    if (typeof populate === "function") {
+      populate(element);
+    }
+  });
+}
+
 function attachStateSpinner({
   spinner,
   options = [],
@@ -5860,6 +5882,24 @@ function attachStateOptionsToggle(button, stateKey, render) {
     state[stateKey] = !state[stateKey];
     saveState();
     render();
+  });
+}
+
+function attachValueButtonListeners(buttons, getValue, onChange) {
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      onChange(getValue(button), button);
+    });
+  });
+}
+
+function attachSelectValueListener(element, handler) {
+  if (!element) {
+    return;
+  }
+
+  element.addEventListener("change", () => {
+    handler(element.value);
   });
 }
 
@@ -6377,6 +6417,7 @@ function renderStarterKanjiPractice() {
     button.className = "basic-practice-option";
     button.dataset.optionIndex = String(optionIndex);
     button.textContent = formatQuizLineBreaks(current.options[optionIndex]);
+    button.setAttribute("aria-pressed", "false");
     button.addEventListener("click", () => handleStarterKanjiPracticeAnswer(optionIndex));
     optionsContainer.appendChild(button);
   });
@@ -6456,13 +6497,23 @@ function renderKanjiStudyControls() {
   const activeView = getKanjiView();
   const visibleItems = getVisibleKanjiItems();
 
-  if (summary) {
-    summary.textContent = getKanjiSummaryText(visibleItems.length);
-  }
-
-  syncStudyViewButtons("[data-kanji-view]", "data-kanji-view", activeView);
-  populateKanjiCollectionSelect(collectionSelect, collectionCounts, getKanjiCollectionFilter());
-  populateKanjiGradeSelect(gradeSelect, gradeCounts, getKanjiGrade());
+  renderStudyCatalogControls({
+    summary,
+    summaryText: getKanjiSummaryText(visibleItems.length),
+    viewSelector: "[data-kanji-view]",
+    viewAttribute: "data-kanji-view",
+    activeView,
+    selectConfigs: [
+      {
+        element: collectionSelect,
+        populate: (element) => populateKanjiCollectionSelect(element, collectionCounts, getKanjiCollectionFilter())
+      },
+      {
+        element: gradeSelect,
+        populate: (element) => populateKanjiGradeSelect(element, gradeCounts, getKanjiGrade())
+      }
+    ]
+  });
 }
 
 function renderKanjiFlashcard() {
@@ -7850,10 +7901,25 @@ function renderVocabStudyControls(counts, availableParts, activePart) {
   const partSelect = document.getElementById("vocab-part-select");
   const activeView = getVocabView();
 
-  syncStudyViewButtons("[data-vocab-view]", "data-vocab-view", activeView);
-  populateVocabLevelSelect(levelSelect);
-  populateVocabFilterSelect(filterSelect, counts);
-  populateVocabPartSelect(partSelect, availableParts, activePart);
+  renderStudyCatalogControls({
+    viewSelector: "[data-vocab-view]",
+    viewAttribute: "data-vocab-view",
+    activeView,
+    selectConfigs: [
+      {
+        element: levelSelect,
+        populate: populateVocabLevelSelect
+      },
+      {
+        element: filterSelect,
+        populate: (element) => populateVocabFilterSelect(element, counts)
+      },
+      {
+        element: partSelect,
+        populate: (element) => populateVocabPartSelect(element, availableParts, activePart)
+      }
+    ]
+  });
 }
 
 function renderVocabQuizControls(counts, availableParts, activePart) {
@@ -8592,46 +8658,18 @@ function renderQuizControls() {
     headingCopy.textContent = heading.description;
   }
 
-  if (optionsSummary) {
-    optionsSummary.textContent = getQuizOptionsSummaryText();
-  }
-
-  if (optionsShell) {
-    optionsShell.classList.toggle("is-open", isOptionsOpen);
-  }
-
-  if (optionsToggle) {
-    optionsToggle.setAttribute("aria-expanded", String(isOptionsOpen));
-  }
-
-  if (optionsPanel) {
-    optionsPanel.hidden = !isOptionsOpen;
-    optionsPanel.setAttribute("aria-hidden", String(!isOptionsOpen));
-  }
-
-  levelButtons.forEach((button) => {
-    const active = button.dataset.quizLevel === activeLevel;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
+  renderOpenableSettingsSection({
+    shell: optionsShell,
+    toggle: optionsToggle,
+    panel: optionsPanel,
+    summary: optionsSummary,
+    summaryText: getQuizOptionsSummaryText(),
+    isOpen: isOptionsOpen
   });
-
-  sizeButtons.forEach((button) => {
-    const active = Number(button.dataset.quizSize) === state.quizSessionSize;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-
-  modeButtons.forEach((button) => {
-    const active = button.dataset.quizMode === state.quizMode;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-
-  timeButtons.forEach((button) => {
-    const active = Number(button.dataset.quizTime) === getQuizDuration();
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
+  syncSelectionButtonState(levelButtons, (button) => button.dataset.quizLevel, activeLevel);
+  syncSelectionButtonState(sizeButtons, (button) => Number(button.dataset.quizSize), state.quizSessionSize);
+  syncSelectionButtonState(modeButtons, (button) => button.dataset.quizMode, state.quizMode);
+  syncSelectionButtonState(timeButtons, (button) => Number(button.dataset.quizTime), getQuizDuration());
 }
 
 function renderQuizResult() {
@@ -9334,6 +9372,43 @@ function attachStudyStatusListListeners({
   });
 }
 
+function attachStudyCatalogListeners({
+  optionsToggle,
+  optionsStateKey,
+  renderOptions,
+  viewButtons,
+  getViewValue,
+  setView,
+  flashcardListeners,
+  paginationListeners,
+  statusListListeners,
+  selectListeners = []
+}) {
+  if (optionsToggle && optionsStateKey && typeof renderOptions === "function") {
+    attachStateOptionsToggle(optionsToggle, optionsStateKey, renderOptions);
+  }
+
+  if (viewButtons && typeof getViewValue === "function" && typeof setView === "function") {
+    attachStudyViewButtonListeners(viewButtons, getViewValue, setView);
+  }
+
+  if (flashcardListeners) {
+    attachStudyFlashcardListeners(flashcardListeners);
+  }
+
+  if (paginationListeners) {
+    attachStudyPaginationListeners(paginationListeners);
+  }
+
+  if (statusListListeners) {
+    attachStudyStatusListListeners(statusListListeners);
+  }
+
+  selectListeners.forEach(({ element, handler }) => {
+    attachSelectValueListener(element, handler);
+  });
+}
+
 function attachVocabStudyListeners({
   flashcardToggle,
   flashcardPrev,
@@ -9349,74 +9424,63 @@ function attachVocabStudyListeners({
   vocabPagePrev,
   vocabPageNext
 }) {
-  attachStudyFlashcardListeners({
-    toggle: flashcardToggle,
-    prev: flashcardPrev,
-    next: flashcardNext,
-    review: flashcardAgain,
-    mastered: flashcardMastered,
-    onToggle: toggleFlashcardReveal,
-    onMove: moveFlashcard,
-    onReview: markFlashcardForReview,
-    onMastered: markFlashcardMastered
-  });
-  attachStudyStatusListListeners({
-    list: vocabList,
-    reviewSelector: "[data-word-review]",
-    masteredSelector: "[data-word-mastered]",
-    getReviewId: (button) => button.dataset.wordReview,
-    getMasteredId: (button) => button.dataset.wordMastered,
-    toggleReview: (id) => {
-      if (isWordSavedToReviewList(id)) {
-        removeWordFromReviewList(id);
-      } else {
-        saveWordToReviewList(id);
-      }
+  attachStudyCatalogListeners({
+    viewButtons: vocabViewButtons,
+    getViewValue: (button) => button.dataset.vocabView,
+    setView: setVocabView,
+    flashcardListeners: {
+      toggle: flashcardToggle,
+      prev: flashcardPrev,
+      next: flashcardNext,
+      review: flashcardAgain,
+      mastered: flashcardMastered,
+      onToggle: toggleFlashcardReveal,
+      onMove: moveFlashcard,
+      onReview: markFlashcardForReview,
+      onMastered: markFlashcardMastered
     },
-    toggleMastered: (id) => {
-      if (isWordSavedToMasteredList(id)) {
-        removeWordFromMasteredList(id);
-      } else {
-        saveWordToMasteredList(id);
-      }
+    paginationListeners: {
+      prev: vocabPagePrev,
+      next: vocabPageNext,
+      getPage: () => state.vocabPage,
+      setPage: (page) => {
+        state.vocabPage = page;
+      },
+      getPageCount: () => getVocabPageCount(getVisibleVocabList()),
+      render: renderVocabPage
     },
-    render: renderAll
+    statusListListeners: {
+      list: vocabList,
+      reviewSelector: "[data-word-review]",
+      masteredSelector: "[data-word-mastered]",
+      getReviewId: (button) => button.dataset.wordReview,
+      getMasteredId: (button) => button.dataset.wordMastered,
+      toggleReview: (id) => {
+        if (isWordSavedToReviewList(id)) {
+          removeWordFromReviewList(id);
+        } else {
+          saveWordToReviewList(id);
+        }
+      },
+      toggleMastered: (id) => {
+        if (isWordSavedToMasteredList(id)) {
+          removeWordFromMasteredList(id);
+        } else {
+          saveWordToMasteredList(id);
+        }
+      },
+      render: renderAll
+    },
+    selectListeners: [
+      { element: vocabLevelSelect, handler: setVocabLevel },
+      { element: vocabFilterSelect, handler: setVocabFilter },
+      { element: vocabPartSelect, handler: setVocabPartFilter }
+    ]
   });
   vocabTabButtons.forEach((button) => {
     button.addEventListener("click", () => {
       setVocabTab(button.dataset.vocabTab);
     });
-  });
-
-  if (vocabLevelSelect) {
-    vocabLevelSelect.addEventListener("change", () => {
-      setVocabLevel(vocabLevelSelect.value);
-    });
-  }
-
-  attachStudyViewButtonListeners(vocabViewButtons, (button) => button.dataset.vocabView, setVocabView);
-
-  if (vocabFilterSelect) {
-    vocabFilterSelect.addEventListener("change", () => {
-      setVocabFilter(vocabFilterSelect.value);
-    });
-  }
-
-  if (vocabPartSelect) {
-    vocabPartSelect.addEventListener("change", () => {
-      setVocabPartFilter(vocabPartSelect.value);
-    });
-  }
-
-  attachStudyPaginationListeners({
-    prev: vocabPagePrev,
-    next: vocabPageNext,
-    getPage: () => state.vocabPage,
-    setPage: (page) => {
-      state.vocabPage = page;
-    },
-    getPageCount: () => getVocabPageCount(getVisibleVocabList()),
-    render: renderVocabPage
   });
 }
 
@@ -9435,79 +9499,69 @@ function attachKanjiStudyListeners({
   kanjiFlashcardMastered,
   kanjiList
 }) {
-  if (kanjiOptionsToggle) {
-    kanjiOptionsToggle.addEventListener("click", () => {
-      state.kanjiOptionsOpen = !state.kanjiOptionsOpen;
-      saveState();
-      renderKanjiStudyControls();
-    });
-  }
-
+  attachStudyCatalogListeners({
+    optionsToggle: kanjiOptionsToggle,
+    optionsStateKey: "kanjiOptionsOpen",
+    renderOptions: renderKanjiStudyControls,
+    viewButtons: kanjiViewButtons,
+    getViewValue: (button) => button.dataset.kanjiView,
+    setView: setKanjiView,
+    flashcardListeners: {
+      toggle: kanjiFlashcardToggle,
+      prev: kanjiFlashcardPrev,
+      next: kanjiFlashcardNext,
+      review: kanjiFlashcardReview,
+      mastered: kanjiFlashcardMastered,
+      onToggle: toggleKanjiFlashcardReveal,
+      onMove: moveKanjiFlashcard,
+      onReview: markKanjiFlashcardForReview,
+      onMastered: markKanjiFlashcardMastered
+    },
+    paginationListeners: {
+      prev: kanjiPagePrev,
+      next: kanjiPageNext,
+      getPage: () => state.kanjiPage,
+      setPage: (page) => {
+        state.kanjiPage = page;
+      },
+      getPageCount: () => getKanjiPageCount(getVisibleKanjiItems()),
+      render: renderKanjiPageLayout
+    },
+    statusListListeners: {
+      list: kanjiList,
+      reviewSelector: "[data-kanji-review]",
+      masteredSelector: "[data-kanji-mastered]",
+      getReviewId: (button) => button.dataset.kanjiReview,
+      getMasteredId: (button) => button.dataset.kanjiMastered,
+      toggleReview: (id) => {
+        if (isKanjiSavedToReviewList(id)) {
+          removeKanjiFromReviewList(id);
+        } else {
+          saveKanjiToReviewList(id);
+        }
+      },
+      toggleMastered: (id) => {
+        if (isKanjiSavedToMasteredList(id)) {
+          removeKanjiFromMasteredList(id);
+        } else {
+          saveKanjiToMasteredList(id);
+        }
+      },
+      render: () => {
+        renderStats();
+        renderKanjiPageLayout();
+      }
+    },
+    selectListeners: [
+      { element: kanjiCollectionSelect, handler: setKanjiCollectionFilter },
+      { element: kanjiGradeSelect, handler: setKanjiGrade }
+    ]
+  });
   kanjiGradeButtons.forEach((button) => {
     button.addEventListener("click", () => {
       setKanjiGrade(button.dataset.kanjiGradeOption);
     });
   });
-
-  attachStudyViewButtonListeners(kanjiViewButtons, (button) => button.dataset.kanjiView, setKanjiView);
-  attachStudyFlashcardListeners({
-    toggle: kanjiFlashcardToggle,
-    prev: kanjiFlashcardPrev,
-    next: kanjiFlashcardNext,
-    review: kanjiFlashcardReview,
-    mastered: kanjiFlashcardMastered,
-    onToggle: toggleKanjiFlashcardReveal,
-    onMove: moveKanjiFlashcard,
-    onReview: markKanjiFlashcardForReview,
-    onMastered: markKanjiFlashcardMastered
-  });
-  attachStudyPaginationListeners({
-    prev: kanjiPagePrev,
-    next: kanjiPageNext,
-    getPage: () => state.kanjiPage,
-    setPage: (page) => {
-      state.kanjiPage = page;
-    },
-    getPageCount: () => getKanjiPageCount(getVisibleKanjiItems()),
-    render: renderKanjiPageLayout
-  });
-  attachStudyStatusListListeners({
-    list: kanjiList,
-    reviewSelector: "[data-kanji-review]",
-    masteredSelector: "[data-kanji-mastered]",
-    getReviewId: (button) => button.dataset.kanjiReview,
-    getMasteredId: (button) => button.dataset.kanjiMastered,
-    toggleReview: (id) => {
-      if (isKanjiSavedToReviewList(id)) {
-        removeKanjiFromReviewList(id);
-      } else {
-        saveKanjiToReviewList(id);
-      }
-    },
-    toggleMastered: (id) => {
-      if (isKanjiSavedToMasteredList(id)) {
-        removeKanjiFromMasteredList(id);
-      } else {
-        saveKanjiToMasteredList(id);
-      }
-    },
-    render: () => {
-      renderStats();
-      renderKanjiPageLayout();
-    }
-  });
-
-  if (kanjiCollectionSelect) {
-    kanjiCollectionSelect.addEventListener("change", () => {
-      setKanjiCollectionFilter(kanjiCollectionSelect.value);
-    });
-  }
-
-  if (kanjiGradeSelect) {
-    kanjiGradeSelect.addEventListener("change", () => {
-      setKanjiGrade(kanjiGradeSelect.value);
-    });
-  }
 }
 
 function attachEventListeners() {
@@ -9716,40 +9770,24 @@ function attachEventListeners() {
     quizClearMistakes.addEventListener("click", clearQuizMistakes);
   }
   attachStateOptionsToggle(quizOptionsToggle, "quizOptionsOpen", renderQuizControls);
-  quizLevelButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setQuizLevel(button.dataset.quizLevel);
-    });
-  });
-  quizSizeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const nextSize = getQuizSessionSize(button.dataset.quizSize);
+  attachValueButtonListeners(quizLevelButtons, (button) => button.dataset.quizLevel, setQuizLevel);
+  attachValueButtonListeners(quizSizeButtons, (button) => getQuizSessionSize(button.dataset.quizSize), (nextSize) => {
+    if (state.quizSessionSize === nextSize) {
+      return;
+    }
 
-      if (state.quizSessionSize === nextSize) {
-        return;
-      }
-
-      state.quizSessionSize = nextSize;
-      startNewQuizSession();
-    });
+    state.quizSessionSize = nextSize;
+    startNewQuizSession();
   });
-  quizModeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const nextMode = getQuizMode(button.dataset.quizMode);
+  attachValueButtonListeners(quizModeButtons, (button) => getQuizMode(button.dataset.quizMode), (nextMode) => {
+    if (state.quizMode === nextMode) {
+      return;
+    }
 
-      if (state.quizMode === nextMode) {
-        return;
-      }
-
-      state.quizMode = nextMode;
-      startNewQuizSession();
-    });
+    state.quizMode = nextMode;
+    startNewQuizSession();
   });
-  quizTimeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setQuizDuration(button.dataset.quizTime);
-    });
-  });
+  attachValueButtonListeners(quizTimeButtons, (button) => button.dataset.quizTime, setQuizDuration);
   attachStateOptionsToggle(grammarPracticeOptionsToggle, "grammarPracticeOptionsOpen", renderGrammarPracticeControls);
   if (grammarPracticeLevelSelect) {
     grammarPracticeLevelSelect.addEventListener("change", () => {
@@ -9923,30 +9961,18 @@ function attachEventListeners() {
   if (kanaQuizNext) {
     kanaQuizNext.addEventListener("click", nextKanaQuizSheetQuestion);
   }
-  if (kanaSetupToggle) {
-    kanaSetupToggle.addEventListener("click", () => {
-      state.kanaSetupOpen = !state.kanaSetupOpen;
-      saveState();
-      renderKanaQuizSetup();
-    });
-  }
-  kanaModeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      kanaQuizSettings.mode = button.dataset.kanaMode || "hiragana";
-      renderKanaQuizSetup();
-    });
+  attachStateOptionsToggle(kanaSetupToggle, "kanaSetupOpen", renderKanaQuizSetup);
+  attachValueButtonListeners(kanaModeButtons, (button) => button.dataset.kanaMode || "hiragana", (nextMode) => {
+    kanaQuizSettings.mode = nextMode;
+    renderKanaQuizSetup();
   });
-  kanaCountButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      kanaQuizSettings.count = button.dataset.kanaCount || "10";
-      renderKanaQuizSetup();
-    });
+  attachValueButtonListeners(kanaCountButtons, (button) => button.dataset.kanaCount || "10", (nextCount) => {
+    kanaQuizSettings.count = nextCount;
+    renderKanaQuizSetup();
   });
-  kanaTimeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      kanaQuizSettings.duration = Number(button.dataset.kanaTime || 5);
-      renderKanaQuizSetup();
-    });
+  attachValueButtonListeners(kanaTimeButtons, (button) => Number(button.dataset.kanaTime || 5), (nextDuration) => {
+    kanaQuizSettings.duration = nextDuration;
+    renderKanaQuizSetup();
   });
   if (kanaSetupStart) {
     kanaSetupStart.addEventListener("click", () => {
@@ -10003,35 +10029,25 @@ function attachEventListeners() {
       renderGrammarPageLayout();
     });
   });
-  writingModeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const nextMode = button.dataset.writingMode || "hiragana";
+  attachValueButtonListeners(writingModeButtons, (button) => button.dataset.writingMode || "hiragana", (nextMode) => {
+    if (nextMode === writingPracticeSettings.mode) {
+      return;
+    }
 
-      if (nextMode === writingPracticeSettings.mode) {
-        return;
-      }
-
-      startWritingPracticeSession(nextMode);
-    });
+    startWritingPracticeSession(nextMode);
   });
-  if (writingSetupToggle) {
-    writingSetupToggle.addEventListener("click", () => {
-      state.writingSetupOpen = !state.writingSetupOpen;
-      saveState();
-      renderWritingPracticeSetup();
-    });
-  }
-  writingOrderButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const nextOrder = getWritingPracticeOrder(button.dataset.writingOrder);
-
+  attachStateOptionsToggle(writingSetupToggle, "writingSetupOpen", renderWritingPracticeSetup);
+  attachValueButtonListeners(
+    writingOrderButtons,
+    (button) => getWritingPracticeOrder(button.dataset.writingOrder),
+    (nextOrder) => {
       if (nextOrder === writingPracticeSettings.order) {
         return;
       }
 
       startWritingPracticeSession(writingPracticeSettings.mode, nextOrder);
-    });
-  });
+    }
+  );
   if (writingReplay) {
     writingReplay.addEventListener("click", replayWritingStrokeAnimation);
   }
@@ -10114,5 +10130,3 @@ window.addEventListener("japanote:storage-updated", (event) => {
   applyExternalStudyState(event.detail.value);
 });
 renderAll();
-
-

@@ -5832,6 +5832,83 @@ function renderStudyCatalogControls({
   });
 }
 
+function renderChoiceOptionButtons({
+  container,
+  options = [],
+  buttonClassName,
+  getButtonText = (option) => option,
+  getOptionValue = (_, index) => index,
+  formatText = (text) => String(text ?? ""),
+  onSelect,
+  datasetKey,
+  setPressedState = false
+}) {
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = "";
+
+  options.forEach((option, index) => {
+    const value = getOptionValue(option, index);
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = buttonClassName;
+    button.textContent = formatText(getButtonText(option, index, value));
+
+    if (datasetKey) {
+      button.dataset[datasetKey] = String(value);
+    }
+
+    if (setPressedState) {
+      button.setAttribute("aria-pressed", "false");
+    }
+
+    button.addEventListener("click", () => {
+      if (typeof onSelect === "function") {
+        onSelect(value, option, index);
+      }
+    });
+    container.appendChild(button);
+  });
+}
+
+function applyChoiceOptionFeedback({
+  options,
+  isCorrectOption,
+  isSelectedOption = () => false,
+  markSelected = true,
+  setPressedState = false
+}) {
+  options.forEach((item, optionIndex) => {
+    const isSelected = isSelectedOption(item, optionIndex);
+    const isCorrect = isCorrectOption(item, optionIndex);
+
+    item.disabled = true;
+
+    if (setPressedState) {
+      item.setAttribute("aria-pressed", String(isSelected));
+    }
+
+    if (markSelected && isSelected) {
+      item.classList.add("is-selected");
+    }
+
+    if (isCorrect) {
+      item.classList.add("is-correct");
+    }
+
+    if (isSelected && !isCorrect) {
+      item.classList.add("is-wrong");
+    }
+  });
+}
+
+function hasAnsweredChoiceOptions(options) {
+  return Array.from(options).some((item) => item.disabled);
+}
+
 function attachStateSpinner({
   spinner,
   options = [],
@@ -6409,17 +6486,17 @@ function renderStarterKanjiPractice() {
     state.basicPracticeIndexes.kanji >= questionCount - 1 ? "결과 볼까요?" : "다음 한자 볼까요?";
   nextButton.disabled = true;
 
-  optionsContainer.innerHTML = "";
   delete optionsContainer.dataset.answered;
-  getStarterKanjiOptionOrder(current).forEach((optionIndex) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "basic-practice-option";
-    button.dataset.optionIndex = String(optionIndex);
-    button.textContent = formatQuizLineBreaks(current.options[optionIndex]);
-    button.setAttribute("aria-pressed", "false");
-    button.addEventListener("click", () => handleStarterKanjiPracticeAnswer(optionIndex));
-    optionsContainer.appendChild(button);
+  renderChoiceOptionButtons({
+    container: optionsContainer,
+    options: getStarterKanjiOptionOrder(current),
+    buttonClassName: "basic-practice-option",
+    getButtonText: (optionIndex) => current.options[optionIndex],
+    getOptionValue: (optionIndex) => optionIndex,
+    formatText: formatQuizLineBreaks,
+    onSelect: handleStarterKanjiPracticeAnswer,
+    datasetKey: "optionIndex",
+    setPressedState: true
   });
 
   setQuizSessionDuration("starterKanji", getStarterKanjiQuizDuration());
@@ -6743,28 +6820,13 @@ function handleStarterKanjiPracticeAnswer(index) {
   const correct = index === current.answer;
   const totalQuestions = getStarterKanjiQuestionCount();
 
-  options.forEach((item) => {
-    const optionIndex = Number(item.dataset.optionIndex);
-
-    if (optionIndex === index) {
-      item.classList.add("is-selected");
-      item.setAttribute("aria-pressed", "true");
-    } else {
-      item.setAttribute("aria-pressed", "false");
-    }
-    if (optionIndex === current.answer) {
-      item.classList.add("is-correct");
-    }
-    if (optionIndex === index && !correct) {
-      item.classList.add("is-wrong");
-    }
+  applyChoiceOptionFeedback({
+    options,
+    isCorrectOption: (item) => Number(item.dataset.optionIndex) === current.answer,
+    isSelectedOption: (item) => Number(item.dataset.optionIndex) === index,
+    setPressedState: true
   });
   optionsContainer.dataset.answered = "true";
-  window.requestAnimationFrame(() => {
-    options.forEach((item) => {
-      item.disabled = true;
-    });
-  });
   finalizeQuizSession("starterKanji", correct);
   setStarterKanjiResult(current, index, correct);
 
@@ -6791,21 +6853,13 @@ function handleStarterKanjiPracticeTimeout() {
 
   finalizeQuizSession("starterKanji", false);
 
-  options.forEach((item) => {
-    const optionIndex = Number(item.dataset.optionIndex);
-    item.setAttribute("aria-pressed", "false");
-
-    if (optionIndex === current.answer) {
-      item.classList.add("is-correct");
-    }
+  applyChoiceOptionFeedback({
+    options,
+    isCorrectOption: (item) => Number(item.dataset.optionIndex) === current.answer,
+    setPressedState: true
   });
 
   optionsContainer.dataset.answered = "true";
-  window.requestAnimationFrame(() => {
-    options.forEach((item) => {
-      item.disabled = true;
-    });
-  });
   setStarterKanjiResult(current, -1, false, true);
   updateStudyStreak();
   saveState();
@@ -7522,20 +7576,10 @@ function renderVocabQuizResults() {
 function revealVocabQuizAnswer(question, selectedIndex, correct) {
   const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
 
-  options.forEach((button, optionIndex) => {
-    button.disabled = true;
-
-    if (optionIndex === selectedIndex) {
-      button.classList.add("is-selected");
-    }
-
-    if (optionIndex === question.answer) {
-      button.classList.add("is-correct");
-    }
-
-    if (!correct && optionIndex === selectedIndex) {
-      button.classList.add("is-wrong");
-    }
+  applyChoiceOptionFeedback({
+    options,
+    isCorrectOption: (_, optionIndex) => optionIndex === question.answer,
+    isSelectedOption: (_, optionIndex) => optionIndex === selectedIndex
   });
 }
 
@@ -7578,7 +7622,7 @@ function finalizeVocabQuizQuestion(selectedIndex, timedOut = false) {
 
 function handleVocabQuizAnswer(index) {
   const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
-  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+  const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
   if (alreadyAnswered) {
     return;
@@ -7590,7 +7634,7 @@ function handleVocabQuizAnswer(index) {
 function handleVocabQuizTimeout() {
   const question = getCurrentVocabQuizQuestion();
   const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
-  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+  const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
   if (alreadyAnswered || !question) {
     return;
@@ -8130,14 +8174,12 @@ function renderVocabQuiz() {
   next.textContent =
     state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
 
-  options.innerHTML = "";
-  question.options.forEach((option, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "basic-practice-option";
-    button.textContent = formatQuizLineBreaks(softenVisibleKoreanCopy(option));
-    button.addEventListener("click", () => handleVocabQuizAnswer(index));
-    options.appendChild(button);
+  renderChoiceOptionButtons({
+    container: options,
+    options: question.options,
+    buttonClassName: "basic-practice-option",
+    formatText: (option) => formatQuizLineBreaks(softenVisibleKoreanCopy(option)),
+    onSelect: handleVocabQuizAnswer
   });
 
   resetQuizSessionTimer("vocab", handleVocabQuizTimeout);
@@ -8460,14 +8502,12 @@ function renderGrammarPractice() {
 
   grammarCard.className = `grammar-practice-card ${current.tone}`;
 
-  optionsContainer.innerHTML = "";
-  current.options.forEach((option, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "grammar-practice-option";
-    button.textContent = softenVisibleKoreanCopy(option);
-    button.addEventListener("click", () => handleGrammarPracticeAnswer(index));
-    optionsContainer.appendChild(button);
+  renderChoiceOptionButtons({
+    container: optionsContainer,
+    options: current.options,
+    buttonClassName: "grammar-practice-option",
+    formatText: softenVisibleKoreanCopy,
+    onSelect: handleGrammarPracticeAnswer
   });
 
   setQuizSessionDuration("grammar", activeDuration);
@@ -8477,7 +8517,7 @@ function renderGrammarPractice() {
 function handleGrammarPracticeAnswer(index) {
   const current = getCurrentGrammarPracticeSet();
   const options = document.querySelectorAll(".grammar-practice-option");
-  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+  const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
   if (alreadyAnswered) {
     return;
@@ -8486,14 +8526,11 @@ function handleGrammarPracticeAnswer(index) {
   const correct = index === current.answer;
   finalizeQuizSession("grammar", correct);
 
-  options.forEach((item, optionIndex) => {
-    item.disabled = true;
-    if (optionIndex === current.answer) {
-      item.classList.add("is-correct");
-    }
-    if (optionIndex === index && !correct) {
-      item.classList.add("is-wrong");
-    }
+  applyChoiceOptionFeedback({
+    options,
+    isCorrectOption: (_, optionIndex) => optionIndex === current.answer,
+    isSelectedOption: (_, optionIndex) => optionIndex === index,
+    markSelected: false
   });
 
   document.getElementById("grammar-practice-feedback").textContent = correct
@@ -8509,7 +8546,7 @@ function handleGrammarPracticeAnswer(index) {
 function handleGrammarPracticeTimeout() {
   const current = getCurrentGrammarPracticeSet();
   const options = document.querySelectorAll(".grammar-practice-option");
-  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+  const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
   if (alreadyAnswered) {
     return;
@@ -8517,11 +8554,10 @@ function handleGrammarPracticeTimeout() {
 
   finalizeQuizSession("grammar", false);
 
-  options.forEach((item, optionIndex) => {
-    item.disabled = true;
-    if (optionIndex === current.answer) {
-      item.classList.add("is-correct");
-    }
+  applyChoiceOptionFeedback({
+    options,
+    isCorrectOption: (_, optionIndex) => optionIndex === current.answer,
+    markSelected: false
   });
 
   document.getElementById("grammar-practice-feedback").textContent = "";
@@ -9140,14 +9176,12 @@ function renderReadingPractice() {
   passage.className = `reading-passage${current.passageStyle === "note" ? " is-note" : ""}`;
   passage.innerHTML = current.passage.map((line) => `<p>${line}</p>`).join("");
 
-  optionsContainer.innerHTML = "";
-  current.options.forEach((option, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "reading-option";
-    button.textContent = softenVisibleKoreanCopy(option);
-    button.addEventListener("click", () => handleReadingAnswer(index));
-    optionsContainer.appendChild(button);
+  renderChoiceOptionButtons({
+    container: optionsContainer,
+    options: current.options,
+    buttonClassName: "reading-option",
+    formatText: softenVisibleKoreanCopy,
+    onSelect: handleReadingAnswer
   });
 
   setQuizSessionDuration("reading", state.readingDuration);
@@ -9157,7 +9191,7 @@ function renderReadingPractice() {
 function handleReadingAnswer(index) {
   const current = getCurrentReadingSet();
   const options = document.querySelectorAll(".reading-option");
-  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+  const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
   if (alreadyAnswered) {
     return;
@@ -9166,14 +9200,11 @@ function handleReadingAnswer(index) {
   const correct = index === current.answer;
   finalizeQuizSession("reading", correct);
 
-  options.forEach((item, optionIndex) => {
-    item.disabled = true;
-    if (optionIndex === current.answer) {
-      item.classList.add("is-correct");
-    }
-    if (optionIndex === index && !correct) {
-      item.classList.add("is-wrong");
-    }
+  applyChoiceOptionFeedback({
+    options,
+    isCorrectOption: (_, optionIndex) => optionIndex === current.answer,
+    isSelectedOption: (_, optionIndex) => optionIndex === index,
+    markSelected: false
   });
 
   document.getElementById("reading-feedback").textContent = correct
@@ -9189,7 +9220,7 @@ function handleReadingAnswer(index) {
 function handleReadingTimeout() {
   const current = getCurrentReadingSet();
   const options = document.querySelectorAll(".reading-option");
-  const alreadyAnswered = Array.from(options).some((item) => item.disabled);
+  const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
   if (alreadyAnswered) {
     return;
@@ -9197,11 +9228,10 @@ function handleReadingTimeout() {
 
   finalizeQuizSession("reading", false);
 
-  options.forEach((item, optionIndex) => {
-    item.disabled = true;
-    if (optionIndex === current.answer) {
-      item.classList.add("is-correct");
-    }
+  applyChoiceOptionFeedback({
+    options,
+    isCorrectOption: (_, optionIndex) => optionIndex === current.answer,
+    markSelected: false
   });
 
   document.getElementById("reading-feedback").textContent = "";
@@ -10130,3 +10160,4 @@ window.addEventListener("japanote:storage-updated", (event) => {
   applyExternalStudyState(event.detail.value);
 });
 renderAll();
+

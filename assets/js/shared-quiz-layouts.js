@@ -439,10 +439,36 @@
           <div class="match-sidebar-head"><span class="eyebrow">QUIZ HUD</span><h3>한자 퀴즈</h3></div>
           <div class="study-options-shell match-options-shell kanji-options-shell" id="starter-kanji-options-shell">
             <button class="study-options-toggle" id="starter-kanji-options-toggle" type="button" aria-expanded="true" aria-controls="starter-kanji-options-panel">
-              <div class="study-options-toggle-copy"><strong>퀴즈 설정, 어떻게 할까요?</strong><p class="study-options-toggle-summary" id="starter-kanji-options-summary">10문제 · 15초</p></div>
+              <div class="study-options-toggle-copy"><strong>퀴즈 설정, 어떻게 할까요?</strong><p class="study-options-toggle-summary" id="starter-kanji-options-summary">전체 · 전체 · 10문제 · 15초</p></div>
               <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
             </button>
             <div class="study-options-panel study-options-panel-wide" id="starter-kanji-options-panel">
+              <div class="study-options-group">
+                <span>문제 영역</span>
+                ${createSelectField({
+                  id: "starter-kanji-question-field",
+                  label: "문제 영역",
+                  ariaLabel: "한자 퀴즈 문제 영역 고르기",
+                  includeLabel: false,
+                  options: [
+                    { value: "display", label: "한자" },
+                    { value: "reading", label: "발음" }
+                  ]
+                })}
+              </div>
+              <div class="study-options-group">
+                <span>보기 영역</span>
+                ${createSelectField({
+                  id: "starter-kanji-option-field",
+                  label: "보기 영역",
+                  ariaLabel: "한자 퀴즈 보기 영역 고르기",
+                  includeLabel: false,
+                  options: [
+                    { value: "reading", label: "발음" },
+                    { value: "display", label: "한자" }
+                  ]
+                })}
+              </div>
               <div class="study-options-group">
                 <span>몇 문제 풀까요?</span>
                 ${createToggleButtonGroup({
@@ -468,6 +494,32 @@
                 })}
               </div>
             </div>
+          </div>
+          <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="한자 퀴즈 학년 필터">
+            ${createSelectField({
+              id: "starter-kanji-collection-select",
+              label: "모아보기",
+              ariaLabel: "한자 퀴즈 모아보기 고르기",
+              options: [
+                { value: "all", label: "전체" },
+                { value: "review", label: "다시 볼래요" },
+                { value: "mastered", label: "익혔어요" }
+              ]
+            })}
+            ${createSelectField({
+              id: "starter-kanji-grade-select",
+              label: "학년",
+              ariaLabel: "한자 퀴즈 학년 고르기",
+              options: [
+                { value: "all", label: "전체" },
+                { value: "1", label: "1학년" },
+                { value: "2", label: "2학년" },
+                { value: "3", label: "3학년" },
+                { value: "4", label: "4학년" },
+                { value: "5", label: "5학년" },
+                { value: "6", label: "6학년" }
+              ]
+            })}
           </div>
           ${createActionButton({
             id: "starter-kanji-start",
@@ -513,6 +565,11 @@
             emptyId: "starter-kanji-result-empty",
             emptyText: "아직 보여줄 결과가 없어요.",
             listId: "starter-kanji-result-list",
+            bulkAction: {
+              id: "starter-kanji-result-bulk-action",
+              labelId: "starter-kanji-result-bulk-label",
+              label: "전체 다시 볼래요"
+            },
             footerHtml:
               '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="starter-kanji-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
           })}
@@ -633,6 +690,116 @@
     `;
   }
 
+  function createKanjiMatchLayout() {
+    return `
+      <div class="match-shell">
+        <aside class="match-sidebar">
+          <div class="match-sidebar-head"><span class="eyebrow">ROUND HUD</span><h3>한자 짝맞추기</h3></div>
+          ${createStudyOptionsShell({
+            shellId: "kanji-match-options-shell",
+            shellClassName: "match-options-shell",
+            toggleId: "kanji-match-options-toggle",
+            toggleTitle: "짝 맞추기 설정",
+            summaryId: "kanji-match-options-summary",
+            summaryText: "전체 · 전체 · 5문제 · 15초",
+            panelId: "kanji-match-options-panel",
+            panelClassName: "study-options-panel-wide",
+            groups: [
+              {
+                label: "몇 문제 풀까요?",
+                content: createToggleButtonGroup({
+                  ariaLabel: "한자 짝 맞추기 문제 수 고르기",
+                  buttons: [
+                    { label: "5문제", className: "level-button is-active", attributes: { "data-kanji-match-count": "5", "aria-pressed": "true" } },
+                    { label: "10문제", attributes: { "data-kanji-match-count": "10", "aria-pressed": "false" } },
+                    { label: "15문제", attributes: { "data-kanji-match-count": "15", "aria-pressed": "false" } },
+                    { label: "20문제", attributes: { "data-kanji-match-count": "20", "aria-pressed": "false" } }
+                  ]
+                })
+              },
+              {
+                label: "시간은 어떻게 할까요?",
+                content: createToggleButtonGroup({
+                  ariaLabel: "한자 짝 맞추기 시간 고르기",
+                  buttons: [
+                    { label: "천천히", attributes: { "data-kanji-match-time": "0", "aria-pressed": "false" } },
+                    { label: "10초", attributes: { "data-kanji-match-time": "10", "aria-pressed": "false" } },
+                    { label: "15초", className: "level-button is-active", attributes: { "data-kanji-match-time": "15", "aria-pressed": "true" } },
+                    { label: "20초", attributes: { "data-kanji-match-time": "20", "aria-pressed": "false" } }
+                  ]
+                })
+              }
+            ]
+          })}
+          <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="한자 짝 맞추기 필터">
+            ${createSelectField({
+              id: "kanji-match-grade-select",
+              label: "학년",
+              ariaLabel: "한자 짝 맞추기 학년 고르기",
+              options: [
+                { value: "all", label: "전체" },
+                { value: "1", label: "1학년" },
+                { value: "2", label: "2학년" },
+                { value: "3", label: "3학년" },
+                { value: "4", label: "4학년" },
+                { value: "5", label: "5학년" },
+                { value: "6", label: "6학년" }
+              ]
+            })}
+            ${createSelectField({
+              id: "kanji-match-filter-select",
+              label: "모아보기",
+              ariaLabel: "한자 짝 맞추기 모아보기 고르기",
+              options: [
+                { value: "all", label: "전체" },
+                { value: "review", label: "다시 볼래요" },
+                { value: "mastered", label: "익혔어요" }
+              ]
+            })}
+          </div>
+          ${createStatsGrid({
+            id: "kanji-match-stats",
+            items: [
+              { label: "진행", valueId: "kanji-match-progress", value: "0 / 5" },
+              { label: "남은 시간", valueId: "kanji-match-timer", value: "15초" }
+            ]
+          })}
+          ${createActionButton({
+            id: "kanji-match-new-round",
+            labelId: "kanji-match-new-round-label",
+            label: "시작해볼까요?"
+          })}
+        </aside>
+        <div class="match-board" id="kanji-match-board" hidden>
+          <p class="vocab-list-empty" id="kanji-match-empty" hidden>준비됐다면 시작해볼까요?</p>
+          <div class="match-play-view" id="kanji-match-play-view">
+            <div class="match-feedback" id="kanji-match-feedback" hidden></div>
+            <div class="match-columns">
+              <section class="match-column"><div class="match-column-head"><h3>한자 카드</h3></div><div class="match-card-list" id="kanji-match-left-list"></div></section>
+              <section class="match-column"><div class="match-column-head"><h3>발음 카드</h3></div><div class="match-card-list" id="kanji-match-right-list"></div></section>
+            </div>
+          </div>
+          ${createResultView({
+            viewId: "kanji-match-result-view",
+            totalId: "kanji-match-result-total",
+            correctId: "kanji-match-result-correct",
+            wrongId: "kanji-match-result-wrong",
+            filterId: "kanji-match-result-filter",
+            filterAriaLabel: "한자 짝 맞추기 결과 필터",
+            emptyId: "kanji-match-result-empty",
+            emptyText: "아직 보여줄 결과가 없어요.",
+            listId: "kanji-match-result-list",
+            bulkAction: {
+              id: "kanji-match-result-bulk-action",
+              labelId: "kanji-match-result-bulk-label",
+              label: "전체 다시 볼래요"
+            }
+          })}
+        </div>
+      </div>
+    `;
+  }
+
   function createGrammarPracticeLayout() {
     return `
       <div class="match-shell">
@@ -739,6 +906,8 @@
         return createVocabQuizLayout();
       case "starter-kanji-practice":
         return createStarterKanjiLayout();
+      case "kanji-match-round":
+        return createKanjiMatchLayout();
       case "match-round":
         return createMatchLayout();
       case "grammar-practice":

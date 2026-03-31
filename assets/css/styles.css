@@ -1993,9 +1993,45 @@ button {
   margin: 0 auto 16px;
 }
 
+.kanji-list-head-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .kanji-list-main {
   margin-top: 14px;
   text-align: center;
+}
+
+.kanji-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.kanji-status-actions > * {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.kanji-status-btn.is-selected-review {
+  color: white;
+  background: var(--coral);
+  border-color: rgba(222, 107, 72, 0.3);
+}
+
+.kanji-status-btn.is-selected-mastered {
+  color: white;
+  background: var(--mint);
+  border-color: rgba(95, 174, 139, 0.3);
+}
+
+.kanji-result-actions {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .kanji-list-char {

@@ -100,6 +100,14 @@
     "quizSessionMistakeIds"
   ];
 
+  /** 제거(빼기)가 동기화돼야 하는 ID 목록은 합집합이 아니라 최근 편집본을 따른다. */
+  const studyArrayIdKeysLastWriteWins = new Set([
+    "masteredIds",
+    "reviewIds",
+    "kanjiMasteredIds",
+    "kanjiReviewIds"
+  ]);
+
   const studyIndexObjectKeys = ["basicPracticeIndexes", "readingIndexes", "grammarPracticeIndexes"];
 
   function unionIdArrays(a, b) {
@@ -174,7 +182,17 @@
     };
 
     for (const key of studyArrayIdKeys) {
-      merged[key] = unionIdArrays(local?.[key], remote?.[key]);
+      if (studyArrayIdKeysLastWriteWins.has(key)) {
+        if (la > ra) {
+          merged[key] = Array.isArray(local?.[key]) ? [...local[key]] : [];
+        } else if (ra > la) {
+          merged[key] = Array.isArray(remote?.[key]) ? [...remote[key]] : [];
+        } else {
+          merged[key] = unionIdArrays(local?.[key], remote?.[key]);
+        }
+      } else {
+        merged[key] = unionIdArrays(local?.[key], remote?.[key]);
+      }
     }
 
     merged.quizMistakes = mergeQuizMistakes(local?.quizMistakes, remote?.quizMistakes);

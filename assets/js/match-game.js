@@ -39,7 +39,7 @@ const matchFilterLabels = {
   all: "전체",
   review: "다시 볼래요",
   mastered: "익혔어요",
-  unmarked: "아직 안 정했어요"
+  unmarked: "아직 안 봤어요"
 };
 
 function loadMatchPreferences() {

@@ -321,7 +321,7 @@
             { value: "all", label: "전체" },
             { value: "review", label: "다시 볼래요" },
             { value: "mastered", label: "익혔어요" },
-            { value: "unmarked", label: "아직 안 정했어요" }
+            { value: "unmarked", label: "아직 안 봤어요" }
           ]
         }),
         createSelectField({
@@ -423,7 +423,7 @@
             { value: "all", label: "전체" },
             { value: "review", label: "다시 볼래요" },
             { value: "mastered", label: "익혔어요" },
-            { value: "unmarked", label: "아직 안 정했어요" }
+            { value: "unmarked", label: "아직 안 봤어요" }
           ]
         })
       ],

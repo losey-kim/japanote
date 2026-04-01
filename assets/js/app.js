@@ -1404,7 +1404,7 @@ const vocabFilterLabels = {
   all: "전체",
   review: "다시 볼래요",
   mastered: "익혔어요",
-  unmarked: "아직 안 정했어요"
+  unmarked: "아직 안 봤어요"
 };
 
 const vocabHeadingCopy = {
@@ -3818,7 +3818,7 @@ const kanjiCollectionFilterLabels = {
   all: "전체",
   review: "다시 볼래요",
   mastered: "익혔어요",
-  unmarked: "아직 안 정했어요"
+  unmarked: "아직 안 봤어요"
 };
 const starterKanjiState = {
   results: [],
@@ -4703,6 +4703,39 @@ function isKanjiSavedToMasteredList(id) {
   return Boolean(id) && state.kanjiMasteredIds.includes(id);
 }
 
+function getKanjiListStatus(id) {
+  if (isKanjiSavedToMasteredList(id)) {
+    return "mastered";
+  }
+
+  if (isKanjiSavedToReviewList(id)) {
+    return "review";
+  }
+
+  return "unmarked";
+}
+
+function setKanjiListStatus(id, status) {
+  if (!id || !status) {
+    return;
+  }
+
+  if (status === "unmarked") {
+    removeKanjiFromReviewList(id);
+    removeKanjiFromMasteredList(id);
+    return;
+  }
+
+  if (status === "review") {
+    saveKanjiToReviewList(id);
+    return;
+  }
+
+  if (status === "mastered") {
+    saveKanjiToMasteredList(id);
+  }
+}
+
 function getKanjiCollectionItems(collectionFilter = state?.kanjiCollectionFilter) {
   const items = basicPracticeSets.kanji?.items || [];
   const activeCollectionFilter = getKanjiCollectionFilter(collectionFilter);
@@ -5137,18 +5170,6 @@ function createStudyStatusButtonsMarkup({
   `;
 }
 
-function createKanjiStatusButtonsMarkup(id) {
-  return createStudyStatusButtonsMarkup({
-    id,
-    groupClassName: "kanji-status-actions",
-    buttonClassName: "kanji-status-btn",
-    reviewAttribute: "data-kanji-review",
-    masteredAttribute: "data-kanji-mastered",
-    reviewSelected: isKanjiSavedToReviewList(id),
-    masteredSelected: isKanjiSavedToMasteredList(id)
-  });
-}
-
 function applyStudyActionButtonState(button, selected, selectedClass, idleClass, disabled) {
   if (!button) {
     return;
@@ -5228,6 +5249,7 @@ function createStudyListCardMarkup({
   index,
   headMetaMarkup = "",
   badgesMarkup = "",
+  headRightMarkup,
   mainClassName = "vocab-list-main",
   titleClassName = "vocab-list-word",
   titleText = "",
@@ -5236,6 +5258,11 @@ function createStudyListCardMarkup({
   descriptionMarkup = "",
   actionsMarkup = ""
 }) {
+  const headRight =
+    headRightMarkup !== undefined
+      ? headRightMarkup
+      : `<div class="vocab-status-badges">${badgesMarkup}</div>`;
+
   return `
     <article class="vocab-list-card">
       <div class="vocab-list-card-head">
@@ -5243,7 +5270,7 @@ function createStudyListCardMarkup({
           <span class="vocab-list-index">${index}</span>
           ${headMetaMarkup}
         </div>
-        <div class="vocab-status-badges">${badgesMarkup}</div>
+        ${headRight}
       </div>
       <div class="${mainClassName}">
         <strong class="${titleClassName}">${titleText}</strong>
@@ -6465,19 +6492,17 @@ function renderKanjiList() {
       saveState();
     },
     renderItem: (item, displayIndex) => {
-      const review = isKanjiSavedToReviewList(item.id);
-      const mastered = isKanjiSavedToMasteredList(item.id);
       const gradeLabel = item.gradeLabel || getKanjiGradeLabel(item.grade);
 
       return createStudyListCardMarkup({
         index: displayIndex,
         headMetaMarkup: gradeLabel ? `<span class="vocab-list-index">${gradeLabel}</span>` : "",
-        badgesMarkup: createStudyStatusBadgesMarkup(review, mastered),
+        headRightMarkup: createKanjiListStatusIconsMarkup(item.id),
         mainClassName: "vocab-list-main kanji-list-main",
         titleClassName: "vocab-list-word kanji-list-char",
         titleText: formatQuizLineBreaks(item.display),
         subtitleText: formatQuizLineBreaks(item.readingsDisplay || item.reading),
-        actionsMarkup: createKanjiStatusButtonsMarkup(item.id)
+        actionsMarkup: ""
       });
     }
   });
@@ -7213,16 +7238,153 @@ function isWordSavedToMasteredList(id) {
   return Boolean(id) && state.masteredIds.includes(id);
 }
 
-function createVocabStatusButtonsMarkup(id) {
-  return createStudyStatusButtonsMarkup({
-    id,
-    groupClassName: "vocab-list-actions",
-    buttonClassName: "vocab-status-btn",
-    reviewAttribute: "data-word-review",
-    masteredAttribute: "data-word-mastered",
-    reviewSelected: isWordSavedToReviewList(id),
-    masteredSelected: isWordSavedToMasteredList(id)
-  });
+function getWordVocabStatus(id) {
+  if (isWordSavedToMasteredList(id)) {
+    return "mastered";
+  }
+
+  if (isWordSavedToReviewList(id)) {
+    return "review";
+  }
+
+  return "unmarked";
+}
+
+function setWordVocabStatus(id, status) {
+  if (!id || !status) {
+    return;
+  }
+
+  if (status === "unmarked") {
+    removeWordFromReviewList(id);
+    removeWordFromMasteredList(id);
+    return;
+  }
+
+  if (status === "review") {
+    saveWordToReviewList(id);
+    return;
+  }
+
+  if (status === "mastered") {
+    saveWordToMasteredList(id);
+  }
+}
+
+function getNextVocabStatus(current) {
+  if (current === "unmarked") {
+    return "review";
+  }
+
+  if (current === "review") {
+    return "mastered";
+  }
+
+  return "unmarked";
+}
+
+function getVocabStatusCycleMessage(status) {
+  switch (status) {
+    case "unmarked":
+      return "아직 안 봤어요로 바꿨어요";
+    case "review":
+      return "다시 볼래요로 바꿨어요";
+    case "mastered":
+      return "익혔어요로 바꿨어요";
+    default:
+      return "";
+  }
+}
+
+function getVocabStatusIconName(status) {
+  switch (status) {
+    case "unmarked":
+      return "radio_button_unchecked";
+    case "review":
+      return "replay";
+    case "mastered":
+      return "check_circle";
+    default:
+      return "radio_button_unchecked";
+  }
+}
+
+function getVocabStatusShortLabel(status) {
+  switch (status) {
+    case "unmarked":
+      return "아직 안 봤어요";
+    case "review":
+      return "다시 볼래요";
+    case "mastered":
+      return "익혔어요";
+    default:
+      return "단어 상태";
+  }
+}
+
+let japanoteToastHideTimer = null;
+let japanoteToastRemoveTimer = null;
+
+function showJapanoteToast(message) {
+  if (!message) {
+    return;
+  }
+
+  let el = document.getElementById("japanote-toast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "japanote-toast";
+    el.className = "japanote-toast";
+    el.setAttribute("role", "status");
+    el.setAttribute("aria-live", "polite");
+    document.body.appendChild(el);
+  }
+
+  el.textContent = message;
+  el.hidden = false;
+  el.classList.add("is-visible");
+
+  if (japanoteToastHideTimer) {
+    clearTimeout(japanoteToastHideTimer);
+  }
+
+  if (japanoteToastRemoveTimer) {
+    clearTimeout(japanoteToastRemoveTimer);
+  }
+
+  japanoteToastHideTimer = window.setTimeout(() => {
+    el.classList.remove("is-visible");
+    japanoteToastRemoveTimer = window.setTimeout(() => {
+      el.hidden = true;
+    }, 280);
+  }, 2600);
+}
+
+function createStudyListStatusCycleButtonMarkup(id, kind) {
+  const getStatus = kind === "kanji" ? getKanjiListStatus : getWordVocabStatus;
+  const status = getStatus(id);
+  const icon = getVocabStatusIconName(status);
+  const label = getVocabStatusShortLabel(status);
+  const nextStatus = getNextVocabStatus(status);
+  const nextLabel = getVocabStatusShortLabel(nextStatus);
+  const idAttr = kind === "kanji" ? "data-kanji-list-id" : "data-vocab-word-id";
+  const cycleAttr = kind === "kanji" ? "data-kanji-cycle" : "data-vocab-cycle";
+
+  return `
+    <div class="vocab-list-status-icons">
+      <button type="button" class="vocab-status-icon-btn is-${status}" ${idAttr}="${id}" ${cycleAttr} aria-label="지금 ${label}. 누르면 ${nextLabel}로 바꿔요" title="눌러서 바꿔요 (${label} → ${nextLabel})">
+        <span class="material-symbols-rounded" aria-hidden="true">${icon}</span>
+      </button>
+    </div>
+  `;
+}
+
+function createVocabListStatusIconsMarkup(id) {
+  return createStudyListStatusCycleButtonMarkup(id, "vocab");
+}
+
+function createKanjiListStatusIconsMarkup(id) {
+  return createStudyListStatusCycleButtonMarkup(id, "kanji");
 }
 
 function getVocabQuizResultCounts() {
@@ -7600,18 +7762,16 @@ function renderVocabList() {
       saveState();
     },
     renderItem: (item, displayIndex) => {
-      const review = isWordSavedToReviewList(item.id);
-      const mastered = isWordSavedToMasteredList(item.id);
       const vocabLevel = item.level || "";
 
       return createStudyListCardMarkup({
         index: displayIndex,
         headMetaMarkup: vocabLevel ? `<span class="vocab-list-index">${vocabLevel}</span>` : "",
-        badgesMarkup: createStudyStatusBadgesMarkup(review, mastered),
+        headRightMarkup: createVocabListStatusIconsMarkup(item.id),
         titleText: formatQuizLineBreaks(item.word),
         subtitleText: formatQuizLineBreaks(item.reading),
         descriptionMarkup: `<p class="vocab-list-meaning">${formatQuizLineBreaks(item.meaning)}</p>`,
-        actionsMarkup: createVocabStatusButtonsMarkup(item.id)
+        actionsMarkup: ""
       });
     }
   });
@@ -9379,6 +9539,56 @@ function attachStudyStatusListListeners({
   });
 }
 
+function attachVocabListStatusIconListeners({ list, render }) {
+  if (!list) {
+    return;
+  }
+
+  list.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-vocab-cycle]");
+    if (!button || !list.contains(button)) {
+      return;
+    }
+
+    const id = button.dataset.vocabWordId;
+    if (!id) {
+      return;
+    }
+
+    const nextStatus = getNextVocabStatus(getWordVocabStatus(id));
+    setWordVocabStatus(id, nextStatus);
+    showJapanoteToast(getVocabStatusCycleMessage(nextStatus));
+    updateStudyStreak();
+    saveState();
+    render();
+  });
+}
+
+function attachKanjiListStatusIconListeners({ list, render }) {
+  if (!list) {
+    return;
+  }
+
+  list.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-kanji-cycle]");
+    if (!button || !list.contains(button)) {
+      return;
+    }
+
+    const id = button.dataset.kanjiListId;
+    if (!id) {
+      return;
+    }
+
+    const nextStatus = getNextVocabStatus(getKanjiListStatus(id));
+    setKanjiListStatus(id, nextStatus);
+    showJapanoteToast(getVocabStatusCycleMessage(nextStatus));
+    updateStudyStreak();
+    saveState();
+    render();
+  });
+}
+
 function attachStudyCatalogListeners({
   optionsToggle,
   optionsStateKey,
@@ -9456,34 +9666,13 @@ function attachVocabStudyListeners({
       getPageCount: () => getVocabPageCount(getVisibleVocabList()),
       render: renderVocabPage
     },
-    statusListListeners: {
-      list: vocabList,
-      reviewSelector: "[data-word-review]",
-      masteredSelector: "[data-word-mastered]",
-      getReviewId: (button) => button.dataset.wordReview,
-      getMasteredId: (button) => button.dataset.wordMastered,
-      toggleReview: (id) => {
-        if (isWordSavedToReviewList(id)) {
-          removeWordFromReviewList(id);
-        } else {
-          saveWordToReviewList(id);
-        }
-      },
-      toggleMastered: (id) => {
-        if (isWordSavedToMasteredList(id)) {
-          removeWordFromMasteredList(id);
-        } else {
-          saveWordToMasteredList(id);
-        }
-      },
-      render: renderAll
-    },
     selectListeners: [
       { element: vocabLevelSelect, handler: setVocabLevel },
       { element: vocabFilterSelect, handler: setVocabFilter },
       { element: vocabPartSelect, handler: setVocabPartFilter }
     ]
   });
+  attachVocabListStatusIconListeners({ list: vocabList, render: renderAll });
   vocabTabButtons.forEach((button) => {
     button.addEventListener("click", () => {
       setVocabTab(button.dataset.vocabTab);
@@ -9534,35 +9723,17 @@ function attachKanjiStudyListeners({
       getPageCount: () => getKanjiPageCount(getVisibleKanjiItems()),
       render: renderKanjiPageLayout
     },
-    statusListListeners: {
-      list: kanjiList,
-      reviewSelector: "[data-kanji-review]",
-      masteredSelector: "[data-kanji-mastered]",
-      getReviewId: (button) => button.dataset.kanjiReview,
-      getMasteredId: (button) => button.dataset.kanjiMastered,
-      toggleReview: (id) => {
-        if (isKanjiSavedToReviewList(id)) {
-          removeKanjiFromReviewList(id);
-        } else {
-          saveKanjiToReviewList(id);
-        }
-      },
-      toggleMastered: (id) => {
-        if (isKanjiSavedToMasteredList(id)) {
-          removeKanjiFromMasteredList(id);
-        } else {
-          saveKanjiToMasteredList(id);
-        }
-      },
-      render: () => {
-        renderStats();
-        renderKanjiPageLayout();
-      }
-    },
     selectListeners: [
       { element: kanjiCollectionSelect, handler: setKanjiCollectionFilter },
       { element: kanjiGradeSelect, handler: setKanjiGrade }
     ]
+  });
+  attachKanjiListStatusIconListeners({
+    list: kanjiList,
+    render: () => {
+      renderStats();
+      renderKanjiPageLayout();
+    }
   });
   kanjiGradeButtons.forEach((button) => {
     button.addEventListener("click", () => {

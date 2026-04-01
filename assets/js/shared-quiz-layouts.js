@@ -99,6 +99,149 @@
     return [createStudySelectGroup(questionField), createStudySelectGroup(optionField)];
   }
 
+  const JLPT_LEVEL_OPTIONS = [
+    { value: "all", label: "전체" },
+    { value: "N5", label: "N5" },
+    { value: "N4", label: "N4" },
+    { value: "N3", label: "N3" }
+  ];
+
+  const VOCAB_LEVEL_OPTIONS_CATALOG = [
+    { value: "N5", label: "N5" },
+    { value: "N4", label: "N4" },
+    { value: "N3", label: "N3" },
+    { value: "all", label: "전체" }
+  ];
+
+  const KANJI_GRADE_FILTER_OPTIONS = [
+    { value: "all", label: "전체" },
+    ...[1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: `${n}학년` }))
+  ];
+
+  const KANJI_COLLECTION_OPTIONS_CATALOG = [
+    { value: "all", label: "전체" },
+    { value: "review", label: "다시 볼래요" },
+    { value: "mastered", label: "익혔어요" },
+    { value: "unmarked", label: "아직 안 봤어요" }
+  ];
+
+  const KANJI_COLLECTION_OPTIONS_BASIC = [
+    { value: "all", label: "전체" },
+    { value: "review", label: "다시 볼래요" },
+    { value: "mastered", label: "익혔어요" }
+  ];
+
+  const DEFAULT_PART_OPTIONS = [{ value: "all", label: "전체 품사" }];
+
+  function buildKanjiGradeCollectionSelectFields({
+    gradeSelectId,
+    collectionSelectId,
+    ariaPrefix,
+    collectionOptions = KANJI_COLLECTION_OPTIONS_CATALOG,
+    fieldOrder = "grade-first"
+  }) {
+    const gradeField = createSelectField({
+      id: gradeSelectId,
+      label: "학년",
+      ariaLabel: `${ariaPrefix} 학년 고르기`,
+      options: KANJI_GRADE_FILTER_OPTIONS
+    });
+    const collectionField = createSelectField({
+      id: collectionSelectId,
+      label: "모아보기",
+      ariaLabel: `${ariaPrefix} 모아보기 고르기`,
+      options: collectionOptions
+    });
+    return fieldOrder === "collection-first" ? [collectionField, gradeField] : [gradeField, collectionField];
+  }
+
+  function createKanjiGradeCollectionToolbarHtml({
+    toolbarAriaLabel,
+    toolbarClassName,
+    gradeSelectId,
+    collectionSelectId,
+    ariaPrefix,
+    collectionOptions,
+    fieldOrder
+  }) {
+    const fields = buildKanjiGradeCollectionSelectFields({
+      gradeSelectId,
+      collectionSelectId,
+      ariaPrefix,
+      collectionOptions,
+      fieldOrder
+    });
+    return `
+      <div class="${escapeHtml(toolbarClassName)}" aria-label="${escapeHtml(toolbarAriaLabel)}">
+        ${fields.join("")}
+      </div>
+    `;
+  }
+
+  function buildVocabLevelFilterPartSelectFields({
+    levelId,
+    filterId,
+    partId,
+    ariaPrefix,
+    levelOptions,
+    collectionOptions,
+    partOptions = DEFAULT_PART_OPTIONS,
+    partAriaLabel
+  }) {
+    return [
+      createSelectField({
+        id: levelId,
+        label: "레벨",
+        ariaLabel: `${ariaPrefix} 레벨 고르기`,
+        options: levelOptions
+      }),
+      createSelectField({
+        id: filterId,
+        label: "모아보기",
+        ariaLabel: `${ariaPrefix} 모아보기 고르기`,
+        options: collectionOptions
+      }),
+      createSelectField({
+        id: partId,
+        label: "품사",
+        ariaLabel: partAriaLabel || `${ariaPrefix} 품사 고르기`,
+        options: partOptions
+      })
+    ];
+  }
+
+  function createVocabQuizSidebarToolbarHtml() {
+    const fields = buildVocabLevelFilterPartSelectFields({
+      levelId: "vocab-quiz-level-select",
+      filterId: "vocab-quiz-filter-select",
+      partId: "vocab-quiz-part-select",
+      ariaPrefix: "단어 퀴즈",
+      levelOptions: JLPT_LEVEL_OPTIONS,
+      collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC
+    });
+    return `
+      <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="단어 퀴즈 필터">
+        ${fields.join("")}
+      </div>
+    `;
+  }
+
+  function createMatchSidebarVocabToolbarHtml() {
+    const fields = buildVocabLevelFilterPartSelectFields({
+      levelId: "match-level-select",
+      filterId: "match-filter-select",
+      partId: "match-part-select",
+      ariaPrefix: "짝 맞추기",
+      levelOptions: JLPT_LEVEL_OPTIONS,
+      collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC
+    });
+    return `
+      <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="짝 맞추기 필터">
+        ${fields.join("")}
+      </div>
+    `;
+  }
+
   function createStudyOptionsShell({
     shellId,
     shellClassName = "",
@@ -301,36 +444,15 @@
   function createVocabCatalogLayout() {
     return createStudyCatalogLayout({
       toolbarAriaLabel: "단어 필터",
-      selectFields: [
-        createSelectField({
-          id: "vocab-level-select",
-          label: "레벨",
-          ariaLabel: "단어 레벨 고르기",
-          options: [
-            { value: "N5", label: "N5" },
-            { value: "N4", label: "N4" },
-            { value: "N3", label: "N3" },
-            { value: "all", label: "전체" }
-          ]
-        }),
-        createSelectField({
-          id: "vocab-filter-select",
-          label: "모아보기",
-          ariaLabel: "단어 모아보기 고르기",
-          options: [
-            { value: "all", label: "전체" },
-            { value: "review", label: "다시 볼래요" },
-            { value: "mastered", label: "익혔어요" },
-            { value: "unmarked", label: "아직 안 봤어요" }
-          ]
-        }),
-        createSelectField({
-          id: "vocab-part-select",
-          label: "품사",
-          ariaLabel: "품사별로 보기",
-          options: [{ value: "all", label: "전체 품사" }]
-        })
-      ],
+      selectFields: buildVocabLevelFilterPartSelectFields({
+        levelId: "vocab-level-select",
+        filterId: "vocab-filter-select",
+        partId: "vocab-part-select",
+        ariaPrefix: "단어",
+        levelOptions: VOCAB_LEVEL_OPTIONS_CATALOG,
+        collectionOptions: KANJI_COLLECTION_OPTIONS_CATALOG,
+        partAriaLabel: "품사별로 보기"
+      }),
       summaryId: "vocab-summary",
       summaryText: "0개 모였어요",
       viewSwitchAriaLabel: "단어 보기 방식 고르기",
@@ -400,33 +522,13 @@
       toolbarClassName: "vocab-select-toolbar kanji-filter-toolbar",
       panelHeadLayout: "inline",
       toolbarAriaLabel: "한자 필터",
-      selectFields: [
-        createSelectField({
-          id: "kanji-grade-select",
-          label: "학년",
-          ariaLabel: "한자 학년 고르기",
-          options: [
-            { value: "all", label: "전체" },
-            { value: "1", label: "1학년" },
-            { value: "2", label: "2학년" },
-            { value: "3", label: "3학년" },
-            { value: "4", label: "4학년" },
-            { value: "5", label: "5학년" },
-            { value: "6", label: "6학년" }
-          ]
-        }),
-        createSelectField({
-          id: "kanji-collection-select",
-          label: "모아보기",
-          ariaLabel: "한자 모아보기 고르기",
-          options: [
-            { value: "all", label: "전체" },
-            { value: "review", label: "다시 볼래요" },
-            { value: "mastered", label: "익혔어요" },
-            { value: "unmarked", label: "아직 안 봤어요" }
-          ]
-        })
-      ],
+      selectFields: buildKanjiGradeCollectionSelectFields({
+        gradeSelectId: "kanji-grade-select",
+        collectionSelectId: "kanji-collection-select",
+        ariaPrefix: "한자",
+        collectionOptions: KANJI_COLLECTION_OPTIONS_CATALOG,
+        fieldOrder: "grade-first"
+      }),
       summaryId: "kanji-summary",
       summaryText: "0개 한자를 준비하고 있어요",
       viewSwitchAriaLabel: "한자 보기 방식 고르기",
@@ -681,35 +783,7 @@
               }
             ]
           })}
-          <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="단어 퀴즈 필터">
-            ${createSelectField({
-              id: "vocab-quiz-level-select",
-              label: "레벨",
-              ariaLabel: "단어 퀴즈 레벨 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "N5", label: "N5" },
-                { value: "N4", label: "N4" },
-                { value: "N3", label: "N3" }
-              ]
-            })}
-            ${createSelectField({
-              id: "vocab-quiz-filter-select",
-              label: "모아보기",
-              ariaLabel: "단어 퀴즈 모아보기 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "review", label: "다시 볼래요" },
-                { value: "mastered", label: "익혔어요" }
-              ]
-            })}
-            ${createSelectField({
-              id: "vocab-quiz-part-select",
-              label: "품사",
-              ariaLabel: "단어 퀴즈 품사 고르기",
-              options: [{ value: "all", label: "전체 품사" }]
-            })}
-          </div>
+          ${createVocabQuizSidebarToolbarHtml()}
           ${createActionButton({
             id: "vocab-quiz-restart",
             labelId: "vocab-quiz-restart-label",
@@ -837,32 +911,15 @@
               }
             ]
           })}
-          <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="한자 퀴즈 학년 필터">
-            ${createSelectField({
-              id: "starter-kanji-collection-select",
-              label: "모아보기",
-              ariaLabel: "한자 퀴즈 모아보기 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "review", label: "다시 볼래요" },
-                { value: "mastered", label: "익혔어요" }
-              ]
-            })}
-            ${createSelectField({
-              id: "starter-kanji-grade-select",
-              label: "학년",
-              ariaLabel: "한자 퀴즈 학년 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "1", label: "1학년" },
-                { value: "2", label: "2학년" },
-                { value: "3", label: "3학년" },
-                { value: "4", label: "4학년" },
-                { value: "5", label: "5학년" },
-                { value: "6", label: "6학년" }
-              ]
-            })}
-          </div>
+          ${createKanjiGradeCollectionToolbarHtml({
+            toolbarAriaLabel: "한자 퀴즈 학년 필터",
+            toolbarClassName: "vocab-select-toolbar vocab-select-toolbar-sidebar kanji-filter-toolbar",
+            gradeSelectId: "starter-kanji-grade-select",
+            collectionSelectId: "starter-kanji-collection-select",
+            ariaPrefix: "한자 퀴즈",
+            collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC,
+            fieldOrder: "grade-first"
+          })}
           ${createActionButton({
             id: "starter-kanji-start",
             labelId: "starter-kanji-start-label",
@@ -954,35 +1011,7 @@
               }
             ]
           })}
-          <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="짝 맞추기 필터">
-            ${createSelectField({
-              id: "match-level-select",
-              label: "레벨",
-              ariaLabel: "짝 맞추기 레벨 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "N5", label: "N5" },
-                { value: "N4", label: "N4" },
-                { value: "N3", label: "N3" }
-              ]
-            })}
-            ${createSelectField({
-              id: "match-filter-select",
-              label: "모아보기",
-              ariaLabel: "짝 맞추기 모아보기 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "review", label: "다시 볼래요" },
-                { value: "mastered", label: "익혔어요" }
-              ]
-            })}
-            ${createSelectField({
-              id: "match-part-select",
-              label: "품사",
-              ariaLabel: "짝 맞추기 품사 고르기",
-              options: [{ value: "all", label: "전체 품사" }]
-            })}
-          </div>
+          ${createMatchSidebarVocabToolbarHtml()}
           ${createActionButton({
             id: "match-new-round",
             labelId: "match-new-round-label",
@@ -1057,32 +1086,15 @@
               }
             ]
           })}
-          <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="한자 짝 맞추기 필터">
-            ${createSelectField({
-              id: "kanji-match-grade-select",
-              label: "학년",
-              ariaLabel: "한자 짝 맞추기 학년 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "1", label: "1학년" },
-                { value: "2", label: "2학년" },
-                { value: "3", label: "3학년" },
-                { value: "4", label: "4학년" },
-                { value: "5", label: "5학년" },
-                { value: "6", label: "6학년" }
-              ]
-            })}
-            ${createSelectField({
-              id: "kanji-match-filter-select",
-              label: "모아보기",
-              ariaLabel: "한자 짝 맞추기 모아보기 고르기",
-              options: [
-                { value: "all", label: "전체" },
-                { value: "review", label: "다시 볼래요" },
-                { value: "mastered", label: "익혔어요" }
-              ]
-            })}
-          </div>
+          ${createKanjiGradeCollectionToolbarHtml({
+            toolbarAriaLabel: "한자 짝 맞추기 필터",
+            toolbarClassName: "vocab-select-toolbar vocab-select-toolbar-sidebar kanji-filter-toolbar",
+            gradeSelectId: "kanji-match-grade-select",
+            collectionSelectId: "kanji-match-filter-select",
+            ariaPrefix: "한자 짝 맞추기",
+            collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC,
+            fieldOrder: "grade-first"
+          })}
           ${createActionButton({
             id: "kanji-match-new-round",
             labelId: "kanji-match-new-round-label",
@@ -1124,13 +1136,6 @@
   }
 
   function createGrammarPracticeLayout() {
-    const grammarLevelOptions = [
-      { value: "all", label: "전체" },
-      { value: "N5", label: "N5" },
-      { value: "N4", label: "N4" },
-      { value: "N3", label: "N3" }
-    ];
-
     return `
       <div class="match-shell">
         <aside class="match-sidebar">
@@ -1149,7 +1154,7 @@
                 groupLabel: "어느 레벨로 풀까요?",
                 id: "grammar-practice-level-select",
                 ariaLabel: "문법 레벨 고르기",
-                options: grammarLevelOptions
+                options: JLPT_LEVEL_OPTIONS
               }),
               {
                 label: "몇 문제 풀까요?",
@@ -1195,13 +1200,6 @@
   }
 
   function createReadingPracticeLayout() {
-    const readingLevelOptions = [
-      { value: "all", label: "전체" },
-      { value: "N5", label: "N5" },
-      { value: "N4", label: "N4" },
-      { value: "N3", label: "N3" }
-    ];
-
     return `
       <div class="match-shell">
         <aside class="match-sidebar">
@@ -1220,7 +1218,7 @@
                 groupLabel: "어느 레벨로 읽을까요?",
                 id: "reading-level-select",
                 ariaLabel: "독해 레벨 고르기",
-                options: readingLevelOptions
+                options: JLPT_LEVEL_OPTIONS
               }),
               {
                 label: "몇 문제 풀까요?",

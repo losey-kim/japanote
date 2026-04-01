@@ -62,4 +62,6 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
 4. Authentication의 `Site URL`과 `Redirect URLs`에 실제 서비스 주소를 등록합니다. GitHub Pages 예: `https://losey-kim.github.io/Japanote/**`. 로컬 개발 주소는 아래「로컬에서 Supabase」절을 참고하세요.
 5. **SQL Editor**(Supabase 대시보드 → SQL)에서 `supabase/migrations/001_user_state.sql` **전체를 복사해 한 번에 실행**합니다. 이걸 하지 않으면 동기화 시 `Could not find the table 'public.user_state' in the schema cache` 같은 오류가 납니다.
 
-앱에서는 **이름 + 이메일**만 입력하면 매직 링크가 전송됩니다. 로그인하면 **클라우드에서 학습 상태를 자동으로 불러오고**, 이후 학습 데이터가 바뀔 때마다 **잠시 후 자동으로 클라우드에 저장**됩니다. 다른 기기에서도 같은 계정으로 로그인하면 같은 데이터를 이어서 볼 수 있어요.
+앱에서는 **이름 + 이메일**만 입력하면 매직 링크가 전송됩니다. 로그인하면 **클라우드에서 학습 상태를 자동으로 불러오고**, 이후 학습 데이터가 바뀔 때마다 **잠시 후 자동으로 클라우드에 저장**됩니다. 여러 기기에서 동시에 진행한 내용은 **ID 목록은 합치고(합집합), 스트릭·인덱스 등은 더 진행된 쪽을 반영**하는 방식으로 맞춥니다(`_sync.clientEditedAt`·서버 `updated_at` 기준).
+
+다른 기기에서도 같은 계정으로 로그인하면 같은 데이터를 이어서 볼 수 있어요.

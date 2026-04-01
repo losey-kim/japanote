@@ -90,6 +90,130 @@
     }
   }
 
+  const studyArrayIdKeys = [
+    "masteredIds",
+    "reviewIds",
+    "kanjiMasteredIds",
+    "kanjiReviewIds",
+    "starterDoneIds",
+    "grammarDoneIds",
+    "quizSessionMistakeIds"
+  ];
+
+  const studyIndexObjectKeys = ["basicPracticeIndexes", "readingIndexes", "grammarPracticeIndexes"];
+
+  function unionIdArrays(a, b) {
+    const seen = new Set();
+    const out = [];
+
+    for (const item of [...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]) {
+      if (item == null || item === "") {
+        continue;
+      }
+
+      const key = String(item);
+
+      if (!seen.has(key)) {
+        seen.add(key);
+        out.push(item);
+      }
+    }
+
+    return out;
+  }
+
+  function mergeIndexObjects(a, b) {
+    const left = a && typeof a === "object" ? a : {};
+    const right = b && typeof b === "object" ? b : {};
+    const keys = new Set([...Object.keys(left), ...Object.keys(right)]);
+    const out = {};
+
+    for (const k of keys) {
+      out[k] = Math.max(Number(left[k]) || 0, Number(right[k]) || 0);
+    }
+
+    return out;
+  }
+
+  function mergeQuizMistakes(a, b) {
+    const map = new Map();
+
+    for (const item of [...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]) {
+      if (item && item.id) {
+        map.set(String(item.id), item);
+      }
+    }
+
+    return Array.from(map.values()).slice(0, 30);
+  }
+
+  function maxDateString(a, b) {
+    if (!a && !b) {
+      return null;
+    }
+
+    if (!a) {
+      return b;
+    }
+
+    if (!b) {
+      return a;
+    }
+
+    return String(a) >= String(b) ? a : b;
+  }
+
+  function mergeStudyState(local, remote) {
+    const la = local?._sync?.clientEditedAt ?? 0;
+    const ra = remote?._sync?.clientEditedAt ?? 0;
+    const newer = la >= ra ? local : remote;
+    const older = la >= ra ? remote : local;
+    const merged = {
+      ...(older && typeof older === "object" ? older : {}),
+      ...(newer && typeof newer === "object" ? newer : {})
+    };
+
+    for (const key of studyArrayIdKeys) {
+      merged[key] = unionIdArrays(local?.[key], remote?.[key]);
+    }
+
+    merged.quizMistakes = mergeQuizMistakes(local?.quizMistakes, remote?.quizMistakes);
+
+    for (const key of studyIndexObjectKeys) {
+      merged[key] = mergeIndexObjects(local?.[key], remote?.[key]);
+    }
+
+    merged.streak = Math.max(Number(local?.streak) || 0, Number(remote?.streak) || 0);
+    merged.lastStudyDate = maxDateString(local?.lastStudyDate, remote?.lastStudyDate);
+    merged.quizCorrectCount = Math.max(Number(local?.quizCorrectCount) || 0, Number(remote?.quizCorrectCount) || 0);
+    merged.quizAnsweredCount = Math.max(Number(local?.quizAnsweredCount) || 0, Number(remote?.quizAnsweredCount) || 0);
+    merged.stateVersion = Math.max(Number(local?.stateVersion) || 0, Number(remote?.stateVersion) || 0);
+
+    const mastered = new Set(merged.masteredIds.map((id) => String(id)));
+    merged.reviewIds = merged.reviewIds.filter((id) => !mastered.has(String(id)));
+    const km = new Set(merged.kanjiMasteredIds.map((id) => String(id)));
+    merged.kanjiReviewIds = merged.kanjiReviewIds.filter((id) => !km.has(String(id)));
+
+    merged._sync = { clientEditedAt: Math.max(la, ra) || Date.now() };
+
+    return merged;
+  }
+
+  function mergeMatchState(local, remote) {
+    const la = local?._sync?.clientEditedAt ?? 0;
+    const ra = remote?._sync?.clientEditedAt ?? 0;
+    const newer = la >= ra ? local : remote;
+    const older = la >= ra ? remote : local;
+    const merged = {
+      ...(older && typeof older === "object" ? older : {}),
+      ...(newer && typeof newer === "object" ? newer : {})
+    };
+
+    merged._sync = { clientEditedAt: Math.max(la, ra) || Date.now() };
+
+    return merged;
+  }
+
   function hasHttpOrigin() {
     return window.location.protocol === "http:" || window.location.protocol === "https:";
   }
@@ -179,6 +303,17 @@
     }
 
     const nextValue = clone(value);
+
+    if (options.source !== "remote") {
+      if (key === studyStateKey && nextValue && typeof nextValue === "object") {
+        nextValue._sync = { clientEditedAt: Date.now() };
+      }
+
+      if (key === matchStateKey && nextValue && typeof nextValue === "object") {
+        nextValue._sync = { clientEditedAt: Date.now() };
+      }
+    }
+
     localValues[key] = nextValue;
     persistLocalValue(key, nextValue);
     dispatchStorageUpdate(key, nextValue, options.source || "local");
@@ -201,16 +336,6 @@
     }, 700);
   }
 
-  function buildRemotePayload() {
-    return {
-      user_id: currentUser.id,
-      study_state: readValue(studyStateKey, {}),
-      match_state: readValue(matchStateKey, {}),
-      theme_mode: typeof localValues[themeStorageKey] === "string" ? localValues[themeStorageKey] : "light",
-      updated_at: new Date().toISOString()
-    };
-  }
-
   async function fetchRemoteState() {
     if (!client || !currentUser) {
       return { data: null, error: null };
@@ -228,11 +353,14 @@
       return;
     }
 
-    writeValue(studyStateKey, remoteState.study_state || {}, {
+    const mergedStudy = mergeStudyState(readValue(studyStateKey, {}), remoteState.study_state || {});
+    const mergedMatch = mergeMatchState(readValue(matchStateKey, {}), remoteState.match_state || {});
+
+    writeValue(studyStateKey, mergedStudy, {
       remote: false,
       source: "remote"
     });
-    writeValue(matchStateKey, remoteState.match_state || {}, {
+    writeValue(matchStateKey, mergedMatch, {
       remote: false,
       source: "remote"
     });
@@ -285,7 +413,28 @@
     setStatus("syncing", "클라우드 저장", detail, true);
 
     try {
-      const { error } = await client.from(config.stateTable).upsert(buildRemotePayload(), {
+      const { data: row, error: fetchError } = await fetchRemoteState();
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      const localStudy = readValue(studyStateKey, {});
+      const localMatch = readValue(matchStateKey, {});
+      const mergedStudy = mergeStudyState(localStudy, row?.study_state || {});
+      const mergedMatch = mergeMatchState(localMatch, row?.match_state || {});
+      const themeMode =
+        typeof localValues[themeStorageKey] === "string" ? localValues[themeStorageKey] : "light";
+
+      const payload = {
+        user_id: currentUser.id,
+        study_state: mergedStudy,
+        match_state: mergedMatch,
+        theme_mode: themeMode,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await client.from(config.stateTable).upsert(payload, {
         onConflict: "user_id"
       });
 
@@ -293,7 +442,16 @@
         throw error;
       }
 
-      setStatus("synced", "동기화됨", "현재 기기의 학습 상태를 클라우드에 저장했어요.");
+      writeValue(studyStateKey, mergedStudy, {
+        remote: false,
+        source: "remote"
+      });
+      writeValue(matchStateKey, mergedMatch, {
+        remote: false,
+        source: "remote"
+      });
+
+      setStatus("synced", "동기화됨", "다른 기기와 합친 학습 상태를 클라우드에 저장했어요.");
       return { ok: true };
     } catch (error) {
       setStatus(

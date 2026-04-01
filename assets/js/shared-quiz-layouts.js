@@ -605,8 +605,35 @@
     };
   }
 
-  function createVocabCatalogLayout() {
+  function createCatalogLayout({
+    toolbarClassName = "vocab-select-toolbar",
+    panelHeadLayout = "spread",
+    toolbarAriaLabel,
+    selectFields,
+    summaryId,
+    summaryText,
+    viewSwitchAriaLabel,
+    viewButtonsScope,
+    flashcard,
+    listView
+  }) {
     return createStudyCatalogLayout({
+      toolbarClassName,
+      panelHeadLayout,
+      toolbarAriaLabel,
+      selectFields,
+      summaryId,
+      summaryText,
+      viewSwitchAriaLabel,
+      viewButtons: createCatalogViewButtons({ scope: viewButtonsScope }),
+      flashcard,
+      listView
+    });
+  }
+
+  function createVocabCatalogLayout() {
+    return createCatalogLayout({
+      viewButtonsScope: "vocab",
       toolbarAriaLabel: "단어 필터",
       selectFields: buildVocabLevelFilterPartSelectFields({
         levelId: "vocab-level-select",
@@ -620,7 +647,7 @@
       summaryId: "vocab-summary",
       summaryText: "0개 모였어요",
       viewSwitchAriaLabel: "단어 보기 방식 고르기",
-      viewButtons: createCatalogViewButtons({ scope: "vocab" }),
+      viewButtonsScope: "vocab",
       flashcard: createCatalogFlashcardConfig({
         viewId: "vocab-card-view",
         articleId: "flashcard",
@@ -647,7 +674,8 @@
   }
 
   function createKanjiCatalogLayout() {
-    return createStudyCatalogLayout({
+    return createCatalogLayout({
+      viewButtonsScope: "kanji",
       toolbarClassName: "vocab-select-toolbar kanji-filter-toolbar",
       panelHeadLayout: "inline",
       toolbarAriaLabel: "한자 필터",
@@ -661,7 +689,7 @@
       summaryId: "kanji-summary",
       summaryText: "0개 한자를 준비하고 있어요",
       viewSwitchAriaLabel: "한자 보기 방식 고르기",
-      viewButtons: createCatalogViewButtons({ scope: "kanji" }),
+      viewButtonsScope: "kanji",
       flashcard: createCatalogFlashcardConfig({
         viewId: "kanji-card-view",
         viewClassName: "vocab-card-view kanji-card-view",

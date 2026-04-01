@@ -489,6 +489,34 @@
     `;
   }
 
+  function createCatalogViewButtons({ scope }) {
+    const dataAttribute = `data-${scope}-view`;
+    const cardLabel = "카드 보기";
+    const listLabel = "목록 보기";
+
+    return [
+      {
+        icon: "style",
+        className: "is-active",
+        attributes: {
+          [dataAttribute]: "card",
+          "aria-pressed": "true",
+          "aria-label": cardLabel,
+          title: cardLabel
+        }
+      },
+      {
+        icon: "view_list",
+        attributes: {
+          [dataAttribute]: "list",
+          "aria-pressed": "false",
+          "aria-label": listLabel,
+          title: listLabel
+        }
+      }
+    ];
+  }
+
   function createVocabCatalogLayout() {
     return createStudyCatalogLayout({
       toolbarAriaLabel: "단어 필터",
@@ -504,27 +532,7 @@
       summaryId: "vocab-summary",
       summaryText: "0개 모였어요",
       viewSwitchAriaLabel: "단어 보기 방식 고르기",
-      viewButtons: [
-        {
-          icon: "style",
-          className: "is-active",
-          attributes: {
-            "data-vocab-view": "card",
-            "aria-pressed": "true",
-            "aria-label": "카드로 보기",
-            title: "카드로 보기"
-          }
-        },
-        {
-          icon: "view_list",
-          attributes: {
-            "data-vocab-view": "list",
-            "aria-pressed": "false",
-            "aria-label": "목록으로 보기",
-            title: "목록으로 보기"
-          }
-        }
-      ],
+      viewButtons: createCatalogViewButtons({ scope: "vocab" }),
       flashcard: {
         viewId: "vocab-card-view",
         articleId: "flashcard",
@@ -580,27 +588,7 @@
       summaryId: "kanji-summary",
       summaryText: "0개 한자를 준비하고 있어요",
       viewSwitchAriaLabel: "한자 보기 방식 고르기",
-      viewButtons: [
-        {
-          icon: "style",
-          className: "is-active",
-          attributes: {
-            "data-kanji-view": "card",
-            "aria-pressed": "true",
-            "aria-label": "카드로 보기",
-            title: "카드로 보기"
-          }
-        },
-        {
-          icon: "view_list",
-          attributes: {
-            "data-kanji-view": "list",
-            "aria-pressed": "false",
-            "aria-label": "목록으로 보기",
-            title: "목록으로 보기"
-          }
-        }
-      ],
+      viewButtons: createCatalogViewButtons({ scope: "kanji" }),
       flashcard: {
         viewId: "kanji-card-view",
         viewClassName: "vocab-card-view kanji-card-view",

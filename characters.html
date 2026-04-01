@@ -87,8 +87,16 @@
                   </button>
                   <div class="kana-setup-panel" id="kana-setup-panel" hidden aria-hidden="true">
                     <div class="kana-setup-group"><span>어떤 문자로 할까요?</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-mode="hiragana">히라가나</button><button class="level-button" type="button" data-kana-mode="katakana">카타카나</button><button class="level-button" type="button" data-kana-mode="random">랜덤</button></div></div>
-                    <div class="kana-setup-group"><span>몇 문제 풀까요?</span><div class="kana-setup-buttons"><button class="level-button is-active" type="button" data-kana-count="10">10문제</button><button class="level-button" type="button" data-kana-count="20">20문제</button><button class="level-button" type="button" data-kana-count="30">30문제</button><button class="level-button" type="button" data-kana-count="all">전부</button></div></div>
-                    <div class="kana-setup-group"><span>시간은 어떻게 할까요?</span><div class="kana-setup-buttons"><button class="level-button" type="button" data-kana-time="0">천천히</button><button class="level-button is-active" type="button" data-kana-time="5">5초</button><button class="level-button" type="button" data-kana-time="10">10초</button><button class="level-button" type="button" data-kana-time="15">15초</button></div></div>
+                    <div class="kana-setup-group"><span>몇 문제 풀까요?</span><div class="study-spinner" data-spinner-id="kana-quiz-count" role="group" aria-label="문자 퀴즈 문제 수 고르기">
+                        <button class="study-spinner-button" type="button" data-spinner-direction="-1" aria-label="문자 퀴즈 문제 수 감소"><span class="material-symbols-rounded" aria-hidden="true">remove</span></button>
+                        <output class="study-spinner-value" data-spinner-value aria-live="polite">10문제</output>
+                        <button class="study-spinner-button" type="button" data-spinner-direction="1" aria-label="문자 퀴즈 문제 수 증가"><span class="material-symbols-rounded" aria-hidden="true">add</span></button>
+                      </div></div>
+                    <div class="kana-setup-group"><span>시간은 어떻게 할까요?</span><div class="study-spinner" data-spinner-id="kana-quiz-time" role="group" aria-label="문자 퀴즈 시간 고르기">
+                        <button class="study-spinner-button" type="button" data-spinner-direction="-1" aria-label="문자 퀴즈 시간 감소"><span class="material-symbols-rounded" aria-hidden="true">remove</span></button>
+                        <output class="study-spinner-value" data-spinner-value aria-live="polite">5초</output>
+                        <button class="study-spinner-button" type="button" data-spinner-direction="1" aria-label="문자 퀴즈 시간 증가"><span class="material-symbols-rounded" aria-hidden="true">add</span></button>
+                      </div></div>
                   </div>
                 </div>
                 <div class="match-actions">

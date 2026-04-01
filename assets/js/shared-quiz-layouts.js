@@ -1109,6 +1109,7 @@
 
   function createGrammarPracticeLayout() {
     const grammarLevelOptions = [
+      { value: "all", label: "전체" },
       { value: "N5", label: "N5" },
       { value: "N4", label: "N4" },
       { value: "N3", label: "N3" }
@@ -1124,7 +1125,7 @@
             toggleId: "grammar-practice-options-toggle",
             toggleTitle: "문법 설정",
             summaryId: "grammar-practice-options-summary",
-            summaryText: "N5 · 25초",
+            summaryText: "N5 · 10문제 · 25초",
             panelId: "grammar-practice-options-panel",
             panelClassName: "study-options-panel-compact",
             groups: [
@@ -1134,6 +1135,14 @@
                 ariaLabel: "문법 레벨 고르기",
                 options: grammarLevelOptions
               }),
+              {
+                label: "몇 문제 풀까요?",
+                content: createQuestionCountSpinner({
+                  spinnerId: "grammar-practice-count",
+                  ariaLabel: "문법 퀴즈 문제 수",
+                  activeValue: 10
+                })
+              },
               {
                 label: "시간은 어떻게 할까요?",
                 content: createDurationSpinner({
@@ -1161,7 +1170,7 @@
               <div class="grammar-practice-options" id="grammar-practice-options"></div>
               <p class="grammar-practice-feedback" id="grammar-practice-feedback"></p>
               <p class="grammar-practice-explanation" id="grammar-practice-explanation"></p>
-              <div class="quiz-actions"><button class="primary-btn" id="grammar-practice-next" type="button">다음 문제 볼까요?</button></div>
+          <div class="quiz-actions"><button class="primary-btn" id="grammar-practice-next" type="button">다음 문제 보기</button></div>
             </article>
           </div>
         </div>
@@ -1171,6 +1180,7 @@
 
   function createReadingPracticeLayout() {
     const readingLevelOptions = [
+      { value: "all", label: "전체" },
       { value: "N5", label: "N5" },
       { value: "N4", label: "N4" },
       { value: "N3", label: "N3" }
@@ -1186,7 +1196,7 @@
             toggleId: "reading-options-toggle",
             toggleTitle: "독해 설정",
             summaryId: "reading-options-summary",
-            summaryText: "N5 · 45초",
+            summaryText: "N5 · 10문제 · 45초",
             panelId: "reading-options-panel",
             panelClassName: "study-options-panel-compact",
             groups: [
@@ -1196,6 +1206,14 @@
                 ariaLabel: "독해 레벨 고르기",
                 options: readingLevelOptions
               }),
+              {
+                label: "몇 문제 풀까요?",
+                content: createQuestionCountSpinner({
+                  spinnerId: "reading-count",
+                  ariaLabel: "독해 문제 수",
+                  activeValue: 10
+                })
+              },
               {
                 label: "시간은 어떻게 할까요?",
                 content: createDurationSpinner({
@@ -1224,7 +1242,7 @@
               <div class="reading-options" id="reading-options"></div>
               <p class="reading-feedback" id="reading-feedback"></p>
               <p class="reading-explanation" id="reading-explanation"></p>
-              <div class="quiz-actions"><button class="primary-btn" id="reading-next" type="button">다음 글도 볼까요?</button></div>
+          <div class="quiz-actions"><button class="primary-btn" id="reading-next" type="button">다음 글 보기</button></div>
             </article>
           </div>
         </div>

@@ -11,6 +11,7 @@ function getStudyStateStore() {
 
 const contentLevels = ["N5", "N4", "N3"];
 const allLevelValue = "all";
+const selectablePracticeLevels = [allLevelValue, ...contentLevels];
 const contentRegistry = globalThis.japanoteContent || {};
 const kanaStrokeSvgs = globalThis.kanaStrokeSvgs || {};
 const vocabContent = contentRegistry.vocab || {};
@@ -22,6 +23,10 @@ function getLevelContentSets(source) {
     sets[level] = Array.isArray(source?.[level]) ? source[level] : [];
     return sets;
   }, {});
+}
+
+function getAllPracticeSets(levelSets = {}) {
+  return contentLevels.flatMap((level) => levelSets[level] || []);
 }
 
 function getLegacyVocabKey(level) {
@@ -813,6 +818,7 @@ const basicPracticeSets = {
 
 const grammarItems = Array.isArray(grammarContent.items) ? grammarContent.items : [];
 const grammarPracticeSets = getLevelContentSets(grammarContent.practiceSets);
+grammarPracticeSets[allLevelValue] = getAllPracticeSets(grammarPracticeSets);
 
 const quizQuestions = [
   {
@@ -872,6 +878,8 @@ const quizSessionSizeOptions = [10, 20];
 const starterKanjiQuizCountOptions = [5, 10, 15, 20];
 const kanjiMatchCountOptions = [5, 10, 15, 20];
 const vocabQuizCountOptions = [5, 10, 15, 20];
+const grammarPracticeCountOptions = [5, 10, 15, 20];
+const readingCountOptions = [5, 10, 15, 20];
 const quizDurationOptions = [10, 15, 20, 0];
 const grammarPracticeDurationOptions = [15, 25, 35, 0];
 const readingDurationOptions = [45, 60, 90, 0];
@@ -1241,8 +1249,19 @@ function getStarterKanjiQuizDuration(value = state?.starterKanjiQuizDuration) {
   return quizDurationOptions.includes(numericValue) ? numericValue : 15;
 }
 
+function getGrammarPracticeCount(value = state?.grammarPracticeCount) {
+  const numericValue = Number(value);
+  return grammarPracticeCountOptions.includes(numericValue) ? numericValue : 10;
+}
+
+function getReadingCount(value = state?.readingCount) {
+  const numericValue = Number(value);
+  return readingCountOptions.includes(numericValue) ? numericValue : 10;
+}
+
 function getGrammarPracticeLevel(level = state?.grammarPracticeLevel) {
-  return contentLevels.includes(level) ? level : "N5";
+  const normalizedLevel = normalizeStudyLevelValue(level, "N5");
+  return selectablePracticeLevels.includes(normalizedLevel) ? normalizedLevel : "N5";
 }
 
 function getGrammarPracticeDuration(value = state?.grammarPracticeDuration) {
@@ -1251,7 +1270,8 @@ function getGrammarPracticeDuration(value = state?.grammarPracticeDuration) {
 }
 
 function getReadingLevel(level = state?.readingLevel) {
-  return contentLevels.includes(level) ? level : "N5";
+  const normalizedLevel = normalizeStudyLevelValue(level, "N5");
+  return selectablePracticeLevels.includes(normalizedLevel) ? normalizedLevel : "N5";
 }
 
 function getReadingDuration(value = state?.readingDuration) {
@@ -1710,6 +1730,8 @@ const kanaQuizSettings = {
   count: 10,
   duration: 5
 };
+const kanaQuizCountOptions = [10, 20, 30, "all"];
+const kanaQuizDurationOptions = [5, 10, 15, 0];
 
 const kanaQuizSheetState = {
   open: false,
@@ -1958,27 +1980,46 @@ function renderKanaQuizSetup() {
   const setupToggle = document.getElementById("kana-setup-toggle");
   const setupPanel = document.getElementById("kana-setup-panel");
   const setupSummary = document.getElementById("kana-setup-summary");
+  const countSpinner = document.querySelector('[data-spinner-id="kana-quiz-count"]');
+  const timeSpinner = document.querySelector('[data-spinner-id="kana-quiz-time"]');
   const isOpen = state.kanaSetupOpen === true;
   const modeButtons = document.querySelectorAll("[data-kana-mode]");
-  const countButtons = document.querySelectorAll("[data-kana-count]");
-  const timeButtons = document.querySelectorAll("[data-kana-time]");
+  const isSettingsLocked = kanaQuizSheetState.open && !kanaQuizSheetState.finished;
   const summaryText = [
     getKanaQuizModeLabel(kanaQuizSettings.mode),
     getKanaQuizCountLabel(kanaQuizSettings.count),
     getKanaQuizDurationLabel(kanaQuizSettings.duration)
   ].join(" · ");
 
-  syncSelectionButtonState(modeButtons, (button) => button.dataset.kanaMode, kanaQuizSettings.mode);
-  syncSelectionButtonState(countButtons, (button) => button.dataset.kanaCount, String(kanaQuizSettings.count));
-  syncSelectionButtonState(timeButtons, (button) => Number(button.dataset.kanaTime), kanaQuizSettings.duration);
-  renderOpenableSettingsSection({
+  renderCollapsibleSettingsSection({
     shell: setupShell,
     toggle: setupToggle,
     panel: setupPanel,
     summary: setupSummary,
     summaryText,
-    isOpen
+    isLocked: isSettingsLocked,
+    shouldShowPanel: !isSettingsLocked && isOpen
   });
+  syncSelectionButtonState(modeButtons, (button) => button.dataset.kanaMode, kanaQuizSettings.mode);
+  modeButtons.forEach((button) => {
+    button.disabled = isSettingsLocked;
+  });
+  renderSpinnerControls([
+    {
+      spinner: countSpinner,
+      options: kanaQuizCountOptions,
+      activeValue: kanaQuizSettings.count,
+      formatValue: getKanaQuizCountLabel,
+      disabled: isSettingsLocked
+    },
+    {
+      spinner: timeSpinner,
+      options: kanaQuizDurationOptions,
+      activeValue: kanaQuizSettings.duration,
+      formatValue: getKanaQuizDurationLabel,
+      disabled: isSettingsLocked
+    }
+  ]);
 }
 
 function startKanaQuizSession(mode = kanaQuizSettings.mode) {
@@ -4128,6 +4169,7 @@ const starterKanjiState = {
 };
 
 const readingSets = getLevelContentSets(readingContent.sets);
+readingSets[allLevelValue] = getAllPracticeSets(readingSets);
 
 const defaultState = {
   flashcardIndex: 0,
@@ -4185,8 +4227,10 @@ const defaultState = {
   grammarPracticeOptionsOpen: false,
   grammarPracticeStarted: false,
   grammarPracticeLevel: "N5",
+  grammarPracticeCount: 10,
   grammarPracticeDuration: 25,
-  grammarPracticeIndexes: { N5: 0, N4: 0, N3: 0 },
+  grammarPracticeSessionQuestionIndex: 0,
+  grammarPracticeIndexes: { all: 0, N5: 0, N4: 0, N3: 0 },
   quizIndex: 0,
   quizLevel: "N5",
   quizMode: "meaning",
@@ -4199,10 +4243,12 @@ const defaultState = {
   quizCorrectCount: 0,
   quizAnsweredCount: 0,
   readingLevel: "N5",
+  readingCount: 10,
   readingDuration: 45,
   readingOptionsOpen: false,
   readingStarted: false,
-  readingIndexes: { N5: 0, N4: 0, N3: 0 },
+  readingSessionQuestionIndex: 0,
+  readingIndexes: { all: 0, N5: 0, N4: 0, N3: 0 },
   charactersTab: "library",
   charactersLibraryTab: "hiragana",
   kanaSetupOpen: false,
@@ -4362,8 +4408,16 @@ function normalizeLoadedState(inputState) {
   nextState.grammarPracticeOptionsOpen = false;
   nextState.grammarPracticeStarted = false;
   nextState.grammarPracticeLevel = getGrammarPracticeLevel(nextState.grammarPracticeLevel);
+  nextState.grammarPracticeCount = getGrammarPracticeCount(nextState.grammarPracticeCount);
+  nextState.grammarPracticeSessionQuestionIndex = Number.isFinite(Number(nextState.grammarPracticeSessionQuestionIndex))
+    ? Math.max(0, Number(nextState.grammarPracticeSessionQuestionIndex))
+    : 0;
   nextState.grammarPracticeDuration = getGrammarPracticeDuration(nextState.grammarPracticeDuration);
   nextState.readingLevel = getReadingLevel(nextState.readingLevel);
+  nextState.readingCount = getReadingCount(nextState.readingCount);
+  nextState.readingSessionQuestionIndex = Number.isFinite(Number(nextState.readingSessionQuestionIndex))
+    ? Math.max(0, Number(nextState.readingSessionQuestionIndex))
+    : 0;
   nextState.readingDuration = getReadingDuration(nextState.readingDuration);
   nextState.readingStarted = false;
   nextState.charactersTab = getCharactersTab(nextState.charactersTab ?? nextState.charactersPracticeTab);
@@ -8347,7 +8401,11 @@ function renderGrammarPageLayout() {
 }
 
 function getGrammarPracticeOptionsSummaryText() {
-  return [getGrammarPracticeLevel(), getDurationLabel(getGrammarPracticeDuration())].join(" · ");
+  return [
+    getLevelSummaryLabel(getGrammarPracticeLevel()),
+    formatQuestionCountLabel(getGrammarPracticeCount()),
+    getDurationLabel(getGrammarPracticeDuration())
+  ].join(" · ");
 }
 
 function setGrammarPracticeLevel(level) {
@@ -8376,6 +8434,7 @@ function setGrammarPracticeDuration(duration) {
 
 function invalidateGrammarPracticeSession() {
   state.grammarPracticeStarted = false;
+  state.grammarPracticeSessionQuestionIndex = 0;
   quizSessions.grammar.correct = 0;
   quizSessions.grammar.streak = 0;
   setQuizSessionDuration("grammar", getGrammarPracticeDuration());
@@ -8388,10 +8447,12 @@ function renderGrammarPracticeControls() {
   const optionsPanel = document.getElementById("grammar-practice-options-panel");
   const optionsSummary = document.getElementById("grammar-practice-options-summary");
   const levelSelect = document.getElementById("grammar-practice-level-select");
+  const countSpinner = document.querySelector('[data-spinner-id="grammar-practice-count"]');
   const timeSpinner = document.querySelector('[data-spinner-id="grammar-practice-time"]');
   const startButton = document.getElementById("grammar-practice-start");
   const startLabel = document.getElementById("grammar-practice-start-label");
   const activeLevel = getGrammarPracticeLevel(state.grammarPracticeLevel);
+  const activeCount = getGrammarPracticeCount(state.grammarPracticeCount);
   const activeDuration = getGrammarPracticeDuration(state.grammarPracticeDuration);
   const isOptionsOpen = state.grammarPracticeOptionsOpen === true;
   const canStart = (grammarPracticeSets[activeLevel] || []).length > 0;
@@ -8407,6 +8468,13 @@ function renderGrammarPracticeControls() {
     isOpen: isOptionsOpen,
     spinnerConfigs: [
       {
+        spinner: countSpinner,
+        options: grammarPracticeCountOptions,
+        activeValue: activeCount,
+        formatValue: formatQuestionCountLabel,
+        disabled: isSettingsLocked
+      },
+      {
         spinner: timeSpinner,
         options: grammarPracticeDurationOptions,
         activeValue: activeDuration,
@@ -8417,7 +8485,7 @@ function renderGrammarPracticeControls() {
     selectConfigs: [
       {
         element: levelSelect,
-        populate: (element) => populateContentLevelSelect(element, activeLevel)
+        populate: (element) => populateContentLevelSelect(element, activeLevel, { includeAll: true })
       }
     ],
     actionButton: {
@@ -8429,15 +8497,20 @@ function renderGrammarPracticeControls() {
   });
 }
 
+function getPracticeLevelIndex(indexes, activeLevel) {
+  const rawIndex = Number.isFinite(Number(indexes?.[activeLevel])) ? Number(indexes[activeLevel]) : 0;
+
+  return Number.isFinite(rawIndex) ? rawIndex : 0;
+}
+
 function getCurrentGrammarPracticeSet() {
   const activeLevel = getGrammarPracticeLevel(state.grammarPracticeLevel);
   const sets = grammarPracticeSets[activeLevel] || [];
+  const currentIndex = getPracticeLevelIndex(state.grammarPracticeIndexes, activeLevel) % (sets.length || 1);
 
   if (!sets.length) {
     return null;
   }
-
-  const currentIndex = state.grammarPracticeIndexes[activeLevel] % sets.length;
   return sets[currentIndex];
 }
 
@@ -8446,6 +8519,7 @@ function renderGrammarPractice() {
   const practiceView = document.getElementById("grammar-practice-view");
   const grammarCard = document.querySelector(".grammar-practice-card");
   const optionsContainer = document.getElementById("grammar-practice-options");
+  const nextButton = document.getElementById("grammar-practice-next");
   const level = document.getElementById("grammar-practice-level");
   const source = document.getElementById("grammar-practice-source");
   const progress = document.getElementById("grammar-practice-progress");
@@ -8458,6 +8532,10 @@ function renderGrammarPractice() {
   const activeDuration = getGrammarPracticeDuration(state.grammarPracticeDuration);
   const sets = grammarPracticeSets[activeLevel] || [];
   const current = getCurrentGrammarPracticeSet();
+  const activeCount = getGrammarPracticeCount(state.grammarPracticeCount);
+  const currentSessionIndex = Number.isFinite(Number(state.grammarPracticeSessionQuestionIndex))
+    ? Number(state.grammarPracticeSessionQuestionIndex)
+    : 0;
 
   renderGrammarPracticeControls();
 
@@ -8466,6 +8544,7 @@ function renderGrammarPractice() {
     !practiceView ||
     !grammarCard ||
     !optionsContainer ||
+    !nextButton ||
     !level ||
     !source ||
     !progress ||
@@ -8492,6 +8571,14 @@ function renderGrammarPractice() {
     return;
   }
 
+  if (currentSessionIndex >= activeCount) {
+    state.grammarPracticeStarted = false;
+    state.grammarPracticeSessionQuestionIndex = 0;
+    saveState();
+    renderGrammarPractice();
+    return;
+  }
+
   if (!current || !sets?.length) {
     stopQuizSessionTimer("grammar");
     setQuizSessionDuration("grammar", activeDuration);
@@ -8508,12 +8595,15 @@ function renderGrammarPractice() {
   level.textContent = activeLevel;
   source.textContent = current.source;
   progress.textContent =
-    `${(state.grammarPracticeIndexes[activeLevel] % sets.length) + 1} / ${sets.length}`;
+    `${currentSessionIndex + 1} / ${activeCount}`;
   title.textContent = softenVisibleKoreanCopy(current.title);
   note.textContent = softenVisibleKoreanCopy(current.note);
   sentence.textContent = current.sentence;
   feedback.textContent = "";
   explanation.textContent = "";
+  nextButton.textContent = currentSessionIndex >= activeCount - 1 ? "결과 보기" : "다음 문제 보기";
+  nextButton.disabled = true;
+  delete optionsContainer.dataset.answered;
 
   grammarCard.className = `grammar-practice-card ${current.tone}`;
 
@@ -8533,6 +8623,9 @@ function handleGrammarPracticeAnswer(index) {
   const current = getCurrentGrammarPracticeSet();
   const options = document.querySelectorAll(".grammar-practice-option");
   const alreadyAnswered = hasAnsweredChoiceOptions(options);
+  const nextButton = document.getElementById("grammar-practice-next");
+  const activeCount = getGrammarPracticeCount(state.grammarPracticeCount);
+  const isLastQuestion = state.grammarPracticeSessionQuestionIndex >= activeCount - 1;
 
   if (alreadyAnswered) {
     return;
@@ -8552,6 +8645,15 @@ function handleGrammarPracticeAnswer(index) {
     ? "좋아요!"
     : "아깝네요! 정답 같이 볼까요?";
   document.getElementById("grammar-practice-explanation").textContent = softenExplanationCopy(current.explanation);
+  if (nextButton) {
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
+    nextButton.disabled = false;
+  }
+  const optionsContainer = document.getElementById("grammar-practice-options");
+
+  if (optionsContainer) {
+    optionsContainer.dataset.answered = "true";
+  }
 
   updateStudyStreak();
   saveState();
@@ -8562,6 +8664,9 @@ function handleGrammarPracticeTimeout() {
   const current = getCurrentGrammarPracticeSet();
   const options = document.querySelectorAll(".grammar-practice-option");
   const alreadyAnswered = hasAnsweredChoiceOptions(options);
+  const nextButton = document.getElementById("grammar-practice-next");
+  const activeCount = getGrammarPracticeCount(state.grammarPracticeCount);
+  const isLastQuestion = state.grammarPracticeSessionQuestionIndex >= activeCount - 1;
 
   if (alreadyAnswered) {
     return;
@@ -8577,6 +8682,13 @@ function handleGrammarPracticeTimeout() {
 
   document.getElementById("grammar-practice-feedback").textContent = "";
   document.getElementById("grammar-practice-explanation").textContent = softenExplanationCopy(current.explanation);
+  if (nextButton) {
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
+    nextButton.disabled = false;
+  }
+  if (document.getElementById("grammar-practice-options")) {
+    document.getElementById("grammar-practice-options").dataset.answered = "true";
+  }
 
   updateStudyStreak();
   saveState();
@@ -8584,14 +8696,28 @@ function handleGrammarPracticeTimeout() {
 }
 
 function nextGrammarPracticeSet() {
+  const nextButton = document.getElementById("grammar-practice-next");
   const activeLevel = getGrammarPracticeLevel(state.grammarPracticeLevel);
   const sets = grammarPracticeSets[activeLevel] || [];
+  const questionLimit = getGrammarPracticeCount(state.grammarPracticeCount);
+  const currentSessionIndex = Number.isFinite(Number(state.grammarPracticeSessionQuestionIndex))
+    ? Number(state.grammarPracticeSessionQuestionIndex)
+    : 0;
 
-  if (!sets.length) {
+  if (!sets.length || !nextButton || nextButton.disabled) {
+    return;
+  }
+
+  if (currentSessionIndex >= questionLimit - 1) {
+    state.grammarPracticeStarted = false;
+    state.grammarPracticeSessionQuestionIndex = 0;
+    saveState();
+    renderGrammarPractice();
     return;
   }
 
   state.grammarPracticeLevel = activeLevel;
+  state.grammarPracticeSessionQuestionIndex = currentSessionIndex + 1;
   state.grammarPracticeIndexes[activeLevel] =
     (state.grammarPracticeIndexes[activeLevel] + 1) % sets.length;
   saveState();
@@ -8610,6 +8736,7 @@ function restartGrammarPractice() {
   quizSessions.grammar.correct = 0;
   quizSessions.grammar.streak = 0;
   setQuizSessionDuration("grammar", state.grammarPracticeDuration);
+  state.grammarPracticeSessionQuestionIndex = 0;
   state.grammarPracticeStarted = true;
   saveState();
   renderGrammarPractice();
@@ -9093,7 +9220,11 @@ function clearQuizMistakes() {
 }
 
 function getReadingOptionsSummaryText() {
-  return [getReadingLevel(), getDurationLabel(getReadingDuration())].join(" · ");
+  return [
+    getLevelSummaryLabel(getReadingLevel()),
+    formatQuestionCountLabel(getReadingCount()),
+    getDurationLabel(getReadingDuration())
+  ].join(" · ");
 }
 
 function setReadingLevel(level) {
@@ -9122,6 +9253,7 @@ function setReadingDuration(duration) {
 
 function invalidateReadingPracticeSession() {
   state.readingStarted = false;
+  state.readingSessionQuestionIndex = 0;
   quizSessions.reading.correct = 0;
   quizSessions.reading.streak = 0;
   setQuizSessionDuration("reading", getReadingDuration());
@@ -9134,10 +9266,12 @@ function renderReadingControls() {
   const optionsPanel = document.getElementById("reading-options-panel");
   const optionsSummary = document.getElementById("reading-options-summary");
   const levelSelect = document.getElementById("reading-level-select");
+  const countSpinner = document.querySelector('[data-spinner-id="reading-count"]');
   const timeSpinner = document.querySelector('[data-spinner-id="reading-time"]');
   const startButton = document.getElementById("reading-start");
   const startLabel = document.getElementById("reading-start-label");
   const activeLevel = getReadingLevel(state.readingLevel);
+  const activeCount = getReadingCount(state.readingCount);
   const activeDuration = getReadingDuration(state.readingDuration);
   const isOptionsOpen = state.readingOptionsOpen === true;
   const canStart = (readingSets[activeLevel] || []).length > 0;
@@ -9153,6 +9287,13 @@ function renderReadingControls() {
     isOpen: isOptionsOpen,
     spinnerConfigs: [
       {
+        spinner: countSpinner,
+        options: readingCountOptions,
+        activeValue: activeCount,
+        formatValue: formatQuestionCountLabel,
+        disabled: isSettingsLocked
+      },
+      {
         spinner: timeSpinner,
         options: readingDurationOptions,
         activeValue: activeDuration,
@@ -9163,7 +9304,7 @@ function renderReadingControls() {
     selectConfigs: [
       {
         element: levelSelect,
-        populate: (element) => populateContentLevelSelect(element, activeLevel)
+        populate: (element) => populateContentLevelSelect(element, activeLevel, { includeAll: true })
       }
     ],
     actionButton: {
@@ -9178,12 +9319,11 @@ function renderReadingControls() {
 function getCurrentReadingSet() {
   const activeLevel = getReadingLevel(state.readingLevel);
   const sets = readingSets[activeLevel] || [];
+  const currentIndex = getPracticeLevelIndex(state.readingIndexes, activeLevel) % (sets.length || 1);
 
   if (!sets.length) {
     return null;
   }
-
-  const currentIndex = state.readingIndexes[activeLevel] % sets.length;
   return sets[currentIndex];
 }
 
@@ -9193,6 +9333,7 @@ function renderReadingPractice() {
   const readingCard = document.querySelector(".reading-card");
   const passage = document.getElementById("reading-passage");
   const optionsContainer = document.getElementById("reading-options");
+  const nextButton = document.getElementById("reading-next");
   const level = document.getElementById("reading-level");
   const source = document.getElementById("reading-source");
   const progress = document.getElementById("reading-progress");
@@ -9206,6 +9347,10 @@ function renderReadingPractice() {
   renderReadingControls();
   const current = getCurrentReadingSet();
   const sets = readingSets[state.readingLevel] || [];
+  const activeCount = getReadingCount(state.readingCount);
+  const currentSessionIndex = Number.isFinite(Number(state.readingSessionQuestionIndex))
+    ? Number(state.readingSessionQuestionIndex)
+    : 0;
 
   if (
     !empty ||
@@ -9237,6 +9382,14 @@ function renderReadingPractice() {
     return;
   }
 
+  if (currentSessionIndex >= activeCount) {
+    state.readingStarted = false;
+    state.readingSessionQuestionIndex = 0;
+    saveState();
+    renderReadingPractice();
+    return;
+  }
+
   if (!current || !sets.length) {
     stopQuizSessionTimer("reading");
     setQuizSessionDuration("reading", state.readingDuration);
@@ -9252,12 +9405,15 @@ function renderReadingPractice() {
 
   level.textContent = state.readingLevel;
   source.textContent = current.source;
-  progress.textContent = `${(state.readingIndexes[state.readingLevel] % sets.length) + 1} / ${sets.length}`;
+  progress.textContent = `${currentSessionIndex + 1} / ${activeCount}`;
   title.textContent = softenVisibleKoreanCopy(current.title);
   korean.textContent = softenVisibleKoreanCopy(current.korean);
   question.textContent = softenVisibleKoreanCopy(current.question);
   feedback.textContent = "";
   explanation.textContent = "";
+  nextButton.textContent = currentSessionIndex >= activeCount - 1 ? "결과 보기" : "다음 글 보기";
+  nextButton.disabled = true;
+  delete optionsContainer.dataset.answered;
 
   readingCard.className = `reading-card ${current.tone}`;
 
@@ -9280,6 +9436,9 @@ function handleReadingAnswer(index) {
   const current = getCurrentReadingSet();
   const options = document.querySelectorAll(".reading-option");
   const alreadyAnswered = hasAnsweredChoiceOptions(options);
+  const nextButton = document.getElementById("reading-next");
+  const activeCount = getReadingCount(state.readingCount);
+  const isLastQuestion = state.readingSessionQuestionIndex >= activeCount - 1;
 
   if (alreadyAnswered) {
     return;
@@ -9299,6 +9458,15 @@ function handleReadingAnswer(index) {
     ? "좋아요!"
     : "아깝네요! 정답 같이 볼까요?";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
+  if (nextButton) {
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 글 보기";
+    nextButton.disabled = false;
+  }
+  const optionsContainer = document.getElementById("reading-options");
+
+  if (optionsContainer) {
+    optionsContainer.dataset.answered = "true";
+  }
 
   updateStudyStreak();
   saveState();
@@ -9309,6 +9477,9 @@ function handleReadingTimeout() {
   const current = getCurrentReadingSet();
   const options = document.querySelectorAll(".reading-option");
   const alreadyAnswered = hasAnsweredChoiceOptions(options);
+  const nextButton = document.getElementById("reading-next");
+  const activeCount = getReadingCount(state.readingCount);
+  const isLastQuestion = state.readingSessionQuestionIndex >= activeCount - 1;
 
   if (alreadyAnswered) {
     return;
@@ -9324,6 +9495,13 @@ function handleReadingTimeout() {
 
   document.getElementById("reading-feedback").textContent = "";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
+  if (nextButton) {
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 글 보기";
+    nextButton.disabled = false;
+  }
+  if (document.getElementById("reading-options")) {
+    document.getElementById("reading-options").dataset.answered = "true";
+  }
 
   updateStudyStreak();
   saveState();
@@ -9331,14 +9509,28 @@ function handleReadingTimeout() {
 }
 
 function nextReadingSet() {
+  const nextButton = document.getElementById("reading-next");
   const activeLevel = getReadingLevel(state.readingLevel);
   const sets = readingSets[activeLevel] || [];
+  const questionLimit = getReadingCount(state.readingCount);
+  const currentSessionIndex = Number.isFinite(Number(state.readingSessionQuestionIndex))
+    ? Number(state.readingSessionQuestionIndex)
+    : 0;
 
-  if (!sets.length) {
+  if (!sets.length || !nextButton || nextButton.disabled) {
+    return;
+  }
+
+  if (currentSessionIndex >= questionLimit - 1) {
+    state.readingStarted = false;
+    state.readingSessionQuestionIndex = 0;
+    saveState();
+    renderReadingPractice();
     return;
   }
 
   state.readingLevel = activeLevel;
+  state.readingSessionQuestionIndex = currentSessionIndex + 1;
   state.readingIndexes[activeLevel] = (state.readingIndexes[activeLevel] + 1) % sets.length;
   saveState();
   renderReadingPractice();
@@ -9356,6 +9548,7 @@ function restartReadingPractice() {
   quizSessions.reading.correct = 0;
   quizSessions.reading.streak = 0;
   setQuizSessionDuration("reading", state.readingDuration);
+  state.readingSessionQuestionIndex = 0;
   state.readingStarted = true;
   saveState();
   renderReadingPractice();
@@ -9719,10 +9912,12 @@ function attachEventListeners() {
   const quizTimeButtons = document.querySelectorAll("[data-quiz-time]");
   const grammarPracticeOptionsToggle = document.getElementById("grammar-practice-options-toggle");
   const grammarPracticeLevelSelect = document.getElementById("grammar-practice-level-select");
+  const grammarPracticeCountSpinner = document.querySelector('[data-spinner-id="grammar-practice-count"]');
   const grammarPracticeTimeSpinner = document.querySelector('[data-spinner-id="grammar-practice-time"]');
   const grammarPracticeStart = document.getElementById("grammar-practice-start");
   const readingOptionsToggle = document.getElementById("reading-options-toggle");
   const readingLevelSelect = document.getElementById("reading-level-select");
+  const readingCountSpinner = document.querySelector('[data-spinner-id="reading-count"]');
   const readingTimeSpinner = document.querySelector('[data-spinner-id="reading-time"]');
   const readingStart = document.getElementById("reading-start");
   const readingNext = document.getElementById("reading-next");
@@ -9760,8 +9955,8 @@ function attachEventListeners() {
   const kanaQuizResultFilter = document.getElementById("kana-quiz-result-filter");
   const kanaSetupToggle = document.getElementById("kana-setup-toggle");
   const kanaModeButtons = document.querySelectorAll("[data-kana-mode]");
-  const kanaCountButtons = document.querySelectorAll("[data-kana-count]");
-  const kanaTimeButtons = document.querySelectorAll("[data-kana-time]");
+  const kanaCountSpinner = document.querySelector('[data-spinner-id="kana-quiz-count"]');
+  const kanaTimeSpinner = document.querySelector('[data-spinner-id="kana-quiz-time"]');
   const kanaSetupStart = document.getElementById("kana-setup-start");
   const charactersTabButtons = document.querySelectorAll("[data-characters-tab]");
   const charactersLibraryTabButtons = document.querySelectorAll("[data-characters-library-tab]");
@@ -9913,6 +10108,18 @@ function attachEventListeners() {
     });
   }
   attachStateSpinner({
+    spinner: grammarPracticeCountSpinner,
+    options: grammarPracticeCountOptions,
+    getCurrentValue: () => state.grammarPracticeCount,
+    setValue: (value) => {
+      state.grammarPracticeCount = value;
+    },
+    invalidate: () => {
+      invalidateGrammarPracticeSession();
+    },
+    render: renderGrammarPractice
+  });
+  attachStateSpinner({
     spinner: grammarPracticeTimeSpinner,
     options: grammarPracticeDurationOptions,
     getCurrentValue: () => state.grammarPracticeDuration,
@@ -9933,6 +10140,18 @@ function attachEventListeners() {
       setReadingLevel(readingLevelSelect.value);
     });
   }
+  attachStateSpinner({
+    spinner: readingCountSpinner,
+    options: readingCountOptions,
+    getCurrentValue: () => state.readingCount,
+    setValue: (value) => {
+      state.readingCount = value;
+    },
+    invalidate: () => {
+      invalidateReadingPracticeSession();
+    },
+    render: renderReadingPractice
+  });
   attachStateSpinner({
     spinner: readingTimeSpinner,
     options: readingDurationOptions,
@@ -10084,13 +10303,23 @@ function attachEventListeners() {
     kanaQuizSettings.mode = nextMode;
     renderKanaQuizSetup();
   });
-  attachValueButtonListeners(kanaCountButtons, (button) => button.dataset.kanaCount || "10", (nextCount) => {
-    kanaQuizSettings.count = nextCount;
-    renderKanaQuizSetup();
+  attachStateSpinner({
+    spinner: kanaCountSpinner,
+    options: kanaQuizCountOptions,
+    getCurrentValue: () => kanaQuizSettings.count,
+    setValue: (nextValue) => {
+      kanaQuizSettings.count = nextValue;
+    },
+    render: renderKanaQuizSetup
   });
-  attachValueButtonListeners(kanaTimeButtons, (button) => Number(button.dataset.kanaTime || 5), (nextDuration) => {
-    kanaQuizSettings.duration = nextDuration;
-    renderKanaQuizSetup();
+  attachStateSpinner({
+    spinner: kanaTimeSpinner,
+    options: kanaQuizDurationOptions,
+    getCurrentValue: () => kanaQuizSettings.duration,
+    setValue: (nextValue) => {
+      kanaQuizSettings.duration = nextValue;
+    },
+    render: renderKanaQuizSetup
   });
   if (kanaSetupStart) {
     kanaSetupStart.addEventListener("click", () => {

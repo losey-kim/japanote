@@ -815,6 +815,52 @@
     `;
   }
 
+
+  function createChoiceQuizLayout({
+    sidebarHead,
+    shellClassName = "match-shell",
+    sidebarClassName = "match-sidebar",
+    optionsShellConfig,
+    sidebarExtra = "",
+    startButton = "",
+    boardClassName,
+    emptyId,
+    emptyText = QUIZ_EMPTY_MESSAGE,
+    viewId,
+    viewClassName = "",
+    choiceQuizCardConfig = {},
+    resultPrefix,
+    resultClassName = "match-result-view",
+    resultFilterAriaLabel,
+    resultBulkActionLabel = QUIZ_RESULT_ALL_ACTION_LABEL,
+    resultFooterHtml = ""
+  }) {
+    const viewClassAttribute = viewClassName ? ` class="${escapeHtml(viewClassName)}"` : "";
+
+    return createLayoutShell({
+      shellClassName,
+      sidebarClassName,
+      sidebarHead,
+      optionsShellConfig,
+      sidebarExtra,
+      startButton,
+      boardMarkup: `
+        <div class="${escapeHtml(boardClassName)}">
+          ${createPracticeEmptyMessage({ id: emptyId, text: emptyText })}
+          <div${viewClassAttribute} id="${escapeHtml(viewId)}">
+            ${createChoiceQuizCard(choiceQuizCardConfig)}
+          </div>
+          ${createPrefixedResultView({
+            idPrefix: resultPrefix,
+            className: resultClassName,
+            filterAriaLabel: resultFilterAriaLabel,
+            bulkActionLabel: resultBulkActionLabel,
+            footerHtml: resultFooterHtml
+          })}
+        </div>
+      `
+    });
+  }
   function createResultView({
     viewId,
     className = "match-result-view",
@@ -928,113 +974,108 @@
       { value: "meaning", label: "뜻" }
     ];
 
-    return `
-      <div class="match-shell vocab-quiz-shell">
-        <aside class="match-sidebar vocab-quiz-sidebar">
-          <div class="match-sidebar-head"><span class="eyebrow">QUIZ HUD</span><h3>단어 퀴즈</h3></div>
-          ${createStudyOptionsShell({
-            shellId: "vocab-quiz-options-shell",
-            shellClassName: "match-options-shell",
-            toggleId: "vocab-quiz-options-toggle",
-            toggleTitle: "퀴즈 설정, 어떻게 할까요?",
-            summaryId: "vocab-quiz-options-summary",
-            summaryText: "히라가나·가타카나 → 뜻 · 10문제 · 15초",
-            panelId: "vocab-quiz-options-panel",
-            panelClassName: "study-options-panel-wide",
-            isOpen: false,
-            groups: [
-              ...createQuizFieldGroups({
-                questionField: {
-                  groupLabel: "문제 영역",
-                  id: "vocab-quiz-question-field",
-                  ariaLabel: "단어 퀴즈 문제 영역 고르기",
-                  options: vocabQuizFieldSelectOptions
-                },
-                optionField: {
-                  groupLabel: "보기 영역",
-                  id: "vocab-quiz-option-field",
-                  ariaLabel: "단어 퀴즈 보기 영역 고르기",
-                  options: vocabQuizFieldSelectOptions
-                }
-              }),
-              {
-                label: "몇 문제 풀까요?",
-                content: createQuestionCountSpinner({
-                  spinnerId: "vocab-quiz-count",
-                  ariaLabel: "단어 퀴즈 문제 수",
-                  activeValue: 10
-                })
-              },
-              {
-                label: "시간은 어떻게 할까요?",
-                content: createDurationSpinner({
-                  spinnerId: "vocab-quiz-time",
-                  ariaLabel: "단어 퀴즈 시간",
-                  activeValue: 15
-                })
-              }
-            ]
-          })}
-          ${createVocabQuizSidebarToolbarHtml()}
-          ${createActionButton({
-            id: "vocab-quiz-restart",
-            labelId: "vocab-quiz-restart-label",
-            label: "시작해볼까요?"
-          })}
-        </aside>
-        <div class="match-board vocab-quiz-board">
-          <div class="vocab-quiz-view" id="vocab-quiz">
-          ${createPracticeEmptyMessage({ id: "vocab-quiz-empty", text: QUIZ_BOARD_READY_MESSAGE })}
-            ${createChoiceQuizCard({
-              articleId: "vocab-quiz-card",
-              className: "basic-practice-card vocab-quiz-card",
-              metaItems: [
-                { id: "vocab-quiz-track", text: "?⑥뼱" },
-                { id: "vocab-quiz-source", text: "N5 ?⑥뼱" }
-              ],
-              hudItems: [
-                { label: "진행", valueId: "vocab-quiz-progress", value: "0 / 0" },
-                { label: "남은 시간", valueId: "vocab-quiz-timer", value: "15초" }
-              ],
-              header: {
-                className: "basic-practice-header",
-                eyebrow: "VOCAB QUIZ",
-                titleId: "vocab-quiz-title",
-                title: "단어 퀴즈",
-                noteClassName: "basic-practice-note",
-                noteId: "vocab-quiz-note",
-                note: "고른 단어로 바로 풀어봐요."
-              },
-              promptBox: {
-                className: "basic-practice-prompt-box",
-                eyebrow: "QUESTION",
-                textId: "vocab-quiz-prompt",
-                text: "문제를 준비하고 있어요."
-              },
-              displayBox: {
-                className: "basic-practice-display-box",
-                titleId: "vocab-quiz-display",
-                title: "-",
-                subtitleId: "vocab-quiz-display-sub",
-                subtitle: ""
-              },
-              optionsId: "vocab-quiz-options",
-              feedbackId: "vocab-quiz-feedback",
-              explanationId: "vocab-quiz-explanation",
-              nextButtonId: "vocab-quiz-next",
-              nextButtonLabel: "다음 문제 볼까요?"
-            })}
-          </div>
-          ${createPrefixedResultView({
-            idPrefix: "vocab-quiz",
-            filterAriaLabel: "단어 퀴즈 결과 필터",
-            bulkActionLabel: QUIZ_RESULT_ALL_ACTION_LABEL
-          })}
-        </div>
-      </div>
-    `;
+    return createChoiceQuizLayout({
+      sidebarHead: "<div class=\"match-sidebar-head\"><span class=\"eyebrow\">QUIZ HUD</span><h3>단어 퀴즈</h3></div>",
+      shellClassName: "match-shell vocab-quiz-shell",
+      sidebarClassName: "match-sidebar vocab-quiz-sidebar",
+      optionsShellConfig: {
+        shellId: "vocab-quiz-options-shell",
+        shellClassName: "match-options-shell",
+        toggleId: "vocab-quiz-options-toggle",
+        toggleTitle: "퀴즈 설정, 어떻게 할까요?",
+        summaryId: "vocab-quiz-options-summary",
+        summaryText: "히라가나·가타카나 → 뜻 · 10문제 · 15초",
+        panelId: "vocab-quiz-options-panel",
+        panelClassName: "study-options-panel-wide",
+        isOpen: false,
+        groups: [
+          ...createQuizFieldGroups({
+            questionField: {
+              groupLabel: "문제 영역",
+              id: "vocab-quiz-question-field",
+              ariaLabel: "단어 퀴즈 문제 영역 고르기",
+              options: vocabQuizFieldSelectOptions
+            },
+            optionField: {
+              groupLabel: "보기 영역",
+              id: "vocab-quiz-option-field",
+              ariaLabel: "단어 퀴즈 보기 영역 고르기",
+              options: vocabQuizFieldSelectOptions
+            }
+          }),
+          {
+            label: "몇 문제 풀까요?",
+            content: createQuestionCountSpinner({
+              spinnerId: "vocab-quiz-count",
+              ariaLabel: "단어 퀴즈 문제 수",
+              activeValue: 10
+            })
+          },
+          {
+            label: "시간은 어떻게 할까요?",
+            content: createDurationSpinner({
+              spinnerId: "vocab-quiz-time",
+              ariaLabel: "단어 퀴즈 시간",
+              activeValue: 15
+            })
+          }
+        ]
+      },
+      sidebarExtra: createVocabQuizSidebarToolbarHtml(),
+      startButton: createActionButton({
+        id: "vocab-quiz-restart",
+        labelId: "vocab-quiz-restart-label",
+        label: "시작해볼까요?"
+      }),
+      boardClassName: "match-board vocab-quiz-board",
+      emptyId: "vocab-quiz-empty",
+      emptyText: QUIZ_BOARD_READY_MESSAGE,
+      viewId: "vocab-quiz",
+      viewClassName: "vocab-quiz-view",
+      choiceQuizCardConfig: {
+        articleId: "vocab-quiz-card",
+        className: "basic-practice-card vocab-quiz-card",
+        metaItems: [
+          { id: "vocab-quiz-track", text: "단어" },
+          { id: "vocab-quiz-source", text: "N5 단어" }
+        ],
+        hudItems: [
+          { label: "진행", valueId: "vocab-quiz-progress", value: "0 / 0" },
+          { label: "남은 시간", valueId: "vocab-quiz-timer", value: "15초" }
+        ],
+        header: {
+          className: "basic-practice-header",
+          eyebrow: "VOCAB QUIZ",
+          titleId: "vocab-quiz-title",
+          title: "단어 퀴즈",
+          noteClassName: "basic-practice-note",
+          noteId: "vocab-quiz-note",
+          note: "고른 단어로 바로 풀어봐요."
+        },
+        promptBox: {
+          className: "basic-practice-prompt-box",
+          eyebrow: "QUESTION",
+          textId: "vocab-quiz-prompt",
+          text: "문제를 준비하고 있어요."
+        },
+        displayBox: {
+          className: "basic-practice-display-box",
+          titleId: "vocab-quiz-display",
+          title: "-",
+          subtitleId: "vocab-quiz-display-sub",
+          subtitle: ""
+        },
+        optionsId: "vocab-quiz-options",
+        feedbackId: "vocab-quiz-feedback",
+        explanationId: "vocab-quiz-explanation",
+        nextButtonId: "vocab-quiz-next",
+        nextButtonLabel: "다음 문제 볼까요?"
+      },
+      resultPrefix: "vocab-quiz",
+      resultFilterAriaLabel: "단어 퀴즈 결과 필터",
+      resultBulkActionLabel: QUIZ_RESULT_ALL_ACTION_LABEL
+    });
   }
-
   function createStarterKanjiLayout() {
     const starterKanjiQuestionFieldOptions = [
       { value: "display", label: "한자" },
@@ -1045,94 +1086,87 @@
       { value: "display", label: "한자" }
     ];
 
-    return `
-      <div class="match-shell">
-        <aside class="match-sidebar">
-          <div class="match-sidebar-head"><span class="eyebrow">QUIZ HUD</span><h3>한자 퀴즈</h3></div>
-          ${createStudyOptionsShell({
-            shellId: "starter-kanji-options-shell",
-            shellClassName: "match-options-shell kanji-options-shell",
-            toggleId: "starter-kanji-options-toggle",
-            toggleTitle: "퀴즈 설정, 어떻게 할까요?",
-            summaryId: "starter-kanji-options-summary",
-            summaryText: "전체 · 전체 · 10문제 · 15초",
-            panelId: "starter-kanji-options-panel",
-            panelClassName: "study-options-panel-wide",
-            isOpen: false,
-            groups: [
-              ...createQuizFieldGroups({
-                questionField: {
-                  groupLabel: "문제 영역",
-                  id: "starter-kanji-question-field",
-                  ariaLabel: "한자 퀴즈 문제 영역 고르기",
-                  options: starterKanjiQuestionFieldOptions
-                },
-                optionField: {
-                  groupLabel: "보기 영역",
-                  id: "starter-kanji-option-field",
-                  ariaLabel: "한자 퀴즈 보기 영역 고르기",
-                  options: starterKanjiOptionFieldOptions
-                }
-              }),
-              ...createQuestionDurationGroups({
-                countSpinnerId: "starter-kanji-count",
-                countAriaLabel: "한자 퀴즈 문제 수",
-                countValue: 10,
-                durationSpinnerId: "starter-kanji-time",
-                durationAriaLabel: "한자 퀴즈 제한시간",
-                durationValue: 15
-              })
-            ]
-          })}
-          ${createKanjiGradeCollectionToolbarHtml({
-            toolbarAriaLabel: "한자 퀴즈 학년 필터",
-            toolbarClassName: "vocab-select-toolbar vocab-select-toolbar-sidebar kanji-filter-toolbar",
-            gradeSelectId: "starter-kanji-grade-select",
-            collectionSelectId: "starter-kanji-collection-select",
-            ariaPrefix: "한자 퀴즈",
-            collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC,
-            fieldOrder: "grade-first"
-          })}
-          ${createStartQuizButton({ id: "starter-kanji-start", labelId: "starter-kanji-start-label" })}
-        </aside>
-        <div class="match-board">
-            ${createPracticeEmptyMessage({ id: "starter-kanji-empty" })}
-          <div id="starter-kanji-practice-view">
-            ${createChoiceQuizCard({
-              articleId: "starter-kanji-card",
-              className: "basic-practice-card tone-gold kanji-practice-card",
-              metaItems: [
-                { text: "한자" },
-                { id: "starter-kanji-source", text: "한자 1" },
-                { id: "starter-kanji-progress", text: "1 / 5" }
-              ],
-              hudItems: [
-                { label: "남은 시간", valueId: "starter-kanji-timer", value: "15초" },
-                { label: "맞힌 수", valueId: "starter-kanji-correct", value: "0" }
-              ],
-              displayBox: {
-                className: "basic-practice-display-box",
-                titleId: "starter-kanji-display",
-                title: "-",
-                subtitleId: "starter-kanji-display-sub",
-                subtitle: ""
-              },
-              optionsId: "starter-kanji-options",
-              nextButtonId: "starter-kanji-next",
-              nextButtonLabel: "다음 한자 볼까요?"
-            })}
-          </div>
-          ${createPrefixedResultView({
-            idPrefix: "starter-kanji",
-            className: "match-result-view kanji-result-view",
-            filterAriaLabel: "한자 퀴즈 결과 필터",
-            bulkActionLabel: QUIZ_RESULT_RETRY_ALL_ACTION_LABEL,
-            footerHtml:
-              '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="starter-kanji-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
-          })}
-        </div>
-      </div>
-    `;
+    return createChoiceQuizLayout({
+      sidebarHead: "<div class=\"match-sidebar-head\"><span class=\"eyebrow\">QUIZ HUD</span><h3>한자 퀴즈</h3></div>",
+      optionsShellConfig: {
+        shellId: "starter-kanji-options-shell",
+        shellClassName: "match-options-shell kanji-options-shell",
+        toggleId: "starter-kanji-options-toggle",
+        toggleTitle: "퀴즈 설정, 어떻게 할까요?",
+        summaryId: "starter-kanji-options-summary",
+        summaryText: "전체 · 전체 · 10문제 · 15초",
+        panelId: "starter-kanji-options-panel",
+        panelClassName: "study-options-panel-wide",
+        isOpen: false,
+        groups: [
+          ...createQuizFieldGroups({
+            questionField: {
+              groupLabel: "문제 영역",
+              id: "starter-kanji-question-field",
+              ariaLabel: "한자 퀴즈 문제 영역 고르기",
+              options: starterKanjiQuestionFieldOptions
+            },
+            optionField: {
+              groupLabel: "보기 영역",
+              id: "starter-kanji-option-field",
+              ariaLabel: "한자 퀴즈 보기 영역 고르기",
+              options: starterKanjiOptionFieldOptions
+            }
+          }),
+          ...createQuestionDurationGroups({
+            countSpinnerId: "starter-kanji-count",
+            countAriaLabel: "한자 퀴즈 문제 수",
+            countValue: 10,
+            durationSpinnerId: "starter-kanji-time",
+            durationAriaLabel: "한자 퀴즈 제한시간",
+            durationValue: 15
+          })
+        ]
+      },
+      sidebarExtra: createKanjiGradeCollectionToolbarHtml({
+        toolbarAriaLabel: "한자 퀴즈 학년 필터",
+        toolbarClassName: "vocab-select-toolbar vocab-select-toolbar-sidebar kanji-filter-toolbar",
+        gradeSelectId: "starter-kanji-grade-select",
+        collectionSelectId: "starter-kanji-collection-select",
+        ariaPrefix: "한자 퀴즈",
+        collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC,
+        fieldOrder: "grade-first"
+      }),
+      startButton: createStartQuizButton({ id: "starter-kanji-start", labelId: "starter-kanji-start-label" }),
+      boardClassName: "match-board",
+      emptyId: "starter-kanji-empty",
+      emptyText: QUIZ_EMPTY_MESSAGE,
+      viewId: "starter-kanji-practice-view",
+      choiceQuizCardConfig: {
+        articleId: "starter-kanji-card",
+        className: "basic-practice-card tone-gold kanji-practice-card",
+        metaItems: [
+          { text: "한자" },
+          { id: "starter-kanji-source", text: "한자 1" },
+          { id: "starter-kanji-progress", text: "1 / 5" }
+        ],
+        hudItems: [
+          { label: "남은 시간", valueId: "starter-kanji-timer", value: "15초" },
+          { label: "맞힌 수", valueId: "starter-kanji-correct", value: "0" }
+        ],
+        displayBox: {
+          className: "basic-practice-display-box",
+          titleId: "starter-kanji-display",
+          title: "-",
+          subtitleId: "starter-kanji-display-sub",
+          subtitle: ""
+        },
+        optionsId: "starter-kanji-options",
+        nextButtonId: "starter-kanji-next",
+        nextButtonLabel: "다음 한자 볼까요?"
+      },
+      resultPrefix: "starter-kanji",
+      resultClassName: "match-result-view kanji-result-view",
+      resultFilterAriaLabel: "한자 퀴즈 결과 필터",
+      resultBulkActionLabel: QUIZ_RESULT_RETRY_ALL_ACTION_LABEL,
+      resultFooterHtml:
+        '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="starter-kanji-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
+    });
   }
 
   function createMatchRoundLayout({

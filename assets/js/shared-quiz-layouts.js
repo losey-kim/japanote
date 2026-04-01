@@ -1162,45 +1162,41 @@
     resultClassName = "match-result-view",
     bulkActionLabel
   }) {
-    return `
-      <div class="match-shell">
-        <aside class="match-sidebar">
-          ${sidebarHead}
-          ${createStudyOptionsShell({
-            shellId,
-            shellClassName,
-            toggleId,
-            toggleTitle,
-            summaryId,
-            summaryText,
-            panelId,
-            panelClassName,
-            isOpen,
-            groups: [
-              ...createQuestionDurationGroups({
-                countSpinnerId,
-                countAriaLabel,
-                countValue,
-                durationSpinnerId,
-                durationAriaLabel,
-                durationValue
-              })
-            ]
-          })}
-          ${sidebarExtra}
-          ${startButton}
-        </aside>
-        ${createMatchBoardLayout({
-          boardId,
-          emptyId,
-          playBoardConfig,
-          resultPrefix,
-          resultFilterAriaLabel,
-          resultClassName,
-          bulkActionLabel
-        })}
-      </div>
-    `;
+    return createLayoutShell({
+      sidebarHead,
+      optionsShellConfig: {
+        shellId,
+        shellClassName,
+        toggleId,
+        toggleTitle,
+        summaryId,
+        summaryText,
+        panelId,
+        panelClassName,
+        isOpen,
+        groups: [
+          ...createQuestionDurationGroups({
+            countSpinnerId,
+            countAriaLabel,
+            countValue,
+            durationSpinnerId,
+            durationAriaLabel,
+            durationValue
+          })
+        ]
+      },
+      sidebarExtra,
+      startButton,
+      boardMarkup: createMatchBoardLayout({
+        boardId,
+        emptyId,
+        playBoardConfig,
+        resultPrefix,
+        resultFilterAriaLabel,
+        resultClassName,
+        bulkActionLabel
+      })
+    });
   }
 
   function createMatchLayout() {
@@ -1483,14 +1479,13 @@
   }
 
   function createStudyLayout(kind) {
-    switch (kind) {
-      case "vocab-catalog":
-        return createVocabCatalogLayout();
-      case "kanji-catalog":
-        return createKanjiCatalogLayout();
-      default:
-        return "";
-    }
+    const studyLayoutMap = {
+      "vocab-catalog": createVocabCatalogLayout,
+      "kanji-catalog": createKanjiCatalogLayout
+    };
+    const layoutFactory = studyLayoutMap[kind];
+
+    return layoutFactory ? layoutFactory() : "";
   }
 
   function mountSharedQuizLayouts() {

@@ -1075,9 +1075,10 @@
           ${createMatchSidebarVocabToolbarHtml()}
           ${createStartQuizButton({ id: "match-new-round", labelId: "match-new-round-label" })}
         </aside>
-        <div class="match-board" id="match-board" hidden>
-          ${createPracticeEmptyMessage({ id: "match-empty" })}
-          ${createMatchPlayView({
+        ${createMatchBoardLayout({
+          boardId: "match-board",
+          emptyId: "match-empty",
+          playBoardConfig: {
             boardId: "match-play-view",
             progressId: "match-progress",
             timerId: "match-timer",
@@ -1086,13 +1087,11 @@
             rightColumnTitle: "뜻 보기",
             leftListId: "match-left-list",
             rightListId: "match-right-list"
-          })}
-          ${createPrefixedResultView({
-            idPrefix: "match",
-            filterAriaLabel: "짝 맞추기 결과 필터",
-            bulkActionLabel: QUIZ_RESULT_ALL_ACTION_LABEL
-          })}
-        </div>
+          },
+          resultPrefix: "match",
+          resultFilterAriaLabel: "짝 맞추기 결과 필터",
+          bulkActionLabel: QUIZ_RESULT_ALL_ACTION_LABEL
+        })}
       </div>
     `;
   }
@@ -1134,9 +1133,10 @@
           })}
           ${createStartQuizButton({ id: "kanji-match-new-round", labelId: "kanji-match-new-round-label" })}
         </aside>
-        <div class="match-board" id="kanji-match-board" hidden>
-          ${createPracticeEmptyMessage({ id: "kanji-match-empty" })}
-          ${createMatchPlayView({
+        ${createMatchBoardLayout({
+          boardId: "kanji-match-board",
+          emptyId: "kanji-match-empty",
+          playBoardConfig: {
             boardId: "kanji-match-play-view",
             progressId: "kanji-match-progress",
             timerId: "kanji-match-timer",
@@ -1145,13 +1145,12 @@
             rightColumnTitle: "의미 보기",
             leftListId: "kanji-match-left-list",
             rightListId: "kanji-match-right-list"
-          })}
-          ${createPrefixedResultView({
-            idPrefix: "kanji-match",
-            filterAriaLabel: "한자 짝 맞추기 결과 필터",
-            bulkActionLabel: QUIZ_RESULT_RETRY_ALL_ACTION_LABEL
-          })}
-        </div>
+          },
+          resultPrefix: "kanji-match",
+          resultFilterAriaLabel: "한자 짝 맞추기 결과 필터",
+          resultClassName: "match-result-view kanji-result-view",
+          bulkActionLabel: QUIZ_RESULT_RETRY_ALL_ACTION_LABEL
+        })}
       </div>
     `;
   }
@@ -1278,6 +1277,29 @@
       default:
         return "";
     }
+  }
+
+  function createMatchBoardLayout({
+    boardId,
+    emptyId,
+    playBoardConfig,
+    resultPrefix,
+    resultFilterAriaLabel,
+    resultClassName = "match-result-view",
+    bulkActionLabel = QUIZ_RESULT_ALL_ACTION_LABEL
+  }) {
+    return `
+        <div class="match-board" id="${escapeHtml(boardId)}" hidden>
+          ${createPracticeEmptyMessage({ id: emptyId })}
+          ${createMatchPlayView(playBoardConfig)}
+          ${createPrefixedResultView({
+            idPrefix: resultPrefix,
+            className: resultClassName,
+            filterAriaLabel: resultFilterAriaLabel,
+            bulkActionLabel
+          })}
+        </div>
+    `;
   }
 
   function createStudyLayout(kind) {

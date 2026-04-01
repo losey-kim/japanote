@@ -311,6 +311,13 @@
     `;
   }
 
+  const QUIZ_EMPTY_MESSAGE = "준비됐다면 시작해볼까요?";
+  const QUIZ_RESULT_EMPTY_MESSAGE = "아직 보여줄 결과가 없어요.";
+
+  function createPracticeEmptyMessage({ id, text = QUIZ_EMPTY_MESSAGE }) {
+    return `<p class="vocab-list-empty" id="${escapeHtml(id)}" hidden>${escapeHtml(text)}</p>`;
+  }
+
   function createQuestionDurationGroups({
     countSpinnerId,
     countAriaLabel,
@@ -953,7 +960,7 @@
           ${createStartQuizButton({ id: "starter-kanji-start", labelId: "starter-kanji-start-label" })}
         </aside>
         <div class="match-board">
-          <p class="vocab-list-empty" id="starter-kanji-empty" hidden>준비됐다면 시작해볼까요?</p>
+            ${createPracticeEmptyMessage({ id: "starter-kanji-empty" })}
           <div id="starter-kanji-practice-view">
             ${createChoiceQuizCard({
               articleId: "starter-kanji-card",
@@ -988,7 +995,7 @@
             filterId: "starter-kanji-result-filter",
             filterAriaLabel: "한자 퀴즈 결과 필터",
             emptyId: "starter-kanji-result-empty",
-            emptyText: "아직 보여줄 결과가 없어요.",
+            emptyText: QUIZ_RESULT_EMPTY_MESSAGE,
             listId: "starter-kanji-result-list",
             bulkAction: {
               id: "starter-kanji-result-bulk-action",
@@ -1033,7 +1040,7 @@
           ${createStartQuizButton({ id: "match-new-round", labelId: "match-new-round-label" })}
         </aside>
         <div class="match-board" id="match-board" hidden>
-          <p class="vocab-list-empty" id="match-empty" hidden>준비됐다면 시작해볼까요?</p>
+          ${createPracticeEmptyMessage({ id: "match-empty" })}
           <div class="match-play-view" id="match-play-view">
             <div class="quiz-hud match-play-hud">
               <div class="quiz-hud-item"><span>진행</span><strong id="match-progress">0 / 5</strong></div>
@@ -1053,7 +1060,7 @@
             filterId: "match-result-filter",
             filterAriaLabel: "짝 맞추기 결과 필터",
             emptyId: "match-result-empty",
-            emptyText: "아직 보여줄 결과가 없어요.",
+            emptyText: QUIZ_RESULT_EMPTY_MESSAGE,
             listId: "match-result-list",
             bulkAction: {
               id: "match-result-bulk-action",
@@ -1104,7 +1111,7 @@
           ${createStartQuizButton({ id: "kanji-match-new-round", labelId: "kanji-match-new-round-label" })}
         </aside>
         <div class="match-board" id="kanji-match-board" hidden>
-          <p class="vocab-list-empty" id="kanji-match-empty" hidden>준비됐다면 시작해볼까요?</p>
+          ${createPracticeEmptyMessage({ id: "kanji-match-empty" })}
           <div class="match-play-view" id="kanji-match-play-view">
             <div class="quiz-hud match-play-hud">
               <div class="quiz-hud-item"><span>진행</span><strong id="kanji-match-progress">0 / 5</strong></div>
@@ -1124,7 +1131,7 @@
             filterId: "kanji-match-result-filter",
             filterAriaLabel: "한자 짝 맞추기 결과 필터",
             emptyId: "kanji-match-result-empty",
-            emptyText: "아직 보여줄 결과가 없어요.",
+            emptyText: QUIZ_RESULT_EMPTY_MESSAGE,
             listId: "kanji-match-result-list",
             bulkAction: {
               id: "kanji-match-result-bulk-action",
@@ -1171,7 +1178,7 @@
           ${createStartQuizButton({ id: "grammar-practice-start", labelId: "grammar-practice-start-label" })}
         </aside>
         <div class="match-board grammar-practice-board">
-          <p class="vocab-list-empty" id="grammar-practice-empty" hidden>준비됐다면 시작해볼까요?</p>
+          ${createPracticeEmptyMessage({ id: "grammar-practice-empty" })}
           <div id="grammar-practice-view">
             <article class="grammar-practice-card">
               <div class="grammar-practice-meta"><span id="grammar-practice-level">N5</span><span id="grammar-practice-source">N5G 1</span><span id="grammar-practice-progress">1 / 4</span></div>
@@ -1223,7 +1230,7 @@
           ${createStartQuizButton({ id: "reading-start", labelId: "reading-start-label" })}
         </aside>
         <div class="match-board reading-practice-board">
-          <p class="vocab-list-empty" id="reading-empty" hidden>준비됐다면 시작해볼까요?</p>
+          ${createPracticeEmptyMessage({ id: "reading-empty" })}
           <div id="reading-practice-view">
             <article class="reading-card">
               <div class="reading-meta"><span id="reading-level">N5</span><span id="reading-source">N5R p1</span></div>

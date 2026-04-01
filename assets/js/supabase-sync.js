@@ -889,6 +889,7 @@
 
     client = globalThis.supabase.createClient(config.url, config.anonKey, {
       auth: {
+        flowType: "pkce",
         autoRefreshToken: true,
         detectSessionInUrl: true,
         persistSession: true,
@@ -917,6 +918,12 @@
       }
     });
 
+    try {
+      await client.auth.getSession();
+    } catch (error) {
+      console.warn("Supabase getSession failed.", error);
+    }
+
     if (!maybeShowAuthUrlError()) {
       setReadyStatus();
     }
@@ -932,5 +939,5 @@
     signOut
   };
 
-  initializeSupabase();
+  void initializeSupabase();
 })();

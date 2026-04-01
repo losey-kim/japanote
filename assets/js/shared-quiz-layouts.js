@@ -312,6 +312,7 @@
   }
 
   const QUIZ_EMPTY_MESSAGE = "준비됐다면 시작해볼까요?";
+  const QUIZ_BOARD_READY_MESSAGE = "퀴즈를 준비하고 있어요.";
   const QUIZ_RESULT_EMPTY_MESSAGE = "아직 보여줄 결과가 없어요.";
 
   function createPracticeEmptyMessage({ id, text = QUIZ_EMPTY_MESSAGE }) {
@@ -837,7 +838,7 @@
         </aside>
         <div class="match-board vocab-quiz-board">
           <div class="vocab-quiz-view" id="vocab-quiz">
-            <p class="vocab-list-empty" id="vocab-quiz-empty" hidden>퀴즈를 준비하고 있어요.</p>
+          ${createPracticeEmptyMessage({ id: "vocab-quiz-empty", text: QUIZ_BOARD_READY_MESSAGE })}
             ${createChoiceQuizCard({
               articleId: "vocab-quiz-card",
               className: "basic-practice-card vocab-quiz-card",

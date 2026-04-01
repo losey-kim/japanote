@@ -1,4 +1,6 @@
 const storageKey = "jlpt-compass-state";
+/** Bump when persisted shape changes; used for localStorage + future remote sync migration. */
+const STATE_SCHEMA_VERSION = 1;
 let state = null;
 
 function getStudyStateStore() {
@@ -3907,7 +3909,8 @@ const defaultState = {
   kanaSetupOpen: false,
   writingSetupOpen: false,
   lastStudyDate: null,
-  streak: 0
+  streak: 0,
+  stateVersion: STATE_SCHEMA_VERSION
 };
 
 function loadState() {
@@ -4086,6 +4089,16 @@ function normalizeLoadedState(inputState) {
   refreshVocabPageContent(nextState.vocabLevel);
   nextState.vocabPartFilter = getVocabPartFilter(nextState.vocabPartFilter);
   activeQuizQuestions = createQuizSession(nextState.quizMode, nextState.quizSessionSize, nextState.quizLevel);
+
+  const loadedSchemaVersion = Number(nextState.stateVersion);
+  const fromVersion =
+    Number.isFinite(loadedSchemaVersion) && loadedSchemaVersion >= 1
+      ? Math.floor(loadedSchemaVersion)
+      : 1;
+  if (fromVersion < STATE_SCHEMA_VERSION) {
+    // Example: if (fromVersion === 1) { ... } when bumping STATE_SCHEMA_VERSION.
+  }
+  nextState.stateVersion = STATE_SCHEMA_VERSION;
 
   return nextState;
 }

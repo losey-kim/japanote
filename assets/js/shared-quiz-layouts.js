@@ -314,6 +314,8 @@
   const QUIZ_EMPTY_MESSAGE = "준비됐다면 시작해볼까요?";
   const QUIZ_BOARD_READY_MESSAGE = "퀴즈를 준비하고 있어요.";
   const QUIZ_RESULT_EMPTY_MESSAGE = "아직 보여줄 결과가 없어요.";
+  const QUIZ_RESULT_ALL_ACTION_LABEL = "전체 담기";
+  const QUIZ_RESULT_RETRY_ALL_ACTION_LABEL = "전체 다시 볼래요";
 
   function createPracticeEmptyMessage({ id, text = QUIZ_EMPTY_MESSAGE }) {
     return `<p class="vocab-list-empty" id="${escapeHtml(id)}" hidden>${escapeHtml(text)}</p>`;
@@ -775,6 +777,34 @@
     `;
   }
 
+  function createPrefixedResultView({
+    idPrefix,
+    className = "match-result-view",
+    filterAriaLabel,
+    emptyText = QUIZ_RESULT_EMPTY_MESSAGE,
+    bulkActionLabel = QUIZ_RESULT_ALL_ACTION_LABEL,
+    footerHtml = ""
+  }) {
+    return createResultView({
+      viewId: `${idPrefix}-result-view`,
+      className,
+      totalId: `${idPrefix}-result-total`,
+      correctId: `${idPrefix}-result-correct`,
+      wrongId: `${idPrefix}-result-wrong`,
+      filterId: `${idPrefix}-result-filter`,
+      filterAriaLabel,
+      emptyId: `${idPrefix}-result-empty`,
+      emptyText,
+      listId: `${idPrefix}-result-list`,
+      bulkAction: {
+        id: `${idPrefix}-result-bulk-action`,
+        labelId: `${idPrefix}-result-bulk-label`,
+        label: bulkActionLabel
+      },
+      footerHtml
+    });
+  }
+
   function createMatchPlayView({
     boardId,
     progressId,
@@ -906,21 +936,10 @@
               nextButtonLabel: "다음 문제 볼까요?"
             })}
           </div>
-          ${createResultView({
-            viewId: "vocab-quiz-result-view",
-            totalId: "vocab-quiz-result-total",
-            correctId: "vocab-quiz-result-correct",
-            wrongId: "vocab-quiz-result-wrong",
-            filterId: "vocab-quiz-result-filter",
+          ${createPrefixedResultView({
+            idPrefix: "vocab-quiz",
             filterAriaLabel: "단어 퀴즈 결과 필터",
-            emptyId: "vocab-quiz-result-empty",
-            emptyText: "아직 보여줄 결과가 없어요.",
-            listId: "vocab-quiz-result-list",
-            bulkAction: {
-              id: "vocab-quiz-result-bulk-action",
-              labelId: "vocab-quiz-result-bulk-label",
-              label: "전체 담기"
-            }
+            bulkActionLabel: QUIZ_RESULT_ALL_ACTION_LABEL
           })}
         </div>
       </div>
@@ -1014,22 +1033,11 @@
               nextButtonLabel: "다음 한자 볼까요?"
             })}
           </div>
-          ${createResultView({
-            viewId: "starter-kanji-result-view",
+          ${createPrefixedResultView({
+            idPrefix: "starter-kanji",
             className: "match-result-view kanji-result-view",
-            totalId: "starter-kanji-result-total",
-            correctId: "starter-kanji-result-correct",
-            wrongId: "starter-kanji-result-wrong",
-            filterId: "starter-kanji-result-filter",
             filterAriaLabel: "한자 퀴즈 결과 필터",
-            emptyId: "starter-kanji-result-empty",
-            emptyText: QUIZ_RESULT_EMPTY_MESSAGE,
-            listId: "starter-kanji-result-list",
-            bulkAction: {
-              id: "starter-kanji-result-bulk-action",
-              labelId: "starter-kanji-result-bulk-label",
-              label: "전체 다시 볼래요"
-            },
+            bulkActionLabel: QUIZ_RESULT_RETRY_ALL_ACTION_LABEL,
             footerHtml:
               '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="starter-kanji-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
           })}
@@ -1079,21 +1087,10 @@
             leftListId: "match-left-list",
             rightListId: "match-right-list"
           })}
-          ${createResultView({
-            viewId: "match-result-view",
-            totalId: "match-result-total",
-            correctId: "match-result-correct",
-            wrongId: "match-result-wrong",
-            filterId: "match-result-filter",
+          ${createPrefixedResultView({
+            idPrefix: "match",
             filterAriaLabel: "짝 맞추기 결과 필터",
-            emptyId: "match-result-empty",
-            emptyText: QUIZ_RESULT_EMPTY_MESSAGE,
-            listId: "match-result-list",
-            bulkAction: {
-              id: "match-result-bulk-action",
-              labelId: "match-result-bulk-label",
-              label: "전체 담기"
-            }
+            bulkActionLabel: QUIZ_RESULT_ALL_ACTION_LABEL
           })}
         </div>
       </div>
@@ -1149,21 +1146,10 @@
             leftListId: "kanji-match-left-list",
             rightListId: "kanji-match-right-list"
           })}
-          ${createResultView({
-            viewId: "kanji-match-result-view",
-            totalId: "kanji-match-result-total",
-            correctId: "kanji-match-result-correct",
-            wrongId: "kanji-match-result-wrong",
-            filterId: "kanji-match-result-filter",
+          ${createPrefixedResultView({
+            idPrefix: "kanji-match",
             filterAriaLabel: "한자 짝 맞추기 결과 필터",
-            emptyId: "kanji-match-result-empty",
-            emptyText: QUIZ_RESULT_EMPTY_MESSAGE,
-            listId: "kanji-match-result-list",
-            bulkAction: {
-              id: "kanji-match-result-bulk-action",
-              labelId: "kanji-match-result-bulk-label",
-              label: "전체 다시 볼래요"
-            }
+            bulkActionLabel: QUIZ_RESULT_RETRY_ALL_ACTION_LABEL
           })}
         </div>
       </div>

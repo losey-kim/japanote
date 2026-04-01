@@ -273,6 +273,33 @@
     select.value = activeFilter;
   }
 
+  function renderBulkActionButtonState({
+    button,
+    label,
+    icon,
+    count,
+    allSaved,
+    datasetKey,
+    getActionLabel,
+    getActionTitle
+  }) {
+    if (!button || !label || !icon) {
+      return;
+    }
+
+    const actionLabel =
+      typeof getActionLabel === "function" ? getActionLabel(allSaved) : allSaved ? "전체 빼기" : "전체 담기";
+    const actionTitle =
+      typeof getActionTitle === "function" ? getActionTitle({ count, allSaved }) : "";
+
+    button.disabled = !count;
+    button.dataset[datasetKey] = allSaved ? "remove" : "save";
+    button.setAttribute("aria-label", actionTitle);
+    button.title = actionTitle;
+    label.textContent = actionLabel;
+    icon.textContent = allSaved ? "delete_sweep" : "bookmark_add";
+  }
+
   function renderResultsView({
     resultViewId,
     totalId,
@@ -317,7 +344,7 @@
 
     if (!filteredResults.length) {
       empty.hidden = false;
-      empty.textContent = `${filterLabels[activeFilter]} 결과는 아직 없어요.`;
+      empty.textContent = `${filterLabels[activeFilter]} 결과가 아직 없어요.`;
       list.innerHTML = "";
       return;
     }
@@ -963,6 +990,7 @@
     renderSettingsPanel,
     renderBoard,
     renderResultFilterOptions,
+    renderBulkActionButtonState,
     renderResultsView,
     renderScreen,
     attachSelectChangeListener,

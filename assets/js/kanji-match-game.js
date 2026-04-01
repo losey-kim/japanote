@@ -600,22 +600,25 @@ function renderKanjiMatchBulkActionButton(results) {
 
   const uniqueIds = Array.from(new Set(results.map((item) => item.id).filter(Boolean)));
   const allSaved = uniqueIds.length > 0 && uniqueIds.every((id) => isKanjiSavedToMemorizationList(id));
-  const actionLabel = typeof matchCopy.getBulkActionLabel === "function" ? matchCopy.getBulkActionLabel(allSaved) : allSaved ? "전체 빼기" : "전체 담기";
-  const actionTitle =
-    typeof matchCopy.getBulkActionTitle === "function"
-      ? matchCopy.getBulkActionTitle({ count: uniqueIds.length, itemLabel: "한자", allSaved })
-      : uniqueIds.length === 0
-        ? "지금 담을 한자가 없어요."
-        : allSaved
-          ? "지금 보이는 한자를 다시 볼래요 목록에서 모두 빼요."
-          : "지금 보이는 한자를 다시 볼래요 목록에 모두 담아요.";
 
-  bulkActionButton.disabled = uniqueIds.length === 0;
-  bulkActionButton.dataset.kanjiMatchBulkAction = allSaved ? "remove" : "save";
-  bulkActionButton.setAttribute("aria-label", actionTitle);
-  bulkActionButton.title = actionTitle;
-  bulkActionLabel.textContent = actionLabel;
-  bulkActionIcon.textContent = allSaved ? "delete_sweep" : "bookmark_add";
+  sharedMatchGame.renderBulkActionButtonState({
+    button: bulkActionButton,
+    label: bulkActionLabel,
+    icon: bulkActionIcon,
+    count: uniqueIds.length,
+    allSaved,
+    datasetKey: "kanjiMatchBulkAction",
+    getActionLabel: (savedState) =>
+      typeof matchCopy.getBulkActionLabel === "function" ? matchCopy.getBulkActionLabel(savedState) : savedState ? "전체 빼기" : "전체 담기",
+    getActionTitle: ({ count, allSaved: savedState }) =>
+      typeof matchCopy.getBulkActionTitle === "function"
+        ? matchCopy.getBulkActionTitle({ count, itemLabel: "한자", allSaved: savedState })
+        : count === 0
+          ? "지금 담을 한자가 없어요."
+          : savedState
+            ? "지금 보이는 한자를 다시 볼래요 목록에서 모두 빼요."
+            : "지금 보이는 한자를 다시 볼래요 목록에 모두 담아요."
+  });
 }
 
 function renderKanjiMatchResultFilterOptions(counts) {

@@ -569,10 +569,6 @@
       '<span class="material-symbols-rounded" aria-hidden="true">person</span>',
       '<strong data-auth-user-email></strong>',
       "</div>",
-      '<div class="auth-sync-actions" data-auth-sync-actions hidden>',
-      '<button class="secondary-btn auth-action-button" type="button" data-auth-pull>클라우드에서 받기</button>',
-      '<button class="secondary-btn auth-action-button" type="button" data-auth-push>클라우드에 올리기</button>',
-      "</div>",
       '<div class="auth-actions" data-auth-actions>',
       '<button class="secondary-btn auth-action-button" type="button" data-auth-signout>로그아웃</button>',
       "</div>",
@@ -647,9 +643,6 @@
       const signoutButton = panel?.querySelector("[data-auth-signout]");
       const userNode = panel?.querySelector("[data-auth-user]");
       const userEmailNode = panel?.querySelector("[data-auth-user-email]");
-      const syncActions = panel?.querySelector("[data-auth-sync-actions]");
-      const pullButton = panel?.querySelector("[data-auth-pull]");
-      const pushButton = panel?.querySelector("[data-auth-push]");
 
       if (panel) {
         panel.hidden = !authPanelOpen;
@@ -697,15 +690,6 @@
           "로그인됨";
         userEmailNode.textContent = display;
       }
-      if (syncActions) {
-        syncActions.hidden = !config.enabled || !currentUser;
-      }
-      if (pullButton) {
-        pullButton.disabled = status.busy;
-      }
-      if (pushButton) {
-        pushButton.disabled = status.busy;
-      }
       if (panel) {
         positionAuthPanel(root, panel);
       }
@@ -733,35 +717,6 @@
   function attachViewportHandlers() {
     window.addEventListener("resize", updateOpenAuthPanelPosition);
     window.addEventListener("scroll", updateOpenAuthPanelPosition, true);
-  }
-
-  function attachDelegatedPanelHandlers() {
-    document.addEventListener("click", async (event) => {
-      const pullBtn = event.target.closest("[data-auth-pull]");
-      const pushBtn = event.target.closest("[data-auth-push]");
-
-      if (!pullBtn && !pushBtn) {
-        return;
-      }
-
-      event.preventDefault();
-
-      if (pullBtn && pullBtn.disabled) {
-        return;
-      }
-
-      if (pushBtn && pushBtn.disabled) {
-        return;
-      }
-
-      if (pullBtn) {
-        await pullRemoteState("클라우드에서 최신 학습 상태를 불러오고 있어요.");
-      } else if (pushBtn) {
-        await pushRemoteState("현재 기기의 학습 상태를 클라우드에 저장하고 있어요.");
-      }
-
-      renderAuthUi();
-    });
   }
 
   function readAuthResponseParams() {
@@ -851,7 +806,6 @@
     renderAuthUi();
     attachDismissHandler();
     attachViewportHandlers();
-    attachDelegatedPanelHandlers();
 
     if (!config.enabled) {
       return;

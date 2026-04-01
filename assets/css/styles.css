@@ -345,13 +345,6 @@ button {
   background: rgba(25, 21, 22, 0.05);
 }
 
-.auth-sync-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 12px;
-}
-
 .auth-actions {
   display: grid;
   grid-template-columns: 1fr;
@@ -373,10 +366,6 @@ button {
   .auth-toggle {
     width: 100%;
     justify-content: center;
-  }
-
-  .auth-sync-actions {
-    grid-template-columns: 1fr;
   }
 
   .auth-actions {

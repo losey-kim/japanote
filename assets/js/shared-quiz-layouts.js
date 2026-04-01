@@ -311,6 +311,44 @@
     `;
   }
 
+  function createQuestionDurationGroups({
+    countSpinnerId,
+    countAriaLabel,
+    countValue,
+    durationSpinnerId,
+    durationAriaLabel,
+    durationValue,
+    countLabel = "문항 수",
+    durationLabel = "문항당 제한시간"
+  }) {
+    return [
+      {
+        label: countLabel,
+        content: createQuestionCountSpinner({
+          spinnerId: countSpinnerId,
+          ariaLabel: countAriaLabel,
+          activeValue: countValue
+        })
+      },
+      {
+        label: durationLabel,
+        content: createDurationSpinner({
+          spinnerId: durationSpinnerId,
+          ariaLabel: durationAriaLabel,
+          activeValue: durationValue
+        })
+      }
+    ];
+  }
+
+  function createStartQuizButton({ id, labelId }) {
+    return createActionButton({
+      id,
+      labelId,
+      label: "시작하기"
+    });
+  }
+
   function createStudyViewSwitch({ ariaLabel, buttons = [] }) {
     const buttonMarkup = buttons
       .map((button) => {
@@ -893,22 +931,14 @@
                   options: starterKanjiOptionFieldOptions
                 }
               }),
-              {
-                label: "몇 문제 풀까요?",
-                content: createQuestionCountSpinner({
-                  spinnerId: "starter-kanji-count",
-                  ariaLabel: "한자 퀴즈 문제 수",
-                  activeValue: 10
-                })
-              },
-              {
-                label: "시간은 어떻게 할까요?",
-                content: createDurationSpinner({
-                  spinnerId: "starter-kanji-time",
-                  ariaLabel: "한자 퀴즈 시간",
-                  activeValue: 15
-                })
-              }
+              ...createQuestionDurationGroups({
+                countSpinnerId: "starter-kanji-count",
+                countAriaLabel: "한자 퀴즈 문제 수",
+                countValue: 10,
+                durationSpinnerId: "starter-kanji-time",
+                durationAriaLabel: "한자 퀴즈 제한시간",
+                durationValue: 15
+              })
             ]
           })}
           ${createKanjiGradeCollectionToolbarHtml({
@@ -920,11 +950,7 @@
             collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC,
             fieldOrder: "grade-first"
           })}
-          ${createActionButton({
-            id: "starter-kanji-start",
-            labelId: "starter-kanji-start-label",
-            label: "시작해볼까요?"
-          })}
+          ${createStartQuizButton({ id: "starter-kanji-start", labelId: "starter-kanji-start-label" })}
         </aside>
         <div class="match-board">
           <p class="vocab-list-empty" id="starter-kanji-empty" hidden>준비됐다면 시작해볼까요?</p>
@@ -993,30 +1019,18 @@
             panelClassName: "study-options-panel-wide",
             isOpen: false,
             groups: [
-              {
-                label: "몇 문제 풀까요?",
-                content: createQuestionCountSpinner({
-                  spinnerId: "match-count",
-                  ariaLabel: "짝 맞추기 문제 수",
-                  activeValue: 5
-                })
-              },
-              {
-                label: "시간은 어떻게 할까요?",
-                content: createDurationSpinner({
-                  spinnerId: "match-time",
-                  ariaLabel: "짝 맞추기 시간",
-                  activeValue: 15
-                })
-              }
+              ...createQuestionDurationGroups({
+                countSpinnerId: "match-count",
+                countAriaLabel: "짝 맞추기 문제 수",
+                countValue: 5,
+                durationSpinnerId: "match-time",
+                durationAriaLabel: "짝 맞추기 제한시간",
+                durationValue: 15
+              })
             ]
           })}
           ${createMatchSidebarVocabToolbarHtml()}
-          ${createActionButton({
-            id: "match-new-round",
-            labelId: "match-new-round-label",
-            label: "시작해볼까요?"
-          })}
+          ${createStartQuizButton({ id: "match-new-round", labelId: "match-new-round-label" })}
         </aside>
         <div class="match-board" id="match-board" hidden>
           <p class="vocab-list-empty" id="match-empty" hidden>준비됐다면 시작해볼까요?</p>
@@ -1068,22 +1082,14 @@
             panelClassName: "study-options-panel-wide",
             isOpen: false,
             groups: [
-              {
-                label: "몇 문제 풀까요?",
-                content: createQuestionCountSpinner({
-                  spinnerId: "kanji-match-count",
-                  ariaLabel: "한자 짝 맞추기 문제 수",
-                  activeValue: 5
-                })
-              },
-              {
-                label: "시간은 어떻게 할까요?",
-                content: createDurationSpinner({
-                  spinnerId: "kanji-match-time",
-                  ariaLabel: "한자 짝 맞추기 시간",
-                  activeValue: 15
-                })
-              }
+              ...createQuestionDurationGroups({
+                countSpinnerId: "kanji-match-count",
+                countAriaLabel: "한자 짝 맞추기 문제 수",
+                countValue: 5,
+                durationSpinnerId: "kanji-match-time",
+                durationAriaLabel: "한자 짝 맞추기 제한시간",
+                durationValue: 15
+              })
             ]
           })}
           ${createKanjiGradeCollectionToolbarHtml({
@@ -1095,11 +1101,7 @@
             collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC,
             fieldOrder: "grade-first"
           })}
-          ${createActionButton({
-            id: "kanji-match-new-round",
-            labelId: "kanji-match-new-round-label",
-            label: "시작해볼까요?"
-          })}
+          ${createStartQuizButton({ id: "kanji-match-new-round", labelId: "kanji-match-new-round-label" })}
         </aside>
         <div class="match-board" id="kanji-match-board" hidden>
           <p class="vocab-list-empty" id="kanji-match-empty" hidden>준비됐다면 시작해볼까요?</p>
@@ -1156,29 +1158,17 @@
                 ariaLabel: "문법 레벨 고르기",
                 options: JLPT_LEVEL_OPTIONS
               }),
-              {
-                label: "몇 문제 풀까요?",
-                content: createQuestionCountSpinner({
-                  spinnerId: "grammar-practice-count",
-                  ariaLabel: "문법 퀴즈 문제 수",
-                  activeValue: 10
-                })
-              },
-              {
-                label: "시간은 어떻게 할까요?",
-                content: createDurationSpinner({
-                  spinnerId: "grammar-practice-time",
-                  ariaLabel: "문법 퀴즈 시간",
-                  activeValue: 25
-                })
-              }
+              ...createQuestionDurationGroups({
+                countSpinnerId: "grammar-practice-count",
+                countAriaLabel: "문법 퀴즈 문제 수",
+                countValue: 10,
+                durationSpinnerId: "grammar-practice-time",
+                durationAriaLabel: "문법 퀴즈 제한시간",
+                durationValue: 25
+              })
             ]
           })}
-          ${createActionButton({
-            id: "grammar-practice-start",
-            labelId: "grammar-practice-start-label",
-            label: "시작해볼까요?"
-          })}
+          ${createStartQuizButton({ id: "grammar-practice-start", labelId: "grammar-practice-start-label" })}
         </aside>
         <div class="match-board grammar-practice-board">
           <p class="vocab-list-empty" id="grammar-practice-empty" hidden>준비됐다면 시작해볼까요?</p>
@@ -1220,29 +1210,17 @@
                 ariaLabel: "독해 레벨 고르기",
                 options: JLPT_LEVEL_OPTIONS
               }),
-              {
-                label: "몇 문제 풀까요?",
-                content: createQuestionCountSpinner({
-                  spinnerId: "reading-count",
-                  ariaLabel: "독해 문제 수",
-                  activeValue: 10
-                })
-              },
-              {
-                label: "시간은 어떻게 할까요?",
-                content: createDurationSpinner({
-                  spinnerId: "reading-time",
-                  ariaLabel: "독해 시간",
-                  activeValue: 45
-                })
-              }
+              ...createQuestionDurationGroups({
+                countSpinnerId: "reading-count",
+                countAriaLabel: "독해 퀴즈 문제 수",
+                countValue: 10,
+                durationSpinnerId: "reading-time",
+                durationAriaLabel: "독해 퀴즈 제한시간",
+                durationValue: 45
+              })
             ]
           })}
-          ${createActionButton({
-            id: "reading-start",
-            labelId: "reading-start-label",
-            label: "시작해볼까요?"
-          })}
+          ${createStartQuizButton({ id: "reading-start", labelId: "reading-start-label" })}
         </aside>
         <div class="match-board reading-practice-board">
           <p class="vocab-list-empty" id="reading-empty" hidden>준비됐다면 시작해볼까요?</p>

@@ -1,4 +1,4 @@
-const kanjiMatchStorageKey = "japanote-kanji-match-state";
+﻿const kanjiMatchStorageKey = "japanote-kanji-match-state";
 const kanjiStudyStateStorageKey = "jlpt-compass-state";
 const sharedMatchGame = globalThis.japanoteSharedMatchGame;
 
@@ -20,16 +20,16 @@ const defaultKanjiMatchPreferences = {
 };
 
 const kanjiMatchResultFilterLabels = {
-  all: "전체",
-  correct: "정답",
-  wrong: "오답"
+  all: "?꾩껜",
+  correct: "?뺣떟",
+  wrong: "?ㅻ떟"
 };
 
 const kanjiMatchFilterLabels = {
-  all: "전체",
-  review: "다시 볼래요",
-  mastered: "익혔어요",
-  unmarked: "아직 안 정했어요"
+  all: "?꾩껜",
+  review: "?ㅼ떆 蹂쇰옒??,
+  mastered: "?듯삍?댁슂",
+  unmarked: "?꾩쭅 ???뺥뻽?댁슂"
 };
 
 function normalizeKanjiMatchText(value) {
@@ -44,17 +44,6 @@ function normalizeKanjiMatchText(value) {
   }
 
   return text.replace(/\s+/g, " ").trim();
-}
-
-function shuffleKanjiMatchItems(items) {
-  const copy = [...items];
-
-  for (let index = copy.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
-  }
-
-  return copy;
 }
 
 function loadKanjiMatchPreferences() {
@@ -136,7 +125,7 @@ function getKanjiMatchGrade(value = kanjiMatchPreferences.grade) {
 
 function getKanjiMatchGradeLabel(grade = kanjiMatchPreferences.grade) {
   const activeGrade = getKanjiMatchGrade(grade);
-  return activeGrade === "all" ? "전체" : `${activeGrade}학년`;
+  return activeGrade === "all" ? "?꾩껜" : `${activeGrade}?숇뀈`;
 }
 
 function getKanjiMatchFilter(value = kanjiMatchPreferences.filter) {
@@ -159,7 +148,7 @@ function getKanjiMatchDuration(value = kanjiMatchPreferences.duration) {
 
 function getKanjiMatchDurationLabel(duration = kanjiMatchPreferences.duration) {
   const activeDuration = Number(duration);
-  return activeDuration <= 0 ? "천천히" : `${activeDuration}초`;
+  return activeDuration <= 0 ? "泥쒖쿇?? : `${activeDuration}珥?;
 }
 
 function getKanjiMatchResultFilter(value = kanjiMatchState.resultFilter) {
@@ -170,9 +159,9 @@ function getKanjiMatchOptionsSummaryText() {
   return [
     getKanjiMatchFilterLabel(),
     getKanjiMatchGradeLabel(),
-    `${getKanjiMatchTotalCount()}문제`,
+    `${getKanjiMatchTotalCount()}臾몄젣`,
     getKanjiMatchDurationLabel()
-  ].join(" · ");
+  ].join(" 쨌 ");
 }
 
 function getBaseKanjiMatchPool() {
@@ -268,7 +257,7 @@ function populateKanjiMatchGradeSelect(select, counts) {
   kanjiMatchGradeOptions.forEach((grade) => {
     const option = document.createElement("option");
     option.value = grade;
-    option.textContent = grade === "all" ? `전체 (${counts[grade] ?? 0})` : `${grade}학년 (${counts[grade] ?? 0})`;
+    option.textContent = grade === "all" ? `?꾩껜 (${counts[grade] ?? 0})` : `${grade}?숇뀈 (${counts[grade] ?? 0})`;
     select.appendChild(option);
   });
   select.value = getKanjiMatchGrade(kanjiMatchPreferences.grade);
@@ -310,9 +299,55 @@ const kanjiMatchState = {
 };
 
 let kanjiMatchPool = [];
-let kanjiMatchWrongTimer = null;
-let kanjiMatchRoundTimer = null;
-let kanjiMatchTransitionTimer = null;
+
+const kanjiMatchEngine = sharedMatchGame.createMatchGameEngine({
+  state: kanjiMatchState,
+  pageSize: kanjiMatchPageSize,
+  wrongFlashDuration: kanjiMatchWrongFlashDuration,
+  pageTransitionDelay: kanjiMatchPageTransitionDelay,
+  getDuration: () => getKanjiMatchDuration(kanjiMatchPreferences.duration),
+  getDefaultSessionItems: buildKanjiMatchSessionItems,
+  mapResultItem: (item) => ({
+    id: item.id,
+    gradeLabel: item.gradeLabel,
+    char: item.char,
+    reading: item.reading
+  }),
+  buildCardsFromPageItems: (pageItems) => ({
+    leftCards: sharedMatchGame.shuffleItems(
+      pageItems.map((item) => ({
+        id: item.id,
+        value: item.char,
+        side: "left"
+      }))
+    ),
+    rightCards: sharedMatchGame.shuffleItems(
+      pageItems.map((item) => ({
+        id: item.id,
+        value: item.reading,
+        side: "right"
+      }))
+    )
+  }),
+  onRender: renderKanjiMatchScreen,
+  onSetActionAvailability: setKanjiMatchActionAvailability,
+  onSetFeedback: setKanjiMatchFeedback,
+  onUnavailable: () => {
+    renderKanjiMatchUnavailableState("??뽰쁽 筌욎빖彛ょ빊遺쎈┛??餓Β??쑵釉??餓λ쵐??癒?뒄.");
+  },
+  onPageOpened: ({ isInitialPage }) => {
+    if (isInitialPage) {
+      scrollKanjiMatchBoardIntoView();
+    }
+  },
+  getTimeoutMessage: ({ isFinalPage }) => {
+    if (isFinalPage) {
+      return "??볦퍢????멸텢??癰귣똻?????뽰쁽???????얜챷?ｆ에?野껉퀗?든몴?獄쏆꼷???됰선??";
+    }
+
+    return "??볦퍢????멸텢??筌왖疫?癰귣똻?????뽰쁽???????얜챷?ｆ에??띾┛????쇱벉??곗쨮 揶쏅뜃苡??";
+  }
+});
 
 kanjiMatchPreferences.grade = getKanjiMatchGrade(kanjiMatchPreferences.grade);
 kanjiMatchPreferences.filter = getKanjiMatchFilter(kanjiMatchPreferences.filter);
@@ -321,36 +356,19 @@ kanjiMatchPreferences.duration = getKanjiMatchDuration(kanjiMatchPreferences.dur
 kanjiMatchPreferences.optionsOpen = false;
 
 function clearKanjiMatchTransitionTimer() {
-  if (!kanjiMatchTransitionTimer) {
-    return;
-  }
-
-  window.clearTimeout(kanjiMatchTransitionTimer);
-  kanjiMatchTransitionTimer = null;
+  kanjiMatchEngine.clearTransitionTimer();
 }
 
 function stopKanjiMatchRoundTimer() {
-  if (!kanjiMatchRoundTimer) {
-    return;
-  }
-
-  window.clearInterval(kanjiMatchRoundTimer);
-  kanjiMatchRoundTimer = null;
+  kanjiMatchEngine.stopRoundTimer();
 }
 
 function clearKanjiWrongMatchTimer() {
-  if (!kanjiMatchWrongTimer) {
-    return;
-  }
-
-  window.clearTimeout(kanjiMatchWrongTimer);
-  kanjiMatchWrongTimer = null;
+  kanjiMatchEngine.clearWrongMatchTimer();
 }
 
 function clearAllKanjiMatchTimers() {
-  clearKanjiMatchTransitionTimer();
-  clearKanjiWrongMatchTimer();
-  stopKanjiMatchRoundTimer();
+  kanjiMatchEngine.clearAllTimers();
 }
 
 function refreshKanjiMatchPool() {
@@ -358,34 +376,19 @@ function refreshKanjiMatchPool() {
 }
 
 function getKanjiMatchPageCount() {
-  return Math.max(1, Math.ceil(kanjiMatchState.sessionItems.length / kanjiMatchPageSize));
+  return kanjiMatchEngine.getPageCount();
 }
 
 function getKanjiMatchResolvedCount() {
-  return kanjiMatchState.results.filter((item) => item.status === "correct").length;
+  return kanjiMatchEngine.getResolvedCount();
 }
 
 function getKanjiMatchResultCounts() {
-  return {
-    all: kanjiMatchState.results.length,
-    correct: kanjiMatchState.results.filter((item) => item.status === "correct").length,
-    wrong: kanjiMatchState.results.filter((item) => item.status === "wrong").length
-  };
+  return kanjiMatchEngine.getResultCounts();
 }
 
 function setKanjiMatchResultStatus(ids, status) {
-  const targetIds = new Set(ids);
-
-  kanjiMatchState.results = kanjiMatchState.results.map((item) => {
-    if (!targetIds.has(item.id)) {
-      return item;
-    }
-
-    return {
-      ...item,
-      status
-    };
-  });
+  kanjiMatchEngine.setResultStatus(ids, status);
 }
 
 function resetKanjiMatchResultStatus(ids) {
@@ -393,24 +396,15 @@ function resetKanjiMatchResultStatus(ids) {
 }
 
 function getCurrentKanjiMatchPageItems(pageIndex = kanjiMatchState.pageIndex) {
-  const startIndex = pageIndex * kanjiMatchPageSize;
-  return kanjiMatchState.sessionItems.slice(startIndex, startIndex + kanjiMatchPageSize);
+  return kanjiMatchEngine.getCurrentPageItems(pageIndex);
 }
 
 function resetKanjiSelectedCards() {
-  kanjiMatchState.selectedLeft = null;
-  kanjiMatchState.selectedRight = null;
+  kanjiMatchEngine.resetSelectedCards();
 }
 
 function resetKanjiCurrentPageState() {
-  clearAllKanjiMatchTimers();
-  resetKanjiSelectedCards();
-  kanjiMatchState.wrongLeft = null;
-  kanjiMatchState.wrongRight = null;
-  kanjiMatchState.matchedIds = [];
-  kanjiMatchState.isLocked = false;
-  kanjiMatchState.timedOut = false;
-  kanjiMatchState.timeLeft = getKanjiMatchDuration(kanjiMatchPreferences.duration);
+  kanjiMatchEngine.resetCurrentPageState();
 }
 
 function setKanjiMatchFeedback(message, tone = "") {
@@ -494,7 +488,7 @@ function renderKanjiMatchSettings() {
         spinner: countSpinner,
         options: kanjiMatchTotalCountOptions,
         activeValue: getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount),
-        formatValue: (value) => `${value}문제`,
+        formatValue: (value) => `${value}臾몄젣`,
         disabled: isSettingsLocked
       },
       {
@@ -577,15 +571,7 @@ function renderKanjiMatchBoard() {
 }
 
 function getFilteredKanjiMatchResults(filter = getKanjiMatchResultFilter(kanjiMatchState.resultFilter)) {
-  if (filter === "correct") {
-    return kanjiMatchState.results.filter((item) => item.status === "correct");
-  }
-
-  if (filter === "wrong") {
-    return kanjiMatchState.results.filter((item) => item.status === "wrong");
-  }
-
-  return kanjiMatchState.results;
+  return kanjiMatchEngine.getFilteredResults(filter);
 }
 
 function renderKanjiMatchBulkActionButton(results) {
@@ -599,13 +585,13 @@ function renderKanjiMatchBulkActionButton(results) {
 
   const uniqueIds = Array.from(new Set(results.map((item) => item.id).filter(Boolean)));
   const allSaved = uniqueIds.length > 0 && uniqueIds.every((id) => isKanjiSavedToMemorizationList(id));
-  const actionLabel = allSaved ? "전체 빼기" : "전체 다시 볼래요";
+  const actionLabel = allSaved ? "?꾩껜 鍮쇨린" : "?꾩껜 ?ㅼ떆 蹂쇰옒??;
   const actionTitle =
     uniqueIds.length === 0
-      ? "지금 담아둘 한자가 없어요."
+      ? "吏湲??댁븘???쒖옄媛 ?놁뼱??"
       : allSaved
-        ? "지금 보이는 한자를 다시 볼래요에서 모두 뺄게요."
-        : "지금 보이는 한자를 다시 볼래요에 모두 담아둘게요.";
+        ? "吏湲?蹂댁씠???쒖옄瑜??ㅼ떆 蹂쇰옒?붿뿉??紐⑤몢 類꾧쾶??"
+        : "吏湲?蹂댁씠???쒖옄瑜??ㅼ떆 蹂쇰옒?붿뿉 紐⑤몢 ?댁븘?섍쾶??";
 
   bulkActionButton.disabled = uniqueIds.length === 0;
   bulkActionButton.dataset.kanjiMatchBulkAction = allSaved ? "remove" : "save";
@@ -646,8 +632,8 @@ function renderKanjiMatchResults() {
     renderBulkActionButton: renderKanjiMatchBulkActionButton,
     createItemMarkup: (item) => {
       const saved = isKanjiSavedToMemorizationList(item.id);
-      const statusLabel = item.status === "correct" ? "정답" : "오답";
-      const actionLabel = saved ? "다시 볼래요에서 빼기" : "다시 볼래요에 담기";
+      const statusLabel = item.status === "correct" ? "?뺣떟" : "?ㅻ떟";
+      const actionLabel = saved ? "?ㅼ떆 蹂쇰옒?붿뿉??鍮쇨린" : "?ㅼ떆 蹂쇰옒?붿뿉 ?닿린";
       const actionIcon = saved ? "delete" : "bookmark_add";
 
       return `
@@ -688,8 +674,8 @@ function renderKanjiMatchScreen() {
     hasStarted: kanjiMatchState.hasStarted,
     showResults: kanjiMatchState.showResults,
     isReady: kanjiMatchPool.length > 0,
-    emptyReadyText: "준비됐다면 시작해볼까요?",
-    emptyUnavailableText: "짝맞추기를 준비하고 있어요.",
+    emptyReadyText: "以鍮꾨릱?ㅻ㈃ ?쒖옉?대낵源뚯슂?",
+    emptyUnavailableText: "吏앸쭪異붽린瑜?以鍮꾪븯怨??덉뼱??",
     renderSettings: renderKanjiMatchSettings,
     renderActionCopy: renderKanjiMatchActionCopy,
     renderStats: renderKanjiMatchStats,
@@ -699,99 +685,20 @@ function renderKanjiMatchScreen() {
 }
 
 function startKanjiMatchRoundTimer() {
-  const activeDuration = getKanjiMatchDuration(kanjiMatchPreferences.duration);
-
-  stopKanjiMatchRoundTimer();
-  kanjiMatchState.timeLeft = activeDuration;
-  renderKanjiMatchTimer();
-
-  if (activeDuration <= 0) {
-    return;
-  }
-
-  kanjiMatchRoundTimer = window.setInterval(() => {
-    kanjiMatchState.timeLeft = Math.max(0, kanjiMatchState.timeLeft - 1);
-    renderKanjiMatchTimer();
-
-    if (kanjiMatchState.timeLeft === 0) {
-      stopKanjiMatchRoundTimer();
-      handleKanjiMatchTimeout();
-    }
-  }, 1000);
+  kanjiMatchEngine.startRoundTimer();
 }
-
 function enterKanjiMatchReadyState(message = "") {
-  clearAllKanjiMatchTimers();
-  kanjiMatchState.sessionItems = [];
-  kanjiMatchState.pageItems = [];
-  kanjiMatchState.results = [];
-  kanjiMatchState.leftCards = [];
-  kanjiMatchState.rightCards = [];
-  kanjiMatchState.pageIndex = 0;
-  kanjiMatchState.resultFilter = "all";
-  kanjiMatchState.showResults = false;
-  kanjiMatchState.hasStarted = false;
-  resetKanjiCurrentPageState();
-  setKanjiMatchActionAvailability(true);
-  setKanjiMatchFeedback(message);
-  renderKanjiMatchScreen();
+  kanjiMatchEngine.enterReadyState(message);
 }
-
 function openKanjiMatchPage(pageItems) {
-  kanjiMatchState.hasStarted = true;
-  kanjiMatchState.showResults = false;
-  kanjiMatchState.pageItems = pageItems;
-  resetKanjiCurrentPageState();
-  kanjiMatchState.leftCards = shuffleKanjiMatchItems(
-    pageItems.map((item) => ({
-      id: item.id,
-      value: item.char,
-      side: "left"
-    }))
-  );
-  kanjiMatchState.rightCards = shuffleKanjiMatchItems(
-    pageItems.map((item) => ({
-      id: item.id,
-      value: item.reading,
-      side: "right"
-    }))
-  );
-  setKanjiMatchActionAvailability(true);
-  setKanjiMatchFeedback("");
-  renderKanjiMatchScreen();
-  startKanjiMatchRoundTimer();
+  kanjiMatchEngine.openPage(pageItems);
 }
-
 function showKanjiMatchResults() {
-  clearAllKanjiMatchTimers();
-  resetKanjiSelectedCards();
-  kanjiMatchState.showResults = true;
-  kanjiMatchState.isLocked = false;
-  kanjiMatchState.timedOut = false;
-  setKanjiMatchActionAvailability(true);
-  renderKanjiMatchScreen();
+  kanjiMatchEngine.showResults();
 }
-
-function queueKanjiMatchPageTransition(callback) {
-  clearKanjiMatchTransitionTimer();
-  kanjiMatchTransitionTimer = window.setTimeout(() => {
-    kanjiMatchTransitionTimer = null;
-    callback();
-  }, kanjiMatchPageTransitionDelay);
-}
-
 function moveToNextKanjiMatchPage() {
-  kanjiMatchState.pageIndex += 1;
-  const nextItems = getCurrentKanjiMatchPageItems(kanjiMatchState.pageIndex);
-
-  if (!nextItems.length) {
-    showKanjiMatchResults();
-    return;
-  }
-
-  openKanjiMatchPage(nextItems);
+  kanjiMatchEngine.moveToNextPage();
 }
-
 function buildKanjiMatchSessionItems() {
   refreshKanjiMatchPool();
 
@@ -800,55 +707,17 @@ function buildKanjiMatchSessionItems() {
   }
 
   const totalCount = Math.min(getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount), kanjiMatchPool.length);
-  return shuffleKanjiMatchItems(kanjiMatchPool).slice(0, totalCount);
+  return sharedMatchGame.shuffleItems(kanjiMatchPool).slice(0, totalCount);
 }
-
 function startKanjiMatchSession(items = buildKanjiMatchSessionItems()) {
-  clearAllKanjiMatchTimers();
-
-  if (!items.length) {
-    renderKanjiMatchUnavailableState("한자 짝맞추기를 준비하는 중이에요. 잠시 후 다시 해볼까요?");
-    return;
-  }
-
-  kanjiMatchState.sessionItems = items.map((item) => ({ ...item }));
-  kanjiMatchState.results = items.map((item) => ({
-    id: item.id,
-    gradeLabel: item.gradeLabel,
-    char: item.char,
-    reading: item.reading,
-    status: "pending"
-  }));
-  kanjiMatchState.pageIndex = 0;
-  kanjiMatchState.resultFilter = "all";
-  kanjiMatchState.hasStarted = true;
-  openKanjiMatchPage(getCurrentKanjiMatchPageItems(0));
-  scrollKanjiMatchBoardIntoView();
+  kanjiMatchEngine.startSession(items);
 }
-
 function replayCurrentKanjiMatchPage() {
-  const currentItems = [...kanjiMatchState.pageItems];
-
-  if (!currentItems.length) {
-    startKanjiMatchSession();
-    return;
-  }
-
-  resetKanjiMatchResultStatus(currentItems.map((item) => item.id));
-  openKanjiMatchPage(currentItems);
+  kanjiMatchEngine.replayCurrentPage();
 }
-
 function replayCurrentKanjiMatchSet() {
-  const sessionItems = [...kanjiMatchState.sessionItems];
-
-  if (!sessionItems.length) {
-    startKanjiMatchSession();
-    return;
-  }
-
-  startKanjiMatchSession(sessionItems);
+  kanjiMatchEngine.replayCurrentSet();
 }
-
 function renderKanjiMatchUnavailableState(message) {
   const leftList = document.getElementById("kanji-match-left-list");
   const rightList = document.getElementById("kanji-match-right-list");
@@ -887,105 +756,14 @@ function renderKanjiMatchUnavailableState(message) {
   renderKanjiMatchScreen();
 }
 
-function finalizeCompletedKanjiMatchPage() {
-  kanjiMatchState.isLocked = true;
-  renderKanjiMatchBoard();
-
-  if (kanjiMatchState.pageIndex + 1 >= getKanjiMatchPageCount()) {
-    setKanjiMatchFeedback("");
-    queueKanjiMatchPageTransition(showKanjiMatchResults);
-    return;
-  }
-
-  setKanjiMatchFeedback("");
-  queueKanjiMatchPageTransition(moveToNextKanjiMatchPage);
-}
-
-function handleSuccessfulKanjiMatch(id) {
-  kanjiMatchState.matchedIds.push(id);
-  setKanjiMatchResultStatus([id], "correct");
-
-  if (kanjiMatchState.matchedIds.length === kanjiMatchState.pageItems.length) {
-    stopKanjiMatchRoundTimer();
-    finalizeCompletedKanjiMatchPage();
-    return;
-  }
-
-  setKanjiMatchFeedback("");
-}
-
-function queueFailedKanjiMatchReset() {
-  kanjiMatchState.isLocked = true;
-  renderKanjiMatchBoard();
-
-  clearKanjiWrongMatchTimer();
-  kanjiMatchWrongTimer = window.setTimeout(() => {
-    kanjiMatchState.wrongLeft = null;
-    kanjiMatchState.wrongRight = null;
-    kanjiMatchState.isLocked = false;
-    resetKanjiSelectedCards();
-    renderKanjiMatchBoard();
-    kanjiMatchWrongTimer = null;
-  }, kanjiMatchWrongFlashDuration);
-}
-
 function handleKanjiMatchSelection(card) {
-  if (kanjiMatchState.isLocked || kanjiMatchState.timedOut || kanjiMatchState.matchedIds.includes(card.id)) {
-    return;
-  }
-
-  if (card.side === "left") {
-    kanjiMatchState.selectedLeft = kanjiMatchState.selectedLeft === card.id ? null : card.id;
-  } else {
-    kanjiMatchState.selectedRight = kanjiMatchState.selectedRight === card.id ? null : card.id;
-  }
-
-  renderKanjiMatchBoard();
-
-  if (!kanjiMatchState.selectedLeft || !kanjiMatchState.selectedRight) {
-    return;
-  }
-
-  if (kanjiMatchState.selectedLeft === kanjiMatchState.selectedRight) {
-    handleSuccessfulKanjiMatch(kanjiMatchState.selectedLeft);
-    resetKanjiSelectedCards();
-    renderKanjiMatchBoard();
-    return;
-  }
-
-  kanjiMatchState.wrongLeft = kanjiMatchState.selectedLeft;
-  kanjiMatchState.wrongRight = kanjiMatchState.selectedRight;
-  queueFailedKanjiMatchReset();
+  kanjiMatchEngine.handleSelection(card);
 }
-
 function handleKanjiMatchTimeout() {
-  const remainingIds = kanjiMatchState.pageItems
-    .filter((item) => !kanjiMatchState.matchedIds.includes(item.id))
-    .map((item) => item.id);
-
-  setKanjiMatchResultStatus(remainingIds, "wrong");
-  kanjiMatchState.timedOut = true;
-  kanjiMatchState.isLocked = true;
-  resetKanjiSelectedCards();
-  renderKanjiMatchBoard();
-
-  if (kanjiMatchState.pageIndex + 1 >= getKanjiMatchPageCount()) {
-    setKanjiMatchFeedback("아깝네요! 시간이 끝났어요. 남은 한자는 틀린 문제로 넘기고 결과로 갈게요.", "is-fail");
-    queueKanjiMatchPageTransition(showKanjiMatchResults);
-    return;
-  }
-
-  setKanjiMatchFeedback("아깝네요! 시간이 끝났어요. 지금 보이는 한자는 틀린 문제로 넘기고 다음으로 갈게요.", "is-fail");
-  queueKanjiMatchPageTransition(moveToNextKanjiMatchPage);
+  kanjiMatchEngine.handleTimeout();
 }
-
 function startNewKanjiMatchSession() {
-  if (kanjiMatchState.hasStarted || kanjiMatchState.showResults) {
-    enterKanjiMatchReadyState();
-    return;
-  }
-
-  startKanjiMatchSession();
+  kanjiMatchEngine.startNewSession();
 }
 
 function setKanjiMatchGrade(grade) {

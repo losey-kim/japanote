@@ -631,10 +631,12 @@
     });
   }
 
-  function createVocabCatalogLayout() {
-    return createCatalogLayout({
+  const CATALOG_LAYOUT_SCOPE_MAP = {
+    vocab: {
       viewButtonsScope: "vocab",
       toolbarAriaLabel: "단어 필터",
+      toolbarClassName: "vocab-select-toolbar",
+      panelHeadLayout: "spread",
       selectFields: buildVocabLevelFilterPartSelectFields({
         levelId: "vocab-level-select",
         filterId: "vocab-filter-select",
@@ -647,7 +649,6 @@
       summaryId: "vocab-summary",
       summaryText: "0개 모였어요",
       viewSwitchAriaLabel: "단어 보기 방식 고르기",
-      viewButtonsScope: "vocab",
       flashcard: createCatalogFlashcardConfig({
         viewId: "vocab-card-view",
         articleId: "flashcard",
@@ -670,15 +671,12 @@
         masteredId: "flashcard-mastered"
       }),
       listView: createCatalogListViewConfig({ scope: "vocab" })
-    });
-  }
-
-  function createKanjiCatalogLayout() {
-    return createCatalogLayout({
+    },
+    kanji: {
       viewButtonsScope: "kanji",
+      toolbarAriaLabel: "한자 필터",
       toolbarClassName: "vocab-select-toolbar kanji-filter-toolbar",
       panelHeadLayout: "inline",
-      toolbarAriaLabel: "한자 필터",
       selectFields: buildKanjiGradeCollectionSelectFields({
         gradeSelectId: "kanji-grade-select",
         collectionSelectId: "kanji-collection-select",
@@ -689,7 +687,6 @@
       summaryId: "kanji-summary",
       summaryText: "0개 한자를 준비하고 있어요",
       viewSwitchAriaLabel: "한자 보기 방식 고르기",
-      viewButtonsScope: "kanji",
       flashcard: createCatalogFlashcardConfig({
         viewId: "kanji-card-view",
         viewClassName: "vocab-card-view kanji-card-view",
@@ -719,7 +716,23 @@
         viewClassName: "vocab-list-view kanji-list-view",
         listClassName: "vocab-list kanji-list"
       })
-    });
+    }
+  };
+
+  function createCatalogLayoutByScope(scope) {
+    const config = CATALOG_LAYOUT_SCOPE_MAP[scope];
+    if (!config) {
+      return createCatalogLayout({});
+    }
+    return createCatalogLayout({ ...config });
+  }
+
+  function createVocabCatalogLayout() {
+    return createCatalogLayoutByScope("vocab");
+  }
+
+  function createKanjiCatalogLayout() {
+    return createCatalogLayoutByScope("kanji");
   }
 
   function createChoiceQuizCard({

@@ -659,26 +659,17 @@ function renderKanjiMatchResults() {
           : saved
             ? "다시 볼래요에서 빼기"
             : "다시 볼래요에 담기";
-      const actionIcon = saved ? "delete" : "bookmark_add";
-
       return `
         <article class="match-result-item is-${item.status}">
-          <div class="match-result-item-head">
-            <div class="match-result-item-badges">
-              <span class="match-result-badge is-${item.status}">${statusLabel}</span>
-              <span class="match-result-level">${item.gradeLabel}</span>
-            </div>
-            <button
-              class="secondary-btn match-save-btn icon-only-btn${saved ? " is-saved" : ""}"
-              type="button"
-              data-kanji-match-save="${item.id}"
-              aria-label="${actionLabel}"
-              aria-pressed="${saved ? "true" : "false"}"
-              title="${actionLabel}"
-            >
-              <span class="material-symbols-rounded" aria-hidden="true">${actionIcon}</span>
-            </button>
-          </div>
+          ${sharedMatchGame.createResultItemHeadMarkup({
+            status: item.status,
+            statusLabel,
+            levelLabel: item.gradeLabel,
+            saved,
+            datasetName: "kanji-match-save",
+            itemId: item.id,
+            actionLabel
+          })}
           <div class="match-result-item-main">
             <strong>${item.char}</strong>
             <p>${item.reading}</p>

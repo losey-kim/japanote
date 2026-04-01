@@ -300,6 +300,43 @@
     icon.textContent = allSaved ? "delete_sweep" : "bookmark_add";
   }
 
+  function createResultItemHeadMarkup({
+    status,
+    statusLabel,
+    levelLabel,
+    saved,
+    datasetName,
+    itemId,
+    actionLabel
+  }) {
+    const safeStatus = typeof status === "string" ? status : "pending";
+    const safeStatusLabel = typeof statusLabel === "string" ? statusLabel : "";
+    const safeLevelLabel = typeof levelLabel === "string" ? levelLabel : "";
+    const safeItemId = typeof itemId === "string" ? itemId : "";
+    const safeDatasetName = typeof datasetName === "string" ? datasetName : "match-save";
+    const safeActionLabel = typeof actionLabel === "string" ? actionLabel : "";
+    const actionIcon = saved ? "delete" : "bookmark_add";
+
+    return `
+      <div class="match-result-item-head">
+        <div class="match-result-item-badges">
+          <span class="match-result-badge is-${safeStatus}">${safeStatusLabel}</span>
+          <span class="match-result-level">${safeLevelLabel}</span>
+        </div>
+        <button
+          class="secondary-btn match-save-btn icon-only-btn${saved ? " is-saved" : ""}"
+          type="button"
+          data-${safeDatasetName}="${safeItemId}"
+          aria-label="${safeActionLabel}"
+          aria-pressed="${saved ? "true" : "false"}"
+          title="${safeActionLabel}"
+        >
+          <span class="material-symbols-rounded" aria-hidden="true">${actionIcon}</span>
+        </button>
+      </div>
+    `;
+  }
+
   function renderResultsView({
     resultViewId,
     totalId,
@@ -991,6 +1028,7 @@
     renderBoard,
     renderResultFilterOptions,
     renderBulkActionButtonState,
+    createResultItemHeadMarkup,
     renderResultsView,
     renderScreen,
     attachSelectChangeListener,

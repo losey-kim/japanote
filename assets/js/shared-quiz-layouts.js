@@ -1168,7 +1168,6 @@
         '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="starter-kanji-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
     });
   }
-
   function createMatchRoundLayout({
     sidebarHead,
     shellId,
@@ -1378,6 +1377,62 @@
     });
   }
 
+  function createPracticeModeCardLayout({
+    articleClassName,
+    metaClassName,
+    metaItems = [],
+    hudItems = [],
+    header,
+    contentMarkup = "",
+    optionsId,
+    feedbackId,
+    explanationId,
+    nextButtonId,
+    nextButtonLabel
+  }) {
+    const metaMarkup = metaItems.map((item) => `<span${item.id ? ` id="${escapeHtml(item.id)}"` : ""}>${escapeHtml(item.text)}</span>`).join("");
+    const hudMarkup = hudItems.length
+      ? `
+        <div class="quiz-hud">
+          ${hudItems
+            .map(
+              (item) => `
+                <div class="quiz-hud-item">
+                  <span>${escapeHtml(item.label)}</span><strong id="${escapeHtml(item.valueId)}">${escapeHtml(item.value)}</strong>
+                </div>
+              `
+            )
+            .join("")}
+        </div>
+      `
+      : "";
+
+    const headerMarkup = header
+      ? `
+        <div class="${escapeHtml(header.className)}">
+          <div>
+            <span class="eyebrow">${escapeHtml(header.eyebrow)}</span>
+            <h3 id="${escapeHtml(header.titleId)}">${escapeHtml(header.title)}</h3>
+          </div>
+          ${header.noteId ? `<p class="${escapeHtml(header.noteClassName || `${header.className}-note`)}" id="${escapeHtml(header.noteId)}">${escapeHtml(header.note || "")}</p>` : ""}
+        </div>
+      `
+      : "";
+
+    return `
+      <article class="${escapeHtml(articleClassName)}">
+        <div class="${escapeHtml(metaClassName)}">${metaMarkup}</div>
+        ${hudMarkup}
+        ${headerMarkup}
+        ${contentMarkup}
+        <div class="${escapeHtml(optionsId)}" id="${escapeHtml(optionsId)}"></div>
+        <p class="${escapeHtml(feedbackId)}" id="${escapeHtml(feedbackId)}"></p>
+        <p class="${escapeHtml(explanationId)}" id="${escapeHtml(explanationId)}"></p>
+        <div class="quiz-actions"><button class="primary-btn" id="${escapeHtml(nextButtonId)}" type="button">${escapeHtml(nextButtonLabel)}</button></div>
+      </article>
+    `;
+  }
+
   function createGrammarPracticeLayout() {
     return createPracticeModeLayout({
       sidebarHead: "<div class=\"match-sidebar-head\"><span class=\"eyebrow\">GRAMMAR HUD</span><h3>문법 퀴즈</h3></div>",
@@ -1411,18 +1466,33 @@
       boardClassName: "match-board grammar-practice-board",
       emptyId: "grammar-practice-empty",
       viewId: "grammar-practice-view",
-      viewMarkup: `
-            <article class="grammar-practice-card">
-              <div class="grammar-practice-meta"><span id="grammar-practice-level">N5</span><span id="grammar-practice-source">N5G 1</span><span id="grammar-practice-progress">1 / 4</span></div>
-              <div class="quiz-hud"><div class="quiz-hud-item"><span>남은 시간</span><strong id="grammar-timer">25초</strong></div></div>
-              <div class="grammar-practice-header"><div><span class="eyebrow">GRAMMAR SET</span><h3 id="grammar-practice-title">문법 퀴즈</h3></div><p class="grammar-practice-note" id="grammar-practice-note"></p></div>
-              <div class="grammar-practice-question"><span class="eyebrow">SENTENCE</span><p id="grammar-practice-sentence">문장을 불러오고 있어요.</p></div>
-              <div class="grammar-practice-options" id="grammar-practice-options"></div>
-              <p class="grammar-practice-feedback" id="grammar-practice-feedback"></p>
-              <p class="grammar-practice-explanation" id="grammar-practice-explanation"></p>
-              <div class="quiz-actions"><button class="primary-btn" id="grammar-practice-next" type="button">다음 문제 보기</button></div>
-            </article>
-          `
+      viewMarkup: createPracticeModeCardLayout({
+        articleClassName: "grammar-practice-card",
+        metaClassName: "grammar-practice-meta",
+        metaItems: [
+          { id: "grammar-practice-level", text: "N5" },
+          { id: "grammar-practice-source", text: "N5G 1" },
+          { id: "grammar-practice-progress", text: "1 / 4" }
+        ],
+        hudItems: [{ label: "남은 시간", valueId: "grammar-timer", value: "25초" }],
+        header: {
+          className: "grammar-practice-header",
+          eyebrow: "GRAMMAR SET",
+          titleId: "grammar-practice-title",
+          title: "문법 퀴즈",
+          noteClassName: "grammar-practice-note",
+          noteId: "grammar-practice-note",
+          note: ""
+        },
+        contentMarkup: `
+          <div class="grammar-practice-question"><span class="eyebrow">SENTENCE</span><p id="grammar-practice-sentence">문장을 불러오고 있어요.</p></div>
+        `,
+        optionsId: "grammar-practice-options",
+        feedbackId: "grammar-practice-feedback",
+        explanationId: "grammar-practice-explanation",
+        nextButtonId: "grammar-practice-next",
+        nextButtonLabel: "다음 문제 보기"
+      })
     });
   }
 
@@ -1459,19 +1529,36 @@
       boardClassName: "match-board reading-practice-board",
       emptyId: "reading-empty",
       viewId: "reading-practice-view",
-      viewMarkup: `
-            <article class="reading-card">
-              <div class="reading-meta"><span id="reading-level">N5</span><span id="reading-source">N5R p1</span></div>
-              <div class="quiz-hud"><div class="quiz-hud-item"><span>진행</span><strong id="reading-progress">1 / 3</strong></div><div class="quiz-hud-item"><span>남은 시간</span><strong id="reading-timer">45초</strong></div></div>
-              <div class="reading-header"><div><span class="eyebrow">READING SET</span><h3 id="reading-title">한 문제씩 읽어봐요</h3></div><p class="reading-korean" id="reading-korean"></p></div>
-              <div class="reading-passage" id="reading-passage"></div>
-              <div class="reading-question-box"><span class="eyebrow">QUESTION</span><h4 id="reading-question">질문을 불러오고 있어요.</h4></div>
-              <div class="reading-options" id="reading-options"></div>
-              <p class="reading-feedback" id="reading-feedback"></p>
-              <p class="reading-explanation" id="reading-explanation"></p>
-              <div class="quiz-actions"><button class="primary-btn" id="reading-next" type="button">다음 글 보기</button></div>
-            </article>
-          `
+      viewMarkup: createPracticeModeCardLayout({
+        articleClassName: "reading-card",
+        metaClassName: "reading-meta",
+        metaItems: [
+          { id: "reading-level", text: "N5" },
+          { id: "reading-source", text: "N5R p1" }
+        ],
+        hudItems: [
+          { label: "진행", valueId: "reading-progress", value: "1 / 3" },
+          { label: "남은 시간", valueId: "reading-timer", value: "45초" }
+        ],
+        header: {
+          className: "reading-header",
+          eyebrow: "READING SET",
+          titleId: "reading-title",
+          title: "한 문제씩 읽어봐요",
+          noteClassName: "reading-korean",
+          noteId: "reading-korean",
+          note: ""
+        },
+        contentMarkup: `
+          <div class="reading-passage" id="reading-passage"></div>
+          <div class="reading-question-box"><span class="eyebrow">QUESTION</span><h4 id="reading-question">질문을 불러오고 있어요.</h4></div>
+        `,
+        optionsId: "reading-options",
+        feedbackId: "reading-feedback",
+        explanationId: "reading-explanation",
+        nextButtonId: "reading-next",
+        nextButtonLabel: "다음 글 보기"
+      })
     });
   }
 

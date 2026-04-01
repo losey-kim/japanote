@@ -20,7 +20,9 @@ function applyThemeMode(mode) {
   const nextMode = themeModes.includes(mode) ? mode : "light";
 
   if (nextMode === "system") {
-    root.removeAttribute("data-theme");
+    // Keep the light marker so broad :not([data-theme="light"]) dark rules
+    // do not leak into the separate system palette.
+    root.setAttribute("data-theme", "light");
   } else {
     root.setAttribute("data-theme", nextMode);
   }

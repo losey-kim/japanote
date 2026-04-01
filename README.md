@@ -23,15 +23,14 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
 
 ## 로컬에서 Supabase(클라우드 로그인) 테스트
 
-- `supabase-config.js`의 `emailRedirectTo`가 GitHub Pages로 되어 있어도, **로컬 origin**(`http://localhost:8080` 등)과 다르면 앱이 매직 링크 복귀 URL을 **현재 로컬 주소**로 잡습니다.
-- Supabase 대시보드 **Authentication → URL Configuration → Redirect URLs**에 로컬 주소를 추가해야 매직 링크가 열립니다. 예:
+매직 링크는 **지금 브라우저 주소창에 보이는 그 URL(포트 포함)**으로 돌아오게 요청합니다. Supabase는 **Redirect URLs에 없는 주소**로는 보내 주지 않고, **Site URL(예: GitHub Pages)**로 바꿔 버립니다. 그래서 로컬에서 보냈는데 배포 주소로 열리면 **허용 목록에 로컬 주소가 없는 것**이에요.
 
-  - `http://localhost:8080/**`
-  - `http://127.0.0.1:8080/**`
+- **Authentication → URL Configuration → Redirect URLs**에 아래를 넣습니다.
 
-  (위의 **8080**은 실제로 쓰는 포트에 맞게 바꾸세요.)
+  - 배포: `https://losey-kim.github.io/Japanote/**` (실제 도메인에 맞게)
+  - 로컬: **`http://localhost:8080/**`** 처럼 **쓰는 포트와 동일하게** (예: Live Server가 `53237`이면 `http://localhost:53237/**`도 추가)
 
-- 개발할 때만 쓰고 배포에는 영향 없습니다.
+- 포트가 매번 바뀌면(Live Server 등) 그때그때 Redirect URLs에 추가하거나, **`npm run dev`(고정 8080)** 로 맞추는 편이 편합니다.
 
 ## 페이지 구성
 
@@ -60,7 +59,7 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
    - `stateTable`: 기본 `user_state` (테이블명을 바꾼 경우만 수정)
    - `emailRedirectTo`: 비워 두면 현재 페이지 기준으로 돌아옵니다.
 3. Supabase Authentication에서 **Email** 로그인(매직 링크)을 켭니다.
-4. Authentication의 `Site URL`과 `Redirect URLs`에 실제 서비스 주소를 등록합니다. GitHub Pages 예: `https://losey-kim.github.io/Japanote/` 및 `https://losey-kim.github.io/Japanote/**` (또는 `config`의 `emailRedirectTo`와 동일한 origin).
+4. Authentication의 `Site URL`과 `Redirect URLs`에 실제 서비스 주소를 등록합니다. GitHub Pages 예: `https://losey-kim.github.io/Japanote/**`. 로컬 개발 주소는 아래「로컬에서 Supabase」절을 참고하세요.
 5. **SQL Editor**(Supabase 대시보드 → SQL)에서 `supabase/migrations/001_user_state.sql` **전체를 복사해 한 번에 실행**합니다. 이걸 하지 않으면 동기화 시 `Could not find the table 'public.user_state' in the schema cache` 같은 오류가 납니다.
 
 앱에서는 **이름 + 이메일**만 입력하면 매직 링크가 전송됩니다. 로그인 후 **클라우드에서 받기** / **클라우드에 올리기**로 동기화할 수 있고, 다른 기기에서도 같은 이메일로 링크 로그인하면 같은 데이터를 불러옵니다.

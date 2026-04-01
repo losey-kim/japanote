@@ -94,32 +94,6 @@
     return window.location.protocol === "http:" || window.location.protocol === "https:";
   }
 
-  function getConfiguredRedirectOrigin() {
-    if (!config.emailRedirectTo) {
-      return "";
-    }
-
-    try {
-      return new URL(config.emailRedirectTo).origin;
-    } catch (error) {
-      return "";
-    }
-  }
-
-  function shouldUseCurrentOriginRedirect() {
-    if (!hasHttpOrigin()) {
-      return false;
-    }
-
-    const configuredOrigin = getConfiguredRedirectOrigin();
-
-    if (!configuredOrigin) {
-      return true;
-    }
-
-    return window.location.origin !== configuredOrigin;
-  }
-
   function getCurrentPageUrl() {
     try {
       const currentUrl = new URL(window.location.href);
@@ -131,10 +105,11 @@
     }
   }
 
+  /** 매직 링크는 항상 "지금 이 페이지"로 돌아오게 함. Supabase Redirect URLs에 이 URL(포트 포함)이 있어야 함. */
   function getEmailRedirectUrl() {
     const currentPageUrl = getCurrentPageUrl();
 
-    if (shouldUseCurrentOriginRedirect()) {
+    if (hasHttpOrigin()) {
       return currentPageUrl;
     }
 

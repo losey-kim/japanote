@@ -107,20 +107,78 @@ function isFileProtocol() {
   return typeof window !== "undefined" && window.location && window.location.protocol === "file:";
 }
 
-function fetchJsonData(fileName, fallbackLabel) {
-  if (isFileProtocol()) {
-    return Promise.resolve(null);
-  }
+function isSuccessfulResponse(response) {
+  return response.status >= 200 && response.status < 300;
+}
 
-  return fetch(getContentDataUrl(fileName), {
+function parseJsonPayload(payloadText, fallbackLabel) {
+  try {
+    const parsed = typeof payloadText === "string" ? JSON.parse(payloadText) : payloadText;
+
+    if (parsed === undefined || parsed === null) {
+      throw new Error(`응답 데이터가 비어 있어요.`);
+    }
+
+    return parsed;
+  } catch (error) {
+    throw new Error(`Failed to parse ${fallbackLabel}: ${error.message}`);
+  }
+}
+
+function fetchJsonDataWithXhr(fileName, fallbackLabel) {
+  const requestUrl = getContentDataUrl(fileName);
+
+  return new Promise((resolve, reject) => {
+    if (typeof XMLHttpRequest !== "function") {
+      reject(new Error(`XHR is not available for ${fallbackLabel}.`));
+      return;
+    }
+
+    const request = new XMLHttpRequest();
+    request.open("GET", requestUrl, true);
+    request.responseType = "text";
+
+    request.onload = () => {
+      const isLoaded = request.status === 0 || isSuccessfulResponse(request);
+
+      if (!isLoaded) {
+        reject(new Error(`Failed to load ${fallbackLabel} (${request.status})`));
+        return;
+      }
+
+      try {
+        resolve(parseJsonPayload(request.responseText, fallbackLabel));
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    request.onerror = () => {
+      reject(new Error(`Failed to load ${fallbackLabel} (XHR).`));
+    };
+
+    request.ontimeout = () => {
+      reject(new Error(`Timed out while loading ${fallbackLabel} (XHR).`));
+    };
+
+    request.send();
+  });
+}
+
+function fetchJsonData(fileName, fallbackLabel) {
+  const requestUrl = getContentDataUrl(fileName);
+
+  return fetch(requestUrl, {
     cache: "default",
     credentials: "same-origin"
   }).then((response) => {
-    if (!response.ok) {
+    if (!isSuccessfulResponse(response)) {
       throw new Error(`Failed to load ${fallbackLabel} (${response.status})`);
     }
 
     return response.json();
+  }).catch(() => {
+    return fetchJsonDataWithXhr(fileName, fallbackLabel);
   });
 }
 
@@ -156,7 +214,7 @@ function refreshStarterItems(payload) {
 function refreshBasicPracticeSets(payload) {
   const source = payload && typeof payload === "object" ? payload : {};
   basicPracticeSets = {
-    kana: null,
+    ...basicPracticeSets,
     words: normalizeBasicPracticeTrack(source.words),
     particles: normalizeBasicPracticeTrackOrNull(source.particles),
     kanji: normalizeBasicPracticeTrackOrNull(source.kanji),

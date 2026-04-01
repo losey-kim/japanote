@@ -18,6 +18,35 @@ const vocabContent = contentRegistry.vocab || {};
 const grammarContent = contentRegistry.grammar || {};
 const readingContent = contentRegistry.reading || {};
 
+function getVocabStore() {
+  if (globalThis.japanoteVocabStore && typeof globalThis.japanoteVocabStore.ensureLevels === "function") {
+    return globalThis.japanoteVocabStore;
+  }
+
+  return null;
+}
+
+function getRequestedVocabLevels(level = "N5") {
+  if (level === allLevelValue) {
+    return [...contentLevels];
+  }
+
+  return contentLevels.includes(level) ? [level] : ["N5"];
+}
+
+function ensureVocabLevelsLoaded(level = "N5") {
+  const vocabStore = getVocabStore();
+  const requestedLevels = Array.isArray(level)
+    ? Array.from(new Set(level.filter((itemLevel) => contentLevels.includes(itemLevel))))
+    : getRequestedVocabLevels(level);
+
+  if (!vocabStore) {
+    return Promise.resolve([]);
+  }
+
+  return vocabStore.ensureLevels(requestedLevels);
+}
+
 function getLevelContentSets(source) {
   return contentLevels.reduce((sets, level) => {
     sets[level] = Array.isArray(source?.[level]) ? source[level] : [];
@@ -26,7 +55,7 @@ function getLevelContentSets(source) {
 }
 
 function getAllPracticeSets(levelSets = {}) {
-  return contentLevels.flatMap((level) => levelSets[level] || []);
+  return contentLevels.reduce((items, level) => items.concat(levelSets[level] || []), []);
 }
 
 function getLegacyVocabKey(level) {
@@ -40,11 +69,7 @@ function withTaggedVocabLevel(items, level) {
   }));
 }
 
-function getDynamicVocabSource(level = "N5") {
-  if (level === allLevelValue) {
-    return contentLevels.flatMap((itemLevel) => getDynamicVocabSource(itemLevel));
-  }
-
+function getDynamicVocabSourceForLevel(level) {
   if (Array.isArray(vocabContent?.[level]) && vocabContent[level].length) {
     return withTaggedVocabLevel(vocabContent[level], level);
   }
@@ -59,6 +84,12 @@ function getDynamicVocabSource(level = "N5") {
   }
 
   return [];
+}
+
+function getDynamicVocabSource(level = "N5") {
+  return getRequestedVocabLevels(level).reduce((items, itemLevel) => {
+    return items.concat(getDynamicVocabSourceForLevel(itemLevel));
+  }, []);
 }
 
 const fallbackFlashcards = [
@@ -1524,6 +1555,63 @@ function refreshVocabPageContent(level = "N5") {
 
   flashcards = buildDynamicFlashcardPool(activeVocabPool, activeLevel);
   vocabListItems = buildDynamicVocabListPool(activeVocabPool, activeLevel);
+}
+
+function syncDynamicVocabCollections() {
+  refreshDynamicVocabContent("N5");
+  refreshQuizContent(state?.quizLevel || "N5");
+  refreshVocabPageContent(state?.vocabLevel || "N5");
+}
+
+function preloadRelevantVocabData() {
+  const requestedLevels = Array.from(
+    new Set(
+      getRequestedVocabLevels("N5")
+        .concat(getRequestedVocabLevels(getVocabLevel(state?.vocabLevel)))
+        .concat(getRequestedVocabLevels(getQuizLevel(state?.quizLevel)))
+    )
+  );
+
+  return ensureVocabLevelsLoaded(requestedLevels);
+}
+
+function completeVocabLoad(request) {
+  return request
+    .then(() => {
+      handleLoadedVocabLevels();
+    })
+    .catch((error) => {
+      console.error("Failed to load vocab data.", error);
+      return [];
+    });
+}
+
+function loadRelevantVocabData() {
+  return completeVocabLoad(preloadRelevantVocabData());
+}
+
+function loadVocabDataForLevel(level) {
+  return completeVocabLoad(ensureVocabLevelsLoaded(level));
+}
+
+function handleLoadedVocabLevels() {
+  if (!state) {
+    return;
+  }
+
+  syncDynamicVocabCollections();
+
+  if (state.quizIndex === 0 && !state.quizSessionFinished) {
+    activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
+  }
+
+  if (!state.vocabQuizStarted) {
+    activeVocabQuizQuestions = [];
+    activeVocabQuizSignature = "";
+    activeVocabQuizResults = [];
+  }
+
+  renderAll();
 }
 
 const kanaBlueprintGroups = [
@@ -4697,6 +4785,7 @@ function applyExternalStudyState(nextState) {
   });
   resetStateDrivenQuizSessions();
   renderAll();
+  loadRelevantVocabData();
 }
 
 function getLocalDateKey() {
@@ -7314,6 +7403,7 @@ function setVocabLevel(level) {
   state.vocabPartFilter = getVocabPartFilter(state.vocabPartFilter);
   saveState();
   renderVocabPage();
+  loadVocabDataForLevel(nextLevel);
 }
 
 function setVocabFilter(filter) {
@@ -8777,6 +8867,7 @@ function setQuizLevel(level) {
   state.quizLevel = nextLevel;
   refreshQuizContent(nextLevel);
   startNewQuizSession();
+  loadVocabDataForLevel(nextLevel);
 }
 
 function setQuizDuration(duration) {
@@ -10457,8 +10548,7 @@ function renderAll() {
   renderStats();
 }
 
-refreshDynamicVocabContent("N5");
-refreshQuizContent(state.quizLevel);
+syncDynamicVocabCollections();
 activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
 attachEventListeners();
 window.addEventListener("hashchange", () => {
@@ -10477,3 +10567,4 @@ window.addEventListener("japanote:storage-updated", (event) => {
   applyExternalStudyState(event.detail.value);
 });
 renderAll();
+loadRelevantVocabData();

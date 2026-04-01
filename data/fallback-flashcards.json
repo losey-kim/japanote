@@ -1,0 +1,144 @@
+{
+  "flashcards": [
+    {
+      "id": "v1",
+      "level": "N5",
+      "word": "食べる",
+      "reading": "たべる",
+      "meaning": "먹다"
+    },
+    {
+      "id": "v2",
+      "level": "N5",
+      "word": "行く",
+      "reading": "いく",
+      "meaning": "가다"
+    },
+    {
+      "id": "v3",
+      "level": "N5",
+      "word": "見る",
+      "reading": "みる",
+      "meaning": "보다"
+    },
+    {
+      "id": "v4",
+      "level": "N5",
+      "word": "聞く",
+      "reading": "きく",
+      "meaning": "듣다, 묻다"
+    },
+    {
+      "id": "v5",
+      "level": "N5",
+      "word": "飲む",
+      "reading": "のむ",
+      "meaning": "마시다"
+    },
+    {
+      "id": "v6",
+      "level": "N5",
+      "word": "学校",
+      "reading": "がっこう",
+      "meaning": "학교"
+    },
+    {
+      "id": "v7",
+      "level": "N5",
+      "word": "先生",
+      "reading": "せんせい",
+      "meaning": "선생님"
+    },
+    {
+      "id": "v8",
+      "level": "N5",
+      "word": "友だち",
+      "reading": "ともだち",
+      "meaning": "친구"
+    },
+    {
+      "id": "v9",
+      "level": "N5",
+      "word": "今日",
+      "reading": "きょう",
+      "meaning": "오늘"
+    },
+    {
+      "id": "v10",
+      "level": "N5",
+      "word": "明日",
+      "reading": "あした",
+      "meaning": "내일"
+    },
+    {
+      "id": "v11",
+      "level": "N5",
+      "word": "水",
+      "reading": "みず",
+      "meaning": "물"
+    },
+    {
+      "id": "v12",
+      "level": "N5",
+      "word": "本",
+      "reading": "ほん",
+      "meaning": "책"
+    },
+    {
+      "id": "v13",
+      "level": "N4",
+      "word": "準備",
+      "reading": "じゅんび",
+      "meaning": "준비"
+    },
+    {
+      "id": "v14",
+      "level": "N4",
+      "word": "続ける",
+      "reading": "つづける",
+      "meaning": "계속하다"
+    },
+    {
+      "id": "v15",
+      "level": "N3",
+      "word": "提案",
+      "reading": "ていあん",
+      "meaning": "제안"
+    },
+    {
+      "id": "v16",
+      "level": "N3",
+      "word": "割合",
+      "reading": "わりあい",
+      "meaning": "비율, 정도"
+    },
+    {
+      "id": "v17",
+      "level": "N2",
+      "word": "模擬",
+      "reading": "もぎ",
+      "meaning": "모의"
+    },
+    {
+      "id": "v18",
+      "level": "N2",
+      "word": "適切",
+      "reading": "てきせつ",
+      "meaning": "적절함"
+    },
+    {
+      "id": "v19",
+      "level": "N1",
+      "word": "顕著",
+      "reading": "けんちょ",
+      "meaning": "현저함"
+    },
+    {
+      "id": "v20",
+      "level": "N1",
+      "word": "推移",
+      "reading": "すいい",
+      "meaning": "추이"
+    }
+  ]
+}

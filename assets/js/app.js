@@ -82,6 +82,19 @@ function normalizeKanjiRows(payload) {
   return Array.isArray(payload) ? payload.filter((row) => Array.isArray(row)) : [];
 }
 
+function normalizeBasicPracticeTrack(payload) {
+  const track = payload && typeof payload === "object" ? payload : {};
+  return {
+    label: typeof track.label === "string" ? track.label : "",
+    heading: typeof track.heading === "string" ? track.heading : "",
+    items: Array.isArray(track.items) ? track.items : []
+  };
+}
+
+function normalizeBasicPracticeTrackOrNull(payload) {
+  return payload && typeof payload === "object" ? normalizeBasicPracticeTrack(payload) : null;
+}
+
 function getContentDataUrl(fileName) {
   if (typeof window === "undefined" || !window.location) {
     return fileName;
@@ -130,6 +143,37 @@ function refreshKanjiRows(payload) {
   kanjiDataRows = normalizeKanjiRows(payload || []);
 }
 
+function normalizeQuizQuestionList(payload) {
+  const candidate = Array.isArray(payload) ? payload : [];
+  return candidate.length ? candidate : [];
+}
+
+function refreshStarterItems(payload) {
+  const normalized = Array.isArray(payload?.items) ? payload.items : [];
+  starterItems = normalized;
+}
+
+function refreshBasicPracticeSets(payload) {
+  const source = payload && typeof payload === "object" ? payload : {};
+  basicPracticeSets = {
+    kana: null,
+    words: normalizeBasicPracticeTrack(source.words),
+    particles: normalizeBasicPracticeTrackOrNull(source.particles),
+    kanji: normalizeBasicPracticeTrackOrNull(source.kanji),
+    sentences: normalizeBasicPracticeTrackOrNull(source.sentences)
+  };
+}
+
+function refreshFallbackFlashcards(payload) {
+  fallbackFlashcards = normalizeQuizQuestionList(payload?.flashcards);
+  flashcards = [...fallbackFlashcards];
+  vocabListItems = [...fallbackFlashcards];
+}
+
+function refreshQuizQuestions(payload) {
+  quizQuestions = normalizeQuizQuestionList(payload?.questions);
+}
+
 function loadGrammarDataFromJson() {
   return fetchJsonData("grammar.json", "grammar.json")
     .then((payload) => {
@@ -169,14 +213,69 @@ function loadKanjiDataFromJson() {
     });
 }
 
+function loadStarterItemsFromJson() {
+  return fetchJsonData("starter-items.json", "starter-items.json")
+    .then((payload) => {
+      refreshStarterItems(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default starter-items data (script fallback).", error);
+      refreshStarterItems({});
+      return null;
+    });
+}
+
+function loadBasicPracticeSetsFromJson() {
+  return fetchJsonData("basic-practice.json", "basic-practice.json")
+    .then((payload) => {
+      refreshBasicPracticeSets(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default basic-practice data (script fallback).", error);
+      refreshBasicPracticeSets({});
+      return null;
+    });
+}
+
+function loadFallbackFlashcardsFromJson() {
+  return fetchJsonData("fallback-flashcards.json", "fallback-flashcards.json")
+    .then((payload) => {
+      refreshFallbackFlashcards(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default fallback flashcards (script fallback).", error);
+      refreshFallbackFlashcards({});
+      return null;
+    });
+}
+
+function loadQuizQuestionsFromJson() {
+  return fetchJsonData("quiz-questions.json", "quiz-questions.json")
+    .then((payload) => {
+      refreshQuizQuestions(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default quiz questions (script fallback).", error);
+      refreshQuizQuestions({});
+      return null;
+    });
+}
+
 function loadSupplementaryContentData() {
   return Promise.all([
     loadGrammarDataFromJson(),
     loadReadingDataFromJson(),
-    loadKanjiDataFromJson()
+    loadKanjiDataFromJson(),
+    loadStarterItemsFromJson(),
+    loadBasicPracticeSetsFromJson(),
+    loadFallbackFlashcardsFromJson(),
+    loadQuizQuestionsFromJson()
   ]).then(() => {
     refreshKanjiPracticeSet();
-    renderAll();
   });
 }
 
@@ -222,28 +321,8 @@ function getDynamicVocabSource(level = "N5") {
   }, []);
 }
 
-const fallbackFlashcards = [
-  { id: "v1", level: "N5", word: "食べる", reading: "たべる", meaning: "먹다" },
-  { id: "v2", level: "N5", word: "行く", reading: "いく", meaning: "가다" },
-  { id: "v3", level: "N5", word: "見る", reading: "みる", meaning: "보다" },
-  { id: "v4", level: "N5", word: "聞く", reading: "きく", meaning: "듣다, 묻다" },
-  { id: "v5", level: "N5", word: "飲む", reading: "のむ", meaning: "마시다" },
-  { id: "v6", level: "N5", word: "学校", reading: "がっこう", meaning: "학교" },
-  { id: "v7", level: "N5", word: "先生", reading: "せんせい", meaning: "선생님" },
-  { id: "v8", level: "N5", word: "友だち", reading: "ともだち", meaning: "친구" },
-  { id: "v9", level: "N5", word: "今日", reading: "きょう", meaning: "오늘" },
-  { id: "v10", level: "N5", word: "明日", reading: "あした", meaning: "내일" },
-  { id: "v11", level: "N5", word: "水", reading: "みず", meaning: "물" },
-  { id: "v12", level: "N5", word: "本", reading: "ほん", meaning: "책" },
-  { id: "v13", level: "N4", word: "準備", reading: "じゅんび", meaning: "준비" },
-  { id: "v14", level: "N4", word: "続ける", reading: "つづける", meaning: "계속하다" },
-  { id: "v15", level: "N3", word: "提案", reading: "ていあん", meaning: "제안" },
-  { id: "v16", level: "N3", word: "割合", reading: "わりあい", meaning: "비율, 정도" },
-  { id: "v17", level: "N2", word: "模擬", reading: "もぎ", meaning: "모의" },
-  { id: "v18", level: "N2", word: "適切", reading: "てきせつ", meaning: "적절함" },
-  { id: "v19", level: "N1", word: "顕著", reading: "けんちょ", meaning: "현저함" },
-  { id: "v20", level: "N1", word: "推移", reading: "すいい", meaning: "추이" }
-];
+let fallbackFlashcards = [];
+
 
 let flashcards = [...fallbackFlashcards];
 let vocabListItems = [...fallbackFlashcards];
@@ -294,726 +373,13 @@ function getOrderedStudyCards(key, items) {
   });
 }
 
-const starterItems = [
-  {
-    id: "s1",
-    track: "문자",
-    module: "hiragana",
-    title: "히라가나 전체 보기",
-    detail: "히라가나를 쭉 보고 바로 퀴즈까지 가봐요.",
-    duration: "2~3분"
-  },
-  {
-    id: "s2",
-    track: "문자",
-    module: "katakana",
-    title: "카타카나 전체 보기",
-    detail: "카타카나를 쭉 보면서 읽기를 익혀봐요.",
-    duration: "2~3분"
-  },
-  {
-    id: "s3",
-    track: "단어",
-    module: "words",
-    title: "N5 단어 보기",
-    detail: "자주 나오는 N5 단어를 가볍게 익혀봐요.",
-    duration: "3분"
-  },
-  {
-    id: "s4",
-    track: "문법",
-    module: "particles",
-    title: "조사 5개 보기",
-    detail: "헷갈리기 쉬운 조사 5개부터 가볍게 볼까요?",
-    duration: "1분"
-  },
-  {
-    id: "s5",
-    track: "한자",
-    module: "kanji",
-    title: "학년별 한자 보기",
-    detail: "일본 초등학교 학년별 배당 한자를 읽기로 익혀봐요.",
-    duration: "5분"
-  },
-  {
-    id: "s6",
-    track: "독해",
-    module: "sentences",
-    title: "짧은 문장 읽기",
-    detail: "메모나 공지처럼 짧은 문장을 읽어봐요.",
-    duration: "1지문"
-  }
-];
-const basicPracticeSets = {
-  kana: {
-    label: "문자",
-    heading: "히라가나 · 가타카나",
-    items: [
-      {
-        id: "bp-k1",
-        source: "히라가나 1",
-        title: "히라가나 기본 모음",
-        note: "문자를 보고 바로 소리를 떠올리기",
-        prompt: "이 글자, 어떻게 읽을까요?",
-        display: "あ",
-        displaySub: "기본 모음",
-        options: ["a / 아", "i / 이", "u / 우", "e / 에"],
-        answer: 0,
-        explanation: "あ는 일본어의 기본 모음 a 소리예요."
-      },
-      {
-        id: "bp-k2",
-        source: "히라가나 2",
-        title: "히라가나 자주 쓰는 글자",
-        note: "단어에서 자주 나오는 글자",
-        prompt: "이 글자, 어떻게 읽을까요?",
-        display: "き",
-        displaySub: "예: きく, きょう",
-        options: ["ki / 키", "sa / 사", "ta / 타", "ne / 네"],
-        answer: 0,
-        explanation: "き는 ki 소리예요. 聞く, 今日 같은 단어에서 자주 보여요."
-      },
-      {
-        id: "bp-k3",
-        source: "가타카나 1",
-        title: "가타카나 읽기",
-        note: "외래어에서 많이 보는 글자",
-        prompt: "이 글자, 어떻게 읽을까요?",
-        display: "コ",
-        displaySub: "예: コーヒー",
-        options: ["ko / 코", "so / 소", "to / 토", "no / 노"],
-        answer: 0,
-        explanation: "コ는 ko 소리예요. コーヒー 같은 단어에서 바로 나와요."
-      },
-      {
-        id: "bp-k4",
-        source: "가타카나 2",
-        title: "가타카나 기본 글자",
-        note: "가타카나도 읽기부터 고정",
-        prompt: "이 글자, 어떻게 읽을까요?",
-        display: "ケ",
-        displaySub: "예: ケーキ",
-        options: ["ke / 케", "re / 레", "na / 나", "ha / 하"],
-        answer: 0,
-        explanation: "ケ는 ke 소리예요. ケーキ처럼 쉬운 외래어에서 자주 보여요."
-      },
-      {
-        id: "bp-k5",
-        source: "히라가나 3",
-        title: "문자 읽기 마무리",
-        note: "헷갈리는 글자 구분",
-        prompt: "이 글자, 어떻게 읽을까요?",
-        display: "ぬ",
-        displaySub: "ぬ / め / ね 구분하기",
-        options: ["nu / 누", "me / 메", "ne / 네", "no / 노"],
-        answer: 0,
-        explanation: "ぬ는 nu 소리예요. 비슷한 글자랑 섞이면 여기서 자주 헷갈려요."
-      }
-    ]
-  },
-  words: {
-    label: "단어",
-    heading: "N5 읽기 단어",
-    items: [
-      {
-        id: "bp-w1",
-        source: "N5 단어 1",
-        title: "동사 읽기",
-        note: "읽기와 뜻을 같이 묶기",
-        prompt: "이 단어 뜻, 어떤 걸까요?",
-        display: "たべる",
-        displaySub: "食べる",
-        options: ["먹다", "가다", "보다", "듣다"],
-        answer: 0,
-        explanation: "たべる는 食べる예요. 뜻은 먹다예요."
-      },
-      {
-        id: "bp-w2",
-        source: "N5 단어 2",
-        title: "명사 읽기",
-        note: "초급 핵심 장소 단어",
-        prompt: "이 단어 뜻, 어떤 걸까요?",
-        display: "がっこう",
-        displaySub: "学校",
-        options: ["학교", "선생님", "친구", "책"],
-        answer: 0,
-        explanation: "がっこう는 学校예요. 뜻은 학교예요."
-      },
-      {
-        id: "bp-w3",
-        source: "N5 단어 3",
-        title: "기본 명사",
-        note: "뜻보다 읽기를 먼저 붙잡기",
-        prompt: "이 단어 뜻, 어떤 걸까요?",
-        display: "みず",
-        displaySub: "水",
-        options: ["물", "불", "사람", "달"],
-        answer: 0,
-        explanation: "みず는 水예요. 뜻은 물이에요."
-      },
-      {
-        id: "bp-w4",
-        source: "N5 단어 4",
-        title: "시간 표현",
-        note: "오늘, 내일 구분하기",
-        prompt: "이 단어 뜻, 어떤 걸까요?",
-        display: "あした",
-        displaySub: "明日",
-        options: ["내일", "오늘", "어제", "아침"],
-        answer: 0,
-        explanation: "あした는 明日예요. 뜻은 내일이에요."
-      },
-      {
-        id: "bp-w5",
-        source: "N5 단어 5",
-        title: "사람 표현",
-        note: "자주 쓰는 인간관계 단어",
-        prompt: "이 단어 뜻, 어떤 걸까요?",
-        display: "ともだち",
-        displaySub: "友だち",
-        options: ["친구", "선생님", "학생", "가족"],
-        answer: 0,
-        explanation: "ともだち는 友だち예요. 뜻은 친구예요."
-      }
-    ]
-  },
-  particles: {
-    label: "조사",
-    heading: "기본 조사",
-    items: [
-      {
-        id: "bp-p1",
-        source: "조사 1",
-        title: "주제 표시",
-        note: "A는 B예요 형태",
-        prompt: "빈칸에 어울리는 조사를 골라봐요.",
-        display: "わたし（　）がくせい です。",
-        displaySub: "나는 학생이에요.",
-        options: ["は", "を", "で", "に"],
-        answer: 0,
-        explanation: "주제를 말할 때는 「は」를 써요. 「わたしは がくせいです。」가 자연스러워요."
-      },
-      {
-        id: "bp-p2",
-        source: "조사 2",
-        title: "도착점",
-        note: "어디에 가는지",
-        prompt: "빈칸에 어울리는 조사를 골라봐요.",
-        display: "がっこう（　）いきます。",
-        displaySub: "학교에 가요.",
-        options: ["を", "に", "が", "と"],
-        answer: 1,
-        explanation: "도착점은 「に」를 써요. 학교에 간다는 뜻이에요."
-      },
-      {
-        id: "bp-p3",
-        source: "조사 3",
-        title: "행동 장소",
-        note: "어디에서 하는지",
-        prompt: "빈칸에 어울리는 조사를 골라봐요.",
-        display: "スーパー（　）みずを かいます。",
-        displaySub: "슈퍼에서 물을 사요.",
-        options: ["で", "に", "を", "は"],
-        answer: 0,
-        explanation: "행동이 일어나는 장소는 「で」를 써요."
-      },
-      {
-        id: "bp-p4",
-        source: "조사 4",
-        title: "목적어",
-        note: "무엇을 하는지",
-        prompt: "빈칸에 어울리는 조사를 골라봐요.",
-        display: "ほん（　）よみます。",
-        displaySub: "책을 읽어요.",
-        options: ["に", "を", "で", "が"],
-        answer: 1,
-        explanation: "목적어는 「を」를 써요. 책을 읽다는 「ほんを よみます。」예요."
-      },
-      {
-        id: "bp-p5",
-        source: "조사 5",
-        title: "함께 하는 대상",
-        note: "누구와 같이",
-        prompt: "빈칸에 어울리는 조사를 골라봐요.",
-        display: "ともだち（　）べんきょう します。",
-        displaySub: "친구와 공부해요.",
-        options: ["と", "を", "で", "へ"],
-        answer: 0,
-        explanation: "함께하는 대상은 「と」를 써요. 친구와 같이 공부한다는 뜻이에요."
-      }
-    ]
-  },
-  kanji: {
-    label: "한자",
-    heading: "첫 한자 읽기",
-    items: [
-      {
-        id: "bp-j1",
-        source: "한자 1",
-        title: "가장 먼저 보는 한자",
-        note: "대표 읽기를 먼저 고정",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "日",
-        displaySub: "뜻: 해, 날",
-        options: ["ひ", "みず", "つき", "やま"],
-        answer: 0,
-        explanation: "日의 대표 읽기는 ひ예요. 날짜나 요일에서도 자주 보여요."
-      },
-      {
-        id: "bp-j2",
-        source: "한자 2",
-        title: "사람 한자",
-        note: "가장 자주 쓰는 기초 한자",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "人",
-        displaySub: "뜻: 사람",
-        options: ["ひと", "ほん", "か", "みる"],
-        answer: 0,
-        explanation: "人은 ひと, 사람이에요."
-      },
-      {
-        id: "bp-j3",
-        source: "한자 3",
-        title: "달 한자",
-        note: "요일과 날짜에서 자주 나옴",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "月",
-        displaySub: "뜻: 달, 월",
-        options: ["つき", "ひ", "みず", "き"],
-        answer: 0,
-        explanation: "月은 보통 つき라고 읽어요."
-      },
-      {
-        id: "bp-j4",
-        source: "한자 4",
-        title: "불 한자",
-        note: "짧게 자주 반복하기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "火",
-        displaySub: "뜻: 불",
-        options: ["ひ", "みず", "ひと", "つき"],
-        answer: 0,
-        explanation: "火는 ひ, 불이에요."
-      },
-      {
-        id: "bp-j5",
-        source: "한자 5",
-        title: "물 한자",
-        note: "초급 명사와 같이 익히기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "水",
-        displaySub: "뜻: 물",
-        options: ["みず", "か", "き", "ほん"],
-        answer: 0,
-        explanation: "水는 みず, 물이에요. 단어 카드랑 같이 보면 더 빨리 익혀요."
-      },
-      {
-        id: "bp-j6",
-        source: "한자 6",
-        title: "나무 한자",
-        note: "요일과 단어에서 자주 보임",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "木",
-        displaySub: "뜻: 나무",
-        options: ["き", "やま", "かわ", "て"],
-        answer: 0,
-        explanation: "木는 き, 나무예요. 목요일(木曜日)에서도 자주 만나요."
-      },
-      {
-        id: "bp-j7",
-        source: "한자 7",
-        title: "산 한자",
-        note: "지형 표현의 기본",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "山",
-        displaySub: "뜻: 산",
-        options: ["やま", "くち", "みず", "ひ"],
-        answer: 0,
-        explanation: "山은 やま, 산이에요. 富士山처럼 지명에서도 많이 보여요."
-      },
-      {
-        id: "bp-j8",
-        source: "한자 8",
-        title: "강 한자",
-        note: "자연 표현과 함께 익히기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "川",
-        displaySub: "뜻: 강",
-        options: ["かわ", "やま", "ひと", "て"],
-        answer: 0,
-        explanation: "川은 かわ, 강이에요. 산이랑 함께 자연 단어에서 자주 보여요."
-      },
-      {
-        id: "bp-j9",
-        source: "한자 9",
-        title: "입 한자",
-        note: "몸과 관련된 기초 한자",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "口",
-        displaySub: "뜻: 입",
-        options: ["くち", "め", "あめ", "つき"],
-        answer: 0,
-        explanation: "口는 くち, 입이에요. 입구라는 뜻의 入口에서도 같은 글자를 볼 수 있어요."
-      },
-      {
-        id: "bp-j10",
-        source: "한자 10",
-        title: "손 한자",
-        note: "몸 표현을 넓히는 한자",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "手",
-        displaySub: "뜻: 손",
-        options: ["て", "くち", "き", "かわ"],
-        answer: 0,
-        explanation: "手는 て, 손이에요. 上手처럼 익숙한 단어에서도 자주 보여요."
-      },
-      {
-        id: "bp-j11",
-        source: "한자 11",
-        title: "눈 한자",
-        note: "몸과 관련된 핵심 한자",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "目",
-        displaySub: "뜻: 눈",
-        options: ["め", "みみ", "あし", "いし"],
-        answer: 0,
-        explanation: "目는 め, 눈이에요. 익혀두면 관련 단어를 볼 때 바로 떠올리기 쉬워요."
-      },
-      {
-        id: "bp-j12",
-        source: "한자 12",
-        title: "귀 한자",
-        note: "몸 표현 세트로 익히기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "耳",
-        displaySub: "뜻: 귀",
-        options: ["みみ", "め", "はな", "あめ"],
-        answer: 0,
-        explanation: "耳는 みみ, 귀예요. 目와 함께 몸 관련 기초 한자로 자주 묶어 배워요."
-      },
-      {
-        id: "bp-j13",
-        source: "한자 13",
-        title: "발 한자",
-        note: "몸 표현을 넓히는 기본",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "足",
-        displaySub: "뜻: 발",
-        options: ["あし", "て", "くるま", "かわ"],
-        answer: 0,
-        explanation: "足는 あし, 발이에요. 걷기나 이동 표현에서도 자주 보여요."
-      },
-      {
-        id: "bp-j14",
-        source: "한자 14",
-        title: "비 한자",
-        note: "날씨 표현에서 자주 등장",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "雨",
-        displaySub: "뜻: 비",
-        options: ["あめ", "ゆき", "いし", "そら"],
-        answer: 0,
-        explanation: "雨는 あめ, 비예요. 날씨 단어를 볼 때 아주 자주 나와요."
-      },
-      {
-        id: "bp-j15",
-        source: "한자 15",
-        title: "돌 한자",
-        note: "짧게 외우기 좋은 명사",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "石",
-        displaySub: "뜻: 돌",
-        options: ["いし", "き", "たけ", "かい"],
-        answer: 0,
-        explanation: "石는 いし, 돌이에요. 글자 모양도 단순해서 초반에 익히기 좋아요."
-      },
-      {
-        id: "bp-j16",
-        source: "한자 16",
-        title: "꽃 한자",
-        note: "일상 단어와 같이 보기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "花",
-        displaySub: "뜻: 꽃",
-        options: ["はな", "みず", "そら", "た"],
-        answer: 0,
-        explanation: "花는 はな, 꽃이에요. 회화에서도 자주 쓰는 친숙한 한자예요."
-      },
-      {
-        id: "bp-j17",
-        source: "한자 17",
-        title: "차 한자",
-        note: "이동 관련 단어의 기본",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "車",
-        displaySub: "뜻: 차, 자동차",
-        options: ["くるま", "かわ", "いと", "やま"],
-        answer: 0,
-        explanation: "車는 くるま, 차예요. 생활 단어와 연결해서 외우기 좋아요."
-      },
-      {
-        id: "bp-j18",
-        source: "한자 18",
-        title: "하늘 한자",
-        note: "자연 표현 확장",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "空",
-        displaySub: "뜻: 하늘",
-        options: ["そら", "あめ", "かわ", "ひ"],
-        answer: 0,
-        explanation: "空는 そら, 하늘이에요. 날씨나 풍경 표현과 함께 자주 익혀요."
-      },
-      {
-        id: "bp-j19",
-        source: "한자 19",
-        title: "밭 한자",
-        note: "기초 글자 모양 익히기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "田",
-        displaySub: "뜻: 밭",
-        options: ["た", "いし", "たけ", "はな"],
-        answer: 0,
-        explanation: "田는 た, 밭이에요. 모양이 단순해서 한자 감각을 잡기 좋아요."
-      },
-      {
-        id: "bp-j20",
-        source: "한자 20",
-        title: "대나무 한자",
-        note: "자연 한자 마무리",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "竹",
-        displaySub: "뜻: 대나무",
-        options: ["たけ", "き", "いと", "くち"],
-        answer: 0,
-        explanation: "竹은 たけ, 대나무예요. 자연 한자를 넓힐 때 같이 보면 좋아요."
-      },
-      {
-        id: "bp-j21",
-        source: "한자 21",
-        title: "실 한자",
-        note: "모양이 단순한 기초 한자",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "糸",
-        displaySub: "뜻: 실",
-        options: ["いと", "いし", "みみ", "はな"],
-        answer: 0,
-        explanation: "糸는 いと, 실이에요. 글자 모양이 독특해서 초반에 기억해두기 좋아요."
-      },
-      {
-        id: "bp-j22",
-        source: "한자 22",
-        title: "조개 한자",
-        note: "사물 이름으로 익히기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "貝",
-        displaySub: "뜻: 조개",
-        options: ["かい", "かわ", "こ", "たけ"],
-        answer: 0,
-        explanation: "貝는 かい, 조개예요. 간단한 명사 한자로 익히기 좋아요."
-      },
-      {
-        id: "bp-j23",
-        source: "한자 23",
-        title: "구슬 한자",
-        note: "짧은 읽기로 외우기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "玉",
-        displaySub: "뜻: 구슬, 공",
-        options: ["たま", "そら", "くるま", "め"],
-        answer: 0,
-        explanation: "玉는 たま, 구슬이에요. 읽기가 짧아서 금방 익히기 좋아요."
-      },
-      {
-        id: "bp-j24",
-        source: "한자 24",
-        title: "아이 한자",
-        note: "사람 관련 한자 시작",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "子",
-        displaySub: "뜻: 아이",
-        options: ["こ", "て", "おとこ", "あめ"],
-        answer: 0,
-        explanation: "子는 こ, 아이예요. 이름이나 단어 끝에서도 자주 보여요."
-      },
-      {
-        id: "bp-j25",
-        source: "한자 25",
-        title: "여자 한자",
-        note: "사람 표현의 기본",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "女",
-        displaySub: "뜻: 여자",
-        options: ["おんな", "おとこ", "ひと", "こ"],
-        answer: 0,
-        explanation: "女는 おんな, 여자예요. 男과 같이 묶어서 보면 더 잘 들어와요."
-      },
-      {
-        id: "bp-j26",
-        source: "한자 26",
-        title: "남자 한자",
-        note: "사람 표현 짝으로 익히기",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "男",
-        displaySub: "뜻: 남자",
-        options: ["おとこ", "おんな", "こ", "みみ"],
-        answer: 0,
-        explanation: "男는 おとこ, 남자예요. 女와 짝으로 보면 더 익히기 쉬워요."
-      },
-      {
-        id: "bp-j27",
-        source: "한자 27",
-        title: "개 한자",
-        note: "동물 한자 시작",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "犬",
-        displaySub: "뜻: 개",
-        options: ["いぬ", "ねこ", "うま", "さかな"],
-        answer: 0,
-        explanation: "犬는 いぬ, 개예요. 생활 단어에서 자주 보는 대표 동물 한자예요."
-      },
-      {
-        id: "bp-j28",
-        source: "한자 28",
-        title: "물고기 한자",
-        note: "동물 표현 확장",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "魚",
-        displaySub: "뜻: 물고기",
-        options: ["さかな", "いぬ", "かわ", "たま"],
-        answer: 0,
-        explanation: "魚는 さかな, 물고기예요. 음식이나 시장 단어로도 이어져요."
-      },
-      {
-        id: "bp-j29",
-        source: "한자 29",
-        title: "위 한자",
-        note: "위치 표현의 기본",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "上",
-        displaySub: "뜻: 위",
-        options: ["うえ", "した", "なか", "そと"],
-        answer: 0,
-        explanation: "上는 うえ, 위예요. 방향과 위치 표현에서 아주 자주 보여요."
-      },
-      {
-        id: "bp-j30",
-        source: "한자 30",
-        title: "아래 한자",
-        note: "방향 표현 마무리",
-        prompt: "이 한자, 어떻게 읽을까요?",
-        display: "下",
-        displaySub: "뜻: 아래",
-        options: ["した", "うえ", "みぎ", "ひだり"],
-        answer: 0,
-        explanation: "下는 した, 아래예요. 上와 함께 묶어두면 방향 한자를 빨리 익혀요."
-      }
-    ]
-  },
-  sentences: {
-    label: "문장",
-    heading: "짧은 문장 읽기",
-    items: [
-      {
-        id: "bp-s1",
-        source: "문장 1",
-        title: "기본 단정 문장",
-        note: "아주 짧은 단정 표현",
-        prompt: "문장 뜻에 맞는 답을 골라봐요.",
-        display: "これは ほん です。",
-        displaySub: "이건 책이에요.",
-        options: ["이건 책이에요.", "이건 물이에요.", "저건 학교예요.", "이건 친구예요."],
-        answer: 0,
-        explanation: "これは는 '이것은', ほん은 '책', です는 문장을 부드럽게 마무리할 때 써요."
-      },
-      {
-        id: "bp-s2",
-        source: "문장 2",
-        title: "이동 문장",
-        note: "장소 + 이동",
-        prompt: "문장 뜻에 맞는 답을 골라봐요.",
-        display: "あした がっこうへ いきます。",
-        displaySub: "시간 표현 + 장소 + 가다",
-        options: ["내일 학교에 가요.", "오늘 학교에서 공부해요.", "내일 집에 와요.", "어제 학교에 갔어요."],
-        answer: 0,
-        explanation: "あした는 '내일', がっこうへ는 '학교에', いきます는 '가요'라는 뜻이에요."
-      },
-      {
-        id: "bp-s3",
-        source: "문장 3",
-        title: "행동 문장",
-        note: "목적어 + 동사",
-        prompt: "문장 뜻에 맞는 답을 골라봐요.",
-        display: "みずを のみます。",
-        displaySub: "을/를 + 마셔요",
-        options: ["물을 마셔요.", "물을 봐요.", "책을 읽어요.", "밥을 먹어요."],
-        answer: 0,
-        explanation: "みず는 '물', のみます는 '마셔요'예요. 그래서 문장 뜻은 '물을 마셔요'가 돼요."
-      },
-      {
-        id: "bp-s4",
-        source: "문장 4",
-        title: "같이 하는 행동",
-        note: "と 조사 익히기",
-        prompt: "문장 뜻에 맞는 답을 골라봐요.",
-        display: "ともだちと べんきょう します。",
-        displaySub: "친구와 공부해요.",
-        options: ["친구와 공부해요.", "친구를 만나요.", "친구와 가요.", "친구가 공부해요."],
-        answer: 0,
-        explanation: "ともだちと는 '친구와', べんきょうします는 '공부해요'예요."
-      },
-      {
-        id: "bp-s5",
-        source: "문장 5",
-        title: "소유 표현",
-        note: "나의 + 명사",
-        prompt: "문장 뜻에 맞는 답을 골라봐요.",
-        display: "わたしの せんせい です。",
-        displaySub: "소유 표현 확인",
-        options: ["제 선생님이에요.", "저는 선생님이에요.", "제 친구예요.", "학생이에요."],
-        answer: 0,
-        explanation: "わたしの는 '저의', せんせい는 '선생님'이에요."
-      }
-    ]
-  }
-};
+let starterItems = [];
 
-const quizQuestions = [
-  {
-    id: "q1",
-    level: "N5",
-    question: "「毎日 日本語を 勉強します。」에서 「毎日」는 무슨 뜻일까요?",
-    options: ["매일", "지금", "어제", "조금"],
-    answer: "매일"
-  },
-  {
-    id: "q2",
-    level: "N4",
-    question: "「雨が降りそうです。」는 자연스럽게 어떻게 읽을까요?",
-    options: ["비를 좋아해요", "비가 올 것 같아요", "비가 그쳤어요", "비를 피했어요"],
-    answer: "비가 올 것 같아요"
-  },
-  {
-    id: "q3",
-    level: "N3",
-    question: "「〜わけではない」는 어떤 느낌에 가장 가까울까요?",
-    options: ["강한 명령", "부분 부정", "과거 회상", "희망 표현"],
-    answer: "부분 부정"
-  },
-  {
-    id: "q4",
-    level: "N2",
-    question: "「急がざるを得ない」는 어떤 뜻에 가장 가까울까요?",
-    options: ["급할 필요가 없다", "서둘러야만 한다", "급하게 말하다", "급하게 먹는다"],
-    answer: "서둘러야만 한다"
-  },
-  {
-    id: "q5",
-    level: "N1",
-    question: "「新製品の発売を皮切りに」는 어떤 뜻일까요?",
-    options: ["판매를 멈추고", "출시를 시작점으로 하여", "가격을 낮추고", "리뷰를 마치고"],
-    answer: "출시를 시작점으로 하여"
-  }
-];
+let basicPracticeSets = {};
+
+
+let quizQuestions = [];
+
 
 let dynamicQuizSource = getDynamicVocabSource("N5");
 const quizModeLabels = {
@@ -10686,8 +10052,6 @@ function renderAll() {
   renderStats();
 }
 
-syncDynamicVocabCollections();
-activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
 attachEventListeners();
 window.addEventListener("hashchange", () => {
   if (!isVocabPagePath()) {
@@ -10704,8 +10068,18 @@ window.addEventListener("japanote:storage-updated", (event) => {
 
   applyExternalStudyState(event.detail.value);
 });
-renderAll();
-loadRelevantVocabData();
-loadSupplementaryContentData().catch((error) => {
-  console.error("Failed to load supplementary content data.", error);
-});
+loadSupplementaryContentData()
+  .then(() => {
+    syncDynamicVocabCollections();
+    activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
+    renderAll();
+  })
+  .catch((error) => {
+    console.error("Failed to load supplementary content data.", error);
+    syncDynamicVocabCollections();
+    activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
+    renderAll();
+  })
+  .finally(() => {
+    loadRelevantVocabData();
+  });

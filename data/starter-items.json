@@ -1,0 +1,52 @@
+{
+  "items": [
+    {
+      "id": "s1",
+      "track": "문자",
+      "module": "hiragana",
+      "title": "히라가나 전체 보기",
+      "detail": "히라가나를 쭉 보고 바로 퀴즈까지 가봐요.",
+      "duration": "2~3분"
+    },
+    {
+      "id": "s2",
+      "track": "문자",
+      "module": "katakana",
+      "title": "카타카나 전체 보기",
+      "detail": "카타카나를 쭉 보면서 읽기를 익혀봐요.",
+      "duration": "2~3분"
+    },
+    {
+      "id": "s3",
+      "track": "단어",
+      "module": "words",
+      "title": "N5 단어 보기",
+      "detail": "자주 나오는 N5 단어를 가볍게 익혀봐요.",
+      "duration": "3분"
+    },
+    {
+      "id": "s4",
+      "track": "문법",
+      "module": "particles",
+      "title": "조사 5개 보기",
+      "detail": "헷갈리기 쉬운 조사 5개부터 가볍게 볼까요?",
+      "duration": "1분"
+    },
+    {
+      "id": "s5",
+      "track": "한자",
+      "module": "kanji",
+      "title": "학년별 한자 보기",
+      "detail": "일본 초등학교 학년별 배당 한자를 읽기로 익혀봐요.",
+      "duration": "5분"
+    },
+    {
+      "id": "s6",
+      "track": "독해",
+      "module": "sentences",
+      "title": "짧은 문장 읽기",
+      "detail": "메모나 공지처럼 짧은 문장을 읽어봐요.",
+      "duration": "1지문"
+    }
+  ]
+}

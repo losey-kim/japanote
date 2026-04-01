@@ -17,12 +17,9 @@ const selectablePracticeLevels = [allLevelValue, ...contentLevels];
 const contentRegistry = globalThis.japanoteContent || {};
 const kanaStrokeSvgs = globalThis.kanaStrokeSvgs || {};
 const vocabContent = contentRegistry.vocab || {};
-const staticGrammarContent = contentRegistry.grammar || {};
-const staticReadingContent = contentRegistry.reading || {};
-const staticKanjiRows = Array.isArray(globalThis.JAPANOTE_KANJI_DATA) ? globalThis.JAPANOTE_KANJI_DATA : [];
-let grammarContent = normalizeGrammarContent(staticGrammarContent);
-let readingContent = normalizeReadingContent(staticReadingContent);
-let kanjiDataRows = normalizeKanjiRows(staticKanjiRows);
+let grammarContent = normalizeGrammarContent({});
+let readingContent = normalizeReadingContent({});
+let kanjiDataRows = normalizeKanjiRows([]);
 let grammarItems = [];
 let grammarPracticeSets = {};
 let readingSets = {};
@@ -82,6 +79,20 @@ function normalizeReadingContent(payload) {
 
 function normalizeKanjiRows(payload) {
   return Array.isArray(payload) ? payload.filter((row) => Array.isArray(row)) : [];
+}
+
+function dispatchSupplementaryContentLoaded() {
+  if (typeof window === "undefined" || typeof window.CustomEvent !== "function") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("japanote:supplementary-content-loaded", {
+      detail: {
+        kanjiRows: [...kanjiDataRows]
+      }
+    })
+  );
 }
 
 function normalizeBasicPracticeTrack(payload) {
@@ -201,6 +212,7 @@ function refreshReadingContentState(payload) {
 
 function refreshKanjiRows(payload) {
   kanjiDataRows = normalizeKanjiRows(payload || []);
+  globalThis.JAPANOTE_KANJI_DATA = [...kanjiDataRows];
 }
 
 function normalizeQuizQuestionList(payload) {
@@ -241,7 +253,7 @@ function loadGrammarDataFromJson() {
       return payload;
     })
     .catch((error) => {
-      console.warn("Using bundled grammar data (script fallback).", error);
+      console.warn("Failed to load grammar.json. Using empty grammar data.", error);
       refreshGrammarContentState(grammarContent);
       return null;
     });
@@ -254,7 +266,7 @@ function loadReadingDataFromJson() {
       return payload;
     })
     .catch((error) => {
-      console.warn("Using bundled reading data (script fallback).", error);
+      console.warn("Failed to load reading.json. Using empty reading data.", error);
       refreshReadingContentState(readingContent);
       return null;
     });
@@ -267,7 +279,7 @@ function loadKanjiDataFromJson() {
       return payload;
     })
     .catch((error) => {
-      console.warn("Using bundled kanji data (script fallback).", error);
+      console.warn("Failed to load kanji.json. Using empty kanji data.", error);
       refreshKanjiRows(kanjiDataRows);
       return null;
     });
@@ -10261,12 +10273,14 @@ loadSupplementaryContentData()
     syncDynamicVocabCollections();
     activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
     renderAll();
+    dispatchSupplementaryContentLoaded();
   })
   .catch((error) => {
     console.error("Failed to load supplementary content data.", error);
     syncDynamicVocabCollections();
     activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
     renderAll();
+    dispatchSupplementaryContentLoaded();
   })
   .finally(() => {
     loadRelevantVocabData();

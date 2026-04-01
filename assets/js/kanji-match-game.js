@@ -902,5 +902,9 @@ if (document.getElementById("kanji-match-new-round")) {
       enterKanjiMatchReadyState();
     }
   });
+  window.addEventListener("japanote:supplementary-content-loaded", () => {
+    renderKanjiMatchSettings();
+    enterKanjiMatchReadyState();
+  });
   enterKanjiMatchReadyState();
 }

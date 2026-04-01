@@ -13,7 +13,6 @@ const vocabLevelStates = vocabLevels.reduce((states, level) => {
   return states;
 }, {});
 const vocabLevelPromises = {};
-let staticBundlePromise = null;
 
 function getLegacyVocabRegistryKey(level) {
   return `jlpt${level}`;
@@ -58,73 +57,86 @@ function markLevelsLoaded(levels) {
   }
 }
 
-function seedStaticVocab() {
-  const staticVocab = globalThis.japanoteStaticVocab || {};
-  const loadedLevels = [];
+function getLevelDataUrl(level) {
+  if (typeof window === "undefined" || !window.location) {
+    return vocabLevelUrls[level];
+  }
 
-  vocabLevels.forEach((level) => {
-    if (!Array.isArray(staticVocab[level]) || !staticVocab[level].length) {
+  return new URL(vocabLevelUrls[level], window.location.href).toString();
+}
+
+function isSuccessfulResponse(response) {
+  return response.status >= 200 && response.status < 300;
+}
+
+function parseJsonPayload(payloadText, level) {
+  try {
+    const parsed = typeof payloadText === "string" ? JSON.parse(payloadText) : payloadText;
+
+    if (parsed === undefined || parsed === null) {
+      throw new Error("Payload is empty.");
+    }
+
+    return parsed;
+  } catch (error) {
+    throw new Error(`Failed to parse vocab data for ${level}: ${error.message}`);
+  }
+}
+
+function fetchLevelItemsWithXhr(level) {
+  const requestUrl = getLevelDataUrl(level);
+
+  return new Promise((resolve, reject) => {
+    if (typeof XMLHttpRequest !== "function") {
+      reject(new Error(`XHR is not available for ${level}.`));
       return;
     }
 
-    setLevelItems(level, staticVocab[level]);
-    loadedLevels.push(level);
-  });
+    const request = new XMLHttpRequest();
+    request.open("GET", requestUrl, true);
+    request.responseType = "text";
 
-  if (loadedLevels.length) {
-    markLevelsLoaded(loadedLevels);
-  }
+    request.onload = () => {
+      const isLoaded = request.status === 0 || isSuccessfulResponse(request);
 
-  return loadedLevels;
-}
+      if (!isLoaded) {
+        reject(new Error(`Failed to load vocab data for ${level} (${request.status}).`));
+        return;
+      }
 
-function isFileProtocol() {
-  return typeof window !== "undefined" && window.location.protocol === "file:";
-}
-
-function loadStaticBundle() {
-  if (globalThis.japanoteStaticVocab) {
-    return Promise.resolve(seedStaticVocab());
-  }
-
-  if (staticBundlePromise) {
-    return staticBundlePromise;
-  }
-
-  staticBundlePromise = new Promise((resolve, reject) => {
-    if (typeof document === "undefined" || !document.head) {
-      reject(new Error("Static vocab bundle cannot be loaded in this environment."));
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "assets/js/jlpt-vocab-data.js";
-    script.async = true;
-    script.onload = () => {
-      resolve(seedStaticVocab());
+      try {
+        resolve(parseJsonPayload(request.responseText, level));
+      } catch (error) {
+        reject(error);
+      }
     };
-    script.onerror = () => {
-      reject(new Error("Failed to load the local vocab bundle."));
-    };
-    document.head.appendChild(script);
-  }).catch((error) => {
-    staticBundlePromise = null;
-    throw error;
-  });
 
-  return staticBundlePromise;
+    request.onerror = () => {
+      reject(new Error(`Failed to load vocab data for ${level} (XHR).`));
+    };
+
+    request.ontimeout = () => {
+      reject(new Error(`Timed out while loading vocab data for ${level} (XHR).`));
+    };
+
+    request.send();
+  });
 }
 
 function fetchLevelItems(level) {
-  return fetch(vocabLevelUrls[level], {
+  const requestUrl = getLevelDataUrl(level);
+
+  return fetch(requestUrl, {
     cache: "default",
     credentials: "same-origin"
   }).then((response) => {
-    if (!response.ok) {
+    if (!isSuccessfulResponse(response)) {
       throw new Error(`Failed to load vocab data for ${level} (${response.status}).`);
     }
 
     return response.json();
+  }).catch(() => {
+    return fetchLevelItemsWithXhr(level);
   }).then((payload) => {
     const items = extractLevelItems(payload);
     setLevelItems(level, items);
@@ -148,7 +160,7 @@ function ensureLevel(level) {
 
   vocabLevelStates[level] = "loading";
 
-  const request = (isFileProtocol() ? loadStaticBundle() : fetchLevelItems(level))
+  const request = fetchLevelItems(level)
     .then(() => vocabRegistry[level] || [])
     .catch((error) => {
       vocabLevelStates[level] = "error";
@@ -206,10 +218,6 @@ globalThis.japanoteVocabStore = {
   isLevelLoading
 };
 
-seedStaticVocab();
-
-if (!globalThis.japanoteStaticVocab && !isFileProtocol()) {
-  ensureLevel("N5").catch(() => {
-    // Keep fallback vocab available in the app if the network fetch fails.
-  });
-}
+ensureLevel("N5").catch(() => {
+  // Keep vocab loading lazy if the first request fails.
+});

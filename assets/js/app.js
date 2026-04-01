@@ -5961,6 +5961,14 @@ function attachSelectValueListener(element, handler) {
   });
 }
 
+function attachClickListener(element, handler) {
+  if (!element) {
+    return;
+  }
+
+  element.addEventListener("click", handler);
+}
+
 function attachLinkedFieldSelectors({
   questionSelect,
   optionSelect,
@@ -9493,14 +9501,6 @@ function renderStats() {
   }
 }
 
-function attachStudyViewButtonListeners(buttons, getValue, setValue) {
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setValue(getValue(button));
-    });
-  });
-}
-
 function attachStudyFlashcardListeners({
   toggle,
   prev,
@@ -9512,53 +9512,35 @@ function attachStudyFlashcardListeners({
   onReview,
   onMastered
 }) {
-  if (toggle) {
-    toggle.addEventListener("click", onToggle);
-  }
-
-  if (prev) {
-    prev.addEventListener("click", () => onMove(-1));
-  }
-
-  if (next) {
-    next.addEventListener("click", () => onMove(1));
-  }
-
-  if (review) {
-    review.addEventListener("click", onReview);
-  }
-
-  if (mastered) {
-    mastered.addEventListener("click", onMastered);
-  }
+  attachClickListener(toggle, onToggle);
+  attachClickListener(prev, () => onMove(-1));
+  attachClickListener(next, () => onMove(1));
+  attachClickListener(review, onReview);
+  attachClickListener(mastered, onMastered);
 }
 
 function attachStudyPaginationListeners({ prev, next, getPage, setPage, getPageCount, render }) {
-  if (prev) {
-    prev.addEventListener("click", () => {
-      if (getPage() <= 1) {
-        return;
-      }
+  attachClickListener(prev, () => {
+    if (getPage() <= 1) {
+      return;
+    }
 
-      setPage(getPage() - 1);
-      saveState();
-      render();
-    });
-  }
+    setPage(getPage() - 1);
+    saveState();
+    render();
+  });
 
-  if (next) {
-    next.addEventListener("click", () => {
-      const pageCount = getPageCount();
+  attachClickListener(next, () => {
+    const pageCount = getPageCount();
 
-      if (getPage() >= pageCount) {
-        return;
-      }
+    if (getPage() >= pageCount) {
+      return;
+    }
 
-      setPage(getPage() + 1);
-      saveState();
-      render();
-    });
-  }
+    setPage(getPage() + 1);
+    saveState();
+    render();
+  });
 }
 
 function attachStudyStatusListListeners({
@@ -9655,7 +9637,7 @@ function attachStudyCatalogListeners({
   }
 
   if (viewButtons && typeof getViewValue === "function" && typeof setView === "function") {
-    attachStudyViewButtonListeners(viewButtons, getViewValue, setView);
+    attachValueButtonListeners(viewButtons, getViewValue, setView);
   }
 
   if (flashcardListeners) {
@@ -9960,21 +9942,11 @@ function attachEventListeners() {
     unselectItem: removeWordFromReviewList,
     render: renderVocabPage
   });
-  if (vocabQuizNext) {
-    vocabQuizNext.addEventListener("click", nextVocabQuizQuestion);
-  }
-  if (vocabQuizRestart) {
-    vocabQuizRestart.addEventListener("click", restartVocabQuiz);
-  }
-  if (quizNext) {
-    quizNext.addEventListener("click", nextQuiz);
-  }
-  if (quizRestart) {
-    quizRestart.addEventListener("click", startNewQuizSession);
-  }
-  if (quizClearMistakes) {
-    quizClearMistakes.addEventListener("click", clearQuizMistakes);
-  }
+  attachClickListener(vocabQuizNext, nextVocabQuizQuestion);
+  attachClickListener(vocabQuizRestart, restartVocabQuiz);
+  attachClickListener(quizNext, nextQuiz);
+  attachClickListener(quizRestart, startNewQuizSession);
+  attachClickListener(quizClearMistakes, clearQuizMistakes);
   attachStateOptionsToggle(quizOptionsToggle, "quizOptionsOpen", renderQuizControls);
   attachValueButtonListeners(quizLevelButtons, (button) => button.dataset.quizLevel, setQuizLevel);
   attachValueButtonListeners(quizSizeButtons, (button) => getQuizSessionSize(button.dataset.quizSize), (nextSize) => {
@@ -10020,9 +9992,7 @@ function attachEventListeners() {
     },
     render: renderGrammarPractice
   });
-  if (grammarPracticeStart) {
-    grammarPracticeStart.addEventListener("click", restartGrammarPractice);
-  }
+  attachClickListener(grammarPracticeStart, restartGrammarPractice);
   attachStateOptionsToggle(readingOptionsToggle, "readingOptionsOpen", renderReadingControls);
   attachSelectValueListener(readingLevelSelect, setReadingLevel);
   attachStateSpinner({
@@ -10049,15 +10019,9 @@ function attachEventListeners() {
     },
     render: renderReadingPractice
   });
-  if (readingStart) {
-    readingStart.addEventListener("click", restartReadingPractice);
-  }
-  if (readingNext) {
-    readingNext.addEventListener("click", nextReadingSet);
-  }
-  if (basicPracticeNext) {
-    basicPracticeNext.addEventListener("click", nextBasicPracticeSet);
-  }
+  attachClickListener(readingStart, restartReadingPractice);
+  attachClickListener(readingNext, nextReadingSet);
+  attachClickListener(basicPracticeNext, nextBasicPracticeSet);
   attachKanjiStudyListeners({
     kanjiOptionsToggle,
     kanjiGradeButtons,
@@ -10092,25 +10056,23 @@ function attachEventListeners() {
   });
   attachSelectValueListener(starterKanjiCollectionSelect, setKanjiCollectionFilter);
   attachSelectValueListener(starterKanjiGradeSelect, setKanjiGrade);
-  if (starterKanjiStart) {
-    starterKanjiStart.addEventListener("click", () => {
-      if (state.starterKanjiQuizStarted) {
-        invalidateStarterKanjiSession();
-        saveState();
-        renderKanjiPageLayout();
-        return;
-      }
-
-      if (!startNewStarterKanjiSession()) {
-        renderKanjiPageLayout();
-        return;
-      }
-
+  attachClickListener(starterKanjiStart, () => {
+    if (state.starterKanjiQuizStarted) {
+      invalidateStarterKanjiSession();
       saveState();
       renderKanjiPageLayout();
-      scrollToElementById("starter-kanji-card");
-    });
-  }
+      return;
+    }
+
+    if (!startNewStarterKanjiSession()) {
+      renderKanjiPageLayout();
+      return;
+    }
+
+    saveState();
+    renderKanjiPageLayout();
+    scrollToElementById("starter-kanji-card");
+  });
   attachStateSpinner({
     spinner: starterKanjiCountSpinner,
     options: starterKanjiQuizCountOptions,
@@ -10131,12 +10093,8 @@ function attachEventListeners() {
     invalidate: invalidateStarterKanjiSession,
     render: renderKanjiPageLayout
   });
-  if (starterKanjiNext) {
-    starterKanjiNext.addEventListener("click", nextStarterKanjiPracticeSet);
-  }
-  if (starterKanjiRestart) {
-    starterKanjiRestart.addEventListener("click", restartStarterKanjiPractice);
-  }
+  attachClickListener(starterKanjiNext, nextStarterKanjiPracticeSet);
+  attachClickListener(starterKanjiRestart, restartStarterKanjiPractice);
   attachBulkResultActionListener({
     button: starterKanjiResultBulkAction,
     getResults: getFilteredStarterKanjiResults,
@@ -10165,12 +10123,8 @@ function attachEventListeners() {
     render: renderKanjiPageLayout
   });
   attachValueButtonListeners(kanjiTabButtons, (button) => button.dataset.kanjiTab, setKanjiTab);
-  if (grammarPracticeNext) {
-    grammarPracticeNext.addEventListener("click", nextGrammarPracticeSet);
-  }
-  if (kanaQuizNext) {
-    kanaQuizNext.addEventListener("click", nextKanaQuizSheetQuestion);
-  }
+  attachClickListener(grammarPracticeNext, nextGrammarPracticeSet);
+  attachClickListener(kanaQuizNext, nextKanaQuizSheetQuestion);
   attachStateOptionsToggle(kanaSetupToggle, "kanaSetupOpen", renderKanaQuizSetup);
   attachValueButtonListeners(kanaModeButtons, (button) => button.dataset.kanaMode || "hiragana", (nextMode) => {
     kanaQuizSettings.mode = nextMode;
@@ -10194,16 +10148,12 @@ function attachEventListeners() {
     },
     render: renderKanaQuizSetup
   });
-  if (kanaSetupStart) {
-    kanaSetupStart.addEventListener("click", () => {
-      startKanaQuizSession(kanaQuizSettings.mode);
-    });
-  }
-  if (kanaQuizRestart) {
-    kanaQuizRestart.addEventListener("click", () => {
-      startKanaQuizSession(kanaQuizSettings.mode);
-    });
-  }
+  attachClickListener(kanaSetupStart, () => {
+    startKanaQuizSession(kanaQuizSettings.mode);
+  });
+  attachClickListener(kanaQuizRestart, () => {
+    startKanaQuizSession(kanaQuizSettings.mode);
+  });
   attachSelectValueListener(kanaQuizResultFilter, (value) => {
     kanaQuizSheetState.resultFilter = getKanaQuizResultFilter(value);
     renderKanaQuizResults();
@@ -10242,29 +10192,15 @@ function attachEventListeners() {
       startWritingPracticeSession(writingPracticeSettings.mode, nextOrder);
     }
   );
-  if (writingReplay) {
-    writingReplay.addEventListener("click", replayWritingStrokeAnimation);
-  }
-  if (writingGuideToggle) {
-    writingGuideToggle.addEventListener("click", toggleWritingGuide);
-  }
-  if (writingRevealToggle) {
-    writingRevealToggle.addEventListener("click", toggleWritingAnswer);
-  }
-  if (writingPrev) {
-    writingPrev.addEventListener("click", previousWritingPracticeItem);
-  }
-  if (writingClear) {
-    writingClear.addEventListener("click", () => {
-      clearWritingPracticeCanvas(true);
-    });
-  }
-  if (writingScore) {
-    writingScore.addEventListener("click", scoreWritingPractice);
-  }
-  if (writingNext) {
-    writingNext.addEventListener("click", nextWritingPracticeItem);
-  }
+  attachClickListener(writingReplay, replayWritingStrokeAnimation);
+  attachClickListener(writingGuideToggle, toggleWritingGuide);
+  attachClickListener(writingRevealToggle, toggleWritingAnswer);
+  attachClickListener(writingPrev, previousWritingPracticeItem);
+  attachClickListener(writingClear, () => {
+    clearWritingPracticeCanvas(true);
+  });
+  attachClickListener(writingScore, scoreWritingPractice);
+  attachClickListener(writingNext, nextWritingPracticeItem);
   if (writingCanvas) {
     writingCanvas.addEventListener("pointerdown", handleWritingPointerDown);
     writingCanvas.addEventListener("pointermove", handleWritingPointerMove);

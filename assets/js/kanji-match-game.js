@@ -856,48 +856,53 @@ function attachKanjiMatchEventListeners() {
   const resultBulkAction = document.getElementById("kanji-match-result-bulk-action");
   const resultList = document.getElementById("kanji-match-result-list");
 
-  if (newRound) {
-    newRound.addEventListener("click", startNewKanjiMatchSession);
-  }
-
-  sharedMatchGame.attachOptionsToggleListener(optionsToggle, () => {
-    kanjiMatchPreferences.optionsOpen = !kanjiMatchPreferences.optionsOpen;
-    saveKanjiMatchPreferences();
-    renderKanjiMatchSettings();
-  });
-
-  sharedMatchGame.attachSelectChangeListener(gradeSelect, setKanjiMatchGrade);
-  sharedMatchGame.attachSelectChangeListener(filterSelect, setKanjiMatchFilterPreference);
-  sharedMatchGame.attachSpinnerListeners({
-    spinner: countSpinner,
-    options: kanjiMatchTotalCountOptions,
-    getCurrentValue: () => getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount),
-    handler: setKanjiMatchTotalCount
-  });
-  sharedMatchGame.attachSpinnerListeners({
-    spinner: timeSpinner,
-    options: kanjiMatchDurationOptions,
-    getCurrentValue: () => getKanjiMatchDuration(kanjiMatchPreferences.duration),
-    handler: setKanjiMatchDuration
-  });
-  sharedMatchGame.attachSelectChangeListener(resultFilterSelect, setKanjiMatchResultFilter);
-  sharedMatchGame.attachBulkActionListener({
-    button: resultBulkAction,
-    datasetKey: "kanjiMatchBulkAction",
-    getFilteredResults: getFilteredKanjiMatchResults,
-    getItemId: (item) => item.id,
-    onRemove: removeKanjiFromMemorizationList,
-    onSave: saveKanjiToMemorizationList,
-    afterChange: renderKanjiMatchResults
-  });
-  sharedMatchGame.attachResultSaveListener({
-    list: resultList,
-    buttonSelector: "[data-kanji-match-save]",
-    getItemId: (button) => button.dataset.kanjiMatchSave,
-    isSaved: isKanjiSavedToMemorizationList,
-    onRemove: removeKanjiFromMemorizationList,
-    onSave: saveKanjiToMemorizationList,
-    afterChange: renderKanjiMatchResults
+  sharedMatchGame.attachStandardMatchEventListeners({
+    newRoundButton: newRound,
+    onStartNewRound: startNewKanjiMatchSession,
+    optionsToggleButton: optionsToggle,
+    onToggleOptions: () => {
+      kanjiMatchPreferences.optionsOpen = !kanjiMatchPreferences.optionsOpen;
+      saveKanjiMatchPreferences();
+      renderKanjiMatchSettings();
+    },
+    selectConfigs: [
+      { element: gradeSelect, handler: setKanjiMatchGrade },
+      { element: filterSelect, handler: setKanjiMatchFilterPreference }
+    ],
+    spinnerConfigs: [
+      {
+        spinner: countSpinner,
+        options: kanjiMatchTotalCountOptions,
+        getCurrentValue: () => getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount),
+        handler: setKanjiMatchTotalCount
+      },
+      {
+        spinner: timeSpinner,
+        options: kanjiMatchDurationOptions,
+        getCurrentValue: () => getKanjiMatchDuration(kanjiMatchPreferences.duration),
+        handler: setKanjiMatchDuration
+      }
+    ],
+    resultFilterSelect,
+    onResultFilterChange: setKanjiMatchResultFilter,
+    bulkActionConfig: {
+      button: resultBulkAction,
+      datasetKey: "kanjiMatchBulkAction",
+      getFilteredResults: getFilteredKanjiMatchResults,
+      getItemId: (item) => item.id,
+      onRemove: removeKanjiFromMemorizationList,
+      onSave: saveKanjiToMemorizationList,
+      afterChange: renderKanjiMatchResults
+    },
+    resultSaveConfig: {
+      list: resultList,
+      buttonSelector: "[data-kanji-match-save]",
+      getItemId: (button) => button.dataset.kanjiMatchSave,
+      isSaved: isKanjiSavedToMemorizationList,
+      onRemove: removeKanjiFromMemorizationList,
+      onSave: saveKanjiToMemorizationList,
+      afterChange: renderKanjiMatchResults
+    }
   });
 }
 

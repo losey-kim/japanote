@@ -976,49 +976,54 @@ function attachMatchEventListeners() {
   const resultBulkAction = document.getElementById("match-result-bulk-action");
   const resultList = document.getElementById("match-result-list");
 
-  if (newRound) {
-    newRound.addEventListener("click", startNewMatchSession);
-  }
-
-  sharedMatchGame.attachOptionsToggleListener(optionsToggle, () => {
-    matchPreferences.optionsOpen = !matchPreferences.optionsOpen;
-    saveMatchPreferences();
-    renderMatchSettings();
-  });
-
-  sharedMatchGame.attachSelectChangeListener(levelSelect, setMatchLevel);
-  sharedMatchGame.attachSelectChangeListener(filterSelect, setMatchFilterPreference);
-  sharedMatchGame.attachSelectChangeListener(partSelect, setMatchPartPreference);
-  sharedMatchGame.attachSpinnerListeners({
-    spinner: countSpinner,
-    options: matchTotalCountOptions,
-    getCurrentValue: () => getMatchTotalCount(matchPreferences.totalCount),
-    handler: setMatchTotalCount
-  });
-  sharedMatchGame.attachSpinnerListeners({
-    spinner: timeSpinner,
-    options: matchDurationOptions,
-    getCurrentValue: () => getMatchDuration(matchPreferences.duration),
-    handler: setMatchDuration
-  });
-  sharedMatchGame.attachSelectChangeListener(resultFilterSelect, setMatchResultFilter);
-  sharedMatchGame.attachBulkActionListener({
-    button: resultBulkAction,
-    datasetKey: "matchBulkAction",
-    getFilteredResults: getFilteredMatchResults,
-    getItemId: (item) => item.id,
-    onRemove: removeWordFromMemorizationList,
-    onSave: saveWordToMemorizationList,
-    afterChange: renderMatchResults
-  });
-  sharedMatchGame.attachResultSaveListener({
-    list: resultList,
-    buttonSelector: "[data-match-save]",
-    getItemId: (button) => button.dataset.matchSave,
-    isSaved: isWordSavedToMemorizationList,
-    onRemove: removeWordFromMemorizationList,
-    onSave: saveWordToMemorizationList,
-    afterChange: renderMatchResults
+  sharedMatchGame.attachStandardMatchEventListeners({
+    newRoundButton: newRound,
+    onStartNewRound: startNewMatchSession,
+    optionsToggleButton: optionsToggle,
+    onToggleOptions: () => {
+      matchPreferences.optionsOpen = !matchPreferences.optionsOpen;
+      saveMatchPreferences();
+      renderMatchSettings();
+    },
+    selectConfigs: [
+      { element: levelSelect, handler: setMatchLevel },
+      { element: filterSelect, handler: setMatchFilterPreference },
+      { element: partSelect, handler: setMatchPartPreference }
+    ],
+    spinnerConfigs: [
+      {
+        spinner: countSpinner,
+        options: matchTotalCountOptions,
+        getCurrentValue: () => getMatchTotalCount(matchPreferences.totalCount),
+        handler: setMatchTotalCount
+      },
+      {
+        spinner: timeSpinner,
+        options: matchDurationOptions,
+        getCurrentValue: () => getMatchDuration(matchPreferences.duration),
+        handler: setMatchDuration
+      }
+    ],
+    resultFilterSelect,
+    onResultFilterChange: setMatchResultFilter,
+    bulkActionConfig: {
+      button: resultBulkAction,
+      datasetKey: "matchBulkAction",
+      getFilteredResults: getFilteredMatchResults,
+      getItemId: (item) => item.id,
+      onRemove: removeWordFromMemorizationList,
+      onSave: saveWordToMemorizationList,
+      afterChange: renderMatchResults
+    },
+    resultSaveConfig: {
+      list: resultList,
+      buttonSelector: "[data-match-save]",
+      getItemId: (button) => button.dataset.matchSave,
+      isSaved: isWordSavedToMemorizationList,
+      onRemove: removeWordFromMemorizationList,
+      onSave: saveWordToMemorizationList,
+      afterChange: renderMatchResults
+    }
   });
 }
 

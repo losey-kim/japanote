@@ -959,6 +959,49 @@
     button.addEventListener("click", onToggle);
   }
 
+  function attachStandardMatchEventListeners({
+    newRoundButton,
+    onStartNewRound,
+    optionsToggleButton,
+    onToggleOptions,
+    selectConfigs = [],
+    spinnerConfigs = [],
+    resultFilterSelect,
+    onResultFilterChange,
+    bulkActionConfig,
+    resultSaveConfig
+  }) {
+    if (newRoundButton && typeof onStartNewRound === "function") {
+      newRoundButton.addEventListener("click", onStartNewRound);
+    }
+
+    if (typeof onToggleOptions === "function") {
+      attachOptionsToggleListener(optionsToggleButton, onToggleOptions);
+    }
+
+    selectConfigs.forEach(({ element, handler }) => {
+      if (typeof handler === "function") {
+        attachSelectChangeListener(element, handler);
+      }
+    });
+
+    spinnerConfigs.forEach((config) => {
+      attachSpinnerListeners(config);
+    });
+
+    if (typeof onResultFilterChange === "function") {
+      attachSelectChangeListener(resultFilterSelect, onResultFilterChange);
+    }
+
+    if (bulkActionConfig) {
+      attachBulkActionListener(bulkActionConfig);
+    }
+
+    if (resultSaveConfig) {
+      attachResultSaveListener(resultSaveConfig);
+    }
+  }
+
   function attachBulkActionListener({ button, datasetKey, getFilteredResults, getItemId, onRemove, onSave, afterChange }) {
     if (!button) {
       return;
@@ -1034,6 +1077,7 @@
     attachSelectChangeListener,
     attachSpinnerListeners,
     attachOptionsToggleListener,
+    attachStandardMatchEventListeners,
     attachBulkActionListener,
     attachResultSaveListener,
     createMatchGameEngine,

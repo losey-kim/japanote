@@ -8,10 +8,6 @@ globalThis.japanoteContent.grammar = {
     { id: "g4", level: "N4", pattern: "〜ながら", description: "두 동작을 함께 할 때 써요." },
     { id: "g5", level: "N3", pattern: "〜わけではない", description: "완전히 그렇진 않다는 느낌을 줄 때 써요." },
     { id: "g6", level: "N3", pattern: "〜ことになる", description: "그렇게 정해지거나 되기로 한 일을 말할 때 써요." },
-    { id: "g7", level: "N2", pattern: "〜に違いない", description: "강하게 추측하거나 확신할 때 써요." },
-    { id: "g8", level: "N2", pattern: "〜ざるを得ない", description: "하지 않을 수 없다는 뜻으로 써요." },
-    { id: "g9", level: "N1", pattern: "〜を皮切りに", description: "어떤 일을 시작점으로 잡을 때 써요." },
-    { id: "g10", level: "N1", pattern: "〜ずくめ", description: "특정한 성질로 가득 찬 상태를 말할 때 써요." }
   ],
   practiceSets: {
     N5: [

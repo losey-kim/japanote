@@ -517,6 +517,40 @@
     ];
   }
 
+  function createCatalogActionButtons({ againId, masteredId }) {
+    return [
+      { id: againId, className: "secondary-btn", label: "다시 볼래요" },
+      { id: masteredId, className: "primary-btn", label: "마스터했어요!" }
+    ];
+  }
+
+  function createCatalogNavigationLabels({ scopeLabel, prevId, nextId }) {
+    return {
+      prevButton: {
+        id: prevId,
+        ariaLabel: `이전 ${scopeLabel}`,
+        title: `이전 ${scopeLabel}`
+      },
+      nextButton: {
+        id: nextId,
+        ariaLabel: `다음 ${scopeLabel}`,
+        title: `다음 ${scopeLabel}`
+      }
+    };
+  }
+
+  function createCatalogListViewConfig({ scope, viewClassName = "vocab-list-view", listClassName = "vocab-list" }) {
+    return {
+      viewId: `${scope}-list-view`,
+      viewClassName,
+      listClassName,
+      listId: `${scope}-list`,
+      prevId: `${scope}-page-prev`,
+      pageInfoId: `${scope}-page-info`,
+      nextId: `${scope}-page-next`
+    };
+  }
+
   function createVocabCatalogLayout() {
     return createStudyCatalogLayout({
       toolbarAriaLabel: "단어 필터",
@@ -548,28 +582,17 @@
         hintId: "flashcard-hint",
         hintText: "눌러서 뜻을 확인해봐요.",
         navAriaLabel: "단어 넘기기",
-        prevButton: {
-          id: "flashcard-prev",
-          ariaLabel: "이전 카드",
-          title: "이전 카드"
-        },
-        nextButton: {
-          id: "flashcard-next",
-          ariaLabel: "다음 카드",
-          title: "다음 카드"
-        },
-        actionButtons: [
-          { id: "flashcard-again", className: "secondary-btn", label: "다시 볼래요" },
-          { id: "flashcard-mastered", className: "primary-btn", label: "익혔어요!" }
-        ]
+        ...createCatalogNavigationLabels({
+          scopeLabel: "카드",
+          prevId: "flashcard-prev",
+          nextId: "flashcard-next"
+        }),
+        actionButtons: createCatalogActionButtons({
+          againId: "flashcard-again",
+          masteredId: "flashcard-mastered"
+        })
       },
-      listView: {
-        viewId: "vocab-list-view",
-        listId: "vocab-list",
-        prevId: "vocab-page-prev",
-        pageInfoId: "vocab-page-info",
-        nextId: "vocab-page-next"
-      }
+      listView: createCatalogListViewConfig({ scope: "vocab" })
     });
   }
 
@@ -607,30 +630,21 @@
         hintId: "kanji-flashcard-hint",
         hintText: "눌러서 읽기를 확인해볼까요?",
         navAriaLabel: "한자 익히기",
-        prevButton: {
-          id: "kanji-flashcard-prev",
-          ariaLabel: "이전 한자",
-          title: "이전 한자"
-        },
-        nextButton: {
-          id: "kanji-flashcard-next",
-          ariaLabel: "다음 한자",
-          title: "다음 한자"
-        },
-        actionButtons: [
-          { id: "kanji-flashcard-review", className: "secondary-btn", label: "다시 볼래요" },
-          { id: "kanji-flashcard-mastered", className: "primary-btn", label: "익혔어요!" }
-        ]
+        ...createCatalogNavigationLabels({
+          scopeLabel: "한자",
+          prevId: "kanji-flashcard-prev",
+          nextId: "kanji-flashcard-next"
+        }),
+        actionButtons: createCatalogActionButtons({
+          againId: "kanji-flashcard-review",
+          masteredId: "kanji-flashcard-mastered"
+        })
       },
-      listView: {
-        viewId: "kanji-list-view",
+      listView: createCatalogListViewConfig({
+        scope: "kanji",
         viewClassName: "vocab-list-view kanji-list-view",
-        listClassName: "vocab-list kanji-list",
-        listId: "kanji-list",
-        prevId: "kanji-page-prev",
-        pageInfoId: "kanji-page-info",
-        nextId: "kanji-page-next"
-      }
+        listClassName: "vocab-list kanji-list"
+      })
     });
   }
 

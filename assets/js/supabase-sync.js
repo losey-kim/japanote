@@ -698,7 +698,7 @@
         helpNode.hidden = config.enabled;
         helpNode.textContent = config.enabled
           ? ""
-          : "supabase-config.example.js를 복사해 supabase-config.js를 만든 뒤 URL·anon key를 넣고 enabled를 true로 바꾸세요.";
+          : "assets/js/supabase-config.js에서 SUPABASE_URL과 SUPABASE_ANON_KEY를 채우세요. (대시보드 → Settings → API)";
       }
       if (form) {
         form.hidden = !config.enabled || Boolean(currentUser);

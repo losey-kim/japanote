@@ -30,13 +30,12 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
 
 기기 간에 같은 학습 상태를 보려면 `Supabase Auth`와 `user_state` 테이블을 설정하면 됩니다. 앱은 `assets/js/supabase-sync.js`에서 학습 상태(`jlpt-compass-state`), 짝 맞추기 상태, 테마를 `user_state` 행에 upsert합니다.
 
-1. `assets/js/supabase-config.example.js`를 복사해 `assets/js/supabase-config.js`를 만들고, 아래 값을 채운 뒤 `enabled`를 `true`로 바꿉니다. (저장소에 실 키를 올리지 않으려면 `supabase-config.js`는 로컬만 두고 커밋에서 제외하면 됩니다.)
-   - `url`: Supabase 프로젝트 URL
-   - `anonKey`: Supabase anon public key
-   - `stateTable`: 상태를 저장할 테이블명. 기본값은 `user_state`
-   - `emailRedirectTo`: 로그인 링크 클릭 후 돌아올 URL. 비워두면 현재 페이지 URL을 사용
-2. Supabase Authentication에서 **Email** 로그인(매직 링크)을 켭니다.
-3. Authentication의 `Site URL`과 `Redirect URLs`에 실제 서비스 주소를 등록합니다.
-4. SQL Editor에서 `supabase/migrations/001_user_state.sql` 내용을 실행합니다.
+1. [Supabase](https://supabase.com/) 프로젝트를 만들고, **Project Settings → API**에서 **Project URL**과 **anon public** 키를 복사합니다.
+2. `assets/js/supabase-config.js` 맨 위의 `SUPABASE_URL`, `SUPABASE_ANON_KEY` 두 줄에 붙여 넣습니다. 둘 다 채워지면 `enabled`가 자동으로 켜집니다. (실 키는 공개 저장소에 커밋하지 않는 것이 좋습니다.)
+   - `stateTable`: 기본 `user_state` (테이블명을 바꾼 경우만 수정)
+   - `emailRedirectTo`: 비워 두면 현재 페이지 기준으로 돌아옵니다.
+3. Supabase Authentication에서 **Email** 로그인(매직 링크)을 켭니다.
+4. Authentication의 `Site URL`과 `Redirect URLs`에 실제 서비스 주소(예: GitHub Pages URL)를 등록합니다.
+5. SQL Editor에서 `supabase/migrations/001_user_state.sql` 내용을 실행합니다.
 
 앱에서는 **이름 + 이메일**만 입력하면 매직 링크가 전송됩니다. 로그인 후 **클라우드에서 받기** / **클라우드에 올리기**로 동기화할 수 있고, 다른 기기에서도 같은 이메일로 링크 로그인하면 같은 데이터를 불러옵니다.

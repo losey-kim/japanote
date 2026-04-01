@@ -8840,20 +8840,20 @@ function rememberQuizMistake(question, userAnswer) {
   }
 }
 
-function revealQuizAnswer(question, selectedOption, correct) {
+function legacyRevealQuizAnswer(question, selectedOption, correct) {
   const answerIndex = question.options.indexOf(selectedOption);
   const options = document.querySelectorAll(".quiz-option");
 
   options.forEach((item) => {
     item.disabled = true;
 
-    if (item.textContent === question.answer || options.length && options.item(item)??) {
-      // item text comparison kept for backward compatibility
+    if (item.textContent === question.answer || item.textContent === selectedOption) {
+      item.classList.add("is-correct");
     }
   });
 }
 
-function revealQuizAnswerWithIndex(question, selectedIndex, correct) {
+function legacyRevealQuizAnswerWithIndex(question, selectedIndex, correct) {
   const answerIndex = question.options.indexOf(question.answer);
   const options = document.querySelectorAll(".quiz-option");
 
@@ -8870,7 +8870,7 @@ function revealQuizAnswerWithIndex(question, selectedIndex, correct) {
   });
 }
 
-function finalizeQuizQuestion(question, selectedOption, correct) {
+function legacyFinalizeQuizQuestion(question, selectedOption, correct) {
   const feedback = document.getElementById("quiz-feedback");
   const lastQuestion = state.quizIndex >= activeQuizQuestions.length - 1;
 
@@ -8889,7 +8889,7 @@ function finalizeQuizQuestion(question, selectedOption, correct) {
       : getQuizFeedbackText(question, correct, selectedOption || "시간 초과");
   }
 
-  revealQuizAnswer(question, selectedOption, correct);
+  legacyRevealQuizAnswer(question, selectedOption, correct);
   setQuizActionState({
     nextLabel: lastQuestion ? "결과 보러 갈까요?" : "다음 문제 볼까요?",
     nextDisabled: false,
@@ -8975,6 +8975,62 @@ function renderQuiz() {
   resetQuizSessionTimer("quiz", handleQuizTimeout);
 }
 
+function revealQuizAnswer(question, selectedOptionOrIndex, correct) {
+  const answerIndex = question.options.indexOf(question.answer);
+  const selectedIndex = Number.isFinite(selectedOptionOrIndex)
+    ? selectedOptionOrIndex
+    : question.options.indexOf(selectedOptionOrIndex);
+  const options = document.querySelectorAll(".quiz-option");
+
+  options.forEach((item, optionIndex) => {
+    item.disabled = true;
+
+    if (optionIndex === answerIndex) {
+      item.classList.add("is-correct");
+    }
+
+    if (!correct && optionIndex === selectedIndex) {
+      item.classList.add("is-wrong");
+    }
+  });
+}
+
+function finalizeQuizQuestion(question, selectedOptionOrIndex, correct) {
+  const feedback = document.getElementById("quiz-feedback");
+  const lastQuestion = state.quizIndex >= activeQuizQuestions.length - 1;
+  const selectedOption = Number.isFinite(selectedOptionOrIndex)
+    ? question.options[selectedOptionOrIndex] ?? ""
+    : selectedOptionOrIndex || "";
+
+  state.quizAnsweredCount += 1;
+  finalizeQuizSession("quiz", correct);
+
+  if (correct) {
+    state.quizCorrectCount += 1;
+  } else {
+    rememberQuizMistake(question, selectedOption);
+  }
+
+  if (feedback) {
+    feedback.textContent = lastQuestion
+      ? `${getQuizFeedbackText(question, correct, selectedOption)} 문제를 처리했습니다.`
+      : getQuizFeedbackText(question, correct, selectedOption);
+  }
+
+  revealQuizAnswer(question, selectedOptionOrIndex, correct);
+  setQuizActionState({
+    nextLabel: lastQuestion ? "결과 확인" : "다음 문제 풀이",
+    nextDisabled: false,
+    nextHidden: false,
+    restartHidden: false
+  });
+
+  updateStudyStreak();
+  saveState();
+  renderStats();
+  renderQuizMistakes();
+}
+
 function handleQuizAnswer(question, option) {
   const selectedIndex = Number.isFinite(option) ? option : question.options.indexOf(option);
   const options = document.querySelectorAll(".quiz-option");
@@ -8985,8 +9041,7 @@ function handleQuizAnswer(question, option) {
   }
 
   const correctAnswer = question.options.indexOf(question.answer);
-  const selectedOption = question.options[selectedIndex] ?? "";
-  finalizeQuizQuestion(question, selectedOption, selectedIndex === correctAnswer);
+  finalizeQuizQuestion(question, selectedIndex, selectedIndex === correctAnswer);
 }
 
 function handleQuizTimeout() {
@@ -8998,7 +9053,7 @@ function handleQuizTimeout() {
     return;
   }
 
-  finalizeQuizQuestion(question, "", false);
+  finalizeQuizQuestion(question, -1, false);
 }
 
 function nextQuiz() {

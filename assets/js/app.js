@@ -5436,6 +5436,68 @@ function moveStudyFlashcard(step, { getCards, indexKey, revealedKey, render }) {
   render();
 }
 
+function getStudyPageCount(items, pageSize) {
+  const safeItems = Array.isArray(items) ? items : [];
+  return Math.max(1, Math.ceil(safeItems.length / pageSize));
+}
+
+function clampStudyPage(pageKey, items, pageSize) {
+  state[pageKey] = Math.min(Math.max(state[pageKey], 1), getStudyPageCount(items, pageSize));
+}
+
+function resetStudyCatalogPointers({ pageKey, indexKey, revealedKey }) {
+  state[pageKey] = 1;
+  state[indexKey] = 0;
+  state[revealedKey] = false;
+}
+
+function syncStudyFlashcardIndexAfterUpdate({ currentCardId, previousIndex, getCards, indexKey }) {
+  const nextCards = getCards();
+  const currentVisibleIndex = nextCards.findIndex((item) => item.id === currentCardId);
+
+  if (!nextCards.length) {
+    state[indexKey] = 0;
+    return;
+  }
+
+  if (currentVisibleIndex !== -1) {
+    state[indexKey] = nextCards.length > 1 ? (currentVisibleIndex + 1) % nextCards.length : currentVisibleIndex;
+    return;
+  }
+
+  state[indexKey] = Math.min(previousIndex, nextCards.length - 1);
+}
+
+function updateStudyCatalogState({
+  stateKey,
+  nextValue,
+  resetPointers,
+  invalidate,
+  afterChange,
+  render
+}) {
+  if (state[stateKey] === nextValue) {
+    return;
+  }
+
+  state[stateKey] = nextValue;
+
+  if (typeof resetPointers === "function") {
+    resetPointers();
+  }
+
+  if (typeof invalidate === "function") {
+    invalidate();
+  }
+
+  if (typeof afterChange === "function") {
+    afterChange(nextValue);
+  }
+
+  saveState();
+  render();
+}
+
 function markStudyFlashcardStatus({
   getCards,
   indexKey,
@@ -6393,35 +6455,28 @@ function getVisibleKanjiCards() {
 }
 
 function getKanjiPageCount(items) {
-  return Math.max(1, Math.ceil((Array.isArray(items) ? items.length : 0) / kanjiPageSize));
+  return getStudyPageCount(items, kanjiPageSize);
 }
 
 function clampKanjiPage(items) {
-  state.kanjiPage = Math.min(Math.max(state.kanjiPage, 1), getKanjiPageCount(items));
+  clampStudyPage("kanjiPage", items, kanjiPageSize);
 }
 
 function resetKanjiStudyPointers() {
-  state.kanjiPage = 1;
-  state.kanjiFlashcardIndex = 0;
-  state.kanjiFlashcardRevealed = false;
+  resetStudyCatalogPointers({
+    pageKey: "kanjiPage",
+    indexKey: "kanjiFlashcardIndex",
+    revealedKey: "kanjiFlashcardRevealed"
+  });
 }
 
 function syncKanjiFlashcardIndexAfterUpdate(currentCardId, previousIndex) {
-  const nextCards = getVisibleKanjiCards();
-  const currentVisibleIndex = nextCards.findIndex((item) => item.id === currentCardId);
-
-  if (!nextCards.length) {
-    state.kanjiFlashcardIndex = 0;
-    return;
-  }
-
-  if (currentVisibleIndex !== -1) {
-    state.kanjiFlashcardIndex =
-      nextCards.length > 1 ? (currentVisibleIndex + 1) % nextCards.length : currentVisibleIndex;
-    return;
-  }
-
-  state.kanjiFlashcardIndex = Math.min(previousIndex, nextCards.length - 1);
+  syncStudyFlashcardIndexAfterUpdate({
+    currentCardId,
+    previousIndex,
+    getCards: getVisibleKanjiCards,
+    indexKey: "kanjiFlashcardIndex"
+  });
 }
 
 function getKanjiFlashcardPlaceholder() {
@@ -6777,42 +6832,33 @@ function restartStarterKanjiPractice() {
 
 function setKanjiGrade(grade) {
   const nextGrade = getKanjiGrade(grade);
-
-  if (state.kanjiGrade === nextGrade) {
-    return;
-  }
-
-  state.kanjiGrade = nextGrade;
-  resetKanjiStudyPointers();
-  invalidateStarterKanjiSession();
-  saveState();
-  renderKanjiPageLayout();
+  updateStudyCatalogState({
+    stateKey: "kanjiGrade",
+    nextValue: nextGrade,
+    resetPointers: resetKanjiStudyPointers,
+    invalidate: invalidateStarterKanjiSession,
+    render: renderKanjiPageLayout
+  });
 }
 
 function setKanjiCollectionFilter(filter) {
   const nextFilter = getKanjiCollectionFilter(filter);
-
-  if (state.kanjiCollectionFilter === nextFilter) {
-    return;
-  }
-
-  state.kanjiCollectionFilter = nextFilter;
-  resetKanjiStudyPointers();
-  invalidateStarterKanjiSession();
-  saveState();
-  renderKanjiPageLayout();
+  updateStudyCatalogState({
+    stateKey: "kanjiCollectionFilter",
+    nextValue: nextFilter,
+    resetPointers: resetKanjiStudyPointers,
+    invalidate: invalidateStarterKanjiSession,
+    render: renderKanjiPageLayout
+  });
 }
 
 function setKanjiView(view) {
   const nextView = getKanjiView(view);
-
-  if (state.kanjiView === nextView) {
-    return;
-  }
-
-  state.kanjiView = nextView;
-  saveState();
-  renderKanjiPageLayout();
+  updateStudyCatalogState({
+    stateKey: "kanjiView",
+    nextValue: nextView,
+    render: renderKanjiPageLayout
+  });
 }
 
 function toggleKanjiFlashcardReveal() {
@@ -7014,14 +7060,11 @@ function setVocabTab(tab) {
 
 function setVocabView(view) {
   const nextView = getVocabView(view);
-
-  if (state.vocabView === nextView) {
-    return;
-  }
-
-  state.vocabView = nextView;
-  saveState();
-  renderVocabPage();
+  updateStudyCatalogState({
+    stateKey: "vocabView",
+    nextValue: nextView,
+    render: renderVocabPage
+  });
 }
 
 function getVocabEmptyMessage(filter = state.vocabFilter, part = state.vocabPartFilter) {
@@ -7103,17 +7146,22 @@ function getVocabSummaryText(count) {
   return `${levelLabel} ${activePart === vocabPartAllValue ? "단어" : partLabel} ${count}개예요`;
 }
 
+function resetVocabStudyPointers() {
+  resetStudyCatalogPointers({
+    pageKey: "vocabPage",
+    indexKey: "flashcardIndex",
+    revealedKey: "flashcardRevealed"
+  });
+}
+
 function setVocabLevel(level) {
   const nextLevel = getVocabLevel(level);
-
   if (state.vocabLevel === nextLevel) {
     return;
   }
 
   state.vocabLevel = nextLevel;
-  state.flashcardIndex = 0;
-  state.flashcardRevealed = false;
-  state.vocabPage = 1;
+  resetVocabStudyPointers();
   invalidateVocabQuizSession();
   refreshVocabPageContent(nextLevel);
   state.vocabPartFilter = getVocabPartFilter(state.vocabPartFilter);
@@ -7124,52 +7172,33 @@ function setVocabLevel(level) {
 
 function setVocabFilter(filter) {
   const nextFilter = getVocabFilter(filter);
-
-  if (state.vocabFilter === nextFilter) {
-    return;
-  }
-
-  state.vocabFilter = nextFilter;
-  state.flashcardIndex = 0;
-  state.flashcardRevealed = false;
-  state.vocabPage = 1;
-  invalidateVocabQuizSession();
-  saveState();
-  renderVocabPage();
+  updateStudyCatalogState({
+    stateKey: "vocabFilter",
+    nextValue: nextFilter,
+    resetPointers: resetVocabStudyPointers,
+    invalidate: invalidateVocabQuizSession,
+    render: renderVocabPage
+  });
 }
 
 function setVocabPartFilter(part) {
   const nextPart = getVocabPartFilter(part);
-
-  if (state.vocabPartFilter === nextPart) {
-    return;
-  }
-
-  state.vocabPartFilter = nextPart;
-  state.flashcardIndex = 0;
-  state.flashcardRevealed = false;
-  state.vocabPage = 1;
-  invalidateVocabQuizSession();
-  saveState();
-  renderVocabPage();
+  updateStudyCatalogState({
+    stateKey: "vocabPartFilter",
+    nextValue: nextPart,
+    resetPointers: resetVocabStudyPointers,
+    invalidate: invalidateVocabQuizSession,
+    render: renderVocabPage
+  });
 }
 
 function syncFlashcardIndexAfterVocabUpdate(currentCardId, previousIndex) {
-  const nextCards = getVisibleFlashcards();
-  const currentVisibleIndex = nextCards.findIndex((item) => item.id === currentCardId);
-
-  if (!nextCards.length) {
-    state.flashcardIndex = 0;
-    return;
-  }
-
-  if (currentVisibleIndex !== -1) {
-    state.flashcardIndex =
-      nextCards.length > 1 ? (currentVisibleIndex + 1) % nextCards.length : currentVisibleIndex;
-    return;
-  }
-
-  state.flashcardIndex = Math.min(previousIndex, nextCards.length - 1);
+  syncStudyFlashcardIndexAfterUpdate({
+    currentCardId,
+    previousIndex,
+    getCards: getVisibleFlashcards,
+    indexKey: "flashcardIndex"
+  });
 }
 
 function getVisibleFlashcards() {
@@ -7185,11 +7214,11 @@ function getVocabQuizItems() {
 }
 
 function getVocabPageCount(items) {
-  return Math.max(1, Math.ceil(items.length / vocabPageSize));
+  return getStudyPageCount(items, vocabPageSize);
 }
 
 function clampVocabPage(items) {
-  state.vocabPage = Math.min(Math.max(state.vocabPage, 1), getVocabPageCount(items));
+  clampStudyPage("vocabPage", items, vocabPageSize);
 }
 
 function getVocabQuizSignature(items = getVocabQuizItems()) {

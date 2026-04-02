@@ -1255,7 +1255,7 @@
       "pron": "安心",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=350898522d233076919121fa3e245bfbeded68e5b107cf436ae29e7f1b7b69f15853572468356d7a19246775e82d80ea87937cf562b81bdf41cca4ea2cb3b39f9113dfb7f07e51fac6fee6d0b1ac77df93365ca2468898c67261db6bab5c14e1200cfb395dc9ee0c93b95abc49711dfc5fd2359fc4aabf2da45c840279793091||https://dict-dn.pstatic.net/v?_lsu_sa_=3e78c052ad8c3b36c79ab18b30f44afd6dc26a0510071f666072bc7f2b586d51d15d179e6eb53772a9796b25e42810159fd7a5fbee53f31c093f52bcc119383bac4f00e9d24b7a9da9eee7d4aac1756bdf631f57273fa58bbfb1581eeb03826ac841be20aae1abb1284a27008f8a146bf64b7a3606a8be479612506274391401",
       "means": [
-        "안심;→あんじん"
+        "안심; 마음이 편안함"
       ],
       "example": null,
       "link_url": null,
@@ -8580,7 +8580,7 @@
       "means": [
         "치다;베다",
         "자르다;절단하다",
-        "→きれる"
+        "끊어지다; 잘리다"
       ],
       "example": null,
       "link_url": null,
@@ -11159,7 +11159,7 @@
       "means": [
         "혼잡하다;붐비다",
         "안에 넣다",
-        "→こめる"
+        "가득 넣다; 채워 넣다"
       ],
       "example": null,
       "link_url": null,
@@ -12254,7 +12254,7 @@
       "pron": null,
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=37880c55bd783da60e9c71293db48bfa6d986b55170f7f916c7259763b396461ab5c47936b95457139a660d5ca29d00c09f774f3c843afe9cece6fef22123366ccc557bfa64d2a8441f6f441a2202040752419bf891a5328c0eb44ca2631af3a01e636d3e6477d70fa1e3ed0bc2ada2871b4b3b5f7d777b8014abdd4a3068ee7",
       "means": [
-        "→させる1",
+        "…하게 하다",
         "…시키다"
       ],
       "example": null,
@@ -14329,7 +14329,7 @@
       "means": [
         "알다",
         "점유하다;영유하다",
-        "→しれる"
+        "알려지다; 드러나다"
       ],
       "example": null,
       "link_url": null,
@@ -14563,7 +14563,7 @@
       "means": [
         "시대",
         "오래되어 낡은 모양·느낌",
-        "→じだいもの"
+        "시대물; 옛 시대를 배경으로 한 것"
       ],
       "example": null,
       "link_url": null,
@@ -15273,7 +15273,7 @@
       "pron": "神社",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=301828579d243926ad9d715236d44df26d946a358a087f256242857b8bb162a1d757e7386e356a70596d66d59e2d9065090687f3c7c9a3c04f9beef73bf78d8a40c55a111ece4d2b54c984d24431c7782c7e16f8347ce07bb3b84b380ccb7425f647c5eefa5fda1e63ff6d80c8fc5d9988f551cf010478d796071747798d4199||https://dict-dn.pstatic.net/v?_lsu_sa_=34a8025cfd193b865c9e613c3b647af1bdab6935dd0c5f966102d6744b2061812558e7376085a57449646ee5cf2050d0aa3f36cbae4d36831148c7c301ad8bfd925be22b1017cc2cc2b68ae76aba50f3f38ea3458a909d24ec7f0af3b46951fb40a45f091fedc0defc5189359372540eed321a22489b45d2e02b4e481cd7a350",
       "means": [
-        "신사;→じいん·ぶっかく"
+        "신사; 사당·사찰"
       ],
       "example": null,
       "link_url": null,
@@ -15550,7 +15550,7 @@
       "means": [
         "나아가다",
         "진출하다",
-        "→すすめる"
+        "나아가게 하다; 진행시키다"
       ],
       "example": null,
       "link_url": null,
@@ -17411,7 +17411,7 @@
       "pron": "存じる",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3828925d9d363c96b09f91ab35b445f06ded62f5d8018f316a42d475bbb26941e359075665a5177dd92f6a15952fa0d9e46895ab1578e61a1d03361288dfe7f1a956c492fab003a7f8194ad1da507aeed63edf803ee940c34c133488f4631623c0f57e047bc516ec1d1657eea67f2c4cc1d8b18082794984927d68369730696a||https://dict-dn.pstatic.net/v?_lsu_sa_=359820529d5738c68c95d13f3b3435f42df06eb5930b3f1460623779abd76601665317aa68758c7bb9756ed5832770f51a9e2ed9426a9af02f07398d6b2552e66de978137051f8b32f7aad576f50364efe567503942aeb51417b3801817a8dc93c4bd4ff9c1c50ae31e87471a41cf49491ce0fbbd3f8dc45f2149e81a998a6e0",
       "means": [
-        "→ぞんずる"
+        "알다; 생각하다의 공손한 말"
       ],
       "example": null,
       "link_url": null,
@@ -18200,7 +18200,7 @@
       "means": [
         "부탁하다",
         "믿게 하다;신뢰하게 하다",
-        "→たのもう"
+        "청하다; 부탁하다"
       ],
       "example": null,
       "link_url": null,
@@ -18234,7 +18234,7 @@
       "pron": "多分",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=30d8345ebd4d3706469f317e3bf495f84dbd698567093fb96d029f77fb7366511c5807506c855676e9ea6b354c27203cccd9c06a4db44611f5f7b9a556b6ecac3dc25784d9b87124e6ca759861c2be1b7fe4059f4558b5d3fd2c0d38f4bd0712ad9ee405c51b39687b5f41af7c81eb2966951968c49b4fb30443527d0f9d8c8b||https://dict-dn.pstatic.net/v?_lsu_sa_=3768e7594d3e3d16b19991d33ec4d9fa9d2d6885d8014ff362424a710bc16ce18d5ab7756ea57878898c6545a52c6084a3775732268d9ccbcc082dd4b4d38227fd950a47b51117e72241ce80d61a465bc24082f12a90c7745ff06a17439a4610674745a8334bc62b11d359b6c6ea6f0e5cc7daac3b8c6081acb999f61275b185",
       "means": [
-        "양·정도가 많거나 큼;→ごたぶん",
+        "양·정도가 많거나 큼; 대부분",
         "대개;아마"
       ],
       "example": null,
@@ -18787,7 +18787,7 @@
       "means": [
         "다르다",
         "틀리다;잘못되다",
-        "→ちがえる"
+        "다르게 하다; 틀리게 하다"
       ],
       "example": null,
       "link_url": null,
@@ -19464,7 +19464,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=39c808593d7b3b06909cd17b3154aef14d9067c550035f0069f2ea75bb5f6bf17d5327b36695827979b269f5a92800131af8c80d54bf1dace99994ebf8d6b1826d90e2b7026e8895214a01c7e85504574854abaef398c7a9d4bd0e72b88f1c22f55703b4fc20c85acaaa7eb364b68dc597fe71c8df3815e2cf6871a84d661b7b||https://dict-dn.pstatic.net/v?_lsu_sa_=3058e85a4d243d86819aa14f3b44e9f89d6d6cf572000f896dd2d17e1b016d811e54a7ad67a5bf72693261e5cd2bc07338423905826a45521816df3d510a82ac59e2c09bd80fc7f9190335d317f260ced960f9e0e956978ee5a00dba6f25baa0a08a75e4554c3cf003f90fbcc2fd31d63e0f7b8697bd21f3c0039b5df2d57720",
       "means": [
         "붙이다",
-        "대다;→つける",
+        "대다; 닿게 하다",
         "늘 …해 오다;항상 … 버릇이다"
       ],
       "example": null,
@@ -19675,7 +19675,7 @@
       "means": [
         "계속하다;계속되다",
         "잇따르다;연달다",
-        "→つづける"
+        "계속하다"
       ],
       "example": null,
       "link_url": null,
@@ -19983,7 +19983,7 @@
       "pron": "梅雨",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=39981156fdce3aa6a2941109339483f25d2f67b549030fd5633249772bde6dc14555a7c06835897829c46755d9234038989633492742474996f28f8b4992887dd89248a430d366ef32cebcbe358401596a7ac674fb86c6815f21f6ba975351e48a3162822541b90038a2b521c4fcb10a903bb5370c210a3e0f537234f9e23785||https://dict-dn.pstatic.net/v?_lsu_sa_=3708c75e5d6a3f263f9d510a331446f3ad2463850f05bffc6bd28e7e0bc96541ce52c7876ec5757b79d46c054d288016fc8bbfb1683ef2d59bc4074c2c6094dde5e6c47cd5bdc084fcc6d88e1dc0dbf8d8a2b371c03e61df0cd18809398b0b746a81dfe8124ab705f75686d7407948fa47633a52b3648290eae4358e9b37b33f",
       "means": [
-        "장마;→にゅうばい"
+        "장마; 우기"
       ],
       "example": null,
       "link_url": null,
@@ -20902,7 +20902,7 @@
       "means": [
         "길",
         "통함",
-        "종류·방법;→ひととおり"
+        "종류·방법"
       ],
       "example": null,
       "link_url": null,
@@ -21210,7 +21210,7 @@
       "means": [
         "닿다;달하다",
         "이루어지다",
-        "→とどける"
+        "닿게 하다; 보내다"
       ],
       "example": null,
       "link_url": null,
@@ -21451,7 +21451,7 @@
       "means": [
         "잡다",
         "들다;쥐다",
-        "→とれる"
+        "빠지다; 떨어지다"
       ],
       "example": null,
       "link_url": null,
@@ -21998,7 +21998,7 @@
       "pron": "鳴く·啼く",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=37284b52fd1e3036589221fa3a847ef90d906615850b0f1466824f7cebda63016155e7e263d58f70991065e5bf2fa0a6a30a6b1a07d5f1b02cb4e8772cab2b48047d84c53ae01ebbe3d1e04664d389bbe146740242640182705018e045b46d3da58999dbc4749e074c8c349b0e93678cfe5cd9d4916b91e7ce454621179b0207||https://dict-dn.pstatic.net/v?_lsu_sa_=3ed81f596d213d861f9a613333344cf05dbc6e25d0077fdd6162d1766bf364b10352f7876925bd7339df61653f2c505e45374391ff08c465099e9274a0634bfb5cb9c55f24bd3bea4e4fe619ee1e92914d97b72e99f88021bff04ad79a53a8f59f0774dbbfc1d70388aa1499bf9e01b59cd3132d2645fdfc83ade264cdf0c7b3",
       "means": [
-        "소리를 내다;울다;→なかずとばず"
+        "소리를 내다; 울다; 이도저도 못하다"
       ],
       "example": null,
       "link_url": null,
@@ -22269,7 +22269,7 @@
       "means": [
         "일곱;일곱 살",
         "옛 시간의 이름;지금의 오전·오후 4시경",
-        "전당포;→ななつや"
+        "전당포; 질전"
       ],
       "example": null,
       "link_url": null,
@@ -22337,7 +22337,7 @@
       "means": [
         "한 줄로 서다",
         "늘어서다",
-        "→ならべる"
+        "늘어놓다; 나란히 하다"
       ],
       "example": null,
       "link_url": null,
@@ -23061,7 +23061,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=332848524d6d3626749521b131f471f85df569b5df006fc262b26d72eb566c71e95e07206825de7509586fd5312600846ab0818f00c88951c3e2937bfbdfe6922793c03372157beae9d2c6a7995e835a922c1cc58ebdada7987a5f61360bf213d80581b6eb9cc90072b87a0f678ad545278337b9423985d2fd29a9a33b9c7e87||https://dict-dn.pstatic.net/v?_lsu_sa_=3168f1583dec3466b49bc1d13ba486f10d3a6be5800fef4b6f322c74fba765e1d951570f6b15f77a09f562f5f72670b435d3425ddc8990ced1009eb7ac4a567dee26066a4c6b75ccceb4fb725c9bd57f0f0fa583836958f2f01c7313111bbed19ddfb251112a4d405707a9c383633ff89972f9b37df88b44c0a45665a5445cb0",
       "means": [
         "사람;인품",
-        "사람;→じん"
+        "사람; 인"
       ],
       "example": null,
       "link_url": null,
@@ -23162,7 +23162,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3988f6594d3f3366069d31ce35e49ff0bd436475d6086f3a6dc2eb758b4d6061355a37086dc5d97db9056d9507237015b9d5ceec95b29b5470329bf11bea0b04d29ee9260406ffd60de163995bd9a77683af81eef95c042c2c04d589a96ef511fb1dbc4b7698feec0c686f36efe646972dba32e21ff6b67075d62dc9a54fcfe7||https://dict-dn.pstatic.net/v?_lsu_sa_=3d38a35eadb43166699bd1673a64c2f90d8469055e057f336922677aeba761f1e35dd7c36c35b07e293d65255d2960f709d757ec91732ce860c6237c22ae7c3f19f468d49cf68e54d57b1b6f174cb9dc3873f804cfc673fa96c3069614c79d3012530a0beed62448c6b60f1f9f701a973e09b4e9411560cdb33a0b9e340cc35d",
       "means": [
         "벗다",
-        "→ぬげる"
+        "벗겨지다"
       ],
       "example": null,
       "link_url": null,
@@ -23572,7 +23572,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3238ca512dc43a165f9491de3484d6fdcd7d661519078f4d6022407efb2e6921e15027a76e45427889dc619510275002e465d5328556a01922ff57ff7cf71a04a692e258ac9ae631dc4a4ee645b116e3a71e382d6b89aea4474d8ed370a1aea86eaecd5842c25b174f476ecf475df9c7966be1420f9711932088118d6b2e7813",
       "means": [
         "년;한 해",
-        "→ねんき",
+        "연수; 연령",
         "…년;연수·연령을 나타내는 말"
       ],
       "example": null,
@@ -23849,7 +23849,7 @@
       "means": [
         "잎",
         "잎사귀",
-        "잎을 가공한 것;→ね"
+        "잎을 가공한 것; 담배"
       ],
       "example": null,
       "link_url": null,
@@ -24700,7 +24700,7 @@
       "means": [
         "뻗다;뻗어나다",
         "펴다;뻗치다",
-        "→はれる"
+        "개다; 풀리다"
       ],
       "example": null,
       "link_url": null,
@@ -25758,7 +25758,7 @@
       "means": [
         "열리다",
         "열다",
-        "→ひらける"
+        "열리다; 펼쳐지다"
       ],
       "example": null,
       "link_url": null,
@@ -26982,7 +26982,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=30c8a85e2d2935c6f496f199338487f6dd966845640ddf0f6a32f27ecb976c91ab56c7a26f95067239c963c5c12650ef649744f81a35906376dee13db46ad20067c2cce9f645fc5ab6f7da9822fc0bbf1d307effb4b912b6784afd274b28e4ca2105f5fec111f09a2e55b1f9d6f5a720d6a54501a674cbbff980bb33c21e66b1",
       "means": [
         "구별;차이",
-        "다름;→べつに",
+        "다름; 별도로",
         "별…"
       ],
       "example": null,
@@ -29267,7 +29267,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3338bd595d4437e66c9cd1ba3394b9f07df06e05860fffea6ca284713b4169a13353d78e69152577999f65b5c92a805d929d96188e323ae1b972b73c3da8227448faeca575f239cf8115a1cf78f67d1bec0416c5e291eea3b1a6a07860cda63939528ab499b1dc44bacb9adbbd066e0aa31166cf229f347e3c0466d61463887b||https://dict-dn.pstatic.net/v?_lsu_sa_=3cb875537ddd3b669095e1ad354442fb9d3768358e0d2ff464a288774bd66021b353973a64454f7c0913605539249008a1a04063f21cdb1d7d0306dd129d163de3418358be343bf9ec9334819a3b8417a5a65ea897d25d37316c53aedab592d7b7dcfe9d81473938448a7b1265484d5102976c3adc6fe4bf11644efba81ee692",
       "means": [
         "수풀;삼림",
-        "신사를 둘러싼 무성한 숲;→はやし"
+        "신사를 둘러싼 무성한 숲"
       ],
       "example": null,
       "link_url": null,
@@ -29371,7 +29371,7 @@
       "means": [
         "태우다",
         "애태우다",
-        "→やける"
+        "타다; 구워지다"
       ],
       "example": null,
       "link_url": null,
@@ -29743,7 +29743,7 @@
       "means": [
         "멈추다",
         "그치다;멎다",
-        "→やめる"
+        "그만두다; 중지하다"
       ],
       "example": null,
       "link_url": null,
@@ -31574,7 +31574,7 @@
       "means": [
         "일부러",
         "특별히",
-        "고의로;→わざと"
+        "고의로; 일부러"
       ],
       "example": null,
       "link_url": null,
@@ -31850,7 +31850,7 @@
       "means": [
         "나누다",
         "노느다;벼르다",
-        "→われる"
+        "갈라지다; 깨지다"
       ],
       "example": null,
       "link_url": null,
@@ -32683,7 +32683,7 @@
       "pron": null,
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3508d95e5d3b36962097e143384411f5bd9f6055a1097f1b6b62d7715bd96151bd5bb70b67b52879796a67e59d29b0d57aec20b97ff27874955defd17482d996558320f0e4441f670b704b78fc6cc982b635cdc7ab16c2d5e6e8ab80c919354e3dcd87e78a21c860b47bc856118cc31f8d5ad6c8d3989d850252201e115fec94",
       "means": [
-        "→キチン"
+        "부엌; 주방"
       ],
       "example": null,
       "link_url": null,
@@ -34946,7 +34946,7 @@
       "means": [
         "미터",
         "미터법에서, 길이의 기본 단위",
-        "→メーター"
+        "계량기"
       ],
       "example": null,
       "link_url": null,
@@ -35047,7 +35047,7 @@
       "pron": null,
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=33b8595e1dd931e6dc9311183fc430f13db7616563037f006e72187fdbd46c81815d476762657e7af95f6bc53b2800f907a43e09951cf4ef4ac642abdc267a249a885040c2ad1f857fb327450a7f6119818611644e470e31dd4788a2c9a2d4d72f8e02054712a2da8ad23cb91b747389a9a0d0d5a55f66a27124760c91784d69",
       "means": [
-        "→レジスター"
+        "계산대; 금전등록기"
       ],
       "example": null,
       "link_url": null,

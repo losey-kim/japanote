@@ -2090,7 +2090,7 @@
       "means": [
         "한 개",
         "일개;한 사람",
-        "백 엔의 변말;→にこよん"
+        "백 엔의 속칭"
       ],
       "example": null,
       "link_url": null,
@@ -7016,7 +7016,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=362872532df63106739821d734b4ddfe3d0563b57c038f4a6062b87c1b406141775c375f6f658675c9646d2536201039eb85305018cc68ca52e1d5849addbde133d1d9184caff655c58aaa8d887dab991acfbc208e7c62c4f62e1975fa49d8b39edefb0d2f697f9b141808de707e54e3346f517bfb4481cc1c07fb02a176c0ae||https://dict-dn.pstatic.net/v?_lsu_sa_=3998e05cdd253fa6bf97919135c418f9fde26835a1036f5e6c22de7d9b416641c956c7f36805007229976025892b709d2cb9fb2e3912f1bb82e9b94ee57cac338edb20a4bf896b1e55431ccd9fec38f8eb056f92a749a1d7c1e5ebb18fb066a829f13757420da2dd5ed229470b40e7a0c46912a90a21940ce5354b398afe4382",
       "means": [
         "오늘",
-        "금일;→あした·きのう",
+        "금일; 내일·어제와 상대되는 오늘",
         "같은 날짜;이 날"
       ],
       "example": null,
@@ -7086,7 +7086,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3448365dad9833d6a29cb1c43db458ff6d6b63755509bf186752b975dba96b615f5e47d668955c7d89386a25ee2ea01fb2f39211d5ff370278cc4b0fd4151bd0a365fcb68eb3ddeef69801336acb1320a652458cc40bbd6b4c13023c1c4c7989221f8ddd84ffd13c5f3ad1746bf820792cb701a8d436ca2a4c29525090ecf0b2||https://dict-dn.pstatic.net/v?_lsu_sa_=3f5839542dd43496509691cd3a4444f83da966652e074fdd62d29471ebc262f1cd58177b6dd5387539fa6f95e72fe0c49b6a172bc8dfab203565649001bdbed57d29d3d4be3d589022e825e940b37a409b3a95079a84bc8a9bfd802ec0bec4c2b3157a57c87e0518a17d8fa0af02e0093c220c9fbd7ee1afa692afe449a19015",
       "means": [
         "형제;동기",
-        "→きょうだいぶん",
+        "형제처럼 가까운 사이;의형제",
         "친구"
       ],
       "example": null,
@@ -7834,7 +7834,7 @@
       "pron": "位",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3ff87f583d043ac66c9ff17c337422f60d7065e51b081fec66b2d4760b986ae18553c77a64b59477b9236635dd2fe0db7e611c228c8a9130d230d3a29d884899029d1aaa448b82e5e92393d75ea0452fb7924e5a8985ce2a26b9aeae0e5daf277ffd3c375a07755f9bb128c4e28a1834a7c865325036dbbd30592e7aa0033105||https://dict-dn.pstatic.net/v?_lsu_sa_=34e8665d0d0034e69494c1383924a4f9edd969550c077f9067a2ac7fdb716f11ba51f7086ec5367579a96235dd2fd002ff8d6aeda88d9e5aabbfee596e7b671a671ae04b1d8d1745e35f291e5c5cd2a482a66a5319927a496b4d53af7af6dedad482f17876d96da0b3352d9b5a14c15e97e9a3f2d368bcf400d96fadb7c0c801",
       "means": [
-        "→くらい"
+        "정도;쯤;만큼"
       ],
       "example": null,
       "link_url": null,
@@ -10409,7 +10409,7 @@
       "pron": "四月",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=30080f5c4d613fe6689821c2333401fa2d616fd5540b3f956d027c7ddb736de1d45ce7736705297e39316ee51f22e04732d1bdac684ea4cc3b00ce0fe62ef7a2f0f7d7c9c694ded1f7cdba296db0f5303b42def875336f5c7512398befd7d964ea3ddd39ffe684268656cf5a679f15e799c363382e41add4bc00bb368a1b6496",
       "means": [
-        "사월;→うづき"
+        "사월; 음력 4월의 다른 이름"
       ],
       "example": null,
       "link_url": null,
@@ -11010,7 +11010,7 @@
       "pron": "食堂",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3ae8fc59dd9935868d976112320489f0ddb067f5960a0f556212b1744bdd68b1fb5db77c67550d7199906cd55e2b20a9418129835a19247bd6c282b799cf966b5a628a50d2204bf06a38e22ffd7668e95e4ca99c4b833360b91d681392e035bb117748cd8e054012c6d95b4be5f606401cab0a6368d0279818b0e5d8fc160e04||https://dict-dn.pstatic.net/v?_lsu_sa_=31e8635c4dc330a69e90f19b39141bf68d64607593099f3d6e12a073dba966313e5067f563858477f99c6635a82e209d9feb504e494e3c2a9af8cc10d62525196a141565ab131b71a70ce8605e4d5303bbad15b03c0b2b5774e760423950342304b40b062cb4f15550c6822979b59582923034177f1f65949a5a83810dabffd4",
       "means": [
-        "식당;→じきどう"
+        "식당; 절에서 승려가 식사하는 곳"
       ],
       "example": null,
       "link_url": null,
@@ -12784,7 +12784,7 @@
       "pron": "生徒",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3418e1513d1c3fa6399d018d3f44f9f6cdd86a65c50e0fb16b82f673abbc6e01cd5807e163a5507e992d6be5ca24603d1be94252978de70cdbf4837359dedc10c27cc33864bb2989aa5cfc23bce3c165b70ab7a0b48b8f124716779663aaf54353e507c81ab15c4d9e73070d07d949e4a6d84bdf9f8382b935270775ae082da8||https://dict-dn.pstatic.net/v?_lsu_sa_=3f687b539d9c37d64b9a51d533747cfb2d4e6275ab0cef6367f2407f7bfe6b416351a73d6f952477c9686415fb2b10bd80b7b95e9e75a0aa731260bf1c8bed173d10ef7bc52eb5f73ab43d8d5d4c858f11cca6d72c49693a8e4ce14384caa3b160071b5a517ddbb57d49560253e37957d64bd9752221eac11b2f4cc965ca1732",
       "means": [
-        "학생;→じどう·がくせい"
+        "학생; 특히 초중고 학생"
       ],
       "example": null,
       "link_url": null,
@@ -13434,7 +13434,7 @@
       "means": [
         "일어서다",
         "일어나다",
-        "→たてる"
+        "세우다"
       ],
       "example": null,
       "link_url": null,
@@ -14530,7 +14530,7 @@
       "means": [
         "…라도",
         "…지라도",
-        "→ても"
+        "…해도;…하더라도"
       ],
       "example": null,
       "link_url": null,
@@ -17119,7 +17119,7 @@
       "pron": "二月",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=34684d557d3331f6039401be31e451f2bdb36785e204ffc46c02e87aeb206841d55897c06d05f47ca9886985132160ea1912e149800de1d5e90176191775cc410fdaf4d86775dc29422046e41b596a7dc3d716833b874a26028c271a4adf26b0d09427fa0abaf884c265d04c6ca5af8258c1d0f853ac632cf599df4fc2f6f0a8",
       "means": [
-        "2월;→きさらぎ"
+        "2월; 음력 2월의 다른 이름"
       ],
       "example": null,
       "link_url": null,
@@ -20713,7 +20713,7 @@
       "means": [
         "집이 많이 모여 있는 구역;도회",
         "행정 구역으로서의 ‘郡’의 하부 단위",
-        "시·구를 구성하는 작은 구획;→まちやくば"
+        "시·구를 구성하는 작은 구획; 행정 단위인 정(町)"
       ],
       "example": null,
       "link_url": null,
@@ -21160,7 +21160,7 @@
       "pron": "三つ",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3c98725d3d313e96d09491d73e44a4f4ad576555ca001f996742347dcbc76601ae5f07b265f57570d9c665952d29b00a5dbc87bf3b09d403f41d80662fb3da40b42324e2335f0a94395aff679805cc22b2df83f36a670d3b23bf9e626d2262a6b58da0604f2c298da903b392a1972c8b280d29bbc80edd32f919b69241be3777||https://dict-dn.pstatic.net/v?_lsu_sa_=3da83d554d2d36a64599f15735341eff2dc061a5d70dff976a827f789b8169b1ff54e77d68c5cd7fc9026c751221f04dd8752dfcca23453e611cca0775807649b095b79b53e13ac5e4b25b52aeb2ae2f8385247c12dd80dec7692d411493068dddbbeebb6d49bc8d381608f2255926e97e2c941821c1f2ac9a5f389078819562",
       "means": [
-        "→みつ"
+        "셋;세 개"
       ],
       "example": null,
       "link_url": null,
@@ -21367,7 +21367,7 @@
       "pron": "皆",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3ad86b5a1df632c6dc9ea16a3b4406f4dd3362556806ffb86622d2730b2a6d31995bc74c6825ed7b09a268758e2dc0bc209797f1341b7a3e75c109ee89624e25ad7d5c288579abc774be661f5f27e30bc7d99c6ed82f5379ccf4a3870c076ccc3ab839ff26cd9c9241948f757a6a258407762fe800bf703d47ffb824de9c8ee5||https://dict-dn.pstatic.net/v?_lsu_sa_=3908255b3def35f6849431013fa4c3f44d9665752002bf206212df73fb736711a35237026bd55c7e59a168751f24002f5ea3ba67843106f4e526f72ae80fe591c7f08acb30fc05d46a635099f9e1c2ca949ae4a25df38b7adae96b5de2720d0c98f5a424f1495b7c11c937fecfab2456365765bb79ef588c622dff527b97e050",
       "means": [
-        "→みな"
+        "모두;전부"
       ],
       "example": null,
       "link_url": null,
@@ -21950,7 +21950,7 @@
       "means": [
         "쉬다",
         "편해지다",
-        "→やすめる"
+        "쉬게 하다;휴식시키다"
       ],
       "example": null,
       "link_url": null,
@@ -22386,7 +22386,7 @@
       "pron": "四つ",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3408a955fd133cc61c9af1c03a947cf7adfa6b5595033f306b52ce768b876901c254f7c46c159f77f9906e95f22640ab99580a1ebc35b5170fc1bc236709b5d545f55043534de1544b68bd534232a10e853d83dbdb74c38310abc275d5a17016825c9468030cfbb2d6b09b16b83961814da93e7f1d2767bee136253cd8323a8e||https://dict-dn.pstatic.net/v?_lsu_sa_=32388b547d1e3a964f96a13b36942cf2cd0f6c3511080fc6632253791b3f69916552e7b76375857a79246095bd22702583c21c19c33400a7c936a386c55e742aeaa0f99d1be75d03740a772469314fe2a7cf3d10ec5628a3bf0394d1c4f565bddb54b71b3a8f7dffe445e326a987a42116c8221551400a82541fb337ce023b09",
       "means": [
-        "→よつ1"
+        "넷;네 개"
       ],
       "example": null,
       "link_url": null,
@@ -24458,7 +24458,7 @@
       "pron": null,
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3ff882537d723a160390e1003d747cfb4d156f153405cf046ee2527ebbd26c215659278f64b5ee7aa9d66c559829b0c0f73d11dd6d394ca1ed4b332f3ca10181ef5be4ed6cd7280102086f0ccd54f2fa7a1ecb66979565b776c32421c65a04cedaa825d6c42612cbd97aee5eff34ec33f33101a70827f05a6c924a86a9768848||https://dict-dn.pstatic.net/v?_lsu_sa_=37f8d35f7d333dc63e9151be31d453f29d576325170deff86d5231713bf069f10f53475066554d7be9c96cd52f27c0e67a51f3c706a89137e258f2d891cfb63708e0d668f363f108bb2e715a3804561cc4e7de547f7f9a01887fcf72f2dca64267a9c267e39235eef5d7fe85208776887136c103e878bf7c7863844464422707",
       "means": [
-        "택시;→ハイヤー"
+        "택시; 운전기사가 딸린 대절 승용차"
       ],
       "example": null,
       "link_url": null,

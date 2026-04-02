@@ -727,6 +727,89 @@
     return createCatalogLayout({ ...config });
   }
 
+  function createQuizHudPauseButton(buttonId) {
+    if (!buttonId) {
+      return "";
+    }
+
+    return `
+      <button class="quiz-hud-pause" id="${escapeHtml(buttonId)}" type="button" aria-label="일시정지" title="일시정지">
+        <span class="quiz-hud-pause-glyph" aria-hidden="true"></span>
+      </button>
+    `;
+  }
+
+  function createQuizHudItem(item, className = "quiz-hud-item") {
+    const itemKind = item.kind || "";
+    const classNames = ["quiz-hud-item"];
+
+    if (className && className !== "quiz-hud-item") {
+      classNames.push(className);
+    }
+
+    if (itemKind) {
+      classNames.push(`is-${itemKind}`);
+    }
+
+    return `
+      <div class="${classNames.join(" ")}"${itemKind ? ` data-hud-kind="${escapeHtml(itemKind)}"` : ""}>
+        <div class="quiz-hud-item-copy">
+          <span>${escapeHtml(item.label)}</span>
+          <strong id="${escapeHtml(item.valueId)}">${escapeHtml(item.value)}</strong>
+        </div>
+      </div>
+    `;
+  }
+
+  function createQuizHudMarkup(hudItems = [], extraClassName = "", options = {}) {
+    if (!hudItems.length) {
+      return "";
+    }
+
+    const progressItem = hudItems.find((item) => item.kind === "progress") || null;
+    const timerItem = hudItems.find((item) => item.kind === "timer") || null;
+    const summaryItems = hudItems.filter((item) => item !== progressItem && item !== timerItem);
+    const pauseButtonMarkup = createQuizHudPauseButton(options.pauseButtonId);
+    const classNames = ["quiz-hud"];
+
+    if (extraClassName) {
+      classNames.push(extraClassName);
+    }
+
+    if (timerItem) {
+      classNames.push("has-timer");
+    }
+
+    return `
+      <div class="${classNames.join(" ")}">
+        <div class="quiz-hud-top">
+          <div class="quiz-hud-stats">
+            ${progressItem ? `<div class="quiz-hud-progress">${createQuizHudItem(progressItem, "quiz-hud-progress-item")}</div>` : ""}
+            ${
+              summaryItems.length
+                ? `
+                  <div class="quiz-hud-summary">
+                    ${summaryItems
+                      .map(
+                        (item, index) =>
+                          `${index > 0 || progressItem ? '<span class="quiz-hud-summary-divider" aria-hidden="true"></span>' : ""}${createQuizHudItem(item)}`
+                      )
+                      .join("")}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        </div>
+        <div class="quiz-hud-bottom">
+          ${timerItem ? '<div class="quiz-hud-track-slot"><div class="quiz-hud-track" aria-hidden="true"><span class="quiz-hud-track-fill"></span></div></div>' : ""}
+          ${timerItem ? `<div class="quiz-hud-timer">${createQuizHudItem(timerItem)}</div>` : ""}
+          ${pauseButtonMarkup}
+        </div>
+      </div>
+    `;
+  }
+
   function createChoiceQuizCard({
     articleId,
     className,
@@ -738,28 +821,14 @@
     optionsId,
     feedbackId,
     explanationId,
+    pauseButtonId,
     nextButtonId,
     nextButtonLabel
   }) {
     const metaMarkup = metaItems
       .map((item) => `<span${item.id ? ` id="${escapeHtml(item.id)}"` : ""}>${escapeHtml(item.text)}</span>`)
       .join("");
-    const hudMarkup = hudItems.length
-      ? `
-        <div class="quiz-hud">
-          ${hudItems
-            .map(
-              (item) => `
-                <div class="quiz-hud-item">
-                  <span>${escapeHtml(item.label)}</span>
-                  <strong id="${escapeHtml(item.valueId)}">${escapeHtml(item.value)}</strong>
-                </div>
-              `
-            )
-            .join("")}
-        </div>
-      `
-      : "";
+    const hudMarkup = createQuizHudMarkup(hudItems, "", { pauseButtonId });
     const headerMarkup = header
       ? `
         <div class="${escapeHtml(header.className)}">
@@ -942,14 +1011,17 @@
     leftListId,
     rightListId,
     initialProgress = "0 / 5",
-    initialTimer = "15초"
+    initialTimer = "00:15"
   }) {
     return `
           <div class="match-play-view" id="${escapeHtml(boardId)}">
-            <div class="quiz-hud match-play-hud">
-              <div class="quiz-hud-item"><span>진행</span><strong id="${escapeHtml(progressId)}">${escapeHtml(initialProgress)}</strong></div>
-              <div class="quiz-hud-item"><span>남은 시간</span><strong id="${escapeHtml(timerId)}">${escapeHtml(initialTimer)}</strong></div>
-            </div>
+            ${createQuizHudMarkup(
+              [
+                { kind: "progress", label: "진행", valueId: progressId, value: initialProgress },
+                { kind: "timer", label: "남은 시간", valueId: timerId, value: initialTimer }
+              ],
+              "match-play-hud"
+            )}
             <div class="match-feedback" id="${escapeHtml(feedbackId)}" hidden></div>
             <div class="match-columns">
               <section class="match-column"><div class="match-column-head"><h3>${escapeHtml(leftColumnTitle)}</h3></div><div class="match-card-list" id="${escapeHtml(leftListId)}"></div></section>
@@ -1032,8 +1104,10 @@
           { id: "vocab-quiz-source", text: "N5 단어" }
         ],
         hudItems: [
-          { label: "진행", valueId: "vocab-quiz-progress", value: "0 / 0" },
-          { label: "남은 시간", valueId: "vocab-quiz-timer", value: "15초" }
+          { kind: "progress", label: "진행", valueId: "vocab-quiz-progress", value: "0 / 0" },
+          { kind: "timer", label: "남은 시간", valueId: "vocab-quiz-timer", value: "00:15" },
+          { kind: "correct", label: "정답", valueId: "vocab-quiz-correct", value: "0" },
+          { kind: "wrong", label: "오답", valueId: "vocab-quiz-wrong", value: "0" }
         ],
         header: {
           className: "basic-practice-header",
@@ -1060,6 +1134,7 @@
         optionsId: "vocab-quiz-options",
         feedbackId: "vocab-quiz-feedback",
         explanationId: "vocab-quiz-explanation",
+        pauseButtonId: "vocab-quiz-pause",
         nextButtonId: "vocab-quiz-next",
         nextButtonLabel: "다음 문제 볼까요?"
       },
@@ -1134,12 +1209,13 @@
         className: "basic-practice-card tone-gold kanji-practice-card",
         metaItems: [
           { text: "한자" },
-          { id: "starter-kanji-source", text: "한자 1" },
-          { id: "starter-kanji-progress", text: "1 / 5" }
+          { id: "starter-kanji-source", text: "한자 1" }
         ],
         hudItems: [
-          { label: "남은 시간", valueId: "starter-kanji-timer", value: "15초" },
-          { label: "맞힌 수", valueId: "starter-kanji-correct", value: "0" }
+          { kind: "progress", label: "진행", valueId: "starter-kanji-progress", value: "1 / 5" },
+          { kind: "timer", label: "남은 시간", valueId: "starter-kanji-timer", value: "00:15" },
+          { kind: "correct", label: "정답", valueId: "starter-kanji-correct", value: "0" },
+          { kind: "wrong", label: "오답", valueId: "starter-kanji-wrong", value: "0" }
         ],
         displayBox: {
           className: "basic-practice-display-box",
@@ -1149,6 +1225,7 @@
           subtitle: ""
         },
         optionsId: "starter-kanji-options",
+        pauseButtonId: "starter-kanji-pause",
         nextButtonId: "starter-kanji-next",
         nextButtonLabel: "다음 한자 볼까요?"
       },
@@ -1379,25 +1456,12 @@
     optionsId,
     feedbackId,
     explanationId,
+    pauseButtonId,
     nextButtonId,
     nextButtonLabel
   }) {
     const metaMarkup = metaItems.map((item) => `<span${item.id ? ` id="${escapeHtml(item.id)}"` : ""}>${escapeHtml(item.text)}</span>`).join("");
-    const hudMarkup = hudItems.length
-      ? `
-        <div class="quiz-hud">
-          ${hudItems
-            .map(
-              (item) => `
-                <div class="quiz-hud-item">
-                  <span>${escapeHtml(item.label)}</span><strong id="${escapeHtml(item.valueId)}">${escapeHtml(item.value)}</strong>
-                </div>
-              `
-            )
-            .join("")}
-        </div>
-      `
-      : "";
+    const hudMarkup = createQuizHudMarkup(hudItems, "", { pauseButtonId });
 
     const headerMarkup = header
       ? `
@@ -1463,10 +1527,14 @@
         metaClassName: "grammar-practice-meta",
         metaItems: [
           { id: "grammar-practice-level", text: "N5" },
-          { id: "grammar-practice-source", text: "N5G 1" },
-          { id: "grammar-practice-progress", text: "1 / 4" }
+          { id: "grammar-practice-source", text: "N5G 1" }
         ],
-        hudItems: [{ label: "남은 시간", valueId: "grammar-timer", value: "25초" }],
+        hudItems: [
+          { kind: "progress", label: "진행", valueId: "grammar-practice-progress", value: "1 / 4" },
+          { kind: "timer", label: "남은 시간", valueId: "grammar-timer", value: "00:25" },
+          { kind: "correct", label: "정답", valueId: "grammar-correct", value: "0" },
+          { kind: "wrong", label: "오답", valueId: "grammar-wrong", value: "0" }
+        ],
         header: {
           className: "grammar-practice-header",
           eyebrow: "GRAMMAR SET",
@@ -1482,6 +1550,7 @@
         optionsId: "grammar-practice-options",
         feedbackId: "grammar-practice-feedback",
         explanationId: "grammar-practice-explanation",
+        pauseButtonId: "grammar-pause",
         nextButtonId: "grammar-practice-next",
         nextButtonLabel: "다음 문제 보기"
       })
@@ -1529,8 +1598,10 @@
           { id: "reading-source", text: "N5R p1" }
         ],
         hudItems: [
-          { label: "진행", valueId: "reading-progress", value: "1 / 3" },
-          { label: "남은 시간", valueId: "reading-timer", value: "45초" }
+          { kind: "progress", label: "진행", valueId: "reading-progress", value: "1 / 3" },
+          { kind: "timer", label: "남은 시간", valueId: "reading-timer", value: "00:45" },
+          { kind: "correct", label: "정답", valueId: "reading-correct", value: "0" },
+          { kind: "wrong", label: "오답", valueId: "reading-wrong", value: "0" }
         ],
         header: {
           className: "reading-header",
@@ -1548,6 +1619,7 @@
         optionsId: "reading-options",
         feedbackId: "reading-feedback",
         explanationId: "reading-explanation",
+        pauseButtonId: "reading-pause",
         nextButtonId: "reading-next",
         nextButtonLabel: "다음 글 보기"
       })

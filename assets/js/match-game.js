@@ -492,7 +492,8 @@ function renderMatchTimer() {
   sharedMatchGame.renderTimer({
     timerId: "match-timer",
     duration: activeDuration,
-    timeLeft: matchState.timeLeft
+    timeLeft: matchState.timeLeft,
+    timerState: matchState
   });
 }
 
@@ -1022,7 +1023,9 @@ sharedMatchGame.initializeStandardMatchScreen({
   storageHandlers: {
     [matchStorageKey]: () => {
       const nextPreferences = loadMatchPreferences();
-      nextPreferences.optionsOpen = false;
+      // 원격 동기화 응답이 와도, 지금 사용자가 보고 있는 설정 패널은
+      // 닫지 않고 유지해야 연속으로 옵션을 조정할 수 있다.
+      nextPreferences.optionsOpen = matchPreferences.optionsOpen === true;
       sharedMatchGame.replaceObjectContents(matchPreferences, nextPreferences);
       renderMatchSettings();
       enterMatchReadyState();

@@ -107,8 +107,32 @@
                 <p class="vocab-list-empty" id="kana-quiz-empty">준비됐다면 시작해볼까요?</p>
                 <div class="kana-quiz-sheet" id="kana-quiz-practice-view" aria-hidden="true" hidden>
                   <article class="basic-practice-card kana-practice-card" id="kana-quiz-card" hidden>
-                    <div class="basic-practice-meta"><span id="kana-quiz-sheet-source">-</span><span id="kana-quiz-sheet-progress">1 / 1</span></div>
-                    <div class="quiz-hud"><div class="quiz-hud-item"><span>남은 시간</span><strong id="kana-quiz-timer">0초</strong></div><div class="quiz-hud-item"><span>맞힌 수</span><strong id="kana-quiz-correct">0</strong></div></div>
+                    <div class="basic-practice-meta"><span id="kana-quiz-sheet-source">-</span></div>
+                    <div class="quiz-hud has-timer">
+                      <div class="quiz-hud-top">
+                        <div class="quiz-hud-stats">
+                          <div class="quiz-hud-progress">
+                            <div class="quiz-hud-item quiz-hud-progress-item is-progress" data-hud-kind="progress">
+                              <div class="quiz-hud-item-copy"><span>진행</span><strong id="kana-quiz-sheet-progress">1 / 1</strong></div>
+                            </div>
+                          </div>
+                          <div class="quiz-hud-item is-correct" data-hud-kind="correct"><div class="quiz-hud-item-copy"><span>정답</span><strong id="kana-quiz-correct">0</strong></div></div>
+                          <span class="quiz-hud-summary-divider" aria-hidden="true"></span>
+                          <div class="quiz-hud-item is-wrong" data-hud-kind="wrong"><div class="quiz-hud-item-copy"><span>오답</span><strong id="kana-quiz-wrong">0</strong></div></div>
+                        </div>
+                      </div>
+                      <div class="quiz-hud-bottom">
+                        <div class="quiz-hud-track-slot"><div class="quiz-hud-track" aria-hidden="true"><span class="quiz-hud-track-fill"></span></div></div>
+                        <div class="quiz-hud-timer">
+                          <div class="quiz-hud-item is-timer" data-hud-kind="timer">
+                            <div class="quiz-hud-item-copy"><span>남은 시간</span><strong id="kana-quiz-timer">00:00</strong></div>
+                          </div>
+                        </div>
+                        <button class="quiz-hud-pause" id="kana-quiz-pause" type="button" aria-label="일시정지" title="일시정지">
+                          <span class="quiz-hud-pause-glyph" aria-hidden="true"></span>
+                        </button>
+                      </div>
+                    </div>
                     <div class="basic-practice-header"><div><span class="eyebrow" id="kana-quiz-sheet-label">KANA QUIZ</span><h3 id="kana-quiz-sheet-title">문자 퀴즈, 풀어볼까요?</h3></div><p class="basic-practice-note" id="kana-quiz-sheet-desc">문자를 보고 읽기를 골라봐요.</p></div>
                     <div class="basic-practice-prompt-box" id="kana-quiz-sheet-copy" hidden><span class="eyebrow">QUESTION</span><p id="kana-quiz-sheet-prompt">문제를 불러오고 있어요.</p></div>
                     <div class="basic-practice-display-box"><strong id="kana-quiz-sheet-display">-</strong><p id="kana-quiz-sheet-display-sub"></p></div>

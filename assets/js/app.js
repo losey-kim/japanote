@@ -24,6 +24,7 @@ let grammarItems = [];
 let grammarPracticeSets = {};
 let readingSets = {};
 const studyViewHelpers = globalThis.japanoteStudyViewHelpers || {};
+const sharedTimer = globalThis.japanoteSharedTimer || {};
 const applyStudyActionButtonState = studyViewHelpers.applyStudyActionButtonState;
 const createStudyListCardMarkup = studyViewHelpers.createStudyListCardMarkup;
 const syncStudyViewButtons = studyViewHelpers.syncStudyViewButtons;
@@ -1701,10 +1702,8 @@ function startKanaQuizSession(mode = kanaQuizSettings.mode) {
   kanaQuizSheetState.results = [];
   kanaQuizSheetState.resultFilter = "all";
 
-  quizSessions.kana.duration = Number(kanaQuizSettings.duration);
-  quizSessions.kana.timeLeft = Number(kanaQuizSettings.duration);
-  quizSessions.kana.correct = 0;
-  quizSessions.kana.streak = 0;
+  setQuizSessionDuration("kana", Number(kanaQuizSettings.duration));
+  resetQuizSessionScore("kana");
 
   renderKanaQuizSetup();
   renderQuizSessionHud("kana");
@@ -1845,7 +1844,7 @@ function finalizeKanaQuizAnswer(correct) {
 
 function handleKanaQuizSheetAnswer(index) {
   const current = getKanaQuizSheetCurrentItem();
-  if (!current || kanaQuizSheetState.answered) {
+  if (!current || kanaQuizSheetState.answered || quizSessions.kana.isPaused) {
     return;
   }
 
@@ -4140,78 +4139,181 @@ const quizSessions = {
     duration: 18,
     timeLeft: 18,
     correct: 0,
+    wrong: 0,
     streak: 0,
+    isPaused: false,
+    onExpire: null,
     timerId: null,
     timerElement: "basic-timer",
+    pauseButtonElement: "basic-pause",
     correctElement: "basic-correct",
+    wrongElement: "basic-wrong",
     streakElement: "basic-streak"
   },
   vocab: {
     duration: state.vocabQuizDuration,
     timeLeft: state.vocabQuizDuration,
     correct: 0,
+    wrong: 0,
     streak: 0,
+    isPaused: false,
+    onExpire: null,
     timerId: null,
     timerElement: "vocab-quiz-timer",
+    pauseButtonElement: "vocab-quiz-pause",
     correctElement: "vocab-quiz-correct",
+    wrongElement: "vocab-quiz-wrong",
     streakElement: "vocab-quiz-streak"
   },
   grammar: {
     duration: state.grammarPracticeDuration,
     timeLeft: state.grammarPracticeDuration,
     correct: 0,
+    wrong: 0,
     streak: 0,
+    isPaused: false,
+    onExpire: null,
     timerId: null,
     timerElement: "grammar-timer",
+    pauseButtonElement: "grammar-pause",
     correctElement: "grammar-correct",
+    wrongElement: "grammar-wrong",
     streakElement: "grammar-streak"
   },
   reading: {
     duration: state.readingDuration,
     timeLeft: state.readingDuration,
     correct: 0,
+    wrong: 0,
     streak: 0,
+    isPaused: false,
+    onExpire: null,
     timerId: null,
     timerElement: "reading-timer",
+    pauseButtonElement: "reading-pause",
     correctElement: "reading-correct",
+    wrongElement: "reading-wrong",
     streakElement: "reading-streak"
   },
   quiz: {
     duration: state.quizDuration,
     timeLeft: state.quizDuration,
     correct: 0,
+    wrong: 0,
     streak: 0,
+    isPaused: false,
+    onExpire: null,
     timerId: null,
     timerElement: "quiz-timer",
+    pauseButtonElement: "quiz-pause",
     correctElement: "quiz-correct",
+    wrongElement: "quiz-wrong",
     streakElement: "quiz-streak"
   },
   kana: {
     duration: 5,
     timeLeft: 5,
     correct: 0,
+    wrong: 0,
     streak: 0,
+    isPaused: false,
+    onExpire: null,
     timerId: null,
     timerElement: "kana-quiz-timer",
+    pauseButtonElement: "kana-quiz-pause",
     correctElement: "kana-quiz-correct",
+    wrongElement: "kana-quiz-wrong",
     streakElement: "kana-quiz-streak"
   },
   starterKanji: {
     duration: state.starterKanjiQuizDuration,
     timeLeft: state.starterKanjiQuizDuration,
     correct: 0,
+    wrong: 0,
     streak: 0,
+    isPaused: false,
+    onExpire: null,
     timerId: null,
     timerElement: "starter-kanji-timer",
+    pauseButtonElement: "starter-kanji-pause",
     correctElement: "starter-kanji-correct",
+    wrongElement: "starter-kanji-wrong",
     streakElement: "starter-kanji-streak"
   }
 };
+
+const quizSessionOptionSelectors = {
+  basic: "#basic-practice-options .basic-practice-option",
+  vocab: "#vocab-quiz-options .basic-practice-option",
+  grammar: "#grammar-practice-options .grammar-practice-option",
+  reading: "#reading-options .reading-option",
+  quiz: "#quiz-options .quiz-option",
+  kana: "[data-kana-quiz-option]",
+  starterKanji: "#starter-kanji-options .basic-practice-option"
+};
+
+function syncQuizSessionAnswerLock(key) {
+  const session = quizSessions[key];
+  const selector = quizSessionOptionSelectors[key];
+
+  if (!session || !selector) {
+    return;
+  }
+
+  document.querySelectorAll(selector).forEach((element) => {
+    if (!("disabled" in element)) {
+      return;
+    }
+
+    const pauseLocked = element.dataset.pauseLocked === "true";
+
+    if (session.isPaused) {
+      if (!element.disabled) {
+        element.disabled = true;
+        element.dataset.pauseLocked = "true";
+      }
+      return;
+    }
+
+    if (pauseLocked) {
+      element.disabled = false;
+      delete element.dataset.pauseLocked;
+    }
+  });
+}
+
+function syncQuizSessionPausedCardState(key) {
+  const session = quizSessions[key];
+
+  if (!session) {
+    return;
+  }
+
+  const pauseButton = document.getElementById(session.pauseButtonElement);
+  const timer = document.getElementById(session.timerElement);
+  const card = (pauseButton || timer)?.closest(
+    ".basic-practice-card, .grammar-practice-card, .reading-card, .quiz-card"
+  );
+
+  if (card) {
+    card.classList.toggle("is-quiz-paused", session.isPaused);
+  }
+}
+
+function syncQuizSessionInteractionState(key) {
+  syncQuizSessionAnswerLock(key);
+  syncQuizSessionPausedCardState(key);
+}
 
 function stopQuizSessionTimer(key) {
   const session = quizSessions[key];
 
   if (!session) {
+    return;
+  }
+
+  if (typeof sharedTimer.stopTimer === "function") {
+    sharedTimer.stopTimer(session);
     return;
   }
 
@@ -4228,6 +4330,10 @@ function stopQuizSessionTimer(key) {
 }
 
 function getQuizSessionRemainingMs(session) {
+  if (typeof sharedTimer.getRemainingMs === "function") {
+    return sharedTimer.getRemainingMs(session);
+  }
+
   if (!session) {
     return 0;
   }
@@ -4240,6 +4346,10 @@ function getQuizSessionRemainingMs(session) {
 }
 
 function getQuizSessionDisplaySeconds(session, remainingMs = getQuizSessionRemainingMs(session)) {
+  if (typeof sharedTimer.getDisplaySeconds === "function") {
+    return sharedTimer.getDisplaySeconds(session, remainingMs);
+  }
+
   if (!session || session.duration <= 0 || remainingMs <= 0) {
     return 0;
   }
@@ -4247,7 +4357,23 @@ function getQuizSessionDisplaySeconds(session, remainingMs = getQuizSessionRemai
   return Math.ceil(remainingMs / 1000);
 }
 
+function formatQuizSessionClock(totalSeconds) {
+  if (typeof sharedTimer.formatClock === "function") {
+    return sharedTimer.formatClock(totalSeconds);
+  }
+
+  const safeSeconds = Math.max(0, Number(totalSeconds) || 0);
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
 function syncQuizSessionClock(session) {
+  if (typeof sharedTimer.syncTimer === "function") {
+    sharedTimer.syncTimer(session);
+    return;
+  }
+
   if (!session || session.duration <= 0 || !Number.isFinite(session.deadlineAt)) {
     return;
   }
@@ -4258,35 +4384,198 @@ function syncQuizSessionClock(session) {
 }
 
 function formatQuizSessionTimerText(session) {
+  if (typeof sharedTimer.createSnapshot === "function") {
+    return sharedTimer.createSnapshot(session).text;
+  }
+
   if (!session || session.duration <= 0) {
     return "천천히";
   }
 
   const remainingMs = getQuizSessionRemainingMs(session);
-  return `${getQuizSessionDisplaySeconds(session, remainingMs)}초`;
+  return formatQuizSessionClock(getQuizSessionDisplaySeconds(session, remainingMs));
 }
 
 function updateQuizTimerItem(timerItem, progress, warning, isStatic, instant = false) {
+  if (typeof sharedTimer.updateTimerItem === "function") {
+    sharedTimer.updateTimerItem(
+      timerItem,
+      {
+        progress,
+        isWarning: warning,
+        isStatic
+      },
+      instant
+    );
+    return;
+  }
+
   const nextProgress = progress.toFixed(3);
-  const previousProgress = Number(timerItem.dataset.timerProgress || "1");
+  const hud = timerItem.closest(".quiz-hud");
+  const progressHost = hud || timerItem;
+  const previousProgress = Number(progressHost.dataset.timerProgress || "1");
   const shouldReset = instant || progress > previousProgress + 0.01;
 
   timerItem.classList.add("is-timer");
-  timerItem.classList.toggle("is-warning", warning);
-  timerItem.classList.toggle("is-static", isStatic);
-
-  if (shouldReset) {
-    timerItem.classList.add("is-resetting");
+  if (hud) {
+    hud.classList.add("has-timer");
   }
 
-  timerItem.style.setProperty("--timer-progress", nextProgress);
-  timerItem.dataset.timerProgress = nextProgress;
+  [timerItem, hud].forEach((target) => {
+    if (!target) {
+      return;
+    }
+
+    target.classList.toggle("is-warning", warning);
+    target.classList.toggle("is-static", isStatic);
+
+    if (shouldReset) {
+      target.classList.add("is-resetting");
+    }
+
+    target.style.setProperty("--timer-progress", nextProgress);
+    target.dataset.timerProgress = nextProgress;
+  });
 
   if (shouldReset) {
     window.requestAnimationFrame(() => {
       timerItem.classList.remove("is-resetting");
+      if (hud) {
+        hud.classList.remove("is-resetting");
+      }
     });
   }
+}
+
+function resetQuizSessionScore(key) {
+  const session = quizSessions[key];
+
+  if (!session) {
+    return;
+  }
+
+  session.correct = 0;
+  session.wrong = 0;
+  session.streak = 0;
+}
+
+function consumeQuizSessionExpire(session) {
+  if (!session || typeof session.onExpire !== "function") {
+    return;
+  }
+
+  const onExpire = session.onExpire;
+  session.onExpire = null;
+  onExpire();
+}
+
+function startQuizSessionInterval(key) {
+  const session = quizSessions[key];
+
+  if (!session) {
+    return;
+  }
+
+  if (typeof sharedTimer.startTimer === "function") {
+    sharedTimer.startTimer(session, {
+      intervalMs: 100,
+      onTick: () => {
+        renderQuizSessionHud(key);
+      },
+      onExpire: () => {
+        session.isPaused = false;
+        renderQuizSessionHud(key);
+        consumeQuizSessionExpire(session);
+      }
+    });
+    return;
+  }
+
+  const remainingMs = getQuizSessionRemainingMs(session);
+
+  if (session.duration <= 0 || session.isPaused || remainingMs <= 0) {
+    session.timeLeftMs = Math.max(0, remainingMs);
+    session.timeLeft = getQuizSessionDisplaySeconds(session, remainingMs);
+    session.deadlineAt = null;
+    renderQuizSessionHud(key);
+
+    if (remainingMs <= 0 && typeof session.onExpire === "function" && session.duration > 0 && !session.isPaused) {
+      const onExpire = session.onExpire;
+      session.onExpire = null;
+      onExpire();
+    }
+
+    return;
+  }
+
+  session.deadlineAt = Date.now() + remainingMs;
+  session.timeLeftMs = remainingMs;
+  session.timeLeft = getQuizSessionDisplaySeconds(session, remainingMs);
+  session.timerId = window.setInterval(() => {
+    syncQuizSessionClock(session);
+    renderQuizSessionHud(key);
+
+    if (getQuizSessionRemainingMs(session) === 0) {
+      stopQuizSessionTimer(key);
+      session.isPaused = false;
+      renderQuizSessionHud(key);
+
+      if (typeof session.onExpire === "function") {
+        const onExpire = session.onExpire;
+        session.onExpire = null;
+        onExpire();
+      }
+    }
+  }, 100);
+
+  renderQuizSessionHud(key);
+}
+
+function pauseQuizSession(key) {
+  const session = quizSessions[key];
+
+  if (!session || session.duration <= 0 || session.isPaused || !session.timerId) {
+    return;
+  }
+
+  if (typeof sharedTimer.pauseTimer === "function") {
+    sharedTimer.pauseTimer(session, {
+      onTick: () => {
+        renderQuizSessionHud(key);
+      }
+    });
+    return;
+  }
+
+  stopQuizSessionTimer(key);
+  session.isPaused = true;
+  renderQuizSessionHud(key);
+}
+
+function resumeQuizSession(key) {
+  const session = quizSessions[key];
+
+  if (!session || session.duration <= 0 || !session.isPaused) {
+    return;
+  }
+
+  session.isPaused = false;
+  startQuizSessionInterval(key);
+}
+
+function toggleQuizSessionPause(key) {
+  const session = quizSessions[key];
+
+  if (!session) {
+    return;
+  }
+
+  if (session.isPaused) {
+    resumeQuizSession(key);
+    return;
+  }
+
+  pauseQuizSession(key);
 }
 
 function renderQuizSessionHud(key) {
@@ -4296,46 +4585,70 @@ function renderQuizSessionHud(key) {
     return;
   }
 
+  syncQuizSessionInteractionState(key);
+
   const timer = document.getElementById(session.timerElement);
+  const pauseButton = document.getElementById(session.pauseButtonElement);
   const correct = document.getElementById(session.correctElement);
+  const wrong = document.getElementById(session.wrongElement);
   const streak = document.getElementById(session.streakElement);
 
-  if (!timer && !correct && !streak) {
+  if (!timer && !pauseButton && !correct && !wrong && !streak) {
     return;
   }
 
   syncQuizSessionClock(session);
 
   if (timer) {
-    const remainingMs = getQuizSessionRemainingMs(session);
-    const warning =
-      session.duration > 0 && remainingMs <= Math.max(5, Math.floor(session.duration / 3)) * 1000;
-    const timerItem = timer.closest(".quiz-hud-item");
-    const progress =
-      session.duration > 0
-        ? Math.max(
-          0,
-          Math.min(
-            1,
-            remainingMs / (session.duration * 1000)
+    if (typeof sharedTimer.renderTimer === "function") {
+      sharedTimer.renderTimer({
+        timerId: session.timerElement,
+        timerState: session
+      });
+    } else {
+      const remainingMs = getQuizSessionRemainingMs(session);
+      const warning =
+        session.duration > 0 && remainingMs <= Math.max(5, Math.floor(session.duration / 3)) * 1000;
+      const timerItem = timer.closest(".quiz-hud-item");
+      const progress =
+        session.duration > 0
+          ? Math.max(
+            0,
+            Math.min(
+              1,
+              remainingMs / (session.duration * 1000)
+            )
           )
-        )
-        : 0;
-    const shouldFreezeProgress = !session.timerId || progress <= 0;
+          : 0;
+      const shouldFreezeProgress = !session.timerId || progress <= 0;
 
-    timer.textContent = formatQuizSessionTimerText(session);
-    timer.classList.toggle(
-      "is-warning",
-      warning
-    );
+      timer.textContent = formatQuizSessionTimerText(session);
+      timer.classList.toggle(
+        "is-warning",
+        warning
+      );
 
-    if (timerItem) {
-      updateQuizTimerItem(timerItem, progress, warning, session.duration <= 0, shouldFreezeProgress);
+      if (timerItem) {
+        updateQuizTimerItem(timerItem, progress, warning, session.duration <= 0, shouldFreezeProgress);
+      }
     }
   }
 
   if (correct) {
     correct.textContent = String(session.correct);
+  }
+
+  if (wrong) {
+    wrong.textContent = String(session.wrong);
+  }
+
+  if (pauseButton) {
+    const canPause = session.duration > 0 && (Boolean(session.timerId) || session.isPaused);
+    const nextLabel = session.isPaused ? "다시 시작" : "일시정지";
+    pauseButton.disabled = !canPause;
+    pauseButton.classList.toggle("is-paused", session.isPaused);
+    pauseButton.setAttribute("aria-label", nextLabel);
+    pauseButton.setAttribute("title", nextLabel);
   }
 
   if (streak) {
@@ -4352,9 +4665,16 @@ function setQuizSessionDuration(key, duration) {
 
   const nextDuration = Math.max(0, Number(duration) || 0);
   stopQuizSessionTimer(key);
-  session.duration = nextDuration;
-  session.timeLeft = nextDuration;
-  session.timeLeftMs = nextDuration * 1000;
+
+  if (typeof sharedTimer.setDuration === "function") {
+    sharedTimer.setDuration(session, nextDuration);
+  } else {
+    session.duration = nextDuration;
+    session.timeLeft = nextDuration;
+    session.timeLeftMs = nextDuration * 1000;
+  }
+
+  session.isPaused = false;
   session.deadlineAt = null;
   renderQuizSessionHud(key);
 }
@@ -4374,26 +4694,34 @@ function resetQuizSessionTimer(key, onExpire) {
   }
 
   stopQuizSessionTimer(key);
+  session.onExpire = typeof onExpire === "function" ? onExpire : null;
+
+  if (typeof sharedTimer.resetTimer === "function") {
+    sharedTimer.resetTimer(session, {
+      intervalMs: 100,
+      onTick: () => {
+        renderQuizSessionHud(key);
+      },
+      onExpire: () => {
+        session.isPaused = false;
+        renderQuizSessionHud(key);
+        consumeQuizSessionExpire(session);
+      }
+    });
+    return;
+  }
+
+  session.isPaused = false;
   session.timeLeft = session.duration;
   session.timeLeftMs = session.duration * 1000;
-  session.deadlineAt = session.duration > 0 ? Date.now() + session.duration * 1000 : null;
+  session.deadlineAt = null;
 
   if (session.duration <= 0) {
     renderQuizSessionHud(key);
     return;
   }
 
-  session.timerId = window.setInterval(() => {
-    syncQuizSessionClock(session);
-    renderQuizSessionHud(key);
-
-    if (getQuizSessionRemainingMs(session) === 0) {
-      stopQuizSessionTimer(key);
-      onExpire();
-    }
-  }, 100);
-
-  renderQuizSessionHud(key);
+  startQuizSessionInterval(key);
 }
 
 function finalizeQuizSession(key, correct) {
@@ -4404,11 +4732,13 @@ function finalizeQuizSession(key, correct) {
   }
 
   stopQuizSessionTimer(key);
+  session.isPaused = false;
 
   if (correct) {
     session.correct += 1;
     session.streak += 1;
   } else {
+    session.wrong += 1;
     session.streak = 0;
   }
 
@@ -4436,16 +4766,11 @@ function resetStateDrivenQuizSessions() {
   stopQuizSessionTimer("reading");
   stopQuizSessionTimer("quiz");
   stopQuizSessionTimer("starterKanji");
-  quizSessions.vocab.correct = 0;
-  quizSessions.vocab.streak = 0;
-  quizSessions.grammar.correct = 0;
-  quizSessions.grammar.streak = 0;
-  quizSessions.reading.correct = 0;
-  quizSessions.reading.streak = 0;
-  quizSessions.quiz.correct = 0;
-  quizSessions.quiz.streak = 0;
-  quizSessions.starterKanji.correct = 0;
-  quizSessions.starterKanji.streak = 0;
+  resetQuizSessionScore("vocab");
+  resetQuizSessionScore("grammar");
+  resetQuizSessionScore("reading");
+  resetQuizSessionScore("quiz");
+  resetQuizSessionScore("starterKanji");
   setQuizSessionDuration("vocab", state.vocabQuizDuration);
   setQuizSessionDuration("grammar", state.grammarPracticeDuration);
   setQuizSessionDuration("reading", state.readingDuration);
@@ -4818,7 +5143,7 @@ function handleBasicPracticeAnswer(index) {
   const options = document.querySelectorAll("#basic-practice-options .basic-practice-option");
   const alreadyAnswered = Array.from(options).some((item) => item.disabled);
 
-  if (alreadyAnswered) {
+  if (alreadyAnswered || quizSessions.basic.isPaused) {
     return;
   }
 
@@ -5217,8 +5542,7 @@ function resetStarterKanjiSessionState(resetIndex = false) {
   starterKanjiState.showResults = false;
   starterKanjiState.resultFilter = "all";
   resetStarterKanjiQuestionOrder();
-  quizSessions.starterKanji.correct = 0;
-  quizSessions.starterKanji.streak = 0;
+  resetQuizSessionScore("starterKanji");
   setQuizSessionDuration("starterKanji", getStarterKanjiQuizDuration());
   stopQuizSessionTimer("starterKanji");
 
@@ -5231,7 +5555,8 @@ function invalidateStarterKanjiSession() {
   resetStarterKanjiSessionState(true);
   state.starterKanjiQuizStarted = false;
   state.starterKanjiQuizFinished = false;
-  state.starterKanjiQuizOptionsOpen = false;
+  // 설정 패널 안에서 문제 수나 시간을 연속으로 조정할 수 있어야 해서
+  // 세션만 초기화하고 패널 open 상태는 그대로 유지한다.
 }
 
 function startNewStarterKanjiSession() {
@@ -6869,8 +7194,7 @@ function renderKanjiPageLayout() {
 
   if (!state.starterKanjiQuizStarted) {
     stopQuizSessionTimer("starterKanji");
-    quizSessions.starterKanji.correct = 0;
-    quizSessions.starterKanji.streak = 0;
+    resetQuizSessionScore("starterKanji");
     setQuizSessionDuration("starterKanji", getStarterKanjiQuizDuration());
     if (empty) {
       empty.textContent = getStarterKanjiQuestionCount() > 0
@@ -6922,7 +7246,7 @@ function handleStarterKanjiPracticeAnswer(index) {
   const options = document.querySelectorAll("#starter-kanji-options .basic-practice-option");
   const alreadyAnswered = optionsContainer?.dataset.answered === "true";
 
-  if (!current || !nextButton || !optionsContainer || alreadyAnswered) {
+  if (!current || !nextButton || !optionsContainer || alreadyAnswered || quizSessions.starterKanji.isPaused) {
     return;
   }
 
@@ -7141,8 +7465,7 @@ function invalidateVocabQuizSession() {
   state.vocabQuizResultFilter = "all";
   state.vocabQuizIndex = 0;
   state.vocabQuizFinished = false;
-  quizSessions.vocab.correct = 0;
-  quizSessions.vocab.streak = 0;
+  resetQuizSessionScore("vocab");
   setQuizSessionDuration("vocab", getVocabQuizDuration());
   stopQuizSessionTimer("vocab");
 }
@@ -7415,8 +7738,7 @@ function getCurrentVocabQuizQuestion() {
 }
 
 function resetVocabQuizSessionStats() {
-  quizSessions.vocab.correct = 0;
-  quizSessions.vocab.streak = 0;
+  resetQuizSessionScore("vocab");
   setQuizSessionDuration("vocab", getVocabQuizDuration());
   renderQuizSessionHud("vocab");
 }
@@ -7756,7 +8078,7 @@ function handleVocabQuizAnswer(index) {
   const options = document.querySelectorAll("#vocab-quiz-options .basic-practice-option");
   const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
-  if (alreadyAnswered) {
+  if (alreadyAnswered || quizSessions.vocab.isPaused) {
     return;
   }
 
@@ -8213,8 +8535,7 @@ function renderVocabQuiz() {
 
   if (!state.vocabQuizStarted) {
     stopQuizSessionTimer("vocab");
-    quizSessions.vocab.correct = 0;
-    quizSessions.vocab.streak = 0;
+    resetQuizSessionScore("vocab");
     setQuizSessionDuration("vocab", getVocabQuizDuration());
     view.hidden = false;
     resultView.hidden = true;
@@ -8495,8 +8816,7 @@ function setGrammarPracticeDuration(duration) {
 function invalidateGrammarPracticeSession() {
   state.grammarPracticeStarted = false;
   state.grammarPracticeSessionQuestionIndex = 0;
-  quizSessions.grammar.correct = 0;
-  quizSessions.grammar.streak = 0;
+  resetQuizSessionScore("grammar");
   setQuizSessionDuration("grammar", getGrammarPracticeDuration());
   stopQuizSessionTimer("grammar");
 }
@@ -8623,8 +8943,7 @@ function renderGrammarPractice() {
 
   if (!state.grammarPracticeStarted) {
     stopQuizSessionTimer("grammar");
-    quizSessions.grammar.correct = 0;
-    quizSessions.grammar.streak = 0;
+    resetQuizSessionScore("grammar");
     setQuizSessionDuration("grammar", activeDuration);
     empty.hidden = false;
     empty.textContent = sets?.length
@@ -8691,7 +9010,7 @@ function handleGrammarPracticeAnswer(index) {
   const activeCount = getGrammarPracticeCount(state.grammarPracticeCount);
   const isLastQuestion = state.grammarPracticeSessionQuestionIndex >= activeCount - 1;
 
-  if (alreadyAnswered) {
+  if (alreadyAnswered || quizSessions.grammar.isPaused) {
     return;
   }
 
@@ -8797,8 +9116,7 @@ function restartGrammarPractice() {
   }
 
   stopQuizSessionTimer("grammar");
-  quizSessions.grammar.correct = 0;
-  quizSessions.grammar.streak = 0;
+  resetQuizSessionScore("grammar");
   setQuizSessionDuration("grammar", state.grammarPracticeDuration);
   state.grammarPracticeSessionQuestionIndex = 0;
   state.grammarPracticeStarted = true;
@@ -8975,8 +9293,7 @@ function renderQuizMistakes() {
 }
 
 function resetQuizSessionStats() {
-  quizSessions.quiz.correct = 0;
-  quizSessions.quiz.streak = 0;
+  resetQuizSessionScore("quiz");
   setQuizSessionDuration("quiz", state.quizDuration);
   renderQuizSessionHud("quiz");
 }
@@ -9228,7 +9545,7 @@ function handleQuizAnswer(question, option) {
   const options = document.querySelectorAll(".quiz-option");
   const alreadyAnswered = hasAnsweredChoiceOptions(options);
 
-  if (alreadyAnswered) {
+  if (alreadyAnswered || quizSessions.quiz.isPaused) {
     return;
   }
 
@@ -9319,8 +9636,7 @@ function setReadingDuration(duration) {
 function invalidateReadingPracticeSession() {
   state.readingStarted = false;
   state.readingSessionQuestionIndex = 0;
-  quizSessions.reading.correct = 0;
-  quizSessions.reading.streak = 0;
+  resetQuizSessionScore("reading");
   setQuizSessionDuration("reading", getReadingDuration());
   stopQuizSessionTimer("reading");
 }
@@ -9509,7 +9825,7 @@ function handleReadingAnswer(index) {
   const activeCount = getReadingCount(state.readingCount);
   const isLastQuestion = state.readingSessionQuestionIndex >= activeCount - 1;
 
-  if (alreadyAnswered) {
+  if (alreadyAnswered || quizSessions.reading.isPaused) {
     return;
   }
 
@@ -9614,8 +9930,7 @@ function restartReadingPractice() {
   }
 
   stopQuizSessionTimer("reading");
-  quizSessions.reading.correct = 0;
-  quizSessions.reading.streak = 0;
+  resetQuizSessionScore("reading");
   setQuizSessionDuration("reading", state.readingDuration);
   state.readingSessionQuestionIndex = 0;
   state.readingStarted = true;
@@ -10298,6 +10613,11 @@ function attachEventListeners() {
   });
   attachClickListener(kanaQuizRestart, () => {
     startKanaQuizSession(kanaQuizSettings.mode);
+  });
+  Object.entries(quizSessions).forEach(([key, session]) => {
+    attachClickListener(document.getElementById(session.pauseButtonElement), () => {
+      toggleQuizSessionPause(key);
+    });
   });
   attachSelectValueListener(kanaQuizResultFilter, (value) => {
     kanaQuizSheetState.resultFilter = getKanaQuizResultFilter(value);

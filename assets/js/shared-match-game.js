@@ -1,4 +1,6 @@
 (function (global) {
+  const sharedTimer = global.japanoteSharedTimer || {};
+
   function getSyncStore() {
     if (global.japanoteSync && typeof global.japanoteSync.readValue === "function") {
       return global.japanoteSync;
@@ -186,7 +188,21 @@
     }
   }
 
-  function renderTimer({ timerId, duration, timeLeft }) {
+  function renderTimer({ timerId, duration, timeLeft, timerState }) {
+    if (typeof sharedTimer.renderTimer === "function") {
+      const resolvedTimerState = timerState || {
+        duration,
+        timeLeft,
+        timeLeftMs: Math.max(0, (Number(timeLeft) || 0) * 1000),
+        timerId: null
+      };
+
+      return sharedTimer.renderTimer({
+        timerId,
+        timerState: resolvedTimerState
+      });
+    }
+
     const timer = document.getElementById(timerId);
 
     if (!timer) {
@@ -196,8 +212,12 @@
     const warning = duration > 0 && timeLeft <= Math.max(10, Math.floor(duration / 3));
     const progress = duration > 0 ? Math.max(0, Math.min(1, timeLeft / duration)) : 0;
     const timerItem = timer.closest(".quiz-hud-item");
+    const formattedTime =
+      duration <= 0
+        ? "천천히"
+        : `${String(Math.floor(timeLeft / 60)).padStart(2, "0")}:${String(timeLeft % 60).padStart(2, "0")}`;
 
-    timer.textContent = duration <= 0 ? "천천히" : `${timeLeft}초`;
+    timer.textContent = formattedTime;
     timer.classList.toggle("is-warning", warning);
 
     if (!timerItem) {
@@ -536,6 +556,13 @@
 
     const safePageSize = Number.isFinite(pageSize) && pageSize > 0 ? Math.max(1, Math.floor(pageSize)) : 5;
 
+    const roundTimerState = {
+      duration: 0,
+      timeLeft: 0,
+      timeLeftMs: 0,
+      deadlineAt: null,
+      timerId: null
+    };
     let roundTimer = null;
     let wrongMatchTimer = null;
     let transitionTimer = null;
@@ -560,6 +587,30 @@
 
     const getActiveDuration = () => Number(getDuration() || 0);
 
+    function mirrorRoundTimerState() {
+      state.duration = roundTimerState.duration;
+      state.timeLeft = Math.max(0, Number(roundTimerState.timeLeft) || 0);
+      state.timeLeftMs = Math.max(0, Number(roundTimerState.timeLeftMs) || 0);
+      state.deadlineAt = roundTimerState.deadlineAt;
+      state.timerId = roundTimerState.timerId;
+    }
+
+    function syncRoundTimerState(resetRemaining = false) {
+      if (typeof sharedTimer.setDuration === "function") {
+        sharedTimer.setDuration(roundTimerState, getActiveDuration(), { resetRemaining });
+      } else {
+        roundTimerState.duration = getActiveDuration();
+
+        if (resetRemaining) {
+          roundTimerState.timeLeft = roundTimerState.duration;
+          roundTimerState.timeLeftMs = roundTimerState.duration * 1000;
+          roundTimerState.deadlineAt = null;
+        }
+      }
+
+      mirrorRoundTimerState();
+    }
+
     function clearTransitionTimer() {
       if (!transitionTimer) {
         return;
@@ -570,6 +621,13 @@
     }
 
     function stopRoundTimer() {
+      if (typeof sharedTimer.stopTimer === "function") {
+        sharedTimer.stopTimer(roundTimerState);
+        roundTimer = null;
+        mirrorRoundTimerState();
+        return;
+      }
+
       if (!roundTimer) {
         return;
       }
@@ -602,7 +660,7 @@
       state.matchedIds = [];
       state.isLocked = false;
       state.timedOut = false;
-      state.timeLeft = getActiveDuration();
+      syncRoundTimerState(true);
     }
 
     function resetSelectedCards() {
@@ -684,6 +742,30 @@
     }
 
     function startRoundTimer() {
+      if (typeof sharedTimer.resetTimer === "function") {
+        syncRoundTimerState(true);
+
+        if (roundTimerState.duration <= 0) {
+          render();
+          return;
+        }
+
+        sharedTimer.resetTimer(roundTimerState, {
+          intervalMs: 100,
+          onTick: () => {
+            mirrorRoundTimerState();
+            render();
+          },
+          onExpire: () => {
+            mirrorRoundTimerState();
+            handleTimeout();
+          }
+        });
+        roundTimer = roundTimerState.timerId;
+        mirrorRoundTimerState();
+        return;
+      }
+
       const activeDuration = getActiveDuration();
 
       stopRoundTimer();
@@ -867,6 +949,7 @@
         state.hasStarted = false;
         state.isLocked = false;
         state.timedOut = false;
+        syncRoundTimerState(true);
         setActionAvailability(false);
         setFeedback("");
         onUnavailable();

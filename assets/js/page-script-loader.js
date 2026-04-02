@@ -11,6 +11,7 @@
     "index.html": [
       "assets/js/theme.js",
       "assets/js/app-study-view-helpers.js",
+      "assets/js/shared-timer.js",
       "assets/js/app.js"
     ],
     "starter.html": [
@@ -20,6 +21,7 @@
       "assets/js/theme.js",
       "assets/js/vocab-registry.js",
       "assets/js/app-study-view-helpers.js",
+      "assets/js/shared-timer.js",
       "assets/js/app.js"
     ],
     "grammar.html": [
@@ -29,6 +31,7 @@
       "assets/js/theme.js",
       "assets/js/shared-quiz-layouts.js",
       "assets/js/app-study-view-helpers.js",
+      "assets/js/shared-timer.js",
       "assets/js/app.js"
     ],
     "reading.html": [
@@ -38,6 +41,7 @@
       "assets/js/theme.js",
       "assets/js/shared-quiz-layouts.js",
       "assets/js/app-study-view-helpers.js",
+      "assets/js/shared-timer.js",
       "assets/js/app.js"
     ],
     "vocab.html": [
@@ -47,6 +51,7 @@
       "assets/js/theme.js",
       "assets/js/vocab-registry.js",
       "assets/js/shared-quiz-layouts.js",
+      "assets/js/shared-timer.js",
       "assets/js/shared-match-game.js",
       "assets/js/shared-match-copy.js",
       "assets/js/app-study-view-helpers.js",
@@ -60,6 +65,7 @@
       "assets/js/theme.js",
       "assets/js/vocab-registry.js",
       "assets/js/shared-quiz-layouts.js",
+      "assets/js/shared-timer.js",
       "assets/js/shared-match-game.js",
       "assets/js/shared-match-copy.js",
       "assets/js/app-study-view-helpers.js",
@@ -74,6 +80,7 @@
       "assets/js/vocab-registry.js?v=20260330a",
       "assets/js/kana-strokes.js?v=20260330a",
       "assets/js/app-study-view-helpers.js?v=20260330a",
+      "assets/js/shared-timer.js?v=20260330a",
       "assets/js/app.js?v=20260330a"
     ]
   };

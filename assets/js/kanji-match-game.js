@@ -452,7 +452,8 @@ function renderKanjiMatchTimer() {
   sharedMatchGame.renderTimer({
     timerId: "kanji-match-timer",
     duration: activeDuration,
-    timeLeft: kanjiMatchState.timeLeft
+    timeLeft: kanjiMatchState.timeLeft,
+    timerState: kanjiMatchState
   });
 }
 
@@ -899,7 +900,9 @@ sharedMatchGame.initializeStandardMatchScreen({
   storageHandlers: {
     [kanjiMatchStorageKey]: () => {
       const nextPreferences = loadKanjiMatchPreferences();
-      nextPreferences.optionsOpen = false;
+      // 원격 동기화 응답이 와도, 지금 사용자가 보고 있는 설정 패널은
+      // 닫지 않고 유지해야 연속으로 옵션을 조정할 수 있다.
+      nextPreferences.optionsOpen = kanjiMatchPreferences.optionsOpen === true;
       sharedMatchGame.replaceObjectContents(kanjiMatchPreferences, nextPreferences);
       renderKanjiMatchSettings();
       enterKanjiMatchReadyState();

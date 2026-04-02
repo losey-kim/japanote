@@ -77,23 +77,7 @@
     ]
   };
 
-  const scripts = (() => {
-    const baseScripts = pageScriptMap[pageName] || [];
-    const isLocalHost = ["localhost", "127.0.0.1"].includes(global.location?.hostname || "");
-
-    if (!isLocalHost) {
-      return baseScripts;
-    }
-
-    const isDeferredSyncScript = (src) =>
-      src === "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" ||
-      src.includes("assets/js/supabase-config.js") ||
-      src.includes("assets/js/supabase-sync.js");
-
-    const essentialScripts = baseScripts.filter((src) => !isDeferredSyncScript(src));
-    const deferredSyncScripts = baseScripts.filter((src) => isDeferredSyncScript(src));
-    return essentialScripts.concat(deferredSyncScripts);
-  })();
+  const scripts = pageScriptMap[pageName] || [];
 
   function hasScript(src) {
     return Boolean(document.querySelector(`script[data-japanote-src="${src}"]`));

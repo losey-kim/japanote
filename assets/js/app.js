@@ -17,130 +17,12 @@ const selectablePracticeLevels = [allLevelValue, ...contentLevels];
 const contentRegistry = globalThis.japanoteContent || {};
 const kanaStrokeSvgs = globalThis.kanaStrokeSvgs || {};
 const vocabContent = contentRegistry.vocab || {};
-const appContentLoader = globalThis.japanoteAppContentLoader || {};
-const normalizeGrammarContent =
-  typeof appContentLoader.normalizeGrammarContent === "function"
-    ? (payload) => appContentLoader.normalizeGrammarContent(payload, contentLevels)
-    : (payload) => ({
-        items: Array.isArray(payload?.items) ? payload.items : [],
-        practiceSets: {}
-      });
-const normalizeReadingContent =
-  typeof appContentLoader.normalizeReadingContent === "function"
-    ? (payload) => appContentLoader.normalizeReadingContent(payload, contentLevels)
-    : () => ({
-        sets: {}
-      });
-const normalizeKanjiRows =
-  typeof appContentLoader.normalizeKanjiRows === "function"
-    ? appContentLoader.normalizeKanjiRows
-    : (payload) => (Array.isArray(payload) ? payload.filter((row) => Array.isArray(row)) : []);
-const normalizeBasicPracticeTrack =
-  typeof appContentLoader.normalizeBasicPracticeTrack === "function"
-    ? appContentLoader.normalizeBasicPracticeTrack
-    : (payload) => {
-        const track = payload && typeof payload === "object" ? payload : {};
-        return {
-          label: typeof track.label === "string" ? track.label : "",
-          heading: typeof track.heading === "string" ? track.heading : "",
-          items: Array.isArray(track.items) ? track.items : []
-        };
-      };
 let grammarContent = normalizeGrammarContent({});
 let readingContent = normalizeReadingContent({});
 let kanjiDataRows = normalizeKanjiRows([]);
 let grammarItems = [];
 let grammarPracticeSets = {};
 let readingSets = {};
-const supplementaryContentLoader =
-  typeof appContentLoader.createSupplementaryContentLoader === "function"
-    ? appContentLoader.createSupplementaryContentLoader({
-        contentLevels,
-        allLevelValue,
-        getAllPracticeSets,
-        refreshKanjiPracticeSet,
-        readState: () => ({
-          grammarContent,
-          grammarItems,
-          grammarPracticeSets,
-          readingContent,
-          readingSets,
-          kanjiDataRows,
-          starterItems,
-          basicPracticeSets,
-          fallbackFlashcards,
-          flashcards,
-          vocabListItems,
-          quizQuestions
-        }),
-        writeState: (partialState) => {
-          if (!partialState || typeof partialState !== "object") {
-            return;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "grammarContent")) {
-            grammarContent = partialState.grammarContent;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "grammarItems")) {
-            grammarItems = partialState.grammarItems;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "grammarPracticeSets")) {
-            grammarPracticeSets = partialState.grammarPracticeSets;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "readingContent")) {
-            readingContent = partialState.readingContent;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "readingSets")) {
-            readingSets = partialState.readingSets;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "kanjiDataRows")) {
-            kanjiDataRows = partialState.kanjiDataRows;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "starterItems")) {
-            starterItems = partialState.starterItems;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "basicPracticeSets")) {
-            basicPracticeSets = partialState.basicPracticeSets;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "fallbackFlashcards")) {
-            fallbackFlashcards = partialState.fallbackFlashcards;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "flashcards")) {
-            flashcards = partialState.flashcards;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "vocabListItems")) {
-            vocabListItems = partialState.vocabListItems;
-          }
-
-          if (Object.prototype.hasOwnProperty.call(partialState, "quizQuestions")) {
-            quizQuestions = partialState.quizQuestions;
-          }
-        },
-        logger: console
-      })
-    : null;
-const dispatchSupplementaryContentLoaded = () => {
-  if (supplementaryContentLoader && typeof supplementaryContentLoader.dispatchSupplementaryContentLoaded === "function") {
-    supplementaryContentLoader.dispatchSupplementaryContentLoaded();
-  }
-};
-const loadSupplementaryContentData = () => {
-  if (supplementaryContentLoader && typeof supplementaryContentLoader.loadSupplementaryContentData === "function") {
-    return supplementaryContentLoader.loadSupplementaryContentData();
-  }
-
-  return Promise.resolve();
-};
 
 function getVocabStore() {
   if (globalThis.japanoteVocabStore && typeof globalThis.japanoteVocabStore.ensureLevels === "function") {
@@ -171,13 +53,307 @@ function ensureVocabLevelsLoaded(level = "N5") {
   return vocabStore.ensureLevels(requestedLevels);
 }
 
-if (supplementaryContentLoader) {
-  supplementaryContentLoader.refreshGrammarContentState(grammarContent);
-  supplementaryContentLoader.refreshReadingContentState(readingContent);
-  supplementaryContentLoader.refreshKanjiRows(kanjiDataRows);
-} else {
+function getLevelContentSets(source) {
+  return contentLevels.reduce((sets, level) => {
+    sets[level] = Array.isArray(source?.[level]) ? source[level] : [];
+    return sets;
+  }, {});
+}
+
+function normalizeGrammarContent(payload) {
+  const normalized = payload || {};
+
+  return {
+    items: Array.isArray(normalized.items) ? normalized.items : [],
+    practiceSets: getLevelContentSets(normalized.practiceSets || {})
+  };
+}
+
+function normalizeReadingContent(payload) {
+  const normalized = payload || {};
+
+  return {
+    sets: getLevelContentSets(normalized.sets || {})
+  };
+}
+
+function normalizeKanjiRows(payload) {
+  return Array.isArray(payload) ? payload.filter((row) => Array.isArray(row)) : [];
+}
+
+function dispatchSupplementaryContentLoaded() {
+  if (typeof window === "undefined" || typeof window.CustomEvent !== "function") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("japanote:supplementary-content-loaded", {
+      detail: {
+        kanjiRows: [...kanjiDataRows]
+      }
+    })
+  );
+}
+
+function normalizeBasicPracticeTrack(payload) {
+  const track = payload && typeof payload === "object" ? payload : {};
+  return {
+    label: typeof track.label === "string" ? track.label : "",
+    heading: typeof track.heading === "string" ? track.heading : "",
+    items: Array.isArray(track.items) ? track.items : []
+  };
+}
+
+function normalizeBasicPracticeTrackOrNull(payload) {
+  return payload && typeof payload === "object" ? normalizeBasicPracticeTrack(payload) : null;
+}
+
+function getContentDataUrl(fileName) {
+  if (typeof window === "undefined" || !window.location) {
+    return fileName;
+  }
+
+  return new URL(`data/${fileName}`, window.location.href).toString();
+}
+
+function isFileProtocol() {
+  return typeof window !== "undefined" && window.location && window.location.protocol === "file:";
+}
+
+function isSuccessfulResponse(response) {
+  return response.status >= 200 && response.status < 300;
+}
+
+function parseJsonPayload(payloadText, fallbackLabel) {
+  try {
+    const parsed = typeof payloadText === "string" ? JSON.parse(payloadText) : payloadText;
+
+    if (parsed === undefined || parsed === null) {
+      throw new Error(`응답 데이터가 비어 있어요.`);
+    }
+
+    return parsed;
+  } catch (error) {
+    throw new Error(`Failed to parse ${fallbackLabel}: ${error.message}`);
+  }
+}
+
+function fetchJsonDataWithXhr(fileName, fallbackLabel) {
+  const requestUrl = getContentDataUrl(fileName);
+
+  return new Promise((resolve, reject) => {
+    if (typeof XMLHttpRequest !== "function") {
+      reject(new Error(`XHR is not available for ${fallbackLabel}.`));
+      return;
+    }
+
+    const request = new XMLHttpRequest();
+    request.open("GET", requestUrl, true);
+    request.responseType = "text";
+
+    request.onload = () => {
+      const isLoaded = request.status === 0 || isSuccessfulResponse(request);
+
+      if (!isLoaded) {
+        reject(new Error(`Failed to load ${fallbackLabel} (${request.status})`));
+        return;
+      }
+
+      try {
+        resolve(parseJsonPayload(request.responseText, fallbackLabel));
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    request.onerror = () => {
+      reject(new Error(`Failed to load ${fallbackLabel} (XHR).`));
+    };
+
+    request.ontimeout = () => {
+      reject(new Error(`Timed out while loading ${fallbackLabel} (XHR).`));
+    };
+
+    request.send();
+  });
+}
+
+function fetchJsonData(fileName, fallbackLabel) {
+  const requestUrl = getContentDataUrl(fileName);
+
+  return fetch(requestUrl, {
+    cache: "default",
+    credentials: "same-origin"
+  }).then((response) => {
+    if (!isSuccessfulResponse(response)) {
+      throw new Error(`Failed to load ${fallbackLabel} (${response.status})`);
+    }
+
+    return response.json();
+  }).catch(() => {
+    return fetchJsonDataWithXhr(fileName, fallbackLabel);
+  });
+}
+
+function refreshGrammarContentState(payload) {
+  const normalized = normalizeGrammarContent(payload || {});
+  grammarContent = normalized;
+  grammarItems = normalized.items;
+  grammarPracticeSets = getLevelContentSets(normalized.practiceSets);
+  grammarPracticeSets[allLevelValue] = getAllPracticeSets(grammarPracticeSets);
+}
+
+function refreshReadingContentState(payload) {
+  const normalized = normalizeReadingContent(payload || {});
+  readingContent = normalized;
+  readingSets = getLevelContentSets(normalized.sets);
+  readingSets[allLevelValue] = getAllPracticeSets(readingSets);
+}
+
+function refreshKanjiRows(payload) {
+  kanjiDataRows = normalizeKanjiRows(payload || []);
   globalThis.JAPANOTE_KANJI_DATA = [...kanjiDataRows];
 }
+
+function normalizeQuizQuestionList(payload) {
+  const candidate = Array.isArray(payload) ? payload : [];
+  return candidate.length ? candidate : [];
+}
+
+function refreshStarterItems(payload) {
+  const normalized = Array.isArray(payload?.items) ? payload.items : [];
+  starterItems = normalized;
+}
+
+function refreshBasicPracticeSets(payload) {
+  const source = payload && typeof payload === "object" ? payload : {};
+  basicPracticeSets = {
+    ...basicPracticeSets,
+    words: normalizeBasicPracticeTrack(source.words),
+    particles: normalizeBasicPracticeTrackOrNull(source.particles),
+    kanji: normalizeBasicPracticeTrackOrNull(source.kanji),
+    sentences: normalizeBasicPracticeTrackOrNull(source.sentences)
+  };
+}
+
+function refreshFallbackFlashcards(payload) {
+  fallbackFlashcards = normalizeQuizQuestionList(payload?.flashcards);
+  flashcards = [...fallbackFlashcards];
+  vocabListItems = [...fallbackFlashcards];
+}
+
+function refreshQuizQuestions(payload) {
+  quizQuestions = normalizeQuizQuestionList(payload?.questions);
+}
+
+function loadGrammarDataFromJson() {
+  return fetchJsonData("grammar.json", "grammar.json")
+    .then((payload) => {
+      refreshGrammarContentState(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Failed to load grammar.json. Using empty grammar data.", error);
+      refreshGrammarContentState(grammarContent);
+      return null;
+    });
+}
+
+function loadReadingDataFromJson() {
+  return fetchJsonData("reading.json", "reading.json")
+    .then((payload) => {
+      refreshReadingContentState(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Failed to load reading.json. Using empty reading data.", error);
+      refreshReadingContentState(readingContent);
+      return null;
+    });
+}
+
+function loadKanjiDataFromJson() {
+  return fetchJsonData("kanji.json", "kanji.json")
+    .then((payload) => {
+      refreshKanjiRows(payload || []);
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Failed to load kanji.json. Using empty kanji data.", error);
+      refreshKanjiRows(kanjiDataRows);
+      return null;
+    });
+}
+
+function loadStarterItemsFromJson() {
+  return fetchJsonData("starter-items.json", "starter-items.json")
+    .then((payload) => {
+      refreshStarterItems(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default starter-items data (script fallback).", error);
+      refreshStarterItems({});
+      return null;
+    });
+}
+
+function loadBasicPracticeSetsFromJson() {
+  return fetchJsonData("basic-practice.json", "basic-practice.json")
+    .then((payload) => {
+      refreshBasicPracticeSets(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default basic-practice data (script fallback).", error);
+      refreshBasicPracticeSets({});
+      return null;
+    });
+}
+
+function loadFallbackFlashcardsFromJson() {
+  return fetchJsonData("fallback-flashcards.json", "fallback-flashcards.json")
+    .then((payload) => {
+      refreshFallbackFlashcards(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default fallback flashcards (script fallback).", error);
+      refreshFallbackFlashcards({});
+      return null;
+    });
+}
+
+function loadQuizQuestionsFromJson() {
+  return fetchJsonData("quiz-questions.json", "quiz-questions.json")
+    .then((payload) => {
+      refreshQuizQuestions(payload || {});
+      return payload;
+    })
+    .catch((error) => {
+      console.warn("Using default quiz questions (script fallback).", error);
+      refreshQuizQuestions({});
+      return null;
+    });
+}
+
+function loadSupplementaryContentData() {
+  return Promise.all([
+    loadGrammarDataFromJson(),
+    loadReadingDataFromJson(),
+    loadKanjiDataFromJson(),
+    loadStarterItemsFromJson(),
+    loadBasicPracticeSetsFromJson(),
+    loadFallbackFlashcardsFromJson(),
+    loadQuizQuestionsFromJson()
+  ]).then(() => {
+    refreshKanjiPracticeSet();
+  });
+}
+
+refreshGrammarContentState(grammarContent);
+refreshReadingContentState(readingContent);
+refreshKanjiRows(kanjiDataRows);
 
 function getAllPracticeSets(levelSets = {}) {
   return contentLevels.reduce((items, level) => items.concat(levelSets[level] || []), []);
@@ -279,19 +455,19 @@ let quizQuestions = [];
 
 let dynamicQuizSource = getDynamicVocabSource("N5");
 const quizModeLabels = {
-  meaning: "??留욏엳湲?,
-  reading: "?쎄린 留욏엳湲?
+  meaning: "뜻 맞히기",
+  reading: "읽기 맞히기"
 };
 const vocabQuizFieldLabels = {
-  reading: "?덈씪媛?샕룰??移대굹",
-  word: "?쒖옄",
-  meaning: "??
+  reading: "히라가나·가타카나",
+  word: "한자",
+  meaning: "뜻"
 };
 const vocabQuizFieldOptions = ["reading", "word", "meaning"];
 const vocabQuizResultFilterLabels = {
-  all: "?꾩껜",
-  correct: "?뺣떟",
-  wrong: "?ㅻ떟"
+  all: "전체",
+  correct: "정답",
+  wrong: "오답"
 };
 const quizSessionSizeOptions = [10, 20];
 const starterKanjiQuizCountOptions = [5, 10, 15, 20];
@@ -304,8 +480,8 @@ const grammarPracticeDurationOptions = [15, 25, 35, 0];
 const readingDurationOptions = [45, 60, 90, 0];
 const kanjiQuizFieldOptions = ["display", "reading"];
 const kanjiQuizFieldLabels = {
-  display: "?쒖옄",
-  reading: "諛쒖쓬"
+  display: "한자",
+  reading: "발음"
 };
 const vocabPartAllValue = allLevelValue;
 const selectableStudyLevels = [...contentLevels, allLevelValue];
@@ -330,11 +506,11 @@ function getKanjiGrade(value = state?.kanjiGrade) {
 
 function getKanjiGradeLabel(grade = state?.kanjiGrade) {
   const activeGrade = getKanjiGrade(grade);
-  return activeGrade === allLevelValue ? "?꾩껜" : `${activeGrade}?숇뀈`;
+  return activeGrade === allLevelValue ? "전체" : `${activeGrade}학년`;
 }
 
 function getKanjiGradeSummaryLabel(grade = state?.kanjiGrade) {
-  return getKanjiGrade(grade) === allLevelValue ? "?꾩껜" : `${getKanjiGrade(grade)}?숇뀈`;
+  return getKanjiGrade(grade) === allLevelValue ? "전체" : `${getKanjiGrade(grade)}학년`;
 }
 
 function getKanjiCollectionFilter(value = state?.kanjiCollectionFilter) {
@@ -354,7 +530,7 @@ function getKanjiView(view = state?.kanjiView) {
 }
 
 function getKanjiViewLabel(view = state?.kanjiView) {
-  return getKanjiView(view) === "list" ? "紐⑸줉" : "移대뱶";
+  return getKanjiView(view) === "list" ? "목록" : "카드";
 }
 
 function getKanjiOptionsSummaryText() {
@@ -362,7 +538,7 @@ function getKanjiOptionsSummaryText() {
     getKanjiGradeSummaryLabel(),
     getKanjiViewLabel(),
     getKanjiCollectionSummaryLabel()
-  ].join(" 쨌 ");
+  ].join(" · ");
 }
 
 function getStarterKanjiQuizField(value, fallback = "display") {
@@ -400,7 +576,7 @@ function getStarterKanjiQuizConfigLabel(
   questionField = state?.starterKanjiQuestionField,
   optionField = state?.starterKanjiOptionField
 ) {
-  return `${getStarterKanjiFieldLabel(questionField)} ??${getStarterKanjiFieldLabel(optionField)}`;
+  return `${getStarterKanjiFieldLabel(questionField)} → ${getStarterKanjiFieldLabel(optionField)}`;
 }
 
 function getStarterKanjiItemValue(item, field) {
@@ -412,8 +588,8 @@ function getStarterKanjiItemValue(item, field) {
 
 function getStarterKanjiPrompt(questionField = state?.starterKanjiQuestionField) {
   return getStarterKanjiQuestionField(questionField) === "reading"
-    ? "??諛쒖쓬, ?대뼡 ?쒖옄?쇨퉴??"
-    : "???쒖옄, ?대뼸寃??쎌쓣源뚯슂?";
+    ? "이 발음, 어떤 한자일까요?"
+    : "이 한자, 어떻게 읽을까요?";
 }
 
 function buildKanjiPracticeItemsFromData(rows = kanjiDataRows) {
@@ -436,16 +612,16 @@ function buildKanjiPracticeItemsFromData(rows = kanjiDataRows) {
         grade: normalizedGrade,
         gradeLabel,
         source: gradeLabel,
-        title: `${gradeLabel} ?쒖옄`,
+        title: `${gradeLabel} 한자`,
         note: gradeLabel,
-        prompt: "???쒖옄, ?대뼸寃??쎌쓣源뚯슂?",
+        prompt: "이 한자, 어떻게 읽을까요?",
         display: normalizedChar,
         displaySub: "",
         reading: normalizedReading,
         readingsDisplay: normalizeQuizText(readingsDisplay || normalizedReading),
         strokeCount: strokes,
         tone: getKanjiTone(normalizedGrade),
-        explanation: `${normalizedChar}??????쎄린 以??섎굹??${normalizedReading}?덉슂.`
+        explanation: `${normalizedChar}의 대표 읽기 중 하나는 ${normalizedReading}예요.`
       };
     })
     .filter(Boolean);
@@ -466,7 +642,7 @@ function normalizeQuizText(value) {
 }
 
 function normalizeQuizDisplay(value) {
-  return normalizeQuizText(value).replace(/\s*쨌\s*/g, " / ");
+  return normalizeQuizText(value).replace(/\s*·\s*/g, " / ");
 }
 
 function normalizeStudyLevelValue(level, fallback = "") {
@@ -487,7 +663,7 @@ function normalizeStudyLevelValue(level, fallback = "") {
 
 function formatStudyLevelLabel(level, fallback = "") {
   const normalizedLevel = normalizeStudyLevelValue(level, fallback);
-  return normalizedLevel === allLevelValue ? "?꾩껜" : normalizedLevel;
+  return normalizedLevel === allLevelValue ? "전체" : normalizedLevel;
 }
 
 function formatQuizLineBreaks(value) {
@@ -501,37 +677,37 @@ function hasFinalConsonant(char) {
 
 function softenCopulaEnding(text) {
   return text
-    .replace(/([媛-??)?댁뿀?듬땲??./g, (_, char) => `${char}?댁뿀?댁슂.`)
-    .replace(/([媛-??)??듬땲??./g, (_, char) => `${char}??댁슂.`)
-    .replace(/([媛-??)?낅땲??./g, (_, char) => `${char}${hasFinalConsonant(char) ? "?댁뿉??" : "?덉슂."}`)
-    .replace(/([媛-??)?낅땲??g, (_, char) => `${char}${hasFinalConsonant(char) ? "?댁뿉?? : "?덉슂"}`);
+    .replace(/([가-힣])이었습니다\./g, (_, char) => `${char}이었어요.`)
+    .replace(/([가-힣])였습니다\./g, (_, char) => `${char}였어요.`)
+    .replace(/([가-힣])입니다\./g, (_, char) => `${char}${hasFinalConsonant(char) ? "이에요." : "예요."}`)
+    .replace(/([가-힣])입니다/g, (_, char) => `${char}${hasFinalConsonant(char) ? "이에요" : "예요"}`);
 }
 
 function softenVisibleKoreanCopy(value) {
   return softenCopulaEnding(normalizeQuizText(value))
-    .replace(/臾댁뾿?멸????/g, "萸섍퉴??")
-    .replace(/臾댁뾿?꾧퉴???/g, "萸섍퉴??")
-    .replace(/媛숈뒿?덈떎\./g, "媛숈븘??")
-    .replace(/?곷땲??./g, "?⑥슂.")
-    .replace(/?⑸땲??./g, "?쇱슂.")
-    .replace(/蹂댁엯?덈떎\./g, "蹂댁뿬??")
-    .replace(/留욎뒿?덈떎\./g, "留욎븘??")
-    .replace(/媛묐땲??./g, "媛??")
-    .replace(/?듬땲??./g, "???")
-    .replace(/?쎈땲??./g, "?ъ슂.")
-    .replace(/?⑸땲??./g, "?댁슂.")
-    .replace(/留덉떗?덈떎\./g, "留덉뀛??")
-    .replace(/?쎌뒿?덈떎\./g, "?쎌뼱??")
-    .replace(/留뚮궔?덈떎\./g, "留뚮굹??")
-    .replace(/?섏샃?덈떎\./g, "?섏???")
-    .replace(/?듯옓?덈떎\./g, "?듯???")
-    .replace(/諛곗썎?덈떎\./g, "諛곗썙??")
-    .replace(/醫뗭븘?⑸땲??./g, "醫뗭븘?댁슂.")
-    .replace(/洹몄낀?듬땲??./g, "洹몄낀?댁슂.")
-    .replace(/?쇳뻽?듬땲??./g, "?쇳뻽?댁슂.")
-    .replace(/?앷컖?⑸땲??./g, "?앷컖?댁슂.")
-    .replace(/留먰빀?덈떎\./g, "留먰빐??")
-    .replace(/臾살뒿?덈떎\./g, "臾산퀬 ?덉뼱??");
+    .replace(/무엇인가요\?/g, "뭘까요?")
+    .replace(/무엇을까요\?/g, "뭘까요?")
+    .replace(/같습니다\./g, "같아요.")
+    .replace(/씁니다\./g, "써요.")
+    .replace(/됩니다\./g, "돼요.")
+    .replace(/보입니다\./g, "보여요.")
+    .replace(/맞습니다\./g, "맞아요.")
+    .replace(/갑니다\./g, "가요.")
+    .replace(/옵니다\./g, "와요.")
+    .replace(/삽니다\./g, "사요.")
+    .replace(/합니다\./g, "해요.")
+    .replace(/마십니다\./g, "마셔요.")
+    .replace(/읽습니다\./g, "읽어요.")
+    .replace(/만납니다\./g, "만나요.")
+    .replace(/나옵니다\./g, "나와요.")
+    .replace(/익힙니다\./g, "익혀요.")
+    .replace(/배웁니다\./g, "배워요.")
+    .replace(/좋아합니다\./g, "좋아해요.")
+    .replace(/그쳤습니다\./g, "그쳤어요.")
+    .replace(/피했습니다\./g, "피했어요.")
+    .replace(/생각합니다\./g, "생각해요.")
+    .replace(/말합니다\./g, "말해요.")
+    .replace(/묻습니다\./g, "묻고 있어요.");
 }
 
 function softenExplanationCopy(value) {
@@ -626,11 +802,11 @@ function getLevelLabel(level) {
 }
 
 function getLevelSummaryLabel(level) {
-  return level === allLevelValue ? "?꾩껜 ?쒖씠?? : getLevelLabel(level);
+  return level === allLevelValue ? "전체 난이도" : getLevelLabel(level);
 }
 
 function getDurationLabel(duration) {
-  return Number(duration) <= 0 ? "泥쒖쿇?? : `${Number(duration)}珥?;
+  return Number(duration) <= 0 ? "천천히" : `${Number(duration)}초`;
 }
 
 function getQuizLevel(level = state?.quizLevel) {
@@ -841,10 +1017,10 @@ function getVocabQuizExplanation(item) {
   const meaning = getVocabQuizItemValue(item, "meaning");
 
   if (word && word !== reading) {
-    return `${reading}??${word}, ?살? ${meaning}?덉슂.`;
+    return `${reading}는 ${word}, 뜻은 ${meaning}예요.`;
   }
 
-  return `${reading}???살? ${meaning}?덉슂.`;
+  return `${reading}의 뜻은 ${meaning}예요.`;
 }
 
 function buildWordPracticeQuestionSet(items, level = "N5", fallbackItems = [], config = {}) {
@@ -879,14 +1055,14 @@ function buildWordPracticeQuestionSet(items, level = "N5", fallbackItems = [], c
     const answer = options.indexOf(correctOption);
     const questionLabel = getVocabQuizFieldLabel(questionField);
     const optionLabel = getVocabQuizFieldLabel(optionField);
-    const title = item.part ? `${item.part} ${optionLabel} ?댁쫰` : `${levelLabel} ${optionLabel} ?댁쫰`;
-    const note = `${questionLabel}瑜?蹂닿퀬 ${optionLabel}瑜?怨⑤씪遊먯슂.`;
-    const prompt = `??${questionLabel}??留욌뒗 ${optionLabel}, ?대뼡 嫄멸퉴??`;
+    const title = item.part ? `${item.part} ${optionLabel} 퀴즈` : `${levelLabel} ${optionLabel} 퀴즈`;
+    const note = `${questionLabel}를 보고 ${optionLabel}를 골라봐요.`;
+    const prompt = `이 ${questionLabel}에 맞는 ${optionLabel}, 어떤 걸까요?`;
     const explanation = getVocabQuizExplanation(item);
 
     questions.push({
       id: `bp-dw-${questionField}-${optionField}-${item.id}-${questionIndex}`,
-      source: `${levelLabel} ?⑥뼱 ${questionIndex + 1}`,
+      source: `${levelLabel} 단어 ${questionIndex + 1}`,
       level: item.level || levelLabel,
       title,
       note,
@@ -1006,142 +1182,142 @@ function handleLoadedVocabLevels() {
 
 const kanaBlueprintGroups = [
   {
-    title: "湲곕낯??,
+    title: "기본음",
     items: [
-      { reading: "a", hiragana: "?? },
-      { reading: "i", hiragana: "?? },
-      { reading: "u", hiragana: "?? },
-      { reading: "e", hiragana: "?? },
-      { reading: "o", hiragana: "?? },
-      { reading: "ka", hiragana: "?? },
-      { reading: "ki", hiragana: "?? },
-      { reading: "ku", hiragana: "?? },
-      { reading: "ke", hiragana: "?? },
-      { reading: "ko", hiragana: "?? },
-      { reading: "sa", hiragana: "?? },
-      { reading: "shi", hiragana: "?? },
-      { reading: "su", hiragana: "?? },
-      { reading: "se", hiragana: "?? },
-      { reading: "so", hiragana: "?? },
-      { reading: "ta", hiragana: "?? },
-      { reading: "chi", hiragana: "?? },
-      { reading: "tsu", hiragana: "?? },
-      { reading: "te", hiragana: "?? },
-      { reading: "to", hiragana: "?? },
-      { reading: "na", hiragana: "?? },
-      { reading: "ni", hiragana: "?? },
-      { reading: "nu", hiragana: "?? },
-      { reading: "ne", hiragana: "?? },
-      { reading: "no", hiragana: "?? },
-      { reading: "ha", hiragana: "?? },
-      { reading: "hi", hiragana: "?? },
-      { reading: "fu", hiragana: "?? },
-      { reading: "he", hiragana: "?? },
-      { reading: "ho", hiragana: "?? },
-      { reading: "ma", hiragana: "?? },
-      { reading: "mi", hiragana: "?? },
-      { reading: "mu", hiragana: "?" },
-      { reading: "me", hiragana: "?? },
-      { reading: "mo", hiragana: "?? },
-      { reading: "ya", hiragana: "?? },
-      { reading: "yu", hiragana: "?? },
-      { reading: "yo", hiragana: "?? },
-      { reading: "ra", hiragana: "?? },
-      { reading: "ri", hiragana: "?? },
-      { reading: "ru", hiragana: "?? },
-      { reading: "re", hiragana: "?? },
-      { reading: "ro", hiragana: "?? },
-      { reading: "wa", hiragana: "?? },
-      { reading: "wo", hiragana: "?? },
-      { reading: "n", hiragana: "?? }
+      { reading: "a", hiragana: "あ" },
+      { reading: "i", hiragana: "い" },
+      { reading: "u", hiragana: "う" },
+      { reading: "e", hiragana: "え" },
+      { reading: "o", hiragana: "お" },
+      { reading: "ka", hiragana: "か" },
+      { reading: "ki", hiragana: "き" },
+      { reading: "ku", hiragana: "く" },
+      { reading: "ke", hiragana: "け" },
+      { reading: "ko", hiragana: "こ" },
+      { reading: "sa", hiragana: "さ" },
+      { reading: "shi", hiragana: "し" },
+      { reading: "su", hiragana: "す" },
+      { reading: "se", hiragana: "せ" },
+      { reading: "so", hiragana: "そ" },
+      { reading: "ta", hiragana: "た" },
+      { reading: "chi", hiragana: "ち" },
+      { reading: "tsu", hiragana: "つ" },
+      { reading: "te", hiragana: "て" },
+      { reading: "to", hiragana: "と" },
+      { reading: "na", hiragana: "な" },
+      { reading: "ni", hiragana: "に" },
+      { reading: "nu", hiragana: "ぬ" },
+      { reading: "ne", hiragana: "ね" },
+      { reading: "no", hiragana: "の" },
+      { reading: "ha", hiragana: "は" },
+      { reading: "hi", hiragana: "ひ" },
+      { reading: "fu", hiragana: "ふ" },
+      { reading: "he", hiragana: "へ" },
+      { reading: "ho", hiragana: "ほ" },
+      { reading: "ma", hiragana: "ま" },
+      { reading: "mi", hiragana: "み" },
+      { reading: "mu", hiragana: "む" },
+      { reading: "me", hiragana: "め" },
+      { reading: "mo", hiragana: "も" },
+      { reading: "ya", hiragana: "や" },
+      { reading: "yu", hiragana: "ゆ" },
+      { reading: "yo", hiragana: "よ" },
+      { reading: "ra", hiragana: "ら" },
+      { reading: "ri", hiragana: "り" },
+      { reading: "ru", hiragana: "る" },
+      { reading: "re", hiragana: "れ" },
+      { reading: "ro", hiragana: "ろ" },
+      { reading: "wa", hiragana: "わ" },
+      { reading: "wo", hiragana: "を" },
+      { reading: "n", hiragana: "ん" }
     ]
   },
   {
-    title: "?곸쓬 / 諛섑긽??,
+    title: "탁음 / 반탁음",
     items: [
-      { reading: "ga", hiragana: "?? },
-      { reading: "gi", hiragana: "?? },
-      { reading: "gu", hiragana: "?? },
-      { reading: "ge", hiragana: "?? },
-      { reading: "go", hiragana: "?? },
-      { reading: "za", hiragana: "?? },
-      { reading: "ji", hiragana: "?? },
-      { reading: "zu", hiragana: "?? },
-      { reading: "ze", hiragana: "?? },
-      { reading: "zo", hiragana: "?? },
-      { reading: "da", hiragana: "?? },
-      { reading: "ji", hiragana: "?? },
-      { reading: "zu", hiragana: "?? },
-      { reading: "de", hiragana: "?? },
-      { reading: "do", hiragana: "?? },
-      { reading: "ba", hiragana: "?? },
-      { reading: "bi", hiragana: "?? },
-      { reading: "bu", hiragana: "?? },
-      { reading: "be", hiragana: "?? },
-      { reading: "bo", hiragana: "?? },
-      { reading: "pa", hiragana: "?? },
-      { reading: "pi", hiragana: "?? },
-      { reading: "pu", hiragana: "?? },
-      { reading: "pe", hiragana: "?? },
-      { reading: "po", hiragana: "?? }
+      { reading: "ga", hiragana: "が" },
+      { reading: "gi", hiragana: "ぎ" },
+      { reading: "gu", hiragana: "ぐ" },
+      { reading: "ge", hiragana: "げ" },
+      { reading: "go", hiragana: "ご" },
+      { reading: "za", hiragana: "ざ" },
+      { reading: "ji", hiragana: "じ" },
+      { reading: "zu", hiragana: "ず" },
+      { reading: "ze", hiragana: "ぜ" },
+      { reading: "zo", hiragana: "ぞ" },
+      { reading: "da", hiragana: "だ" },
+      { reading: "ji", hiragana: "ぢ" },
+      { reading: "zu", hiragana: "づ" },
+      { reading: "de", hiragana: "で" },
+      { reading: "do", hiragana: "ど" },
+      { reading: "ba", hiragana: "ば" },
+      { reading: "bi", hiragana: "び" },
+      { reading: "bu", hiragana: "ぶ" },
+      { reading: "be", hiragana: "べ" },
+      { reading: "bo", hiragana: "ぼ" },
+      { reading: "pa", hiragana: "ぱ" },
+      { reading: "pi", hiragana: "ぴ" },
+      { reading: "pu", hiragana: "ぷ" },
+      { reading: "pe", hiragana: "ぺ" },
+      { reading: "po", hiragana: "ぽ" }
     ]
   },
   {
-    title: "?붿쓬",
+    title: "요음",
     items: [
-      { reading: "kya", hiragana: "?띲굛" },
-      { reading: "kyu", hiragana: "?띲굝" },
-      { reading: "kyo", hiragana: "?띲굟" },
-      { reading: "sha", hiragana: "?쀣굛" },
-      { reading: "shu", hiragana: "?쀣굝" },
-      { reading: "sho", hiragana: "?쀣굟" },
-      { reading: "cha", hiragana: "?▲굛" },
-      { reading: "chu", hiragana: "?▲굝" },
-      { reading: "cho", hiragana: "?▲굟" },
-      { reading: "nya", hiragana: "?ャ굛" },
-      { reading: "nyu", hiragana: "?ャ굝" },
-      { reading: "nyo", hiragana: "?ャ굟" },
-      { reading: "hya", hiragana: "?꿔굛" },
-      { reading: "hyu", hiragana: "?꿔굝" },
-      { reading: "hyo", hiragana: "?꿔굟" },
-      { reading: "mya", hiragana: "?욍굛" },
-      { reading: "myu", hiragana: "?욍굝" },
-      { reading: "myo", hiragana: "?욍굟" },
-      { reading: "rya", hiragana: "?듽굛" },
-      { reading: "ryu", hiragana: "?듽굝" },
-      { reading: "ryo", hiragana: "?듽굟" },
-      { reading: "gya", hiragana: "?롢굛" },
-      { reading: "gyu", hiragana: "?롢굝" },
-      { reading: "gyo", hiragana: "?롢굟" },
-      { reading: "ja", hiragana: "?섅굛" },
-      { reading: "ju", hiragana: "?섅굝" },
-      { reading: "jo", hiragana: "?섅굟" },
-      { reading: "bya", hiragana: "?녈굛" },
-      { reading: "byu", hiragana: "?녈굝" },
-      { reading: "byo", hiragana: "?녈굟" },
-      { reading: "pya", hiragana: "?담굛" },
-      { reading: "pyu", hiragana: "?담굝" },
-      { reading: "pyo", hiragana: "?담굟" }
+      { reading: "kya", hiragana: "きゃ" },
+      { reading: "kyu", hiragana: "きゅ" },
+      { reading: "kyo", hiragana: "きょ" },
+      { reading: "sha", hiragana: "しゃ" },
+      { reading: "shu", hiragana: "しゅ" },
+      { reading: "sho", hiragana: "しょ" },
+      { reading: "cha", hiragana: "ちゃ" },
+      { reading: "chu", hiragana: "ちゅ" },
+      { reading: "cho", hiragana: "ちょ" },
+      { reading: "nya", hiragana: "にゃ" },
+      { reading: "nyu", hiragana: "にゅ" },
+      { reading: "nyo", hiragana: "にょ" },
+      { reading: "hya", hiragana: "ひゃ" },
+      { reading: "hyu", hiragana: "ひゅ" },
+      { reading: "hyo", hiragana: "ひょ" },
+      { reading: "mya", hiragana: "みゃ" },
+      { reading: "myu", hiragana: "みゅ" },
+      { reading: "myo", hiragana: "みょ" },
+      { reading: "rya", hiragana: "りゃ" },
+      { reading: "ryu", hiragana: "りゅ" },
+      { reading: "ryo", hiragana: "りょ" },
+      { reading: "gya", hiragana: "ぎゃ" },
+      { reading: "gyu", hiragana: "ぎゅ" },
+      { reading: "gyo", hiragana: "ぎょ" },
+      { reading: "ja", hiragana: "じゃ" },
+      { reading: "ju", hiragana: "じゅ" },
+      { reading: "jo", hiragana: "じょ" },
+      { reading: "bya", hiragana: "びゃ" },
+      { reading: "byu", hiragana: "びゅ" },
+      { reading: "byo", hiragana: "びょ" },
+      { reading: "pya", hiragana: "ぴゃ" },
+      { reading: "pyu", hiragana: "ぴゅ" },
+      { reading: "pyo", hiragana: "ぴょ" }
     ]
   },
   {
-    title: "?뚮Ц??/ 湲고?",
+    title: "소문자 / 기타",
     items: [
-      { reading: "xa", hiragana: "??, quiz: false },
-      { reading: "xi", hiragana: "??, quiz: false },
-      { reading: "xu", hiragana: "??, quiz: false },
-      { reading: "xe", hiragana: "??, quiz: false },
-      { reading: "xo", hiragana: "??, quiz: false },
-      { reading: "xtu", hiragana: "??, quiz: false },
-      { reading: "xya", hiragana: "??, quiz: false },
-      { reading: "xyu", hiragana: "??, quiz: false },
-      { reading: "xyo", hiragana: "??, quiz: false },
-      { reading: "xwa", hiragana: "??, quiz: false },
-      { reading: "vu", hiragana: "?? },
-      { reading: "wi", hiragana: "??, quiz: false },
-      { reading: "we", hiragana: "??, quiz: false },
-      { reading: "la", hiragana: "??, quiz: false },
-      { reading: "le", hiragana: "??, quiz: false }
+      { reading: "xa", hiragana: "ぁ", quiz: false },
+      { reading: "xi", hiragana: "ぃ", quiz: false },
+      { reading: "xu", hiragana: "ぅ", quiz: false },
+      { reading: "xe", hiragana: "ぇ", quiz: false },
+      { reading: "xo", hiragana: "ぉ", quiz: false },
+      { reading: "xtu", hiragana: "っ", quiz: false },
+      { reading: "xya", hiragana: "ゃ", quiz: false },
+      { reading: "xyu", hiragana: "ゅ", quiz: false },
+      { reading: "xyo", hiragana: "ょ", quiz: false },
+      { reading: "xwa", hiragana: "ゎ", quiz: false },
+      { reading: "vu", hiragana: "ゔ" },
+      { reading: "wi", hiragana: "ゐ", quiz: false },
+      { reading: "we", hiragana: "ゑ", quiz: false },
+      { reading: "la", hiragana: "ゕ", quiz: false },
+      { reading: "le", hiragana: "ゖ", quiz: false }
     ]
   }
 ];
@@ -1188,15 +1364,15 @@ function buildKanaPracticeItems(script) {
 
       return {
         id: `bp-${script}-${index}`,
-        source: `${script === "hiragana" ? "?덈씪媛?? : "移댄?移대굹"} ${index + 1}`,
-        title: `${script === "hiragana" ? "?덈씪媛?? : "移댄?移대굹"} ?쎄린`,
-        note: "諛⑷툑 ?쒖뿉??蹂?湲?먮뱾?댁뿉??",
-        prompt: "??湲?? ?대뼸寃??쎌쓣源뚯슂?",
+        source: `${script === "hiragana" ? "히라가나" : "카타카나"} ${index + 1}`,
+        title: `${script === "hiragana" ? "히라가나" : "카타카나"} 읽기`,
+        note: "방금 표에서 본 글자들이에요.",
+        prompt: "이 글자, 어떻게 읽을까요?",
         display: item.char,
         displaySub: item.reading,
         options,
         answer,
-        explanation: `${item.char}??${item.reading}濡??쎌뼱??`,
+        explanation: `${item.char}는 ${item.reading}로 읽어요.`,
         tone: index % 2 === 0 ? "tone-coral" : "tone-sky"
       };
     })
@@ -1223,71 +1399,71 @@ const kanaQuizSheetState = {
 };
 
 const kanaQuizResultFilterLabels = {
-  all: "?꾩껜",
-  correct: "?뺣떟",
-  wrong: "?ㅻ떟"
+  all: "전체",
+  correct: "정답",
+  wrong: "오답"
 };
 
 function getKanaQuizModeLabel(mode) {
   if (mode === "random") {
-    return "?쒕뜡";
+    return "랜덤";
   }
 
-  return mode === "katakana" ? "移댄?移대굹" : "?덈씪媛??;
+  return mode === "katakana" ? "카타카나" : "히라가나";
 }
 
 const vocabFilterLabels = {
-  all: "?꾩껜",
-  review: "?ㅼ떆 蹂쇰옒??,
-  mastered: "?듯삍?댁슂",
-  unmarked: "?꾩쭅 ??遊ㅼ뼱??
+  all: "전체",
+  review: "다시 볼래요",
+  mastered: "익혔어요",
+  unmarked: "아직 안 봤어요"
 };
 
 const vocabHeadingCopy = {
   N5: {
-    title: "N5 ?⑥뼱, 移대뱶濡??듯?遊먯슂",
+    title: "N5 단어, 카드로 익혀봐요",
     description: ""
   },
   N4: {
-    title: "N4 ?⑥뼱, 移대뱶濡??듯?遊먯슂",
-    description: "議곌툑 ???볦뼱吏??쒗쁽??移대뱶? 紐⑸줉?쇰줈 媛숈씠 ?듯?遊먯슂."
+    title: "N4 단어, 카드로 익혀봐요",
+    description: "조금 더 넓어진 표현을 카드와 목록으로 같이 익혀봐요."
   },
   N3: {
-    title: "N3 ?⑥뼱, 移대뱶濡??듯?遊먯슂",
-    description: "?ㅼ쟾?먯꽌 ?먯＜ 留뚮굹??N3 ?⑥뼱瑜?泥쒖쿇???볦븘遊먯슂."
+    title: "N3 단어, 카드로 익혀봐요",
+    description: "실전에서 자주 만나는 N3 단어를 천천히 쌓아봐요."
   },
   all: {
-    title: "?꾩껜 ?⑥뼱, ??踰덉뿉 ?듯?遊먯슂",
-    description: "N5遺??N3源뚯? ?욎뼱??移대뱶? 紐⑸줉?쇰줈 媛숈씠 ?묒뼱遊먯슂."
+    title: "전체 단어, 한 번에 익혀봐요",
+    description: "N5부터 N3까지 섞어서 카드와 목록으로 같이 훑어봐요."
   }
 };
 
 const quizHeadingCopy = {
   N5: {
-    title: "N5 ?⑥뼱 ?댁쫰, 媛蹂띻쾶 ??대낵源뚯슂?",
+    title: "N5 단어 퀴즈, 가볍게 풀어볼까요?",
     description: ""
   },
   N4: {
-    title: "N4 ?⑥뼱 ?댁쫰濡?媛먭컖???щ젮遊먯슂",
-    description: "N4 ?⑥뼱瑜??살씠???⑥뼱濡?踰덇컝????대킄??"
+    title: "N4 단어 퀴즈로 감각을 올려봐요",
+    description: "N4 단어를 뜻이랑 단어로 번갈아 풀어봐요."
   },
   N3: {
-    title: "N3 ?⑥뼱 ?댁쫰, ?ㅼ쟾 ?먮굦?쇰줈 媛遊먯슂",
-    description: "議곌툑 ??湲??명씉?쇰줈 N3 ?댄쐶 媛먭컖???뺤씤?대킄??"
+    title: "N3 단어 퀴즈, 실전 느낌으로 가봐요",
+    description: "조금 더 긴 호흡으로 N3 어휘 감각을 확인해봐요."
   },
   all: {
-    title: "?꾩껜 ?⑥뼱 ?댁쫰濡?媛먭컖???욎뼱遊먯슂",
-    description: "N5遺??N3源뚯? ?욎뼱??臾몄젣 ?섏? ?쒓컙??留욎떠 ??대킄??"
+    title: "전체 단어 퀴즈로 감각을 섞어봐요",
+    description: "N5부터 N3까지 섞어서 문제 수와 시간에 맞춰 풀어봐요."
   }
 };
 
 const matchHeadingCopy = {
-  title: "?⑥뼱 吏앸쭪異붽린, 諛붾줈 媛먭컖 ?щ젮遊먯슂",
-  description: "?쎄린? ?살쓣 鍮좊Ⅴ寃?臾띠쑝硫댁꽌 ?ㅻ뒛 蹂??⑥뼱瑜?媛蹂띻쾶 紐몄뿉 遺숈뿬遊먯슂."
+  title: "단어 짝맞추기, 바로 감각 올려봐요",
+  description: "읽기와 뜻을 빠르게 묶으면서 오늘 볼 단어를 가볍게 몸에 붙여봐요."
 };
 
 function getVocabItemPart(item) {
-  return normalizeQuizText(item?.part) || "湲고?";
+  return normalizeQuizText(item?.part) || "기타";
 }
 
 function getKanaQuizPool(mode) {
@@ -1337,11 +1513,11 @@ function getKanaQuizSheetCurrentItem() {
 }
 
 function getKanaQuizCountLabel(count) {
-  return String(count) === "all" ? "?꾨?" : `${count}臾몄젣`;
+  return String(count) === "all" ? "전부" : `${count}문제`;
 }
 
 function getKanaQuizDurationLabel(duration) {
-  return Number(duration) <= 0 ? "泥쒖쿇?? : `${duration}珥?;
+  return Number(duration) <= 0 ? "천천히" : `${duration}초`;
 }
 
 function getKanaQuizResultFilter(value = kanaQuizSheetState.resultFilter) {
@@ -1421,7 +1597,7 @@ function renderKanaQuizResults() {
 
   if (!filteredResults.length) {
     empty.hidden = false;
-    empty.textContent = `${kanaQuizResultFilterLabels[getKanaQuizResultFilter(kanaQuizSheetState.resultFilter)]} 寃곌낵???꾩쭅 ?놁뼱??`;
+    empty.textContent = `${kanaQuizResultFilterLabels[getKanaQuizResultFilter(kanaQuizSheetState.resultFilter)]} 결과는 아직 없어요.`;
     list.innerHTML = "";
     return;
   }
@@ -1429,11 +1605,11 @@ function renderKanaQuizResults() {
   empty.hidden = true;
   list.innerHTML = filteredResults
     .map((item) => {
-      const statusLabel = item.timedOut ? "?쒓컙珥덇낵" : item.status === "correct" ? "?뺣떟" : "?ㅻ떟";
+      const statusLabel = item.timedOut ? "시간초과" : item.status === "correct" ? "정답" : "오답";
       const detail =
         item.status === "correct"
-          ? `?뺣떟: ${formatQuizLineBreaks(item.reading)}`
-          : `?좏깮: ${formatQuizLineBreaks(item.selected || "誘몄쓳??)} 쨌 ?뺣떟: ${formatQuizLineBreaks(item.reading)}`;
+          ? `정답: ${formatQuizLineBreaks(item.reading)}`
+          : `선택: ${formatQuizLineBreaks(item.selected || "미응답")} · 정답: ${formatQuizLineBreaks(item.reading)}`;
 
       return `
         <article class="match-result-item is-${item.status}">
@@ -1444,7 +1620,7 @@ function renderKanaQuizResults() {
             </div>
           </div>
           <div class="match-result-item-main">
-            <strong>${formatQuizLineBreaks(item.char)} 쨌 ${formatQuizLineBreaks(item.reading)}</strong>
+            <strong>${formatQuizLineBreaks(item.char)} · ${formatQuizLineBreaks(item.reading)}</strong>
             <p>${detail}</p>
           </div>
         </article>
@@ -1467,7 +1643,7 @@ function renderKanaQuizSetup() {
     getKanaQuizModeLabel(kanaQuizSettings.mode),
     getKanaQuizCountLabel(kanaQuizSettings.count),
     getKanaQuizDurationLabel(kanaQuizSettings.duration)
-  ].join(" 쨌 ");
+  ].join(" · ");
 
   renderCollapsibleSettingsSection({
     shell: setupShell,
@@ -1588,8 +1764,8 @@ function renderKanaQuizSheet() {
 
   if (!current) {
     label.textContent = "KANA QUIZ";
-    title.textContent = "臾몄옄 ?댁쫰, ??대낵源뚯슂?";
-    desc.textContent = "?댁쫰瑜??꾩쭅 遺덈윭?ㅼ? 紐삵뻽?댁슂.";
+    title.textContent = "문자 퀴즈, 풀어볼까요?";
+    desc.textContent = "퀴즈를 아직 불러오지 못했어요.";
     source.textContent = "-";
     progress.textContent = "-";
     promptBox.hidden = true;
@@ -1609,8 +1785,8 @@ function renderKanaQuizSheet() {
 
   const modeLabel = getKanaQuizModeLabel(kanaQuizSheetState.mode);
   label.textContent = `${modeLabel.toUpperCase()} QUIZ`;
-  title.textContent = `${modeLabel} ?댁쫰, ??대낵源뚯슂?`;
-  desc.textContent = "臾몄옄瑜?蹂닿퀬 ?쎄린瑜?怨⑤씪遊먯슂.";
+  title.textContent = `${modeLabel} 퀴즈, 풀어볼까요?`;
+  desc.textContent = "문자를 보고 읽기를 골라봐요.";
   source.textContent = formatQuizLineBreaks(current.item.source);
   progress.textContent = `${current.index + 1} / ${current.total}`;
   promptBox.hidden = true;
@@ -1625,7 +1801,7 @@ function renderKanaQuizSheet() {
   options.hidden = false;
   next.disabled = true;
   next.textContent =
-    current.index + 1 >= current.total ? "寃곌낵 蹂대윭 媛덇퉴??" : "?ㅼ쓬 臾몄젣 蹂쇨퉴??";
+    current.index + 1 >= current.total ? "결과 보러 갈까요?" : "다음 문제 볼까요?";
 
   options.innerHTML = "";
   current.item.options.forEach((option, optionIndex) => {
@@ -1722,7 +1898,7 @@ function nextKanaQuizSheetQuestion() {
   if (!kanaQuizSheetState.answered) {
     const feedback = document.getElementById("kana-quiz-feedback");
     if (feedback) {
-      feedback.textContent = "?듭쓣 怨좊Ⅴ硫??ㅼ쓬?쇰줈 ?섏뼱媛??";
+      feedback.textContent = "답을 고르면 다음으로 넘어가요.";
     }
     return;
   }
@@ -1745,29 +1921,29 @@ const kanaStudyDecks = {
 };
 
 basicPracticeSets.hiragana = {
-  label: "?덈씪媛??,
-  heading: "?덈씪媛???쒕늿??蹂닿린",
+  label: "히라가나",
+  heading: "히라가나 한눈에 보기",
   items: buildKanaPracticeItems("hiragana")
 };
 
 basicPracticeSets.katakana = {
-  label: "移댄?移대굹",
-  heading: "移댄?移대굹 ?쒕늿??蹂닿린",
+  label: "카타카나",
+  heading: "카타카나 한눈에 보기",
   items: buildKanaPracticeItems("katakana")
 };
 
 delete basicPracticeSets.kana;
 
-basicPracticeSets.hiragana.label = "?덈씪媛??;
-basicPracticeSets.hiragana.heading = "?덈씪媛???쒕늿??蹂닿린";
-basicPracticeSets.katakana.label = "移댄?移대굹";
-basicPracticeSets.katakana.heading = "移댄?移대굹 ?쒕늿??蹂닿린";
+basicPracticeSets.hiragana.label = "히라가나";
+basicPracticeSets.hiragana.heading = "히라가나 한눈에 보기";
+basicPracticeSets.katakana.label = "카타카나";
+basicPracticeSets.katakana.heading = "카타카나 한눈에 보기";
 
 const dynamicKanjiItems = buildKanjiPracticeItemsFromData();
 if (dynamicKanjiItems.length) {
   basicPracticeSets.kanji = {
-    label: "?쒖옄",
-    heading: "?숇뀈蹂?諛곕떦 ?쒖옄",
+    label: "한자",
+    heading: "학년별 배당 한자",
     items: dynamicKanjiItems
   };
 }
@@ -1778,8 +1954,8 @@ function refreshKanjiPracticeSet() {
 
   if (dynamicKanjiItems.length) {
     basicPracticeSets.kanji = {
-      label: "??뽰쁽",
-      heading: "??뉖덅퉪?獄쏄퀡????뽰쁽",
+      label: "?쒖옄",
+      heading: "?숇뀈蹂?諛곕떦 ?쒖옄",
       items: dynamicKanjiItems
     };
   } else {
@@ -1790,12 +1966,12 @@ function refreshKanjiPracticeSet() {
 refreshKanjiPracticeSet();
 
 const basicPracticeTrackLabels = {
-  hiragana: "?덈씪媛??,
-  katakana: "移댄?移대굹",
-  words: "?⑥뼱",
-  particles: "臾몃쾿",
-  kanji: "?쒖옄",
-  sentences: "?낇빐"
+  hiragana: "히라가나",
+  katakana: "카타카나",
+  words: "단어",
+  particles: "문법",
+  kanji: "한자",
+  sentences: "독해"
 };
 
 function getAvailableBasicPracticeTracks() {
@@ -1818,14 +1994,14 @@ function renderKanaLibrary() {
     {
       targetId: "hiragana-table",
       track: "hiragana",
-      title: "?덈씪媛???쒕늿??蹂닿린",
-      description: "湲곕낯?뚮????붿쓬源뚯? ??踰덉뿉 彛??댄렣遊먯슂."
+      title: "히라가나 한눈에 보기",
+      description: "기본음부터 요음까지 한 번에 쭉 살펴봐요."
     },
     {
       targetId: "katakana-table",
       track: "katakana",
-      title: "移댄?移대굹 ?쒕늿??蹂닿린",
-      description: "?먯＜ 蹂대뒗 移댄?移대굹瑜??쒕늿???듯?遊먯슂."
+      title: "카타카나 한눈에 보기",
+      description: "자주 보는 카타카나를 한눈에 익혀봐요."
     }
   ];
 
@@ -1845,7 +2021,7 @@ function renderKanaLibrary() {
               ${group.items
                 .map(
                   (item) => `
-                    <button class="kana-tile${item.quiz ? "" : " is-muted"}" type="button" data-writing-char="${item.char}" data-writing-script="${section.track}" aria-label="${item.char} ?곕씪?곌린 諛붾줈 ?닿린">
+                    <button class="kana-tile${item.quiz ? "" : " is-muted"}" type="button" data-writing-char="${item.char}" data-writing-script="${section.track}" aria-label="${item.char} 따라쓰기 바로 열기">
                       <strong>${item.char}</strong>
                       <span>${item.reading}</span>
                     </button>
@@ -1946,8 +2122,8 @@ const writingPracticeState = {
   isDrawing: false,
   strokes: [],
   score: null,
-  feedback: "?고븳 湲?먮? ?곕씪 泥쒖쿇???⑤킄??",
-  tip: "媛?대뱶媛 ??蹂댁씠寃?泥쒖쿇???ш쾶 ?⑤킄??",
+  feedback: "연한 글자를 따라 천천히 써봐요.",
+  tip: "가이드가 잘 보이게 천천히 크게 써봐요.",
   slotEntries: [],
   targetCanvas: document.createElement("canvas"),
   overlayHasInk: false,
@@ -1958,11 +2134,11 @@ const writingPracticeState = {
 };
 
 function getWritingPracticeDefaultFeedback() {
-  return "?고븳 湲?먮? ?곕씪 泥쒖쿇???⑤킄??";
+  return "연한 글자를 따라 천천히 써봐요.";
 }
 
 function getWritingPracticeDefaultTip() {
-  return "媛?대뱶媛 ??蹂댁씠寃?泥쒖쿇???ш쾶 ?⑤킄??";
+  return "가이드가 잘 보이게 천천히 크게 써봐요.";
 }
 
 function beginWritingPracticeTransition() {
@@ -1975,14 +2151,14 @@ function endWritingPracticeTransition() {
 
 function getWritingPracticeModeLabel(mode = writingPracticeSettings.mode) {
   if (mode === "random") {
-    return "?쒕뜡";
+    return "랜덤";
   }
 
-  return mode === "katakana" ? "移댄?移대굹" : "?덈씪媛??;
+  return mode === "katakana" ? "카타카나" : "히라가나";
 }
 
 function getWritingPracticeOrderLabel(order = writingPracticeSettings.order) {
-  return getWritingPracticeOrder(order) === "random" ? "?쒕뜡 ?쒖꽌" : "?쒖꽌?濡?;
+  return getWritingPracticeOrder(order) === "random" ? "랜덤 순서" : "순서대로";
 }
 
 function renderWritingPracticeSetup() {
@@ -1994,7 +2170,7 @@ function renderWritingPracticeSetup() {
   const summaryText = [
     getWritingPracticeModeLabel(writingPracticeSettings.mode),
     getWritingPracticeOrderLabel(writingPracticeSettings.order)
-  ].join(" 쨌 ");
+  ].join(" · ");
 
   renderOpenableSettingsSection({
     shell: setupShell,
@@ -2007,7 +2183,7 @@ function renderWritingPracticeSetup() {
 }
 
 function buildWritingPracticePool(script) {
-  const label = script === "katakana" ? "移댄?移대굹" : "?덈씪媛??;
+  const label = script === "katakana" ? "카타카나" : "히라가나";
   const deck = kanaStudyDecks[script] || [];
 
   return deck.flatMap((group, groupIndex) =>
@@ -2019,7 +2195,7 @@ function buildWritingPracticePool(script) {
         group: group.title,
         char: item.char,
         reading: item.reading,
-        source: `${label} 쨌 ${group.title}`
+        source: `${label} · ${group.title}`
       }))
   );
 }
@@ -2077,7 +2253,7 @@ function resetWritingPracticeRound() {
   writingPracticeState.tip = getWritingPracticeDefaultTip();
 }
 
-const writingPracticeCompoundFollowers = new Set(["??, "??, "??, "??, "??, "??]);
+const writingPracticeCompoundFollowers = new Set(["ゃ", "ゅ", "ょ", "ャ", "ュ", "ョ"]);
 
 function splitWritingPracticeUnits(text = "") {
   return Array.from(text).reduce((units, character) => {
@@ -2497,7 +2673,7 @@ function buildWritingPracticeStage(current) {
   stageEmpty.hidden = writingPracticeState.hasVectorGuide;
   stageEmpty.textContent = writingPracticeState.hasVectorGuide
     ? ""
-    : "?곕씪?곌린 ?곗씠?곕? 以鍮꾪븯吏 紐삵뻽?댁슂.";
+    : "따라쓰기 데이터를 준비하지 못했어요.";
   setWritingStrokeEntriesState(false, 0);
 }
 
@@ -2547,21 +2723,21 @@ function updateWritingPracticeControls() {
     const guideIcon = guideToggle.querySelector(".writing-practice-guide-icon");
 
     if (guideLabel) {
-      guideLabel.textContent = "媛?대뱶";
+      guideLabel.textContent = "가이드";
     }
 
     if (guideIcon) {
       guideIcon.textContent = isGuideVisible ? "visibility_off" : "visibility";
-      guideIcon.setAttribute("aria-label", isGuideVisible ? "?④?" : "?쒖떆");
+      guideIcon.setAttribute("aria-label", isGuideVisible ? "숨김" : "표시");
     }
 
-    guideToggle.setAttribute("aria-label", `媛?대뱶 ${isGuideVisible ? "?④린湲? : "蹂닿린"}`);
+    guideToggle.setAttribute("aria-label", `가이드 ${isGuideVisible ? "숨기기" : "보기"}`);
   }
 
   if (revealToggle) {
     syncButtonState(
       revealToggle,
-      writingPracticeState.answerVisible ? "?뺣떟 ?④만?섏슂" : "?뺣떟 蹂쇰옒??,
+      writingPracticeState.answerVisible ? "정답 숨길래요" : "정답 볼래요",
       !writingPracticeState.hasVectorGuide || isBusy
     );
   }
@@ -2615,7 +2791,7 @@ function updateWritingPracticePanel() {
 
   if (!current) {
     if (title) {
-      title.textContent = "臾몄옄 ?곕씪?곌린";
+      title.textContent = "문자 따라쓰기";
     }
     if (source) {
       source.textContent = "-";
@@ -2640,7 +2816,7 @@ function updateWritingPracticePanel() {
       feedback.textContent = "";
     }
     if (prompt) {
-      prompt.textContent = "媛?대뱶瑜??곕씪 泥쒖쿇???⑤낫怨? ?앸굹硫??먯닔瑜??뺤씤?대킄??";
+      prompt.textContent = "가이드를 따라 천천히 써보고, 끝나면 점수를 확인해봐요.";
     }
     if (tip) {
       tip.textContent = getWritingPracticeDefaultTip();
@@ -2653,13 +2829,13 @@ function updateWritingPracticePanel() {
   const total = writingPracticeState.sessionItems.length;
   const modeLabel =
     writingPracticeSettings.mode === "random"
-      ? "?쒕뜡"
+      ? "랜덤"
       : current.script === "katakana"
-        ? "移댄?移대굹"
-        : "?덈씪媛??;
+        ? "카타카나"
+        : "히라가나";
 
   if (title) {
-    title.textContent = `${modeLabel} ?곕씪?곌린`;
+    title.textContent = `${modeLabel} 따라쓰기`;
   }
   if (source) {
     source.textContent = current.source;
@@ -2668,7 +2844,7 @@ function updateWritingPracticePanel() {
     progress.textContent = `${writingPracticeState.sessionIndex + 1} / ${total}`;
   }
   if (strokes) {
-    strokes.textContent = `${getWritingPracticeStrokeCount()}??;
+    strokes.textContent = `${getWritingPracticeStrokeCount()}획`;
   }
   if (character) {
     character.textContent = current.char;
@@ -2677,14 +2853,14 @@ function updateWritingPracticePanel() {
     reading.textContent = current.reading;
   }
   if (score) {
-    score.textContent = writingPracticeState.score === null ? "-" : `${writingPracticeState.score}??;
+    score.textContent = writingPracticeState.score === null ? "-" : `${writingPracticeState.score}점`;
   }
   if (feedback) {
     feedback.hidden = writingPracticeState.score === null;
     feedback.textContent = writingPracticeState.score === null ? "" : writingPracticeState.feedback;
   }
   if (prompt) {
-    prompt.textContent = `??{current.char}?띾? 移??덉뿉 留욎떠 ?⑤낫怨? ?앸굹硫??먯닔瑜??뺤씤?대킄??`;
+    prompt.textContent = `「${current.char}」를 칸 안에 맞춰 써보고, 끝나면 점수를 확인해봐요.`;
   }
   if (tip) {
     tip.textContent = writingPracticeState.tip;
@@ -2989,8 +3165,8 @@ function getWritingPracticeScoreResult(score, coverage, precision) {
   if (score >= 90) {
     return {
       score,
-      feedback: "嫄곗쓽 留욎븯?댁슂. ??紐⑥뼇???덉젙?곸쑝濡??ㅼ뼱?붿뼱??",
-      tip: "??媛먭컖?쇰줈 ?ㅼ쓬 湲?먮룄 ?댁뼱媛蹂댁꽭??"
+      feedback: "거의 맞았어요. 획 모양이 안정적으로 들어왔어요.",
+      tip: "이 감각으로 다음 글자도 이어가보세요."
     };
   }
 
@@ -2998,15 +3174,15 @@ function getWritingPracticeScoreResult(score, coverage, precision) {
     if (coverage < precision) {
       return {
         score,
-        feedback: "紐⑥뼇? 醫뗭븘?? ?ㅻ쭔 鍮좎쭊 遺遺꾩씠 議곌툑 ?덉뼱??",
-        tip: "?띿쓽 ?앹젏????踰덈쭔 ??湲멸쾶 鍮쇰낫硫?????븘?몄슂."
+        feedback: "모양은 좋아요. 다만 빠진 부분이 조금 있어요.",
+        tip: "획의 끝점을 한 번만 더 길게 빼보면 더 닮아져요."
       };
     }
 
     return {
       score,
-      feedback: "?泥대줈 ??留욎븘?? 媛?대뱶 諛뽰쑝濡??섏삩 遺遺꾨쭔 議곌툑 以꾩뿬蹂댁꽭??",
-      tip: "?좎쓣 議곌툑 ??泥쒖쿇???뚮윭 ?곕㈃ ?먯닔媛 ???щ씪媛??"
+      feedback: "대체로 잘 맞아요. 가이드 밖으로 나온 부분만 조금 줄여보세요.",
+      tip: "선을 조금 더 천천히 눌러 쓰면 점수가 더 올라가요."
     };
   }
 
@@ -3014,38 +3190,38 @@ function getWritingPracticeScoreResult(score, coverage, precision) {
     if (coverage < 0.55) {
       return {
         score,
-        feedback: "?뺥깭???≫삍吏留?鍮좎쭊 ?띿씠 ?꾩쭅 蹂댁뿬??",
-        tip: "?띿닚 ?ㅼ떆 蹂닿린濡??쒖옉?먭낵 ?앹젏???뺤씤?대낫?몄슂."
+        feedback: "형태는 잡혔지만 빠진 획이 아직 보여요.",
+        tip: "획순 다시 보기로 시작점과 끝점을 확인해보세요."
       };
     }
 
     return {
       score,
-      feedback: "?꾩껜 ?ㅺ낸? 蹂댁씠湲??쒖옉?덉뼱?? 議곌툑留????덉そ?쇰줈 紐⑥븘 ?⑤낫?몄슂.",
-      tip: "媛?대뱶 ?덉뿉???ш린瑜?議곌툑 以꾩씠硫??⑥뵮 鍮꾩듂?댁졇??"
+      feedback: "전체 윤곽은 보이기 시작했어요. 조금만 더 안쪽으로 모아 써보세요.",
+      tip: "가이드 안에서 크기를 조금 줄이면 훨씬 비슷해져요."
     };
   }
 
   if (coverage < 0.42) {
     return {
       score,
-      feedback: "鍮좎쭊 遺遺꾩씠 留롮븘?? ?띿쓣 ?앷퉴吏 ?댁뼱???⑤낫硫?醫뗭븘??",
-      tip: "?뺣떟 紐⑥뼇??蹂닿퀬 ?먮쫫???듯엺 ?? ?붾㈃??苑?梨꾩슫?ㅻ뒗 ?먮굦?쇰줈 ?ㅼ떆 ?⑤킄??"
+      feedback: "빠진 부분이 많아요. 획을 끝까지 이어서 써보면 좋아요.",
+      tip: "정답 모양을 보고 흐름을 익힌 뒤, 화면을 꽉 채운다는 느낌으로 다시 써봐요."
     };
   }
 
   if (precision < 0.34) {
     return {
       score,
-      feedback: "?띿씠 媛?대뱶 諛뽰쑝濡?留롮씠 踰쀬뼱?ъ뼱??",
-      tip: "??踰덉뿉 鍮⑤━ ?곌린蹂대떎 吏㏐쾶 ?딆뼱媛硫?留욎떠蹂댁꽭??"
+      feedback: "획이 가이드 밖으로 많이 벗어났어요.",
+      tip: "한 번에 빨리 쓰기보다 짧게 끊어가며 맞춰보세요."
     };
   }
 
   return {
     score,
-    feedback: "泥??뺥깭???≫삍?댁슂. ?ㅼ떆 ??踰?泥쒖쿇???⑤낫硫?湲덈갑 ?щ씪媛??",
-    tip: "媛?대뱶瑜?耳??곹깭濡??ш린? 媛꾧꺽遺??癒쇱? 留욎떠蹂댁꽭??"
+    feedback: "첫 형태는 잡혔어요. 다시 한 번 천천히 써보면 금방 올라가요.",
+    tip: "가이드를 켠 상태로 크기와 간격부터 먼저 맞춰보세요."
   };
 }
 
@@ -3140,8 +3316,8 @@ function scoreWritingPractice() {
   }
 
   if (!writingPracticeState.strokes.some((stroke) => stroke.length)) {
-    writingPracticeState.feedback = "?꾩쭅 ???띿씠 ?놁뼱?? 癒쇱? ??踰??⑤낵源뚯슂?";
-    writingPracticeState.tip = "湲?먮? 移??덉뿉 ?ш쾶 ??踰??????먯닔瑜??뚮윭蹂댁꽭??";
+    writingPracticeState.feedback = "아직 쓴 획이 없어요. 먼저 한 번 써볼까요?";
+    writingPracticeState.tip = "글자를 칸 안에 크게 한 번 쓴 뒤 점수를 눌러보세요.";
     updateWritingPracticePanel();
     return;
   }
@@ -3154,8 +3330,8 @@ function scoreWritingPractice() {
   const { mask: targetMask, activePixels: targetPixels } = buildWritingPracticeMask(targetData);
 
   if (!targetPixels || !userPixels) {
-    writingPracticeState.feedback = "?꾩쭅 鍮꾧탳???좎씠 異⑸텇?섏? ?딆븘?? 議곌툑 ???ш쾶 ?⑤낫?몄슂.";
-    writingPracticeState.tip = "?띿쓣 ?쒕몢 踰???蹂닿컯?????ㅼ떆 ?먯닔瑜??뚮윭蹂댁꽭??";
+    writingPracticeState.feedback = "아직 비교할 선이 충분하지 않아요. 조금 더 크게 써보세요.";
+    writingPracticeState.tip = "획을 한두 번 더 보강한 뒤 다시 점수를 눌러보세요.";
     updateWritingPracticePanel();
     return;
   }
@@ -3426,7 +3602,7 @@ function toggleWritingAnswer() {
 
   if (writingPracticeState.answerVisible) {
     writingPracticeState.guideVisible = true;
-    writingPracticeState.tip = "?뺣떟 紐⑥뼇??耳곗뼱?? ?띿닚??蹂닿퀬 媛숈? ?먮쫫?쇰줈 ?ㅼ떆 ?⑤킄??";
+    writingPracticeState.tip = "정답 모양을 켰어요. 획순을 보고 같은 흐름으로 다시 써봐요.";
     setWritingStrokeEntriesState(true, 0.88);
     updateWritingPracticePanel();
     return;
@@ -3495,7 +3671,7 @@ function buildWordToMeaningQuizQuestion(item, pool, index) {
   return {
     id: `quiz-meaning-${item.id}-${index}`,
     level: item.level || "N5",
-    question: `???덈씪媛?? ?살씠 萸섍퉴?? ${item.reading}${label}`,
+    question: `이 히라가나, 뜻이 뭘까요? ${item.reading}${label}`,
     options: shuffleQuizArray([correctMeaning, ...distractors.slice(0, 3)]),
     answer: correctMeaning,
     meta: createQuizMeta(item, "meaning", "word-to-meaning")
@@ -3519,7 +3695,7 @@ function buildMeaningToWordQuizQuestion(item, pool, index) {
   return {
     id: `quiz-word-${item.id}-${index}`,
     level: item.level || "N5",
-    question: `???살뿉 留욌뒗 ?쇰낯???⑥뼱??萸섍퉴?? ${item.meaning}`,
+    question: `이 뜻에 맞는 일본어 단어는 뭘까요? ${item.meaning}`,
     options: shuffleQuizArray([correctWord, ...distractors.slice(0, 3)]),
     answer: correctWord,
     meta: createQuizMeta(item, "meaning", "meaning-to-word")
@@ -3548,7 +3724,7 @@ function buildReadingQuizQuestion(item, pool, index) {
   return {
     id: `quiz-reading-${item.id}-${index}`,
     level: item.level || "N5",
-    question: `???⑥뼱, ?대뼸寃??쎌쓣源뚯슂? ${item.word}${label}`,
+    question: `이 단어, 어떻게 읽을까요? ${item.word}${label}`,
     options: shuffleQuizArray([item.reading, ...distractors.slice(0, 3)]),
     answer: item.reading,
     meta: createQuizMeta(item, "reading", "word-to-reading")
@@ -3646,15 +3822,15 @@ let activeVocabQuizResults = [];
 let starterKanjiQuestionOrder = [];
 let starterKanjiOptionOrders = {};
 const starterKanjiResultFilterLabels = {
-  all: "?꾩껜",
-  correct: "?뺣떟",
-  wrong: "?ㅻ떟"
+  all: "전체",
+  correct: "정답",
+  wrong: "오답"
 };
 const kanjiCollectionFilterLabels = {
-  all: "?꾩껜",
-  review: "?ㅼ떆 蹂쇰옒??,
-  mastered: "?듯삍?댁슂",
-  unmarked: "?꾩쭅 ??遊ㅼ뼱??
+  all: "전체",
+  review: "다시 볼래요",
+  mastered: "익혔어요",
+  unmarked: "아직 안 봤어요"
 };
 const starterKanjiState = {
   results: [],
@@ -4068,7 +4244,7 @@ function renderQuizSessionHud(key) {
     const timerItem = timer.closest(".quiz-hud-item");
     const progress = session.duration > 0 ? Math.max(0, Math.min(1, session.timeLeft / session.duration)) : 0;
 
-    timer.textContent = session.duration <= 0 ? "泥쒖쿇?? : `${session.timeLeft}珥?;
+    timer.textContent = session.duration <= 0 ? "천천히" : `${session.timeLeft}초`;
     timer.classList.toggle(
       "is-warning",
       warning
@@ -4277,14 +4453,14 @@ function renderStarterPath() {
     article.innerHTML = `
       <div class="starter-item-head">
         <span class="starter-track">${item.track}</span>
-        <span>${done ? "?대뇬?댁슂" : item.duration}</span>
+        <span>${done ? "해봤어요" : item.duration}</span>
       </div>
       <h3>${item.title}</h3>
       <p>${item.detail}</p>
       <div class="starter-item-actions">
-        <button class="secondary-btn starter-learn" type="button">諛붾줈 ?대낵源뚯슂?</button>
+        <button class="secondary-btn starter-learn" type="button">바로 해볼까요?</button>
         <button class="secondary-btn starter-toggle${done ? " is-checked" : ""}" type="button">
-          ${done ? "??踰????대킄?? : "?대뇬?댁슂"}
+          ${done ? "한 번 더 해봐요" : "해봤어요"}
         </button>
       </div>
     `;
@@ -4447,8 +4623,8 @@ function handleBasicPracticeAnswer(index) {
   });
 
   document.getElementById("basic-practice-feedback").textContent = correct
-    ? "醫뗭븘??"
-    : "?꾧튉?ㅼ슂! ?뺣떟 媛숈씠 蹂쇨퉴??";
+    ? "좋아요!"
+    : "아깝네요! 정답 같이 볼까요?";
   document.getElementById("basic-practice-explanation").textContent = softenExplanationCopy(current.explanation);
 
   updateStudyStreak();
@@ -4590,11 +4766,11 @@ function getNextStudyListStatus(current) {
 function getStudyListStatusCycleMessage(status) {
   switch (status) {
     case "unmarked":
-      return "?꾩쭅 ??遊ㅼ뼱?붾줈 諛붽엥?댁슂";
+      return "아직 안 봤어요로 바꿨어요";
     case "review":
-      return "?ㅼ떆 蹂쇰옒?붾줈 諛붽엥?댁슂";
+      return "다시 볼래요로 바꿨어요";
     case "mastered":
-      return "?듯삍?댁슂濡?諛붽엥?댁슂";
+      return "익혔어요로 바꿨어요";
     default:
       return "";
   }
@@ -4616,13 +4792,13 @@ function getStudyListStatusIconName(status) {
 function getStudyListStatusShortLabel(status) {
   switch (status) {
     case "unmarked":
-      return "?꾩쭅 ??遊ㅼ뼱??;
+      return "아직 안 봤어요";
     case "review":
-      return "?ㅼ떆 蹂쇰옒??;
+      return "다시 볼래요";
     case "mastered":
-      return "?듯삍?댁슂";
+      return "익혔어요";
     default:
-      return "?곹깭 ?놁쓬";
+      return "상태 없음";
   }
 }
 
@@ -4736,8 +4912,8 @@ function populateKanjiGradeSelect(select, counts, activeGrade = getKanjiGrade())
     option.value = grade;
     option.textContent =
       grade === allLevelValue
-        ? `?꾩껜 (${counts[grade] ?? 0})`
-        : `${grade}?숇뀈 (${counts[grade] ?? 0})`;
+        ? `전체 (${counts[grade] ?? 0})`
+        : `${grade}학년 (${counts[grade] ?? 0})`;
     select.appendChild(option);
   });
 
@@ -4936,9 +5112,9 @@ function getStarterKanjiOptionsSummaryText() {
     getStarterKanjiQuizConfigLabel(),
     getKanjiCollectionSummaryLabel(),
     getKanjiGradeSummaryLabel(),
-    `${getStarterKanjiQuestionCount()}臾몄젣`,
+    `${getStarterKanjiQuestionCount()}문제`,
     getDurationLabel(getStarterKanjiQuizDuration())
-  ].join(" 쨌 ");
+  ].join(" · ");
 }
 
 function getKanjiEmptyMessage(collectionFilter = state?.kanjiCollectionFilter, grade = state?.kanjiGrade) {
@@ -4946,18 +5122,18 @@ function getKanjiEmptyMessage(collectionFilter = state?.kanjiCollectionFilter, g
   const activeGrade = getKanjiGrade(grade);
 
   if (activeCollectionFilter === "review") {
-    return activeGrade === allLevelValue ? "?ㅼ떆 蹂쇰옒???쒖옄媛 ?꾩쭅 ?놁뼱??" : `${getKanjiGradeSummaryLabel(activeGrade)} ?ㅼ떆 蹂쇰옒???쒖옄媛 ?꾩쭅 ?놁뼱??`;
+    return activeGrade === allLevelValue ? "다시 볼래요 한자가 아직 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 다시 볼래요 한자가 아직 없어요.`;
   }
 
   if (activeCollectionFilter === "mastered") {
-    return activeGrade === allLevelValue ? "?듯삍?댁슂 ?쒖옄媛 ?꾩쭅 ?놁뼱??" : `${getKanjiGradeSummaryLabel(activeGrade)} ?듯삍?댁슂 ?쒖옄媛 ?꾩쭅 ?놁뼱??`;
+    return activeGrade === allLevelValue ? "익혔어요 한자가 아직 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 익혔어요 한자가 아직 없어요.`;
   }
 
   if (activeCollectionFilter === "unmarked") {
-    return activeGrade === allLevelValue ? "?꾩쭅 ???뺥븳 ?쒖옄媛 ?놁뼱??" : `${getKanjiGradeSummaryLabel(activeGrade)} ?꾩쭅 ???뺥븳 ?쒖옄媛 ?놁뼱??`;
+    return activeGrade === allLevelValue ? "아직 안 정한 한자가 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 아직 안 정한 한자가 없어요.`;
   }
 
-  return activeGrade === allLevelValue ? "?쒖옄瑜?以鍮꾪븯怨??덉뼱??" : `${getKanjiGradeSummaryLabel(activeGrade)} ?쒖옄瑜?以鍮꾪븯怨??덉뼱??`;
+  return activeGrade === allLevelValue ? "한자를 준비하고 있어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 한자를 준비하고 있어요.`;
 }
 
 function getStudyResultCounts(results) {
@@ -5040,11 +5216,11 @@ function renderStarterKanjiBulkActionButton(results) {
     datasetKey: "starterKanjiBulkAction",
     saveActionValue: "save-review",
     removeActionValue: "remove-review",
-    saveLabel: "?꾩껜 ?ㅼ떆 蹂쇰옒??,
-    removeLabel: "?꾩껜 鍮쇨린",
-    emptyTitle: "吏湲덉? ?댁쓣 ?쒖옄媛 ?놁뼱??",
-    saveTitle: "吏湲?蹂댁씠???쒖옄瑜??ㅼ떆 蹂쇰옒?붿뿉 紐⑤몢 ?댁쓣寃뚯슂.",
-    removeTitle: "吏湲?蹂댁씠???쒖옄瑜??ㅼ떆 蹂쇰옒?붿뿉??紐⑤몢 類꾧쾶??"
+    saveLabel: "전체 다시 볼래요",
+    removeLabel: "전체 빼기",
+    emptyTitle: "지금은 담을 한자가 없어요.",
+    saveTitle: "지금 보이는 한자를 다시 볼래요에 모두 담을게요.",
+    removeTitle: "지금 보이는 한자를 다시 볼래요에서 모두 뺄게요."
   });
 }
 
@@ -5052,24 +5228,24 @@ function getStarterKanjiResultDetail(item) {
   const parts = [];
 
   if (item.status === "wrong" && item.timedOut) {
-    parts.push("?쒓컙 珥덇낵");
+    parts.push("시간 초과");
   }
 
   if (item.optionField !== "reading" && item.reading) {
-    parts.push(`諛쒖쓬 ${item.reading}`);
+    parts.push(`발음 ${item.reading}`);
   }
 
   if (item.meta) {
     parts.push(item.meta);
   }
 
-  return parts.join(" 쨌 ");
+  return parts.join(" · ");
 }
 
 function createStudyStatusBadgesMarkup(review, mastered) {
   return [
-    review ? '<span class="vocab-review-badge">?ㅼ떆 蹂쇰옒??/span>' : "",
-    mastered ? '<span class="vocab-mastered-badge">?듯삍?댁슂!</span>' : ""
+    review ? '<span class="vocab-review-badge">다시 볼래요</span>' : "",
+    mastered ? '<span class="vocab-mastered-badge">익혔어요!</span>' : ""
   ]
     .filter(Boolean)
     .join("");
@@ -5086,8 +5262,8 @@ function createStudyStatusButtonsMarkup({
 }) {
   return `
     <div class="${groupClassName}">
-      <button class="secondary-btn ${buttonClassName}${reviewSelected ? " is-selected-review" : ""}" type="button" ${reviewAttribute}="${id}" aria-pressed="${reviewSelected ? "true" : "false"}">?ㅼ떆 蹂쇰옒??/button>
-      <button class="secondary-btn ${buttonClassName}${masteredSelected ? " is-selected-mastered" : ""}" type="button" ${masteredAttribute}="${id}" aria-pressed="${masteredSelected ? "true" : "false"}">?듯삍?댁슂!</button>
+      <button class="secondary-btn ${buttonClassName}${reviewSelected ? " is-selected-review" : ""}" type="button" ${reviewAttribute}="${id}" aria-pressed="${reviewSelected ? "true" : "false"}">다시 볼래요</button>
+      <button class="secondary-btn ${buttonClassName}${masteredSelected ? " is-selected-mastered" : ""}" type="button" ${masteredAttribute}="${id}" aria-pressed="${masteredSelected ? "true" : "false"}">익혔어요!</button>
     </div>
   `;
 }
@@ -5530,14 +5706,14 @@ function renderRestartableActionButton(button, label, isStarted, canStart) {
   }
 
   if (label) {
-    label.textContent = isStarted ? "?ㅼ떆 ?대낵源뚯슂?" : "?쒖옉?대낵源뚯슂?";
+    label.textContent = isStarted ? "다시 해볼까요?" : "시작해볼까요?";
   }
 
   setActionButtonIcon(button, isStarted ? "autorenew" : "play_arrow");
 }
 
 function formatQuestionCountLabel(count) {
-  return `${Number(count)}臾몄젣`;
+  return `${Number(count)}문제`;
 }
 
 function renderSpinnerControl({ spinner, options = [], activeValue, formatValue, disabled = false }) {
@@ -6000,7 +6176,7 @@ function appendQuizResultItem({
   const main = document.createElement("div");
   const title = document.createElement("strong");
   const description = document.createElement("p");
-  const statusLabel = status === "correct" ? "?뺣떟" : "?ㅻ떟";
+  const statusLabel = status === "correct" ? "정답" : "오답";
 
   article.className = `match-result-item is-${status}`;
   head.className = "match-result-item-head";
@@ -6169,17 +6345,17 @@ function renderStarterKanjiResults() {
     list,
     counts,
     filteredResults,
-    emptyMessage: `${starterKanjiResultFilterLabels[getStarterKanjiResultFilter(starterKanjiState.resultFilter)]} 寃곌낵媛 ?놁뼱??`,
+    emptyMessage: `${starterKanjiResultFilterLabels[getStarterKanjiResultFilter(starterKanjiState.resultFilter)]} 결과가 없어요.`,
     renderItems: (results, container) => {
       results.forEach((item) => {
         const saved = isKanjiSavedToReviewList(item.id);
-        const actionLabel = saved ? "?ㅼ떆 蹂쇰옒?붿뿉??鍮쇨린" : "?ㅼ떆 蹂쇰옒?붿뿉 ?닿린";
+        const actionLabel = saved ? "다시 볼래요에서 빼기" : "다시 볼래요에 담기";
 
         appendQuizResultItem({
           container,
           status: item.status,
-          levelText: item.source || "?쒖옄",
-          titleText: item.reading ? `${item.char || "-"} 쨌 ${item.reading}` : item.char || "-",
+          levelText: item.source || "한자",
+          titleText: item.reading ? `${item.char || "-"} · ${item.reading}` : item.char || "-",
           descriptionText: getStarterKanjiResultDetail(item),
           saved,
           saveActionLabel: actionLabel,
@@ -6300,7 +6476,7 @@ function renderStarterKanjiPractice() {
     return;
   }
 
-  source.textContent = formatQuizLineBreaks(current.gradeLabel || current.source || "?쒖옄");
+  source.textContent = formatQuizLineBreaks(current.gradeLabel || current.source || "한자");
   progress.textContent = `${state.basicPracticeIndexes.kanji + 1} / ${questionCount}`;
   display.textContent = formatQuizLineBreaks(current.display);
   displaySub.textContent = formatQuizLineBreaks(current.displaySub || "");
@@ -6308,7 +6484,7 @@ function renderStarterKanjiPractice() {
 
   card.className = `basic-practice-card kanji-practice-card ${current.tone || "tone-gold"}`;
   nextButton.textContent =
-    state.basicPracticeIndexes.kanji >= questionCount - 1 ? "寃곌낵 蹂쇨퉴??" : "?ㅼ쓬 ?쒖옄 蹂쇨퉴??";
+    state.basicPracticeIndexes.kanji >= questionCount - 1 ? "결과 볼까요?" : "다음 한자 볼까요?";
   nextButton.disabled = true;
 
   delete optionsContainer.dataset.answered;
@@ -6332,9 +6508,9 @@ function getKanjiSummaryText(count, collectionFilter = state?.kanjiCollectionFil
   const activeCollectionFilter = getKanjiCollectionFilter(collectionFilter);
   const collectionLabel = getKanjiCollectionSummaryLabel(activeCollectionFilter);
   const gradeLabel = getKanjiGradeSummaryLabel(grade);
-  const subject = activeCollectionFilter === "all" ? "?쒖옄" : `${collectionLabel} ?쒖옄`;
+  const subject = activeCollectionFilter === "all" ? "한자" : `${collectionLabel} 한자`;
 
-  return `${gradeLabel} ${subject} ${count}媛쒕? 蹂닿퀬 ?덉뼱??;
+  return `${gradeLabel} ${subject} ${count}개를 보고 있어요`;
 }
 
 function getVisibleKanjiCards() {
@@ -6372,14 +6548,14 @@ function getKanjiFlashcardPlaceholder() {
   return {
     id: "kanji-empty",
     gradeLabel: getKanjiGradeSummaryLabel(),
-    display: "轢℡춻",
+    display: "漢字",
     statusText: getKanjiEmptyMessage(),
     readingsDisplay:
       activeCollectionFilter === "review"
-        ? "?ㅻⅨ ?숇뀈?대굹 紐⑥븘蹂닿린濡?諛붽퓭蹂댁꽭??"
+        ? "다른 학년이나 모아보기로 바꿔보세요."
         : activeCollectionFilter === "mastered"
-          ? "?꾩쭅 ?듯엺 ?쒖옄媛 ?놁뼱??"
-          : "?숇뀈蹂??쒖옄瑜?李④렐李④렐 ?듯?蹂????덉뼱??"
+          ? "아직 익힌 한자가 없어요."
+          : "학년별 한자를 차근차근 익혀볼 수 있어요."
   };
 }
 
@@ -6450,12 +6626,12 @@ function renderKanjiFlashcard() {
   const hintText = hasCards
     ? isRevealed
       ? review
-        ? "?ㅼ떆 蹂쇰옒?붿뿉 ?닿릿 ?쒖옄?덉슂"
+        ? "다시 볼래요에 담긴 한자예요"
         : mastered
-          ? "?듯삍?댁슂???닿릿 ?쒖옄?덉슂"
-          : "????곹깭瑜?諛붾줈 諛붽퓭蹂????덉뼱??
-      : "?뚮윭???쎄린瑜??뺤씤?대낵源뚯슂?"
-    : "?꾪꽣瑜?諛붽씀硫??ㅻⅨ ?쒖옄瑜?諛붾줈 蹂????덉뼱??";
+          ? "익혔어요에 담긴 한자예요"
+          : "저장 상태를 바로 바꿔볼 수 있어요"
+      : "눌러서 읽기를 확인해볼까요?"
+    : "필터를 바꾸면 다른 한자를 바로 볼 수 있어요.";
 
   renderStudyFlashcardComponent({
     flashcard,
@@ -6470,16 +6646,16 @@ function renderKanjiFlashcard() {
     hasCards,
     isRevealed,
     revealWhenEmpty: true,
-    levelText: currentCard.gradeLabel || "?쒖옄",
-    wordText: currentCard.display || "轢℡춻",
+    levelText: currentCard.gradeLabel || "한자",
+    wordText: currentCard.display || "漢字",
     meaningText: hasCards
       ? currentCard.readingsDisplay || currentCard.reading || ""
       : currentCard.statusText || getKanjiEmptyMessage(),
     hintText,
     hideReading: true,
-    toggleOpenLabel: "?쎄린瑜??ㅼ떆 ?묒뼱?섍퉴??",
-    toggleClosedLabel: "?쎄린瑜??뺤씤?대낵源뚯슂?",
-    toggleEmptyLabel: "?쒖떆???쒖옄媛 ?놁뼱??,
+    toggleOpenLabel: "읽기를 다시 접어둘까요?",
+    toggleClosedLabel: "읽기를 확인해볼까요?",
+    toggleEmptyLabel: "표시할 한자가 없어요",
     prevDisabled: cards.length <= 1,
     nextDisabled: cards.length <= 1,
     actionButtons: [
@@ -6577,7 +6753,7 @@ function renderKanjiPageLayout() {
     setQuizSessionDuration("starterKanji", getStarterKanjiQuizDuration());
     if (empty) {
       empty.textContent = getStarterKanjiQuestionCount() > 0
-        ? "以鍮꾨릱?ㅻ㈃ ?쒖옉?대낵源뚯슂?"
+        ? "준비됐다면 시작해볼까요?"
         : getKanjiEmptyMessage();
     }
     setElementHidden(empty, false);
@@ -6647,7 +6823,7 @@ function handleStarterKanjiPracticeAnswer(index) {
   renderStats();
 
   nextButton.textContent =
-    starterKanjiState.results.length >= totalQuestions ? "寃곌낵 蹂쇨퉴??" : "?ㅼ쓬 ?쒖옄 蹂쇨퉴??";
+    starterKanjiState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 한자 볼까요?";
   nextButton.disabled = false;
 }
 
@@ -6677,7 +6853,7 @@ function handleStarterKanjiPracticeTimeout() {
   saveState();
   renderStats();
   nextButton.textContent =
-    starterKanjiState.results.length >= totalQuestions ? "寃곌낵 蹂쇨퉴??" : "?ㅼ쓬 ?쒖옄 蹂쇨퉴??";
+    starterKanjiState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 한자 볼까요?";
   nextButton.disabled = false;
 }
 
@@ -6820,7 +6996,7 @@ function getVocabPartFilter(part = state.vocabPartFilter, items = vocabListItems
 
 function getVocabPartSummaryLabel(part = state.vocabPartFilter) {
   const activePart = getVocabPartFilter(part);
-  return activePart === vocabPartAllValue ? "?꾩껜 ?덉궗" : activePart;
+  return activePart === vocabPartAllValue ? "전체 품사" : activePart;
 }
 
 function getVocabView(view = state.vocabView) {
@@ -6829,8 +7005,8 @@ function getVocabView(view = state.vocabView) {
 
 function getVocabViewLabel(view = state.vocabView) {
   const labels = {
-    card: "移대뱶",
-    list: "紐⑸줉"
+    card: "카드",
+    list: "목록"
   };
 
   return labels[getVocabView(view)];
@@ -6858,7 +7034,7 @@ function getVocabQuizConfigLabel(
   questionField = state?.vocabQuizQuestionField,
   optionField = state?.vocabQuizOptionField
 ) {
-  return `${getVocabQuizFieldLabel(questionField)} ??${getVocabQuizFieldLabel(optionField)}`;
+  return `${getVocabQuizFieldLabel(questionField)} → ${getVocabQuizFieldLabel(optionField)}`;
 }
 
 function getVocabQuizResultFilter(value = state.vocabQuizResultFilter) {
@@ -6868,9 +7044,9 @@ function getVocabQuizResultFilter(value = state.vocabQuizResultFilter) {
 function getVocabQuizOptionsSummaryText() {
   return [
     getVocabQuizConfigLabel(),
-    `${getVocabQuizCount()}臾몄젣`,
+    `${getVocabQuizCount()}문제`,
     getDurationLabel(getVocabQuizDuration())
-  ].join(" 쨌 ");
+  ].join(" · ");
 }
 
 function syncVocabLocationHash(tab = state.vocabTab) {
@@ -6946,21 +7122,21 @@ function setVocabView(view) {
 function getVocabEmptyMessage(filter = state.vocabFilter, part = state.vocabPartFilter) {
   const activeFilter = getVocabFilter(filter);
   const activePart = getVocabPartFilter(part);
-  const partLabel = activePart === vocabPartAllValue ? "?⑥뼱" : `${activePart} ?⑥뼱`;
+  const partLabel = activePart === vocabPartAllValue ? "단어" : `${activePart} 단어`;
 
   if (activeFilter === "review") {
-    return `?ㅼ떆 蹂?${partLabel}媛 ?꾩쭅 ?놁뼱??`;
+    return `다시 볼 ${partLabel}가 아직 없어요.`;
   }
 
   if (activeFilter === "mastered") {
-    return `?듯엺 ${partLabel}媛 ?꾩쭅 ?놁뼱??`;
+    return `익힌 ${partLabel}가 아직 없어요.`;
   }
 
   if (activeFilter === "unmarked") {
-    return `?꾩쭅 ???뺥븳 ${partLabel}媛 ?놁뼱??`;
+    return `아직 안 정한 ${partLabel}가 없어요.`;
   }
 
-  return `${partLabel}媛 ?꾩쭅 ?놁뼱??`;
+  return `${partLabel}가 아직 없어요.`;
 }
 
 function filterVocabItems(items, filter = state.vocabFilter, partFilter = state.vocabPartFilter) {
@@ -7005,21 +7181,21 @@ function getVocabSummaryText(count) {
   const activeLevel = getVocabLevel();
   const levelLabel = getLevelSummaryLabel(activeLevel);
   const activePart = getVocabPartFilter();
-  const partLabel = activePart === vocabPartAllValue ? "?⑥뼱" : `${activePart} ?⑥뼱`;
+  const partLabel = activePart === vocabPartAllValue ? "단어" : `${activePart} 단어`;
 
   if (activeFilter === "review") {
-    return `${levelLabel} ?ㅼ떆 蹂?${partLabel} ${count}媛쒖삁??;
+    return `${levelLabel} 다시 볼 ${partLabel} ${count}개예요`;
   }
 
   if (activeFilter === "mastered") {
-    return `${levelLabel} ?듯엺 ${partLabel} ${count}媛?紐⑥??댁슂`;
+    return `${levelLabel} 익힌 ${partLabel} ${count}개 모였어요`;
   }
 
   if (activeFilter === "unmarked") {
-    return `${levelLabel} ?꾩쭅 ???뺥븳 ${partLabel} ${count}媛쒖삁??;
+    return `${levelLabel} 아직 안 정한 ${partLabel} ${count}개예요`;
   }
 
-  return `${levelLabel} ${activePart === vocabPartAllValue ? "?⑥뼱" : partLabel} ${count}媛쒖삁??;
+  return `${levelLabel} ${activePart === vocabPartAllValue ? "단어" : partLabel} ${count}개예요`;
 }
 
 function resetVocabStudyPointers() {
@@ -7110,7 +7286,7 @@ function getVocabQuizSignature(items = getVocabQuizItems()) {
 }
 
 function getVocabQuizSourceLabel() {
-  return [getVocabLevelLabel(), vocabFilterLabels[getVocabFilter()], getVocabPartSummaryLabel()].join(" 쨌 ");
+  return [getVocabLevelLabel(), vocabFilterLabels[getVocabFilter()], getVocabPartSummaryLabel()].join(" · ");
 }
 
 function getCurrentVocabQuizQuestion() {
@@ -7171,14 +7347,14 @@ function ensureVocabQuizSession(force = false) {
 
 function getVocabQuizEmptyText(items = getVocabQuizItems()) {
   if (!items.length) {
-    return `${getVocabEmptyMessage()} ?댁쫰???⑥뼱媛 以鍮꾨릺硫?媛숈씠 ??대킄??`;
+    return `${getVocabEmptyMessage()} 퀴즈는 단어가 준비되면 같이 풀어봐요.`;
   }
 
   if (items.length < 4) {
-    return "?좏깮???⑥뼱媛 4媛쒕낫???곸뼱???댁쫰瑜?留뚮뱾湲??대젮?뚯슂. 紐⑥븘蹂닿린???덉궗瑜?議곌툑 ?볧?遊먯슂.";
+    return "선택한 단어가 4개보다 적어서 퀴즈를 만들기 어려워요. 모아보기나 품사를 조금 넓혀봐요.";
   }
 
-  return "?좏깮???⑥뼱濡쒕뒗 ?댁쫰瑜?留뚮뱾湲??대젮?뚯슂. ?ㅻⅨ 紐⑥븘蹂닿린??怨⑤씪遊먯슂.";
+  return "선택한 단어로는 퀴즈를 만들기 어려워요. 다른 모아보기도 골라봐요.";
 }
 
 function saveWordToReviewList(id) {
@@ -7281,7 +7457,7 @@ function createStudyListStatusCycleButtonMarkup(id, kind) {
 
   return `
     <div class="vocab-list-status-icons">
-      <button type="button" class="vocab-status-icon-btn is-${status}" ${idAttr}="${id}" ${cycleAttr} aria-label="吏湲?${label}. ?꾨Ⅴ硫?${nextLabel}濡?諛붽퓭?? title="?뚮윭??諛붽퓭??(${label} ??${nextLabel})">
+      <button type="button" class="vocab-status-icon-btn is-${status}" ${idAttr}="${id}" ${cycleAttr} aria-label="지금 ${label}. 누르면 ${nextLabel}로 바꿔요" title="눌러서 바꿔요 (${label} → ${nextLabel})">
         <span class="material-symbols-rounded" aria-hidden="true">${icon}</span>
       </button>
     </div>
@@ -7328,11 +7504,11 @@ function renderVocabQuizBulkActionButton(results) {
     getId: (item) => item.id,
     isSaved: isWordSavedToReviewList,
     datasetKey: "vocabQuizBulkAction",
-    saveLabel: "?꾩껜 ?닿린",
-    removeLabel: "?꾩껜 鍮쇨린",
-    emptyTitle: "吏湲??댁븘???⑥뼱媛 ?놁뼱??",
-    saveTitle: "吏湲?蹂댁씠???⑥뼱瑜??ㅼ떆 蹂쇰옒?붿뿉 紐⑤몢 ?댁븘?섍쾶??",
-    removeTitle: "吏湲?蹂댁씠???⑥뼱瑜??ㅼ떆 蹂쇰옒?붿뿉??紐⑤몢 類꾧쾶??"
+    saveLabel: "전체 담기",
+    removeLabel: "전체 빼기",
+    emptyTitle: "지금 담아둘 단어가 없어요.",
+    saveTitle: "지금 보이는 단어를 다시 볼래요에 모두 담아둘게요.",
+    removeTitle: "지금 보이는 단어를 다시 볼래요에서 모두 뺄게요."
   });
 }
 
@@ -7382,17 +7558,17 @@ function renderVocabQuizResults() {
     list,
     counts,
     filteredResults,
-    emptyMessage: `${vocabQuizResultFilterLabels[getVocabQuizResultFilter()]} 寃곌낵???꾩쭅 ?놁뼱??`,
+    emptyMessage: `${vocabQuizResultFilterLabels[getVocabQuizResultFilter()]} 결과는 아직 없어요.`,
     renderItems: (results, container) => {
       results.forEach((item) => {
         const saved = isWordSavedToReviewList(item.id);
-        const actionLabel = saved ? "?ㅼ떆 蹂쇰옒?붿뿉??鍮쇨린" : "?ㅼ떆 蹂쇰옒?붿뿉 ?닿린";
+        const actionLabel = saved ? "다시 볼래요에서 빼기" : "다시 볼래요에 담기";
 
         appendQuizResultItem({
           container,
           status: item.status,
           levelText: item.level || getVocabLevelLabel(),
-          titleText: item.reading ? `${item.word} 쨌 ${item.reading}` : item.word,
+          titleText: item.reading ? `${item.word} · ${item.reading}` : item.word,
           descriptionText: item.meaning,
           saved,
           saveActionLabel: actionLabel,
@@ -7441,14 +7617,14 @@ function finalizeVocabQuizQuestion(selectedIndex, timedOut = false) {
   recordVocabQuizResult(question, selectedIndex, correct, timedOut);
   revealVocabQuizAnswer(question, selectedIndex, correct);
   feedback.textContent = correct
-    ? "醫뗭븘??"
+    ? "좋아요!"
     : timedOut
       ? ""
-      : "?꾧튉?ㅼ슂! ?뺣떟 媛숈씠 蹂쇨퉴??";
+      : "아깝네요! 정답 같이 볼까요?";
   explanation.textContent = softenExplanationCopy(question.explanation || "");
   nextButton.disabled = false;
   nextButton.hidden = false;
-  nextButton.textContent = isLastQuestion ? "寃곌낵 蹂쇨퉴??" : "?ㅼ쓬 臾몄젣 蹂쇨퉴??";
+  nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
 
   updateStudyStreak();
   saveState();
@@ -7543,11 +7719,11 @@ function renderFlashcard() {
     return;
   }
 
-  const emptyWordLabel = activePart === vocabPartAllValue ? "?꾩쭅 ?⑥뼱媛 ?놁뼱?? : `?꾩쭅 ${activePart} ?⑥뼱媛 ?놁뼱??;
+  const emptyWordLabel = activePart === vocabPartAllValue ? "아직 단어가 없어요" : `아직 ${activePart} 단어가 없어요`;
   const emptyReadingLabel =
-    activePart === vocabPartAllValue ? "?⑥뼱媛 梨꾩썙吏硫??ш린??諛붾줈 蹂????덉뼱??" : `${activePart} ?⑥뼱媛 梨꾩썙吏硫??ш린??諛붾줈 蹂????덉뼱??`;
+    activePart === vocabPartAllValue ? "단어가 채워지면 여기서 바로 볼 수 있어요." : `${activePart} 단어가 채워지면 여기서 바로 볼 수 있어요.`;
   const emptyMeaningLabel =
-    activePart === vocabPartAllValue ? "?꾪꽣瑜?諛붽씀硫??ㅻⅨ ?⑥뼱瑜?癒쇱? 蹂????덉뼱??" : "?ㅻⅨ ?덉궗??紐⑥븘蹂닿린瑜?怨좊Ⅴ硫?諛붾줈 ?댁뼱??蹂????덉뼱??";
+    activePart === vocabPartAllValue ? "필터를 바꾸면 다른 단어를 먼저 볼 수 있어요." : "다른 품사나 모아보기를 고르면 바로 이어서 볼 수 있어요.";
   const emptyCardMap = {
     all: {
       level: activeLevel,
@@ -7558,32 +7734,32 @@ function renderFlashcard() {
     },
     review: {
       level: "REVIEW",
-      word: activePart === vocabPartAllValue ? "?ㅼ떆 蹂쇰옒???⑥뼱媛 ?놁뼱?? : `?ㅼ떆 蹂쇰옒??${activePart} ?⑥뼱媛 ?놁뼱??,
-      reading: "議곌툑 ???댁븘?먮㈃ ?ш린??紐⑥븘 蹂????덉뼱??",
+      word: activePart === vocabPartAllValue ? "다시 볼래요 단어가 없어요" : `다시 볼래요 ${activePart} 단어가 없어요`,
+      reading: "조금 더 담아두면 여기서 모아 볼 수 있어요.",
       meaning:
         activePart === vocabPartAllValue
-          ? "移대뱶?먯꽌 ?ㅼ떆 蹂쇰옒?붾? ?꾨Ⅴ硫??ш린濡?紐⑥뿬??"
-          : "?ㅻⅨ ?덉궗瑜?怨좊Ⅴ嫄곕굹 ?곹깭瑜?諛붽씀硫?諛붾줈 ?댁뼱??蹂????덉뼱??",
+          ? "카드에서 다시 볼래요를 누르면 여기로 모여요."
+          : "다른 품사를 고르거나 상태를 바꾸면 바로 이어서 볼 수 있어요.",
       id: "empty-review"
     },
     mastered: {
       level: "MASTERED",
-      word: activePart === vocabPartAllValue ? "?듯삍?댁슂 ?⑥뼱媛 ?놁뼱?? : `?듯삍?댁슂 ${activePart} ?⑥뼱媛 ?놁뼱??,
-      reading: "?꾩쭅 ?댁븘???⑥뼱媛 ?놁뼱??",
+      word: activePart === vocabPartAllValue ? "익혔어요 단어가 없어요" : `익혔어요 ${activePart} 단어가 없어요`,
+      reading: "아직 담아둔 단어가 없어요.",
       meaning:
         activePart === vocabPartAllValue
-          ? "移대뱶?먯꽌 ?듯삍?댁슂瑜??꾨Ⅴ硫??ш린濡?紐⑥뿬??"
-          : "?좏깮???덉궗?먯꽌 ?듯엺 ?⑥뼱媛 ?앷린硫??ш린???ㅼ떆 蹂????덉뼱??",
+          ? "카드에서 익혔어요를 누르면 여기로 모여요."
+          : "선택한 품사에서 익힌 단어가 생기면 여기서 다시 볼 수 있어요.",
       id: "empty-mastered"
     },
     unmarked: {
       level: "UNMARKED",
-      word: activePart === vocabPartAllValue ? "?꾩쭅 ???뺥븳 ?⑥뼱媛 ?놁뼱?? : `?꾩쭅 ???뺥븳 ${activePart} ?⑥뼱媛 ?놁뼱??,
-      reading: "?곹깭瑜?怨좊Ⅴ吏 ?딆? ?⑥뼱瑜??곕줈 紐⑥븘 蹂닿퀬 ?덉뼱??",
+      word: activePart === vocabPartAllValue ? "아직 안 정한 단어가 없어요" : `아직 안 정한 ${activePart} 단어가 없어요`,
+      reading: "상태를 고르지 않은 단어를 따로 모아 보고 있어요.",
       meaning:
         activePart === vocabPartAllValue
-          ? "?ㅼ떆 蹂쇰옒?붾굹 ?듯삍?댁슂瑜??꾨Ⅴ硫???紐⑸줉?먯꽌 鍮좎졇??"
-          : "?ㅻⅨ ?덉궗???곹깭瑜?怨좊Ⅴ硫?諛붾줈 ?ㅻⅨ 移대뱶濡??댁뼱吏묐땲??",
+          ? "다시 볼래요나 익혔어요를 누르면 이 목록에서 빠져요."
+          : "다른 품사나 상태를 고르면 바로 다른 카드로 이어집니다.",
       id: "empty-unmarked"
     }
   };
@@ -7596,18 +7772,18 @@ function renderFlashcard() {
   const hintText = hasCards
     ? isRevealed
       ? review
-        ? "?ㅼ떆 蹂쇰옒?붿뿉 ?닿릿 ?⑥뼱?덉슂"
+        ? "다시 볼래요에 담긴 단어예요"
         : mastered
-          ? "?듯삍?댁슂???닿릿 ?⑥뼱?덉슂"
-          : "吏湲??곹깭瑜?諛붾줈 ?뺥븷 ???덉뼱??
-      : "?뚮윭???살쓣 ?뺤씤?대낵源뚯슂?"
+          ? "익혔어요에 담긴 단어예요"
+          : "지금 상태를 바로 정할 수 있어요"
+      : "눌러서 뜻을 확인해볼까요?"
     : activeFilter === "review"
-      ? "?ㅼ떆 蹂쇰옒???곹깭瑜??댁븘?먮㈃ ?ш린??紐⑥븘 蹂????덉뼱??"
+      ? "다시 볼래요 상태를 담아두면 여기서 모아 볼 수 있어요."
       : activeFilter === "mastered"
-        ? "?듯삍?댁슂 ?곹깭瑜??댁븘?먮㈃ ?ш린???ㅼ떆 蹂????덉뼱??"
+        ? "익혔어요 상태를 담아두면 여기서 다시 볼 수 있어요."
         : activeFilter === "unmarked"
-          ? "?꾩쭅 ???뺥븳 ?⑥뼱留??곕줈 蹂닿퀬 ?덉뼱??"
-          : "?꾪꽣瑜?諛붽씀硫??ㅻⅨ ?⑥뼱瑜?癒쇱? 蹂????덉뼱??";
+          ? "아직 안 정한 단어만 따로 보고 있어요."
+          : "필터를 바꾸면 다른 단어를 먼저 볼 수 있어요.";
 
   renderStudyFlashcardComponent({
     flashcard,
@@ -7627,9 +7803,9 @@ function renderFlashcard() {
     readingText: currentCard.reading || "",
     meaningText: currentCard.meaning || "",
     hintText,
-    toggleOpenLabel: "?살쓣 ?ㅼ떆 媛由닿퉴??",
-    toggleClosedLabel: "?살쓣 ?뺤씤?대낵源뚯슂?",
-    toggleEmptyLabel: "吏湲?蹂????덈뒗 ?⑥뼱媛 ?놁뼱??,
+    toggleOpenLabel: "뜻을 다시 가릴까요?",
+    toggleClosedLabel: "뜻을 확인해볼까요?",
+    toggleEmptyLabel: "지금 볼 수 있는 단어가 없어요",
     prevDisabled: cards.length <= 1,
     nextDisabled: cards.length <= 1,
     actionButtons: [
@@ -7720,7 +7896,7 @@ function populateContentLevelSelect(select, activeLevel, { includeAll = false } 
   levelOptions.forEach((level) => {
     const option = document.createElement("option");
     option.value = level;
-    option.textContent = level === allLevelValue ? "?꾩껜" : level;
+    option.textContent = level === allLevelValue ? "전체" : level;
     select.appendChild(option);
   });
 
@@ -7741,7 +7917,7 @@ function populateVocabPartSelect(select, availableParts, activePart) {
   const partOptions = [{ value: vocabPartAllValue, count: vocabListItems.length }, ...availableParts];
   partOptions.forEach((partOption) => {
     const option = document.createElement("option");
-    const label = partOption.value === vocabPartAllValue ? "?꾩껜 ?덉궗" : partOption.value;
+    const label = partOption.value === vocabPartAllValue ? "전체 품사" : partOption.value;
 
     option.value = partOption.value;
     option.textContent = `${label} (${partOption.count})`;
@@ -7923,14 +8099,14 @@ function renderVocabQuiz() {
     resultView.hidden = true;
     empty.hidden = false;
     empty.textContent = canStart
-      ? "以鍮꾨릱?ㅻ㈃ ?쒖옉?대낵源뚯슂?"
+      ? "준비됐다면 시작해볼까요?"
       : getVocabQuizEmptyText(items);
     card.hidden = true;
     progress.textContent = `0 / ${getVocabQuizCount()}`;
     restart.classList.add("primary-btn");
     restart.classList.remove("secondary-btn");
     restart.disabled = !canStart;
-    restartLabel.textContent = "?쒖옉?대낵源뚯슂?";
+    restartLabel.textContent = "시작해볼까요?";
     setActionButtonIcon(restart, "play_arrow");
     next.hidden = true;
     next.disabled = true;
@@ -7953,7 +8129,7 @@ function renderVocabQuiz() {
     restart.classList.add("primary-btn");
     restart.classList.remove("secondary-btn");
     restart.disabled = !canStart;
-    restartLabel.textContent = "?쒖옉?대낵源뚯슂?";
+    restartLabel.textContent = "시작해볼까요?";
     setActionButtonIcon(restart, "play_arrow");
     state.vocabQuizStarted = false;
     renderQuizSessionHud("vocab");
@@ -7969,7 +8145,7 @@ function renderVocabQuiz() {
   restart.classList.add("secondary-btn");
   restart.classList.remove("primary-btn");
   restart.disabled = false;
-  restartLabel.textContent = "?ㅼ떆 ?대낵源뚯슂?";
+  restartLabel.textContent = "다시 해볼까요?";
   setActionButtonIcon(restart, "autorenew");
 
   if (state.vocabQuizFinished) {
@@ -7982,7 +8158,7 @@ function renderVocabQuiz() {
     progress.textContent = `${total} / ${total}`;
     next.hidden = true;
     next.disabled = false;
-    restartLabel.textContent = "?ㅼ떆 ?대낵源뚯슂?";
+    restartLabel.textContent = "다시 해볼까요?";
     setActionButtonIcon(restart, "autorenew");
     renderVocabQuizResults();
     return;
@@ -8001,7 +8177,7 @@ function renderVocabQuiz() {
   next.hidden = false;
   next.disabled = true;
   next.textContent =
-    state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1 ? "寃곌낵 蹂쇨퉴??" : "?ㅼ쓬 臾몄젣 蹂쇨퉴??";
+    state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
 
   renderChoiceOptionButtons({
     container: options,
@@ -8109,12 +8285,12 @@ function renderGrammar() {
     article.innerHTML = `
       <div class="grammar-header">
         <span class="grammar-level">${item.level}</span>
-        <span>${checked ? "?대뇬?댁슂" : "吏湲??대킄??}</span>
+        <span>${checked ? "해봤어요" : "지금 해봐요"}</span>
       </div>
       <h3>${item.pattern}</h3>
       <p>${item.description}</p>
       <button class="secondary-btn grammar-toggle${checked ? " is-checked" : ""}" type="button">
-        ${checked ? "??踰????대킄?? : "?대뇬?댁슂"}
+        ${checked ? "한 번 더 해봐요" : "해봤어요"}
       </button>
     `;
 
@@ -8164,7 +8340,7 @@ function getGrammarPracticeOptionsSummaryText() {
     getLevelSummaryLabel(getGrammarPracticeLevel()),
     formatQuestionCountLabel(getGrammarPracticeCount()),
     getDurationLabel(getGrammarPracticeDuration())
-  ].join(" 쨌 ");
+  ].join(" · ");
 }
 
 function setGrammarPracticeLevel(level) {
@@ -8323,8 +8499,8 @@ function renderGrammarPractice() {
     setQuizSessionDuration("grammar", activeDuration);
     empty.hidden = false;
     empty.textContent = sets?.length
-      ? "以鍮꾨릱?ㅻ㈃ ?쒖옉?대낵源뚯슂?"
-      : "臾몃쾿 臾몄젣瑜?以鍮꾪븯怨??덉뼱??";
+      ? "준비됐다면 시작해볼까요?"
+      : "문법 문제를 준비하고 있어요.";
     practiceView.hidden = true;
     renderQuizSessionHud("grammar");
     return;
@@ -8342,7 +8518,7 @@ function renderGrammarPractice() {
     stopQuizSessionTimer("grammar");
     setQuizSessionDuration("grammar", activeDuration);
     empty.hidden = false;
-    empty.textContent = "臾몃쾿 臾몄젣瑜?以鍮꾪븯怨??덉뼱??";
+    empty.textContent = "문법 문제를 준비하고 있어요.";
     practiceView.hidden = true;
     renderQuizSessionHud("grammar");
     return;
@@ -8360,7 +8536,7 @@ function renderGrammarPractice() {
   sentence.textContent = current.sentence;
   feedback.textContent = "";
   explanation.textContent = "";
-  nextButton.textContent = currentSessionIndex >= activeCount - 1 ? "寃곌낵 蹂닿린" : "?ㅼ쓬 臾몄젣 蹂닿린";
+  nextButton.textContent = currentSessionIndex >= activeCount - 1 ? "결과 보기" : "다음 문제 보기";
   nextButton.disabled = true;
   delete optionsContainer.dataset.answered;
 
@@ -8401,11 +8577,11 @@ function handleGrammarPracticeAnswer(index) {
   });
 
   document.getElementById("grammar-practice-feedback").textContent = correct
-    ? "醫뗭븘??"
-    : "?꾧튉?ㅼ슂! ?뺣떟 媛숈씠 蹂쇨퉴??";
+    ? "좋아요!"
+    : "아깝네요! 정답 같이 볼까요?";
   document.getElementById("grammar-practice-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "寃곌낵 蹂닿린" : "?ㅼ쓬 臾몄젣 蹂닿린";
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
     nextButton.disabled = false;
   }
   const optionsContainer = document.getElementById("grammar-practice-options");
@@ -8442,7 +8618,7 @@ function handleGrammarPracticeTimeout() {
   document.getElementById("grammar-practice-feedback").textContent = "";
   document.getElementById("grammar-practice-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "寃곌낵 蹂닿린" : "?ㅼ쓬 臾몄젣 蹂닿린";
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
     nextButton.disabled = false;
   }
   if (document.getElementById("grammar-practice-options")) {
@@ -8521,9 +8697,9 @@ function getQuizOptionsSummaryText() {
   return [
     getQuizLevelLabel(),
     getQuizModeLabel(),
-    `${getQuizSessionSize(state.quizSessionSize)}臾몄젣`,
+    `${getQuizSessionSize(state.quizSessionSize)}문제`,
     getDurationLabel(getQuizDuration())
-  ].join(" 쨌 ");
+  ].join(" · ");
 }
 
 function setQuizLevel(level) {
@@ -8628,11 +8804,11 @@ function renderQuizResult() {
   result.hidden = false;
   score.textContent = `${correct} / ${total}`;
   accuracy.textContent = `${getQuizAccuracyValue(correct, total)}%`;
-  wrong.textContent = `${wrongCount}媛?;
+  wrong.textContent = `${wrongCount}개`;
   copy.textContent =
     wrongCount === 0
-      ? `${getQuizModeLabel()} ${total}臾몄젣, ?꾨? 留욏삍?댁슂!`
-      : `${getQuizModeLabel()} ${total}臾몄젣源뚯? ?붿뼱?? ?由?臾몄젣???ㅼ떆 蹂쇨퉴??`;
+      ? `${getQuizModeLabel()} ${total}문제, 전부 맞혔어요!`
+      : `${getQuizModeLabel()} ${total}문제까지 왔어요. 틀린 문제는 다시 볼까요?`;
 }
 
 function renderQuizMistakes() {
@@ -8659,10 +8835,10 @@ function renderQuizMistakes() {
             <strong>${item.word || item.correctAnswer}</strong>
           </div>
           <p class="quiz-note-item-prompt">${item.prompt}</p>
-          <p class="quiz-note-item-meta">?뺣떟 쨌 ${item.correctAnswer}</p>
-          <p class="quiz-note-item-meta">????쨌 ${item.userAnswer}</p>
-          <p class="quiz-note-item-meta">?쎄린 쨌 ${item.reading || "-"}</p>
-          <p class="quiz-note-item-meta">??쨌 ${item.meaning || "-"}</p>
+          <p class="quiz-note-item-meta">정답 · ${item.correctAnswer}</p>
+          <p class="quiz-note-item-meta">내 답 · ${item.userAnswer}</p>
+          <p class="quiz-note-item-meta">읽기 · ${item.reading || "-"}</p>
+          <p class="quiz-note-item-meta">뜻 · ${item.meaning || "-"}</p>
         </article>
       `
     )
@@ -8692,17 +8868,17 @@ function startNewQuizSession() {
 }
 
 function getQuizFeedbackText(question, correct, userAnswer) {
-  const readingText = question.meta?.reading ? ` ?쎄린 쨌 ${question.meta.reading}` : "";
-  const meaningText = question.meta?.meaning ? ` ??쨌 ${question.meta.meaning}` : "";
+  const readingText = question.meta?.reading ? ` 읽기 · ${question.meta.reading}` : "";
+  const meaningText = question.meta?.meaning ? ` 뜻 · ${question.meta.meaning}` : "";
 
   if (correct) {
     return question.meta?.mode === "reading"
-      ? `醫뗭븘??${meaningText}`
-      : `醫뗭븘??${readingText}`;
+      ? `좋아요!${meaningText}`
+      : `좋아요!${readingText}`;
   }
 
-  return `?꾧튉?ㅼ슂! ?뺣떟? "${question.answer}"?덉슂.${question.meta?.mode === "reading" ? meaningText : readingText} ${
-    userAnswer === "?쒓컙 珥덇낵" ? "?쒓컙 珥덇낵濡??④꺼?섍쾶??" : ""
+  return `아깝네요! 정답은 "${question.answer}"예요.${question.meta?.mode === "reading" ? meaningText : readingText} ${
+    userAnswer === "시간 초과" ? "시간 초과로 남겨둘게요." : ""
   }`.trim();
 }
 
@@ -8767,18 +8943,18 @@ function legacyFinalizeQuizQuestion(question, selectedOption, correct) {
   if (correct) {
     state.quizCorrectCount += 1;
   } else {
-    rememberQuizMistake(question, selectedOption || "?쒓컙 珥덇낵");
+    rememberQuizMistake(question, selectedOption || "시간 초과");
   }
 
   if (feedback) {
     feedback.textContent = lastQuestion
-      ? `${getQuizFeedbackText(question, correct, selectedOption || "?쒓컙 珥덇낵")} 留덉?留?臾몄젣?덉슂. 寃곌낵 蹂대윭 媛蹂쇨퉴??`
-      : getQuizFeedbackText(question, correct, selectedOption || "?쒓컙 珥덇낵");
+      ? `${getQuizFeedbackText(question, correct, selectedOption || "시간 초과")} 마지막 문제예요. 결과 보러 가볼까요?`
+      : getQuizFeedbackText(question, correct, selectedOption || "시간 초과");
   }
 
   legacyRevealQuizAnswer(question, selectedOption, correct);
   setQuizActionState({
-    nextLabel: lastQuestion ? "寃곌낵 蹂대윭 媛덇퉴??" : "?ㅼ쓬 臾몄젣 蹂쇨퉴??",
+    nextLabel: lastQuestion ? "결과 보러 갈까요?" : "다음 문제 볼까요?",
     nextDisabled: false,
     nextHidden: false,
     restartHidden: false
@@ -8807,14 +8983,14 @@ function renderQuiz() {
 
   if (state.quizSessionFinished) {
     stopQuizSessionTimer("quiz");
-    level.textContent = `${getQuizLevelLabel()} 쨌 ${getQuizModeLabel()}`;
+    level.textContent = `${getQuizLevelLabel()} · ${getQuizModeLabel()}`;
     progress.textContent = `${activeQuizQuestions.length} / ${activeQuizQuestions.length}`;
-    questionText.textContent = "?대쾲 ?댁쫰 ??";
-    feedback.textContent = `${activeQuizQuestions.length}臾몄젣源뚯? ????덉뼱??`;
+    questionText.textContent = "이번 퀴즈 끝!";
+    feedback.textContent = `${activeQuizQuestions.length}문제까지 잘 풀었어요.`;
     optionsContainer.innerHTML = "";
     optionsContainer.hidden = true;
     setQuizActionState({
-      nextLabel: "?ㅼ쓬 臾몄젣 蹂쇨퉴??",
+      nextLabel: "다음 문제 볼까요?",
       nextDisabled: true,
       nextHidden: true,
       restartHidden: false
@@ -8833,7 +9009,7 @@ function renderQuiz() {
     result.hidden = true;
   }
 
-  level.textContent = `${getQuizLevelLabel()} 쨌 ${getQuizModeLabel()}`;
+  level.textContent = `${getQuizLevelLabel()} · ${getQuizModeLabel()}`;
   progress.textContent = `${state.quizIndex + 1} / ${activeQuizQuestions.length}`;
   questionText.textContent = softenVisibleKoreanCopy(question.question);
   feedback.textContent = "";
@@ -8853,8 +9029,8 @@ function renderQuiz() {
   setQuizActionState({
     nextLabel:
       state.quizIndex >= activeQuizQuestions.length - 1
-        ? "寃곌낵 蹂대윭 媛덇퉴??"
-        : "?ㅼ쓬 臾몄젣 蹂쇨퉴??",
+        ? "결과 보러 갈까요?"
+        : "다음 문제 볼까요?",
     nextDisabled: true,
     nextHidden: false,
     restartHidden: false
@@ -8900,13 +9076,13 @@ function finalizeQuizQuestion(question, selectedOptionOrIndex, correct) {
 
   if (feedback) {
     feedback.textContent = lastQuestion
-      ? `${getQuizFeedbackText(question, correct, selectedOption)} 臾몄젣瑜?泥섎━?덉뒿?덈떎.`
+      ? `${getQuizFeedbackText(question, correct, selectedOption)} 문제를 처리했습니다.`
       : getQuizFeedbackText(question, correct, selectedOption);
   }
 
   revealQuizAnswer(question, selectedOptionOrIndex, correct);
   setQuizActionState({
-    nextLabel: lastQuestion ? "寃곌낵 ?뺤씤" : "?ㅼ쓬 臾몄젣 ???,
+    nextLabel: lastQuestion ? "결과 확인" : "다음 문제 풀이",
     nextDisabled: false,
     nextHidden: false,
     restartHidden: false
@@ -8955,7 +9131,7 @@ function nextQuiz() {
 
   if (!answered) {
     if (feedback) {
-      feedback.textContent = "?듭쓣 怨좊Ⅴ硫??ㅼ쓬?쇰줈 ?섏뼱媛??";
+      feedback.textContent = "답을 고르면 다음으로 넘어가요.";
     }
     return;
   }
@@ -8984,7 +9160,7 @@ function getReadingOptionsSummaryText() {
     getLevelSummaryLabel(getReadingLevel()),
     formatQuestionCountLabel(getReadingCount()),
     getDurationLabel(getReadingDuration())
-  ].join(" 쨌 ");
+  ].join(" · ");
 }
 
 function setReadingLevel(level) {
@@ -9135,8 +9311,8 @@ function renderReadingPractice() {
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
     empty.textContent = sets.length
-      ? "以鍮꾨릱?ㅻ㈃ ?쒖옉?대낵源뚯슂?"
-      : "?낇빐 ?곗씠?곕? 以鍮꾪븯怨??덉뼱??";
+      ? "준비됐다면 시작해볼까요?"
+      : "독해 데이터를 준비하고 있어요.";
     practiceView.hidden = true;
     renderQuizSessionHud("reading");
     return;
@@ -9154,7 +9330,7 @@ function renderReadingPractice() {
     stopQuizSessionTimer("reading");
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
-    empty.textContent = "?낇빐 ?곗씠?곕? 以鍮꾪븯怨??덉뼱??";
+    empty.textContent = "독해 데이터를 준비하고 있어요.";
     practiceView.hidden = true;
     renderQuizSessionHud("reading");
     return;
@@ -9171,7 +9347,7 @@ function renderReadingPractice() {
   question.textContent = softenVisibleKoreanCopy(current.question);
   feedback.textContent = "";
   explanation.textContent = "";
-  nextButton.textContent = currentSessionIndex >= activeCount - 1 ? "寃곌낵 蹂닿린" : "?ㅼ쓬 湲 蹂닿린";
+  nextButton.textContent = currentSessionIndex >= activeCount - 1 ? "결과 보기" : "다음 글 보기";
   nextButton.disabled = true;
   delete optionsContainer.dataset.answered;
 
@@ -9215,11 +9391,11 @@ function handleReadingAnswer(index) {
   });
 
   document.getElementById("reading-feedback").textContent = correct
-    ? "醫뗭븘??"
-    : "?꾧튉?ㅼ슂! ?뺣떟 媛숈씠 蹂쇨퉴??";
+    ? "좋아요!"
+    : "아깝네요! 정답 같이 볼까요?";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "寃곌낵 蹂닿린" : "?ㅼ쓬 湲 蹂닿린";
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 글 보기";
     nextButton.disabled = false;
   }
   const optionsContainer = document.getElementById("reading-options");
@@ -9256,7 +9432,7 @@ function handleReadingTimeout() {
   document.getElementById("reading-feedback").textContent = "";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "寃곌낵 蹂닿린" : "?ㅼ쓬 湲 蹂닿린";
+    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 글 보기";
     nextButton.disabled = false;
   }
   if (document.getElementById("reading-options")) {
@@ -9324,13 +9500,13 @@ function renderStats() {
   const quiz = document.getElementById("quiz-accuracy");
 
   if (streak) {
-    streak.textContent = `${state.streak}??;
+    streak.textContent = `${state.streak}일`;
   }
   if (mastered) {
-    mastered.textContent = `${state.masteredIds.length}媛?;
+    mastered.textContent = `${state.masteredIds.length}개`;
   }
   if (grammar) {
-    grammar.textContent = `${state.grammarDoneIds.length}媛?;
+    grammar.textContent = `${state.grammarDoneIds.length}개`;
   }
   if (quiz) {
     quiz.textContent = `${accuracy}%`;

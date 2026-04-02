@@ -552,16 +552,15 @@ function renderMatchSettings() {
   const activePart = getMatchPartFilter(matchPreferences.part, basePool);
   const availableParts = getAvailableMatchParts(basePool);
   const isSettingsLocked = matchState.hasStarted && !matchState.showResults;
-  const shouldShowOptionsPanel = !isSettingsLocked && matchPreferences.optionsOpen !== false;
 
-  sharedMatchGame.renderSettingsPanel({
+  sharedMatchGame.renderStandardMatchSettings({
     optionsShellId: "match-options-shell",
     optionsToggleId: "match-options-toggle",
     optionsPanelId: "match-options-panel",
     optionsSummaryId: "match-options-summary",
     summaryText: getMatchOptionsSummaryText(),
     isSettingsLocked,
-    shouldShowOptionsPanel,
+    optionsOpen: matchPreferences.optionsOpen,
     selectConfigs: [
       {
         element: levelSelect,
@@ -583,22 +582,14 @@ function renderMatchSettings() {
         disabled: isSettingsLocked
       }
     ],
-    spinnerConfigs: [
-      {
-        spinner: countSpinner,
-        options: matchTotalCountOptions,
-        activeValue: getMatchTotalCount(matchPreferences.totalCount),
-        formatValue: (value) => `${value}臾몄젣`,
-        disabled: isSettingsLocked
-      },
-      {
-        spinner: timeSpinner,
-        options: matchDurationOptions,
-        activeValue: getMatchDuration(matchPreferences.duration),
-        formatValue: getMatchDurationLabel,
-        disabled: isSettingsLocked
-      }
-    ],
+    countSpinner,
+    countOptions: matchTotalCountOptions,
+    countValue: getMatchTotalCount(matchPreferences.totalCount),
+    countFormatValue: (value) => `${value}문제`,
+    timeSpinner,
+    timeOptions: matchDurationOptions,
+    timeValue: getMatchDuration(matchPreferences.duration),
+    timeFormatValue: getMatchDurationLabel,
     refreshPool: refreshMatchPool,
     updateActionAvailability: () => {
       setMatchActionAvailability(matchPool.length > 0);
@@ -807,13 +798,7 @@ function moveToNextMatchPage() {
 
 function buildMatchSessionItems() {
   refreshMatchPool();
-
-  if (!matchPool.length) {
-    return [];
-  }
-
-  const totalCount = Math.min(getMatchTotalCount(matchPreferences.totalCount), matchPool.length);
-  return sharedMatchGame.shuffleItems(matchPool).slice(0, totalCount);
+  return sharedMatchGame.createSessionItems(matchPool, getMatchTotalCount(matchPreferences.totalCount));
 }
 
 function startMatchSession(items = buildMatchSessionItems()) {

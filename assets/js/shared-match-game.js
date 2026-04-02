@@ -278,6 +278,56 @@
     });
   }
 
+  function renderStandardMatchSettings({
+    optionsShellId,
+    optionsToggleId,
+    optionsPanelId,
+    optionsSummaryId,
+    summaryText,
+    isSettingsLocked,
+    optionsOpen,
+    selectConfigs = [],
+    countSpinner,
+    countOptions = [],
+    countValue,
+    countFormatValue = (value) => String(value ?? ""),
+    timeSpinner,
+    timeOptions = [],
+    timeValue,
+    timeFormatValue = (value) => String(value ?? ""),
+    refreshPool,
+    updateActionAvailability
+  }) {
+    renderSettingsPanel({
+      optionsShellId,
+      optionsToggleId,
+      optionsPanelId,
+      optionsSummaryId,
+      summaryText,
+      isSettingsLocked,
+      shouldShowOptionsPanel: !isSettingsLocked && optionsOpen !== false,
+      selectConfigs,
+      spinnerConfigs: [
+        {
+          spinner: countSpinner,
+          options: countOptions,
+          activeValue: countValue,
+          formatValue: countFormatValue,
+          disabled: isSettingsLocked
+        },
+        {
+          spinner: timeSpinner,
+          options: timeOptions,
+          activeValue: timeValue,
+          formatValue: timeFormatValue,
+          disabled: isSettingsLocked
+        }
+      ],
+      refreshPool,
+      updateActionAvailability
+    });
+  }
+
   function renderBoard({ leftListId, rightListId, leftCards, rightCards, selectedLeft, selectedRight, createCard, renderStats }) {
     const leftList = document.getElementById(leftListId);
     const rightList = document.getElementById(rightListId);
@@ -1099,6 +1149,17 @@
     });
   }
 
+  function createSessionItems(items, requestedCount) {
+    const safeItems = Array.isArray(items) ? items : [];
+
+    if (!safeItems.length) {
+      return [];
+    }
+
+    const totalCount = Math.min(Number(requestedCount) || 0, safeItems.length);
+    return shuffleItems(safeItems).slice(0, totalCount);
+  }
+
   global.japanoteSharedMatchGame = {
     loadStoredObject,
     saveStoredObject,
@@ -1111,6 +1172,7 @@
     renderStats,
     renderSpinnerControl,
     renderSettingsPanel,
+    renderStandardMatchSettings,
     renderBoard,
     renderResultFilterOptions,
     renderBulkActionButtonState,
@@ -1124,6 +1186,7 @@
     attachBulkActionListener,
     attachResultSaveListener,
     createMatchGameEngine,
-    shuffleItems
+    shuffleItems,
+    createSessionItems
   };
 })(globalThis);

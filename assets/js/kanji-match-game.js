@@ -476,16 +476,15 @@ function renderKanjiMatchSettings() {
   const filterCounts = getKanjiMatchFilterCounts(basePool);
   const gradeCounts = getKanjiMatchGradeCounts(basePool);
   const isSettingsLocked = kanjiMatchState.hasStarted && !kanjiMatchState.showResults;
-  const shouldShowOptionsPanel = !isSettingsLocked && kanjiMatchPreferences.optionsOpen !== false;
 
-  sharedMatchGame.renderSettingsPanel({
+  sharedMatchGame.renderStandardMatchSettings({
     optionsShellId: "kanji-match-options-shell",
     optionsToggleId: "kanji-match-options-toggle",
     optionsPanelId: "kanji-match-options-panel",
     optionsSummaryId: "kanji-match-options-summary",
     summaryText: getKanjiMatchOptionsSummaryText(),
     isSettingsLocked,
-    shouldShowOptionsPanel,
+    optionsOpen: kanjiMatchPreferences.optionsOpen,
     selectConfigs: [
       {
         element: gradeSelect,
@@ -498,22 +497,14 @@ function renderKanjiMatchSettings() {
         disabled: isSettingsLocked
       }
     ],
-    spinnerConfigs: [
-      {
-        spinner: countSpinner,
-        options: kanjiMatchTotalCountOptions,
-        activeValue: getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount),
-        formatValue: (value) => `${value}臾몄젣`,
-        disabled: isSettingsLocked
-      },
-      {
-        spinner: timeSpinner,
-        options: kanjiMatchDurationOptions,
-        activeValue: getKanjiMatchDuration(kanjiMatchPreferences.duration),
-        formatValue: getKanjiMatchDurationLabel,
-        disabled: isSettingsLocked
-      }
-    ],
+    countSpinner,
+    countOptions: kanjiMatchTotalCountOptions,
+    countValue: getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount),
+    countFormatValue: (value) => `${value}문제`,
+    timeSpinner,
+    timeOptions: kanjiMatchDurationOptions,
+    timeValue: getKanjiMatchDuration(kanjiMatchPreferences.duration),
+    timeFormatValue: getKanjiMatchDurationLabel,
     refreshPool: refreshKanjiMatchPool,
     updateActionAvailability: () => {
       setKanjiMatchActionAvailability(kanjiMatchPool.length > 0);
@@ -717,13 +708,7 @@ function moveToNextKanjiMatchPage() {
 }
 function buildKanjiMatchSessionItems() {
   refreshKanjiMatchPool();
-
-  if (!kanjiMatchPool.length) {
-    return [];
-  }
-
-  const totalCount = Math.min(getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount), kanjiMatchPool.length);
-  return sharedMatchGame.shuffleItems(kanjiMatchPool).slice(0, totalCount);
+  return sharedMatchGame.createSessionItems(kanjiMatchPool, getKanjiMatchTotalCount(kanjiMatchPreferences.totalCount));
 }
 function startKanjiMatchSession(items = buildKanjiMatchSessionItems()) {
   kanjiMatchEngine.startSession(items);

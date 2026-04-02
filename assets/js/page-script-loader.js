@@ -8,7 +8,6 @@
   const pageScriptMap = {
     "index.html": [
       "assets/js/theme.js",
-      "assets/js/app-content-loader.js",
       "assets/js/app.js"
     ],
     "starter.html": [
@@ -17,7 +16,6 @@
       "assets/js/supabase-sync.js",
       "assets/js/theme.js",
       "assets/js/vocab-registry.js",
-      "assets/js/app-content-loader.js",
       "assets/js/app.js"
     ],
     "grammar.html": [
@@ -26,7 +24,6 @@
       "assets/js/supabase-sync.js",
       "assets/js/theme.js",
       "assets/js/shared-quiz-layouts.js",
-      "assets/js/app-content-loader.js",
       "assets/js/app.js"
     ],
     "reading.html": [
@@ -35,7 +32,6 @@
       "assets/js/supabase-sync.js",
       "assets/js/theme.js",
       "assets/js/shared-quiz-layouts.js",
-      "assets/js/app-content-loader.js",
       "assets/js/app.js"
     ],
     "vocab.html": [
@@ -47,7 +43,6 @@
       "assets/js/shared-quiz-layouts.js",
       "assets/js/shared-match-game.js",
       "assets/js/shared-match-copy.js",
-      "assets/js/app-content-loader.js",
       "assets/js/app.js",
       "assets/js/match-game.js"
     ],
@@ -60,7 +55,6 @@
       "assets/js/shared-quiz-layouts.js",
       "assets/js/shared-match-game.js",
       "assets/js/shared-match-copy.js",
-      "assets/js/app-content-loader.js",
       "assets/js/app.js",
       "assets/js/kanji-match-game.js"
     ],
@@ -71,7 +65,6 @@
       "assets/js/theme.js?v=20260330a",
       "assets/js/vocab-registry.js?v=20260330a",
       "assets/js/kana-strokes.js?v=20260330a",
-      "assets/js/app-content-loader.js?v=20260330a",
       "assets/js/app.js?v=20260330a"
     ]
   };

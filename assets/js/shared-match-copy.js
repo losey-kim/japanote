@@ -34,10 +34,20 @@ globalThis.japanoteMatchCopy = {
   getSavedActionLabel(saved) {
     return saved ? "다시 볼래요에서 빼기" : "다시 볼래요에 담기";
   },
+  getActionButtonText(isResetState) {
+    return {
+      label: isResetState ? "다시 해볼까요?" : "시작해볼까요?",
+      icon: isResetState ? "autorenew" : "play_arrow"
+    };
+  },
   getReadyStateText() {
     return {
       ready: "준비되면 시작해볼까요?",
       unavailable: "지금은 준비 중이에요."
     };
+  },
+  getEmptyResultsText(filterLabel) {
+    const label = filterLabel || "선택한";
+    return `${label} 결과가 아직 없어요.`;
   }
 };

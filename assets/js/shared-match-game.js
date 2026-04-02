@@ -163,6 +163,14 @@
     const button = document.getElementById(buttonId);
     const label = document.getElementById(labelId);
     const icon = button?.querySelector(".material-symbols-rounded");
+    const matchCopy = global.japanoteMatchCopy || {};
+    const actionCopy =
+      typeof matchCopy.getActionButtonText === "function"
+        ? matchCopy.getActionButtonText(isResetState)
+        : {
+            label: isResetState ? "다시 해볼까요?" : "시작해볼까요?",
+            icon: isResetState ? "autorenew" : "play_arrow"
+          };
 
     if (button) {
       button.classList.toggle("primary-btn", !isResetState);
@@ -170,11 +178,11 @@
     }
 
     if (label) {
-      label.textContent = isResetState ? "다시 해볼까요?" : "시작해볼까요?";
+      label.textContent = actionCopy.label;
     }
 
     if (icon) {
-      icon.textContent = isResetState ? "autorenew" : "play_arrow";
+      icon.textContent = actionCopy.icon;
     }
   }
 
@@ -388,8 +396,8 @@
     button.dataset[datasetKey] = allSaved ? "remove" : "save";
     button.setAttribute("aria-label", actionTitle);
     button.title = actionTitle;
-    label.textContent = actionLabel;
-    icon.textContent = allSaved ? "delete_sweep" : "bookmark_add";
+    label.textContent = actionCopy.label;
+    icon.textContent = actionCopy.icon;
   }
 
   function createResultItemHeadMarkup({
@@ -472,8 +480,9 @@
     }
 
     if (!filteredResults.length) {
+      const matchCopy = global.japanoteMatchCopy || {};
       empty.hidden = false;
-      empty.textContent = `${filterLabels[activeFilter]} 결과가 아직 없어요.`;
+      empty.textContent = typeof matchCopy.getEmptyResultsText === "function" ? matchCopy.getEmptyResultsText(filterLabels[activeFilter]) : `${filterLabels[activeFilter]} 결과가 아직 없어요.`;
       list.innerHTML = "";
       return;
     }

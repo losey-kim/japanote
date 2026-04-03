@@ -517,22 +517,22 @@
   ],
   "practiceTemplates": {
     "hiragana": {
-      "label": "????",
-      "heading": "???? ??? ??",
-      "sourcePrefix": "????",
-      "title": "???? ??",
-      "note": "?? ? ?? ???? ????.",
-      "prompt": "? ??, ??? ?????",
-      "explanationTemplate": "{{char}}? {{reading}}? ???."
+      "label": "히라가나",
+      "heading": "히라가나 퀴즈로 익혀봐요",
+      "sourcePrefix": "문자",
+      "title": "문자를 읽어봐요",
+      "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+      "prompt": "이 문자, 어떻게 읽을까요?",
+      "explanationTemplate": "{{char}}는 {{reading}}로 읽어요."
     },
     "katakana": {
-      "label": "????",
-      "heading": "???? ??? ??",
-      "sourcePrefix": "????",
-      "title": "???? ??",
-      "note": "?? ? ?? ???? ????.",
-      "prompt": "? ??, ??? ?????",
-      "explanationTemplate": "{{char}}? {{reading}}? ???."
+      "label": "카타카나",
+      "heading": "카타카나 퀴즈로 익혀봐요",
+      "sourcePrefix": "문자",
+      "title": "문자를 읽어봐요",
+      "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+      "prompt": "이 문자, 어떻게 읽을까요?",
+      "explanationTemplate": "{{char}}는 {{reading}}로 읽어요."
     }
   },
   "toneCycle": [

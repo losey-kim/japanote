@@ -1131,6 +1131,10 @@ button {
   margin: 0 auto;
 }
 
+.kana-practice-card .basic-practice-meta {
+  display: none;
+}
+
 .kana-result-view {
   width: min(760px, 100%);
   margin: 0 auto;

@@ -1475,15 +1475,15 @@
   },
   "tracks": {
     "hiragana": {
-      "label": "????",
-      "heading": "???? ??? ??",
+      "label": "히라가나",
+      "heading": "히라가나 퀴즈로 익혀봐요",
       "items": [
         {
           "id": "bp-hiragana-0",
-          "source": "???? 1",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 1",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "あ",
           "displaySub": "기본음",
           "options": [
@@ -1493,15 +1493,15 @@
             "a"
           ],
           "answer": 3,
-          "explanation": "あ? a? ???.",
+          "explanation": "あ는 a로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-1",
-          "source": "???? 2",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 2",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "い",
           "displaySub": "기본음",
           "options": [
@@ -1511,15 +1511,15 @@
             "bya"
           ],
           "answer": 1,
-          "explanation": "い? i? ???.",
+          "explanation": "い는 i로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-2",
-          "source": "???? 3",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 3",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "う",
           "displaySub": "기본음",
           "options": [
@@ -1529,15 +1529,15 @@
             "u"
           ],
           "answer": 3,
-          "explanation": "う? u? ???.",
+          "explanation": "う는 u로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-3",
-          "source": "???? 4",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 4",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "え",
           "displaySub": "기본음",
           "options": [
@@ -1547,15 +1547,15 @@
             "ri"
           ],
           "answer": 1,
-          "explanation": "え? e? ???.",
+          "explanation": "え는 e로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-4",
-          "source": "???? 5",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 5",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "お",
           "displaySub": "기본음",
           "options": [
@@ -1565,15 +1565,15 @@
             "o"
           ],
           "answer": 3,
-          "explanation": "お? o? ???.",
+          "explanation": "お는 o로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-5",
-          "source": "???? 6",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 6",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "か",
           "displaySub": "기본음",
           "options": [
@@ -1583,15 +1583,15 @@
             "cho"
           ],
           "answer": 0,
-          "explanation": "か? ka? ???.",
+          "explanation": "か는 ka로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-6",
-          "source": "???? 7",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 7",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "き",
           "displaySub": "기본음",
           "options": [
@@ -1601,15 +1601,15 @@
             "ha"
           ],
           "answer": 0,
-          "explanation": "き? ki? ???.",
+          "explanation": "き는 ki로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-7",
-          "source": "???? 8",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 8",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "く",
           "displaySub": "기본음",
           "options": [
@@ -1619,15 +1619,15 @@
             "shi"
           ],
           "answer": 0,
-          "explanation": "く? ku? ???.",
+          "explanation": "く는 ku로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-8",
-          "source": "???? 9",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 9",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "け",
           "displaySub": "기본음",
           "options": [
@@ -1637,15 +1637,15 @@
             "cho"
           ],
           "answer": 0,
-          "explanation": "け? ke? ???.",
+          "explanation": "け는 ke로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-9",
-          "source": "???? 10",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 10",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "こ",
           "displaySub": "기본음",
           "options": [
@@ -1655,15 +1655,15 @@
             "ji"
           ],
           "answer": 2,
-          "explanation": "こ? ko? ???.",
+          "explanation": "こ는 ko로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-10",
-          "source": "???? 11",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 11",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "さ",
           "displaySub": "기본음",
           "options": [
@@ -1673,15 +1673,15 @@
             "ni"
           ],
           "answer": 0,
-          "explanation": "さ? sa? ???.",
+          "explanation": "さ는 sa로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-11",
-          "source": "???? 12",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 12",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "し",
           "displaySub": "기본음",
           "options": [
@@ -1691,15 +1691,15 @@
             "wa"
           ],
           "answer": 0,
-          "explanation": "し? shi? ???.",
+          "explanation": "し는 shi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-12",
-          "source": "???? 13",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 13",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "す",
           "displaySub": "기본음",
           "options": [
@@ -1709,15 +1709,15 @@
             "hya"
           ],
           "answer": 0,
-          "explanation": "す? su? ???.",
+          "explanation": "す는 su로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-13",
-          "source": "???? 14",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 14",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "せ",
           "displaySub": "기본음",
           "options": [
@@ -1727,15 +1727,15 @@
             "ke"
           ],
           "answer": 0,
-          "explanation": "せ? se? ???.",
+          "explanation": "せ는 se로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-14",
-          "source": "???? 15",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 15",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "そ",
           "displaySub": "기본음",
           "options": [
@@ -1745,15 +1745,15 @@
             "n"
           ],
           "answer": 2,
-          "explanation": "そ? so? ???.",
+          "explanation": "そ는 so로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-15",
-          "source": "???? 16",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 16",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "た",
           "displaySub": "기본음",
           "options": [
@@ -1763,15 +1763,15 @@
             "se"
           ],
           "answer": 0,
-          "explanation": "た? ta? ???.",
+          "explanation": "た는 ta로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-16",
-          "source": "???? 17",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 17",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ち",
           "displaySub": "기본음",
           "options": [
@@ -1781,15 +1781,15 @@
             "bu"
           ],
           "answer": 0,
-          "explanation": "ち? chi? ???.",
+          "explanation": "ち는 chi로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-17",
-          "source": "???? 18",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 18",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "つ",
           "displaySub": "기본음",
           "options": [
@@ -1799,15 +1799,15 @@
             "jo"
           ],
           "answer": 2,
-          "explanation": "つ? tsu? ???.",
+          "explanation": "つ는 tsu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-18",
-          "source": "???? 19",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 19",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "て",
           "displaySub": "기본음",
           "options": [
@@ -1817,15 +1817,15 @@
             "te"
           ],
           "answer": 3,
-          "explanation": "て? te? ???.",
+          "explanation": "て는 te로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-19",
-          "source": "???? 20",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 20",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "と",
           "displaySub": "기본음",
           "options": [
@@ -1835,15 +1835,15 @@
             "gi"
           ],
           "answer": 1,
-          "explanation": "と? to? ???.",
+          "explanation": "と는 to로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-20",
-          "source": "???? 21",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 21",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "な",
           "displaySub": "기본음",
           "options": [
@@ -1853,15 +1853,15 @@
             "na"
           ],
           "answer": 3,
-          "explanation": "な? na? ???.",
+          "explanation": "な는 na로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-21",
-          "source": "???? 22",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 22",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "に",
           "displaySub": "기본음",
           "options": [
@@ -1871,15 +1871,15 @@
             "pi"
           ],
           "answer": 0,
-          "explanation": "に? ni? ???.",
+          "explanation": "に는 ni로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-22",
-          "source": "???? 23",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 23",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぬ",
           "displaySub": "기본음",
           "options": [
@@ -1889,15 +1889,15 @@
             "chi"
           ],
           "answer": 1,
-          "explanation": "ぬ? nu? ???.",
+          "explanation": "ぬ는 nu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-23",
-          "source": "???? 24",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 24",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ね",
           "displaySub": "기본음",
           "options": [
@@ -1907,15 +1907,15 @@
             "ka"
           ],
           "answer": 2,
-          "explanation": "ね? ne? ???.",
+          "explanation": "ね는 ne로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-24",
-          "source": "???? 25",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 25",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "の",
           "displaySub": "기본음",
           "options": [
@@ -1925,15 +1925,15 @@
             "no"
           ],
           "answer": 3,
-          "explanation": "の? no? ???.",
+          "explanation": "の는 no로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-25",
-          "source": "???? 26",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 26",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "は",
           "displaySub": "기본음",
           "options": [
@@ -1943,15 +1943,15 @@
             "cho"
           ],
           "answer": 0,
-          "explanation": "は? ha? ???.",
+          "explanation": "は는 ha로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-26",
-          "source": "???? 27",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 27",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ひ",
           "displaySub": "기본음",
           "options": [
@@ -1961,15 +1961,15 @@
             "hi"
           ],
           "answer": 3,
-          "explanation": "ひ? hi? ???.",
+          "explanation": "ひ는 hi로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-27",
-          "source": "???? 28",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 28",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ふ",
           "displaySub": "기본음",
           "options": [
@@ -1979,15 +1979,15 @@
             "ja"
           ],
           "answer": 0,
-          "explanation": "ふ? fu? ???.",
+          "explanation": "ふ는 fu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-28",
-          "source": "???? 29",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 29",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "へ",
           "displaySub": "기본음",
           "options": [
@@ -1997,15 +1997,15 @@
             "o"
           ],
           "answer": 1,
-          "explanation": "へ? he? ???.",
+          "explanation": "へ는 he로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-29",
-          "source": "???? 30",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 30",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ほ",
           "displaySub": "기본음",
           "options": [
@@ -2015,15 +2015,15 @@
             "ji"
           ],
           "answer": 2,
-          "explanation": "ほ? ho? ???.",
+          "explanation": "ほ는 ho로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-30",
-          "source": "???? 31",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 31",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ま",
           "displaySub": "기본음",
           "options": [
@@ -2033,15 +2033,15 @@
             "ma"
           ],
           "answer": 3,
-          "explanation": "ま? ma? ???.",
+          "explanation": "ま는 ma로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-31",
-          "source": "???? 32",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 32",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "み",
           "displaySub": "기본음",
           "options": [
@@ -2051,15 +2051,15 @@
             "chi"
           ],
           "answer": 0,
-          "explanation": "み? mi? ???.",
+          "explanation": "み는 mi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-32",
-          "source": "???? 33",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 33",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "む",
           "displaySub": "기본음",
           "options": [
@@ -2069,15 +2069,15 @@
             "a"
           ],
           "answer": 1,
-          "explanation": "む? mu? ???.",
+          "explanation": "む는 mu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-33",
-          "source": "???? 34",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 34",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "め",
           "displaySub": "기본음",
           "options": [
@@ -2087,15 +2087,15 @@
             "ryo"
           ],
           "answer": 2,
-          "explanation": "め? me? ???.",
+          "explanation": "め는 me로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-34",
-          "source": "???? 35",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 35",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "も",
           "displaySub": "기본음",
           "options": [
@@ -2105,15 +2105,15 @@
             "mo"
           ],
           "answer": 3,
-          "explanation": "も? mo? ???.",
+          "explanation": "も는 mo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-35",
-          "source": "???? 36",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 36",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "や",
           "displaySub": "기본음",
           "options": [
@@ -2123,15 +2123,15 @@
             "gu"
           ],
           "answer": 2,
-          "explanation": "や? ya? ???.",
+          "explanation": "や는 ya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-36",
-          "source": "???? 37",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 37",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ゆ",
           "displaySub": "기본음",
           "options": [
@@ -2141,15 +2141,15 @@
             "yu"
           ],
           "answer": 3,
-          "explanation": "ゆ? yu? ???.",
+          "explanation": "ゆ는 yu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-37",
-          "source": "???? 38",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 38",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "よ",
           "displaySub": "기본음",
           "options": [
@@ -2159,15 +2159,15 @@
             "gya"
           ],
           "answer": 2,
-          "explanation": "よ? yo? ???.",
+          "explanation": "よ는 yo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-38",
-          "source": "???? 39",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 39",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ら",
           "displaySub": "기본음",
           "options": [
@@ -2177,15 +2177,15 @@
             "ka"
           ],
           "answer": 0,
-          "explanation": "ら? ra? ???.",
+          "explanation": "ら는 ra로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-39",
-          "source": "???? 40",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 40",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "り",
           "displaySub": "기본음",
           "options": [
@@ -2195,15 +2195,15 @@
             "ri"
           ],
           "answer": 3,
-          "explanation": "り? ri? ???.",
+          "explanation": "り는 ri로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-40",
-          "source": "???? 41",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 41",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "る",
           "displaySub": "기본음",
           "options": [
@@ -2213,15 +2213,15 @@
             "su"
           ],
           "answer": 2,
-          "explanation": "る? ru? ???.",
+          "explanation": "る는 ru로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-41",
-          "source": "???? 42",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 42",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "れ",
           "displaySub": "기본음",
           "options": [
@@ -2231,15 +2231,15 @@
             "shu"
           ],
           "answer": 1,
-          "explanation": "れ? re? ???.",
+          "explanation": "れ는 re로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-42",
-          "source": "???? 43",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 43",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ろ",
           "displaySub": "기본음",
           "options": [
@@ -2249,15 +2249,15 @@
             "gu"
           ],
           "answer": 0,
-          "explanation": "ろ? ro? ???.",
+          "explanation": "ろ는 ro로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-43",
-          "source": "???? 44",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 44",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "わ",
           "displaySub": "기본음",
           "options": [
@@ -2267,15 +2267,15 @@
             "ro"
           ],
           "answer": 0,
-          "explanation": "わ? wa? ???.",
+          "explanation": "わ는 wa로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-44",
-          "source": "???? 45",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 45",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "を",
           "displaySub": "기본음",
           "options": [
@@ -2285,15 +2285,15 @@
             "wo"
           ],
           "answer": 3,
-          "explanation": "を? wo? ???.",
+          "explanation": "を는 wo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-45",
-          "source": "???? 46",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 46",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ん",
           "displaySub": "기본음",
           "options": [
@@ -2303,15 +2303,15 @@
             "ra"
           ],
           "answer": 0,
-          "explanation": "ん? n? ???.",
+          "explanation": "ん는 n로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-46",
-          "source": "???? 47",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 47",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "が",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2321,15 +2321,15 @@
             "ta"
           ],
           "answer": 2,
-          "explanation": "が? ga? ???.",
+          "explanation": "が는 ga로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-47",
-          "source": "???? 48",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 48",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぎ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2339,15 +2339,15 @@
             "gi"
           ],
           "answer": 3,
-          "explanation": "ぎ? gi? ???.",
+          "explanation": "ぎ는 gi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-48",
-          "source": "???? 49",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 49",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぐ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2357,15 +2357,15 @@
             "pya"
           ],
           "answer": 2,
-          "explanation": "ぐ? gu? ???.",
+          "explanation": "ぐ는 gu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-49",
-          "source": "???? 50",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 50",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "げ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2375,15 +2375,15 @@
             "ge"
           ],
           "answer": 3,
-          "explanation": "げ? ge? ???.",
+          "explanation": "げ는 ge로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-50",
-          "source": "???? 51",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 51",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ご",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2393,15 +2393,15 @@
             "se"
           ],
           "answer": 1,
-          "explanation": "ご? go? ???.",
+          "explanation": "ご는 go로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-51",
-          "source": "???? 52",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 52",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ざ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2411,15 +2411,15 @@
             "za"
           ],
           "answer": 3,
-          "explanation": "ざ? za? ???.",
+          "explanation": "ざ는 za로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-52",
-          "source": "???? 53",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 53",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "じ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2429,15 +2429,15 @@
             "chi"
           ],
           "answer": 1,
-          "explanation": "じ? ji? ???.",
+          "explanation": "じ는 ji로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-53",
-          "source": "???? 54",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 54",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ず",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2447,15 +2447,15 @@
             "zu"
           ],
           "answer": 3,
-          "explanation": "ず? zu? ???.",
+          "explanation": "ず는 zu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-54",
-          "source": "???? 55",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 55",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぜ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2465,15 +2465,15 @@
             "ru"
           ],
           "answer": 1,
-          "explanation": "ぜ? ze? ???.",
+          "explanation": "ぜ는 ze로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-55",
-          "source": "???? 56",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 56",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぞ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2483,15 +2483,15 @@
             "zo"
           ],
           "answer": 3,
-          "explanation": "ぞ? zo? ???.",
+          "explanation": "ぞ는 zo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-56",
-          "source": "???? 57",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 57",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "だ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2501,15 +2501,15 @@
             "ke"
           ],
           "answer": 2,
-          "explanation": "だ? da? ???.",
+          "explanation": "だ는 da로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-57",
-          "source": "???? 58",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 58",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぢ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2519,15 +2519,15 @@
             "ji"
           ],
           "answer": 0,
-          "explanation": "ぢ? ji? ???.",
+          "explanation": "ぢ는 ji로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-58",
-          "source": "???? 59",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 59",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "づ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2537,15 +2537,15 @@
             "re"
           ],
           "answer": 0,
-          "explanation": "づ? zu? ???.",
+          "explanation": "づ는 zu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-59",
-          "source": "???? 60",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 60",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "で",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2555,15 +2555,15 @@
             "ma"
           ],
           "answer": 2,
-          "explanation": "で? de? ???.",
+          "explanation": "で는 de로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-60",
-          "source": "???? 61",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 61",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ど",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2573,15 +2573,15 @@
             "e"
           ],
           "answer": 0,
-          "explanation": "ど? do? ???.",
+          "explanation": "ど는 do로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-61",
-          "source": "???? 62",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 62",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ば",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2591,15 +2591,15 @@
             "hya"
           ],
           "answer": 1,
-          "explanation": "ば? ba? ???.",
+          "explanation": "ば는 ba로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-62",
-          "source": "???? 63",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 63",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "び",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2609,15 +2609,15 @@
             "i"
           ],
           "answer": 0,
-          "explanation": "び? bi? ???.",
+          "explanation": "び는 bi로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-63",
-          "source": "???? 64",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 64",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぶ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2627,15 +2627,15 @@
             "bu"
           ],
           "answer": 3,
-          "explanation": "ぶ? bu? ???.",
+          "explanation": "ぶ는 bu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-64",
-          "source": "???? 65",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 65",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "べ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2645,15 +2645,15 @@
             "mi"
           ],
           "answer": 0,
-          "explanation": "べ? be? ???.",
+          "explanation": "べ는 be로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-65",
-          "source": "???? 66",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 66",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぼ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2663,15 +2663,15 @@
             "jo"
           ],
           "answer": 1,
-          "explanation": "ぼ? bo? ???.",
+          "explanation": "ぼ는 bo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-66",
-          "source": "???? 67",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 67",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぱ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2681,15 +2681,15 @@
             "sha"
           ],
           "answer": 2,
-          "explanation": "ぱ? pa? ???.",
+          "explanation": "ぱ는 pa로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-67",
-          "source": "???? 68",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 68",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぴ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2699,15 +2699,15 @@
             "mo"
           ],
           "answer": 2,
-          "explanation": "ぴ? pi? ???.",
+          "explanation": "ぴ는 pi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-68",
-          "source": "???? 69",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 69",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぷ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2717,15 +2717,15 @@
             "te"
           ],
           "answer": 2,
-          "explanation": "ぷ? pu? ???.",
+          "explanation": "ぷ는 pu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-69",
-          "source": "???? 70",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 70",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぺ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2735,15 +2735,15 @@
             "pe"
           ],
           "answer": 3,
-          "explanation": "ぺ? pe? ???.",
+          "explanation": "ぺ는 pe로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-70",
-          "source": "???? 71",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 71",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぽ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -2753,15 +2753,15 @@
             "hi"
           ],
           "answer": 0,
-          "explanation": "ぽ? po? ???.",
+          "explanation": "ぽ는 po로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-71",
-          "source": "???? 72",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 72",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "きゃ",
           "displaySub": "요음",
           "options": [
@@ -2771,15 +2771,15 @@
             "ke"
           ],
           "answer": 1,
-          "explanation": "きゃ? kya? ???.",
+          "explanation": "きゃ는 kya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-72",
-          "source": "???? 73",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 73",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "きゅ",
           "displaySub": "요음",
           "options": [
@@ -2789,15 +2789,15 @@
             "kyu"
           ],
           "answer": 3,
-          "explanation": "きゅ? kyu? ???.",
+          "explanation": "きゅ는 kyu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-73",
-          "source": "???? 74",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 74",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "きょ",
           "displaySub": "요음",
           "options": [
@@ -2807,15 +2807,15 @@
             "rya"
           ],
           "answer": 1,
-          "explanation": "きょ? kyo? ???.",
+          "explanation": "きょ는 kyo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-74",
-          "source": "???? 75",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 75",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "しゃ",
           "displaySub": "요음",
           "options": [
@@ -2825,15 +2825,15 @@
             "sha"
           ],
           "answer": 3,
-          "explanation": "しゃ? sha? ???.",
+          "explanation": "しゃ는 sha로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-75",
-          "source": "???? 76",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 76",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "しゅ",
           "displaySub": "요음",
           "options": [
@@ -2843,15 +2843,15 @@
             "te"
           ],
           "answer": 1,
-          "explanation": "しゅ? shu? ???.",
+          "explanation": "しゅ는 shu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-76",
-          "source": "???? 77",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 77",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "しょ",
           "displaySub": "요음",
           "options": [
@@ -2861,15 +2861,15 @@
             "sho"
           ],
           "answer": 3,
-          "explanation": "しょ? sho? ???.",
+          "explanation": "しょ는 sho로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-77",
-          "source": "???? 78",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 78",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ちゃ",
           "displaySub": "요음",
           "options": [
@@ -2879,15 +2879,15 @@
             "so"
           ],
           "answer": 2,
-          "explanation": "ちゃ? cha? ???.",
+          "explanation": "ちゃ는 cha로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-78",
-          "source": "???? 79",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 79",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ちゅ",
           "displaySub": "요음",
           "options": [
@@ -2897,15 +2897,15 @@
             "chu"
           ],
           "answer": 3,
-          "explanation": "ちゅ? chu? ???.",
+          "explanation": "ちゅ는 chu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-79",
-          "source": "???? 80",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 80",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ちょ",
           "displaySub": "요음",
           "options": [
@@ -2915,15 +2915,15 @@
             "e"
           ],
           "answer": 1,
-          "explanation": "ちょ? cho? ???.",
+          "explanation": "ちょ는 cho로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-80",
-          "source": "???? 81",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 81",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "にゃ",
           "displaySub": "요음",
           "options": [
@@ -2933,15 +2933,15 @@
             "nya"
           ],
           "answer": 3,
-          "explanation": "にゃ? nya? ???.",
+          "explanation": "にゃ는 nya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-81",
-          "source": "???? 82",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 82",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "にゅ",
           "displaySub": "요음",
           "options": [
@@ -2951,15 +2951,15 @@
             "shi"
           ],
           "answer": 1,
-          "explanation": "にゅ? nyu? ???.",
+          "explanation": "にゅ는 nyu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-82",
-          "source": "???? 83",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 83",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "にょ",
           "displaySub": "요음",
           "options": [
@@ -2969,15 +2969,15 @@
             "nyo"
           ],
           "answer": 3,
-          "explanation": "にょ? nyo? ???.",
+          "explanation": "にょ는 nyo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-83",
-          "source": "???? 84",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 84",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ひゃ",
           "displaySub": "요음",
           "options": [
@@ -2987,15 +2987,15 @@
             "ma"
           ],
           "answer": 2,
-          "explanation": "ひゃ? hya? ???.",
+          "explanation": "ひゃ는 hya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-84",
-          "source": "???? 85",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 85",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ひゅ",
           "displaySub": "요음",
           "options": [
@@ -3005,15 +3005,15 @@
             "ki"
           ],
           "answer": 0,
-          "explanation": "ひゅ? hyu? ???.",
+          "explanation": "ひゅ는 hyu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-85",
-          "source": "???? 86",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 86",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ひょ",
           "displaySub": "요음",
           "options": [
@@ -3023,15 +3023,15 @@
             "ru"
           ],
           "answer": 2,
-          "explanation": "ひょ? hyo? ???.",
+          "explanation": "ひょ는 hyo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-86",
-          "source": "???? 87",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 87",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "みゃ",
           "displaySub": "요음",
           "options": [
@@ -3041,15 +3041,15 @@
             "mya"
           ],
           "answer": 3,
-          "explanation": "みゃ? mya? ???.",
+          "explanation": "みゃ는 mya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-87",
-          "source": "???? 88",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 88",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "みゅ",
           "displaySub": "요음",
           "options": [
@@ -3059,15 +3059,15 @@
             "gyu"
           ],
           "answer": 1,
-          "explanation": "みゅ? myu? ???.",
+          "explanation": "みゅ는 myu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-88",
-          "source": "???? 89",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 89",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "みょ",
           "displaySub": "요음",
           "options": [
@@ -3077,15 +3077,15 @@
             "myo"
           ],
           "answer": 3,
-          "explanation": "みょ? myo? ???.",
+          "explanation": "みょ는 myo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-89",
-          "source": "???? 90",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 90",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "りゃ",
           "displaySub": "요음",
           "options": [
@@ -3095,15 +3095,15 @@
             "pa"
           ],
           "answer": 0,
-          "explanation": "りゃ? rya? ???.",
+          "explanation": "りゃ는 rya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-90",
-          "source": "???? 91",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 91",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "りゅ",
           "displaySub": "요음",
           "options": [
@@ -3113,15 +3113,15 @@
             "ja"
           ],
           "answer": 2,
-          "explanation": "りゅ? ryu? ???.",
+          "explanation": "りゅ는 ryu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-91",
-          "source": "???? 92",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 92",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "りょ",
           "displaySub": "요음",
           "options": [
@@ -3131,15 +3131,15 @@
             "a"
           ],
           "answer": 0,
-          "explanation": "りょ? ryo? ???.",
+          "explanation": "りょ는 ryo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-92",
-          "source": "???? 93",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 93",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぎゃ",
           "displaySub": "요음",
           "options": [
@@ -3149,15 +3149,15 @@
             "cho"
           ],
           "answer": 0,
-          "explanation": "ぎゃ? gya? ???.",
+          "explanation": "ぎゃ는 gya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-93",
-          "source": "???? 94",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 94",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぎゅ",
           "displaySub": "요음",
           "options": [
@@ -3167,15 +3167,15 @@
             "tsu"
           ],
           "answer": 0,
-          "explanation": "ぎゅ? gyu? ???.",
+          "explanation": "ぎゅ는 gyu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-94",
-          "source": "???? 95",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 95",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぎょ",
           "displaySub": "요음",
           "options": [
@@ -3185,15 +3185,15 @@
             "ji"
           ],
           "answer": 0,
-          "explanation": "ぎょ? gyo? ???.",
+          "explanation": "ぎょ는 gyo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-95",
-          "source": "???? 96",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 96",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "じゃ",
           "displaySub": "요음",
           "options": [
@@ -3203,15 +3203,15 @@
             "re"
           ],
           "answer": 0,
-          "explanation": "じゃ? ja? ???.",
+          "explanation": "じゃ는 ja로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-96",
-          "source": "???? 97",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 97",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "じゅ",
           "displaySub": "요음",
           "options": [
@@ -3221,15 +3221,15 @@
             "i"
           ],
           "answer": 0,
-          "explanation": "じゅ? ju? ???.",
+          "explanation": "じゅ는 ju로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-97",
-          "source": "???? 98",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 98",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "じょ",
           "displaySub": "요음",
           "options": [
@@ -3239,15 +3239,15 @@
             "e"
           ],
           "answer": 0,
-          "explanation": "じょ? jo? ???.",
+          "explanation": "じょ는 jo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-98",
-          "source": "???? 99",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 99",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "びゃ",
           "displaySub": "요음",
           "options": [
@@ -3257,15 +3257,15 @@
             "bya"
           ],
           "answer": 3,
-          "explanation": "びゃ? bya? ???.",
+          "explanation": "びゃ는 bya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-99",
-          "source": "???? 100",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 100",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "びゅ",
           "displaySub": "요음",
           "options": [
@@ -3275,15 +3275,15 @@
             "re"
           ],
           "answer": 2,
-          "explanation": "びゅ? byu? ???.",
+          "explanation": "びゅ는 byu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-100",
-          "source": "???? 101",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 101",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "びょ",
           "displaySub": "요음",
           "options": [
@@ -3293,15 +3293,15 @@
             "byo"
           ],
           "answer": 3,
-          "explanation": "びょ? byo? ???.",
+          "explanation": "びょ는 byo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-101",
-          "source": "???? 102",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 102",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぴゃ",
           "displaySub": "요음",
           "options": [
@@ -3311,15 +3311,15 @@
             "za"
           ],
           "answer": 0,
-          "explanation": "ぴゃ? pya? ???.",
+          "explanation": "ぴゃ는 pya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-102",
-          "source": "???? 103",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 103",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぴゅ",
           "displaySub": "요음",
           "options": [
@@ -3329,15 +3329,15 @@
             "ru"
           ],
           "answer": 0,
-          "explanation": "ぴゅ? pyu? ???.",
+          "explanation": "ぴゅ는 pyu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-hiragana-103",
-          "source": "???? 104",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 104",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ぴょ",
           "displaySub": "요음",
           "options": [
@@ -3347,15 +3347,15 @@
             "te"
           ],
           "answer": 2,
-          "explanation": "ぴょ? pyo? ???.",
+          "explanation": "ぴょ는 pyo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-hiragana-104",
-          "source": "???? 105",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 105",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ゔ",
           "displaySub": "소문자 / 기타",
           "options": [
@@ -3365,21 +3365,21 @@
             "wa"
           ],
           "answer": 1,
-          "explanation": "ゔ? vu? ???.",
+          "explanation": "ゔ는 vu로 읽어요.",
           "tone": "tone-coral"
         }
       ]
     },
     "katakana": {
-      "label": "????",
-      "heading": "???? ??? ??",
+      "label": "카타카나",
+      "heading": "카타카나 퀴즈로 익혀봐요",
       "items": [
         {
           "id": "bp-katakana-0",
-          "source": "???? 1",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 1",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ア",
           "displaySub": "기본음",
           "options": [
@@ -3389,15 +3389,15 @@
             "cho"
           ],
           "answer": 0,
-          "explanation": "ア? a? ???.",
+          "explanation": "ア는 a로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-1",
-          "source": "???? 2",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 2",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "イ",
           "displaySub": "기본음",
           "options": [
@@ -3407,15 +3407,15 @@
             "hyo"
           ],
           "answer": 2,
-          "explanation": "イ? i? ???.",
+          "explanation": "イ는 i로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-2",
-          "source": "???? 3",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 3",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ウ",
           "displaySub": "기본음",
           "options": [
@@ -3425,15 +3425,15 @@
             "nu"
           ],
           "answer": 0,
-          "explanation": "ウ? u? ???.",
+          "explanation": "ウ는 u로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-3",
-          "source": "???? 4",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 4",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "エ",
           "displaySub": "기본음",
           "options": [
@@ -3443,15 +3443,15 @@
             "pyo"
           ],
           "answer": 0,
-          "explanation": "エ? e? ???.",
+          "explanation": "エ는 e로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-4",
-          "source": "???? 5",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 5",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "オ",
           "displaySub": "기본음",
           "options": [
@@ -3461,15 +3461,15 @@
             "kyo"
           ],
           "answer": 2,
-          "explanation": "オ? o? ???.",
+          "explanation": "オ는 o로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-5",
-          "source": "???? 6",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 6",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "カ",
           "displaySub": "기본음",
           "options": [
@@ -3479,15 +3479,15 @@
             "ka"
           ],
           "answer": 3,
-          "explanation": "カ? ka? ???.",
+          "explanation": "カ는 ka로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-6",
-          "source": "???? 7",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 7",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "キ",
           "displaySub": "기본음",
           "options": [
@@ -3497,15 +3497,15 @@
             "ya"
           ],
           "answer": 1,
-          "explanation": "キ? ki? ???.",
+          "explanation": "キ는 ki로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-7",
-          "source": "???? 8",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 8",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ク",
           "displaySub": "기본음",
           "options": [
@@ -3515,15 +3515,15 @@
             "ku"
           ],
           "answer": 3,
-          "explanation": "ク? ku? ???.",
+          "explanation": "ク는 ku로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-8",
-          "source": "???? 9",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 9",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ケ",
           "displaySub": "기본음",
           "options": [
@@ -3533,15 +3533,15 @@
             "ku"
           ],
           "answer": 2,
-          "explanation": "ケ? ke? ???.",
+          "explanation": "ケ는 ke로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-9",
-          "source": "???? 10",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 10",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "コ",
           "displaySub": "기본음",
           "options": [
@@ -3551,15 +3551,15 @@
             "ko"
           ],
           "answer": 3,
-          "explanation": "コ? ko? ???.",
+          "explanation": "コ는 ko로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-10",
-          "source": "???? 11",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 11",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "サ",
           "displaySub": "기본음",
           "options": [
@@ -3569,15 +3569,15 @@
             "cho"
           ],
           "answer": 1,
-          "explanation": "サ? sa? ???.",
+          "explanation": "サ는 sa로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-11",
-          "source": "???? 12",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 12",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "シ",
           "displaySub": "기본음",
           "options": [
@@ -3587,15 +3587,15 @@
             "shi"
           ],
           "answer": 3,
-          "explanation": "シ? shi? ???.",
+          "explanation": "シ는 shi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-12",
-          "source": "???? 13",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 13",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ス",
           "displaySub": "기본음",
           "options": [
@@ -3605,15 +3605,15 @@
             "yu"
           ],
           "answer": 1,
-          "explanation": "ス? su? ???.",
+          "explanation": "ス는 su로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-13",
-          "source": "???? 14",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 14",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "セ",
           "displaySub": "기본음",
           "options": [
@@ -3623,15 +3623,15 @@
             "se"
           ],
           "answer": 3,
-          "explanation": "セ? se? ???.",
+          "explanation": "セ는 se로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-14",
-          "source": "???? 15",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 15",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ソ",
           "displaySub": "기본음",
           "options": [
@@ -3641,15 +3641,15 @@
             "ra"
           ],
           "answer": 1,
-          "explanation": "ソ? so? ???.",
+          "explanation": "ソ는 so로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-15",
-          "source": "???? 16",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 16",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "タ",
           "displaySub": "기본음",
           "options": [
@@ -3659,15 +3659,15 @@
             "ta"
           ],
           "answer": 3,
-          "explanation": "タ? ta? ???.",
+          "explanation": "タ는 ta로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-16",
-          "source": "???? 17",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 17",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "チ",
           "displaySub": "기본음",
           "options": [
@@ -3677,15 +3677,15 @@
             "ge"
           ],
           "answer": 2,
-          "explanation": "チ? chi? ???.",
+          "explanation": "チ는 chi로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-17",
-          "source": "???? 18",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 18",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ツ",
           "displaySub": "기본음",
           "options": [
@@ -3695,15 +3695,15 @@
             "sa"
           ],
           "answer": 0,
-          "explanation": "ツ? tsu? ???.",
+          "explanation": "ツ는 tsu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-18",
-          "source": "???? 19",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 19",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "テ",
           "displaySub": "기본음",
           "options": [
@@ -3713,15 +3713,15 @@
             "ji"
           ],
           "answer": 0,
-          "explanation": "テ? te? ???.",
+          "explanation": "テ는 te로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-19",
-          "source": "???? 20",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 20",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ト",
           "displaySub": "기본음",
           "options": [
@@ -3731,15 +3731,15 @@
             "yu"
           ],
           "answer": 2,
-          "explanation": "ト? to? ???.",
+          "explanation": "ト는 to로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-20",
-          "source": "???? 21",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 21",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ナ",
           "displaySub": "기본음",
           "options": [
@@ -3749,15 +3749,15 @@
             "ryo"
           ],
           "answer": 0,
-          "explanation": "ナ? na? ???.",
+          "explanation": "ナ는 na로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-21",
-          "source": "???? 22",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 22",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ニ",
           "displaySub": "기본음",
           "options": [
@@ -3767,15 +3767,15 @@
             "ni"
           ],
           "answer": 3,
-          "explanation": "ニ? ni? ???.",
+          "explanation": "ニ는 ni로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-22",
-          "source": "???? 23",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 23",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヌ",
           "displaySub": "기본음",
           "options": [
@@ -3785,15 +3785,15 @@
             "cha"
           ],
           "answer": 0,
-          "explanation": "ヌ? nu? ???.",
+          "explanation": "ヌ는 nu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-23",
-          "source": "???? 24",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 24",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ネ",
           "displaySub": "기본음",
           "options": [
@@ -3803,15 +3803,15 @@
             "te"
           ],
           "answer": 1,
-          "explanation": "ネ? ne? ???.",
+          "explanation": "ネ는 ne로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-24",
-          "source": "???? 25",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 25",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ノ",
           "displaySub": "기본음",
           "options": [
@@ -3821,15 +3821,15 @@
             "e"
           ],
           "answer": 0,
-          "explanation": "ノ? no? ???.",
+          "explanation": "ノ는 no로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-25",
-          "source": "???? 26",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 26",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ハ",
           "displaySub": "기본음",
           "options": [
@@ -3839,15 +3839,15 @@
             "ha"
           ],
           "answer": 3,
-          "explanation": "ハ? ha? ???.",
+          "explanation": "ハ는 ha로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-26",
-          "source": "???? 27",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 27",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヒ",
           "displaySub": "기본음",
           "options": [
@@ -3857,15 +3857,15 @@
             "se"
           ],
           "answer": 2,
-          "explanation": "ヒ? hi? ???.",
+          "explanation": "ヒ는 hi로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-27",
-          "source": "???? 28",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 28",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "フ",
           "displaySub": "기본음",
           "options": [
@@ -3875,15 +3875,15 @@
             "hi"
           ],
           "answer": 2,
-          "explanation": "フ? fu? ???.",
+          "explanation": "フ는 fu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-28",
-          "source": "???? 29",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 29",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヘ",
           "displaySub": "기본음",
           "options": [
@@ -3893,15 +3893,15 @@
             "byu"
           ],
           "answer": 2,
-          "explanation": "ヘ? he? ???.",
+          "explanation": "ヘ는 he로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-29",
-          "source": "???? 30",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 30",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ホ",
           "displaySub": "기본음",
           "options": [
@@ -3911,15 +3911,15 @@
             "ho"
           ],
           "answer": 3,
-          "explanation": "ホ? ho? ???.",
+          "explanation": "ホ는 ho로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-30",
-          "source": "???? 31",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 31",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "マ",
           "displaySub": "기본음",
           "options": [
@@ -3929,15 +3929,15 @@
             "ryu"
           ],
           "answer": 0,
-          "explanation": "マ? ma? ???.",
+          "explanation": "マ는 ma로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-31",
-          "source": "???? 32",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 32",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ミ",
           "displaySub": "기본음",
           "options": [
@@ -3947,15 +3947,15 @@
             "mi"
           ],
           "answer": 3,
-          "explanation": "ミ? mi? ???.",
+          "explanation": "ミ는 mi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-32",
-          "source": "???? 33",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 33",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ム",
           "displaySub": "기본음",
           "options": [
@@ -3965,15 +3965,15 @@
             "pe"
           ],
           "answer": 0,
-          "explanation": "ム? mu? ???.",
+          "explanation": "ム는 mu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-33",
-          "source": "???? 34",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 34",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "メ",
           "displaySub": "기본음",
           "options": [
@@ -3983,15 +3983,15 @@
             "yu"
           ],
           "answer": 1,
-          "explanation": "メ? me? ???.",
+          "explanation": "メ는 me로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-34",
-          "source": "???? 35",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 35",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "モ",
           "displaySub": "기본음",
           "options": [
@@ -4001,15 +4001,15 @@
             "wa"
           ],
           "answer": 2,
-          "explanation": "モ? mo? ???.",
+          "explanation": "モ는 mo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-35",
-          "source": "???? 36",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 36",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヤ",
           "displaySub": "기본음",
           "options": [
@@ -4019,15 +4019,15 @@
             "myu"
           ],
           "answer": 0,
-          "explanation": "ヤ? ya? ???.",
+          "explanation": "ヤ는 ya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-36",
-          "source": "???? 37",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 37",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ユ",
           "displaySub": "기본음",
           "options": [
@@ -4037,15 +4037,15 @@
             "o"
           ],
           "answer": 2,
-          "explanation": "ユ? yu? ???.",
+          "explanation": "ユ는 yu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-37",
-          "source": "???? 38",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 38",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヨ",
           "displaySub": "기본음",
           "options": [
@@ -4055,15 +4055,15 @@
             "o"
           ],
           "answer": 0,
-          "explanation": "ヨ? yo? ???.",
+          "explanation": "ヨ는 yo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-38",
-          "source": "???? 39",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 39",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ラ",
           "displaySub": "기본음",
           "options": [
@@ -4073,15 +4073,15 @@
             "su"
           ],
           "answer": 2,
-          "explanation": "ラ? ra? ???.",
+          "explanation": "ラ는 ra로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-39",
-          "source": "???? 40",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 40",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "リ",
           "displaySub": "기본음",
           "options": [
@@ -4091,15 +4091,15 @@
             "pu"
           ],
           "answer": 0,
-          "explanation": "リ? ri? ???.",
+          "explanation": "リ는 ri로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-40",
-          "source": "???? 41",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 41",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ル",
           "displaySub": "기본음",
           "options": [
@@ -4109,15 +4109,15 @@
             "ru"
           ],
           "answer": 3,
-          "explanation": "ル? ru? ???.",
+          "explanation": "ル는 ru로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-41",
-          "source": "???? 42",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 42",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "レ",
           "displaySub": "기본음",
           "options": [
@@ -4127,15 +4127,15 @@
             "so"
           ],
           "answer": 2,
-          "explanation": "レ? re? ???.",
+          "explanation": "レ는 re로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-42",
-          "source": "???? 43",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 43",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ロ",
           "displaySub": "기본음",
           "options": [
@@ -4145,15 +4145,15 @@
             "ba"
           ],
           "answer": 1,
-          "explanation": "ロ? ro? ???.",
+          "explanation": "ロ는 ro로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-43",
-          "source": "???? 44",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 44",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ワ",
           "displaySub": "기본음",
           "options": [
@@ -4163,15 +4163,15 @@
             "wa"
           ],
           "answer": 3,
-          "explanation": "ワ? wa? ???.",
+          "explanation": "ワ는 wa로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-44",
-          "source": "???? 45",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 45",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヲ",
           "displaySub": "기본음",
           "options": [
@@ -4181,15 +4181,15 @@
             "su"
           ],
           "answer": 0,
-          "explanation": "ヲ? wo? ???.",
+          "explanation": "ヲ는 wo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-45",
-          "source": "???? 46",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 46",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ン",
           "displaySub": "기본음",
           "options": [
@@ -4199,15 +4199,15 @@
             "n"
           ],
           "answer": 3,
-          "explanation": "ン? n? ???.",
+          "explanation": "ン는 n로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-46",
-          "source": "???? 47",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 47",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ガ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4217,15 +4217,15 @@
             "he"
           ],
           "answer": 0,
-          "explanation": "ガ? ga? ???.",
+          "explanation": "ガ는 ga로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-47",
-          "source": "???? 48",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 48",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ギ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4235,15 +4235,15 @@
             "u"
           ],
           "answer": 2,
-          "explanation": "ギ? gi? ???.",
+          "explanation": "ギ는 gi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-48",
-          "source": "???? 49",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 49",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "グ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4253,15 +4253,15 @@
             "gyu"
           ],
           "answer": 0,
-          "explanation": "グ? gu? ???.",
+          "explanation": "グ는 gu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-49",
-          "source": "???? 50",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 50",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ゲ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4271,15 +4271,15 @@
             "pyo"
           ],
           "answer": 0,
-          "explanation": "ゲ? ge? ???.",
+          "explanation": "ゲ는 ge로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-50",
-          "source": "???? 51",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 51",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ゴ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4289,15 +4289,15 @@
             "a"
           ],
           "answer": 2,
-          "explanation": "ゴ? go? ???.",
+          "explanation": "ゴ는 go로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-51",
-          "source": "???? 52",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 52",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ザ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4307,15 +4307,15 @@
             "pa"
           ],
           "answer": 0,
-          "explanation": "ザ? za? ???.",
+          "explanation": "ザ는 za로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-52",
-          "source": "???? 53",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 53",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ジ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4325,15 +4325,15 @@
             "yu"
           ],
           "answer": 2,
-          "explanation": "ジ? ji? ???.",
+          "explanation": "ジ는 ji로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-53",
-          "source": "???? 54",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 54",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ズ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4343,15 +4343,15 @@
             "ha"
           ],
           "answer": 0,
-          "explanation": "ズ? zu? ???.",
+          "explanation": "ズ는 zu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-54",
-          "source": "???? 55",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 55",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ゼ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4361,15 +4361,15 @@
             "ji"
           ],
           "answer": 0,
-          "explanation": "ゼ? ze? ???.",
+          "explanation": "ゼ는 ze로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-55",
-          "source": "???? 56",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 56",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ゾ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4379,15 +4379,15 @@
             "shu"
           ],
           "answer": 2,
-          "explanation": "ゾ? zo? ???.",
+          "explanation": "ゾ는 zo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-56",
-          "source": "???? 57",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 57",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ダ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4397,15 +4397,15 @@
             "to"
           ],
           "answer": 0,
-          "explanation": "ダ? da? ???.",
+          "explanation": "ダ는 da로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-57",
-          "source": "???? 58",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 58",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヂ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4415,15 +4415,15 @@
             "e"
           ],
           "answer": 0,
-          "explanation": "ヂ? ji? ???.",
+          "explanation": "ヂ는 ji로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-58",
-          "source": "???? 59",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 59",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヅ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4433,15 +4433,15 @@
             "go"
           ],
           "answer": 2,
-          "explanation": "ヅ? zu? ???.",
+          "explanation": "ヅ는 zu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-59",
-          "source": "???? 60",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 60",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "デ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4451,15 +4451,15 @@
             "de"
           ],
           "answer": 3,
-          "explanation": "デ? de? ???.",
+          "explanation": "デ는 de로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-60",
-          "source": "???? 61",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 61",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ド",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4469,15 +4469,15 @@
             "yu"
           ],
           "answer": 1,
-          "explanation": "ド? do? ???.",
+          "explanation": "ド는 do로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-61",
-          "source": "???? 62",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 62",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "バ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4487,15 +4487,15 @@
             "ru"
           ],
           "answer": 0,
-          "explanation": "バ? ba? ???.",
+          "explanation": "バ는 ba로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-62",
-          "source": "???? 63",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 63",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ビ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4505,15 +4505,15 @@
             "bi"
           ],
           "answer": 3,
-          "explanation": "ビ? bi? ???.",
+          "explanation": "ビ는 bi로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-63",
-          "source": "???? 64",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 64",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ブ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4523,15 +4523,15 @@
             "wo"
           ],
           "answer": 0,
-          "explanation": "ブ? bu? ???.",
+          "explanation": "ブ는 bu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-64",
-          "source": "???? 65",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 65",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ベ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4541,15 +4541,15 @@
             "ma"
           ],
           "answer": 2,
-          "explanation": "ベ? be? ???.",
+          "explanation": "ベ는 be로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-65",
-          "source": "???? 66",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 66",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ボ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4559,15 +4559,15 @@
             "po"
           ],
           "answer": 2,
-          "explanation": "ボ? bo? ???.",
+          "explanation": "ボ는 bo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-66",
-          "source": "???? 67",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 67",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "パ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4577,15 +4577,15 @@
             "gyu"
           ],
           "answer": 1,
-          "explanation": "パ? pa? ???.",
+          "explanation": "パ는 pa로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-67",
-          "source": "???? 68",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 68",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ピ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4595,15 +4595,15 @@
             "jo"
           ],
           "answer": 0,
-          "explanation": "ピ? pi? ???.",
+          "explanation": "ピ는 pi로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-68",
-          "source": "???? 69",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 69",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "プ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4613,15 +4613,15 @@
             "pu"
           ],
           "answer": 3,
-          "explanation": "プ? pu? ???.",
+          "explanation": "プ는 pu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-69",
-          "source": "???? 70",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 70",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ペ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4631,15 +4631,15 @@
             "be"
           ],
           "answer": 0,
-          "explanation": "ペ? pe? ???.",
+          "explanation": "ペ는 pe로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-70",
-          "source": "???? 71",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 71",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ポ",
           "displaySub": "탁음 / 반탁음",
           "options": [
@@ -4649,15 +4649,15 @@
             "nyu"
           ],
           "answer": 1,
-          "explanation": "ポ? po? ???.",
+          "explanation": "ポ는 po로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-71",
-          "source": "???? 72",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 72",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "キャ",
           "displaySub": "요음",
           "options": [
@@ -4667,15 +4667,15 @@
             "ba"
           ],
           "answer": 0,
-          "explanation": "キャ? kya? ???.",
+          "explanation": "キャ는 kya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-72",
-          "source": "???? 73",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 73",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "キュ",
           "displaySub": "요음",
           "options": [
@@ -4685,15 +4685,15 @@
             "ge"
           ],
           "answer": 2,
-          "explanation": "キュ? kyu? ???.",
+          "explanation": "キュ는 kyu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-73",
-          "source": "???? 74",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 74",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "キョ",
           "displaySub": "요음",
           "options": [
@@ -4703,15 +4703,15 @@
             "ji"
           ],
           "answer": 0,
-          "explanation": "キョ? kyo? ???.",
+          "explanation": "キョ는 kyo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-74",
-          "source": "???? 75",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 75",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "シャ",
           "displaySub": "요음",
           "options": [
@@ -4721,15 +4721,15 @@
             "zu"
           ],
           "answer": 0,
-          "explanation": "シャ? sha? ???.",
+          "explanation": "シャ는 sha로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-75",
-          "source": "???? 76",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 76",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "シュ",
           "displaySub": "요음",
           "options": [
@@ -4739,15 +4739,15 @@
             "o"
           ],
           "answer": 2,
-          "explanation": "シュ? shu? ???.",
+          "explanation": "シュ는 shu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-76",
-          "source": "???? 77",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 77",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ショ",
           "displaySub": "요음",
           "options": [
@@ -4757,15 +4757,15 @@
             "u"
           ],
           "answer": 0,
-          "explanation": "ショ? sho? ???.",
+          "explanation": "ショ는 sho로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-77",
-          "source": "???? 78",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 78",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "チャ",
           "displaySub": "요음",
           "options": [
@@ -4775,15 +4775,15 @@
             "de"
           ],
           "answer": 0,
-          "explanation": "チャ? cha? ???.",
+          "explanation": "チャ는 cha로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-78",
-          "source": "???? 79",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 79",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "チュ",
           "displaySub": "요음",
           "options": [
@@ -4793,15 +4793,15 @@
             "ryo"
           ],
           "answer": 2,
-          "explanation": "チュ? chu? ???.",
+          "explanation": "チュ는 chu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-79",
-          "source": "???? 80",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 80",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "チョ",
           "displaySub": "요음",
           "options": [
@@ -4811,15 +4811,15 @@
             "ji"
           ],
           "answer": 0,
-          "explanation": "チョ? cho? ???.",
+          "explanation": "チョ는 cho로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-80",
-          "source": "???? 81",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 81",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ニャ",
           "displaySub": "요음",
           "options": [
@@ -4829,15 +4829,15 @@
             "pya"
           ],
           "answer": 0,
-          "explanation": "ニャ? nya? ???.",
+          "explanation": "ニャ는 nya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-81",
-          "source": "???? 82",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 82",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ニュ",
           "displaySub": "요음",
           "options": [
@@ -4847,15 +4847,15 @@
             "be"
           ],
           "answer": 2,
-          "explanation": "ニュ? nyu? ???.",
+          "explanation": "ニュ는 nyu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-82",
-          "source": "???? 83",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 83",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ニョ",
           "displaySub": "요음",
           "options": [
@@ -4865,15 +4865,15 @@
             "a"
           ],
           "answer": 0,
-          "explanation": "ニョ? nyo? ???.",
+          "explanation": "ニョ는 nyo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-83",
-          "source": "???? 84",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 84",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヒャ",
           "displaySub": "요음",
           "options": [
@@ -4883,15 +4883,15 @@
             "n"
           ],
           "answer": 2,
-          "explanation": "ヒャ? hya? ???.",
+          "explanation": "ヒャ는 hya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-84",
-          "source": "???? 85",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 85",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヒュ",
           "displaySub": "요음",
           "options": [
@@ -4901,15 +4901,15 @@
             "hyu"
           ],
           "answer": 3,
-          "explanation": "ヒュ? hyu? ???.",
+          "explanation": "ヒュ는 hyu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-85",
-          "source": "???? 86",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 86",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヒョ",
           "displaySub": "요음",
           "options": [
@@ -4919,15 +4919,15 @@
             "ge"
           ],
           "answer": 1,
-          "explanation": "ヒョ? hyo? ???.",
+          "explanation": "ヒョ는 hyo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-86",
-          "source": "???? 87",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 87",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ミャ",
           "displaySub": "요음",
           "options": [
@@ -4937,15 +4937,15 @@
             "gyo"
           ],
           "answer": 0,
-          "explanation": "ミャ? mya? ???.",
+          "explanation": "ミャ는 mya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-87",
-          "source": "???? 88",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 88",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ミュ",
           "displaySub": "요음",
           "options": [
@@ -4955,15 +4955,15 @@
             "nu"
           ],
           "answer": 2,
-          "explanation": "ミュ? myu? ???.",
+          "explanation": "ミュ는 myu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-88",
-          "source": "???? 89",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 89",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ミョ",
           "displaySub": "요음",
           "options": [
@@ -4973,15 +4973,15 @@
             "fu"
           ],
           "answer": 0,
-          "explanation": "ミョ? myo? ???.",
+          "explanation": "ミョ는 myo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-89",
-          "source": "???? 90",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 90",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "リャ",
           "displaySub": "요음",
           "options": [
@@ -4991,15 +4991,15 @@
             "mya"
           ],
           "answer": 1,
-          "explanation": "リャ? rya? ???.",
+          "explanation": "リャ는 rya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-90",
-          "source": "???? 91",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 91",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "リュ",
           "displaySub": "요음",
           "options": [
@@ -5009,15 +5009,15 @@
             "ryu"
           ],
           "answer": 3,
-          "explanation": "リュ? ryu? ???.",
+          "explanation": "リュ는 ryu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-91",
-          "source": "???? 92",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 92",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "リョ",
           "displaySub": "요음",
           "options": [
@@ -5027,15 +5027,15 @@
             "ku"
           ],
           "answer": 2,
-          "explanation": "リョ? ryo? ???.",
+          "explanation": "リョ는 ryo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-92",
-          "source": "???? 93",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 93",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ギャ",
           "displaySub": "요음",
           "options": [
@@ -5045,15 +5045,15 @@
             "sha"
           ],
           "answer": 2,
-          "explanation": "ギャ? gya? ???.",
+          "explanation": "ギャ는 gya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-93",
-          "source": "???? 94",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 94",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ギュ",
           "displaySub": "요음",
           "options": [
@@ -5063,15 +5063,15 @@
             "gyu"
           ],
           "answer": 3,
-          "explanation": "ギュ? gyu? ???.",
+          "explanation": "ギュ는 gyu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-94",
-          "source": "???? 95",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 95",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ギョ",
           "displaySub": "요음",
           "options": [
@@ -5081,15 +5081,15 @@
             "pya"
           ],
           "answer": 2,
-          "explanation": "ギョ? gyo? ???.",
+          "explanation": "ギョ는 gyo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-95",
-          "source": "???? 96",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 96",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ジャ",
           "displaySub": "요음",
           "options": [
@@ -5099,15 +5099,15 @@
             "ja"
           ],
           "answer": 3,
-          "explanation": "ジャ? ja? ???.",
+          "explanation": "ジャ는 ja로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-96",
-          "source": "???? 97",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 97",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ジュ",
           "displaySub": "요음",
           "options": [
@@ -5117,15 +5117,15 @@
             "ru"
           ],
           "answer": 1,
-          "explanation": "ジュ? ju? ???.",
+          "explanation": "ジュ는 ju로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-97",
-          "source": "???? 98",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 98",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ジョ",
           "displaySub": "요음",
           "options": [
@@ -5135,15 +5135,15 @@
             "jo"
           ],
           "answer": 3,
-          "explanation": "ジョ? jo? ???.",
+          "explanation": "ジョ는 jo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-98",
-          "source": "???? 99",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 99",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ビャ",
           "displaySub": "요음",
           "options": [
@@ -5153,15 +5153,15 @@
             "da"
           ],
           "answer": 0,
-          "explanation": "ビャ? bya? ???.",
+          "explanation": "ビャ는 bya로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-99",
-          "source": "???? 100",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 100",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ビュ",
           "displaySub": "요음",
           "options": [
@@ -5171,15 +5171,15 @@
             "tsu"
           ],
           "answer": 2,
-          "explanation": "ビュ? byu? ???.",
+          "explanation": "ビュ는 byu로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-100",
-          "source": "???? 101",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 101",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ビョ",
           "displaySub": "요음",
           "options": [
@@ -5189,15 +5189,15 @@
             "na"
           ],
           "answer": 0,
-          "explanation": "ビョ? byo? ???.",
+          "explanation": "ビョ는 byo로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-101",
-          "source": "???? 102",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 102",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ピャ",
           "displaySub": "요음",
           "options": [
@@ -5207,15 +5207,15 @@
             "pya"
           ],
           "answer": 3,
-          "explanation": "ピャ? pya? ???.",
+          "explanation": "ピャ는 pya로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-102",
-          "source": "???? 103",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 103",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ピュ",
           "displaySub": "요음",
           "options": [
@@ -5225,15 +5225,15 @@
             "ga"
           ],
           "answer": 1,
-          "explanation": "ピュ? pyu? ???.",
+          "explanation": "ピュ는 pyu로 읽어요.",
           "tone": "tone-coral"
         },
         {
           "id": "bp-katakana-103",
-          "source": "???? 104",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 104",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ピョ",
           "displaySub": "요음",
           "options": [
@@ -5243,15 +5243,15 @@
             "pyo"
           ],
           "answer": 3,
-          "explanation": "ピョ? pyo? ???.",
+          "explanation": "ピョ는 pyo로 읽어요.",
           "tone": "tone-sky"
         },
         {
           "id": "bp-katakana-104",
-          "source": "???? 105",
-          "title": "???? ??",
-          "note": "?? ? ?? ???? ????.",
-          "prompt": "? ??, ??? ?????",
+          "source": "문자 105",
+          "title": "문자를 읽어봐요",
+          "note": "문자를 보고 알맞은 읽기를 골라봐요.",
+          "prompt": "이 문자, 어떻게 읽을까요?",
           "display": "ヴ",
           "displaySub": "소문자 / 기타",
           "options": [
@@ -5261,7 +5261,7 @@
             "ge"
           ],
           "answer": 0,
-          "explanation": "ヴ? vu? ???.",
+          "explanation": "ヴ는 vu로 읽어요.",
           "tone": "tone-coral"
         }
       ]

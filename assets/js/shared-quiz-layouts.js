@@ -1633,7 +1633,7 @@
 
   function createReadingPracticeLayout() {
     return createPracticeModeLayout({
-      sidebarHead: "<div class=\"match-sidebar-head\"><span class=\"eyebrow\">READING HUD</span><h3>독해 퀴즈</h3></div>",
+      sidebarHead: "",
       optionsShellConfig: {
         shellId: "reading-options-shell",
         shellClassName: "match-options-shell",
@@ -1667,25 +1667,14 @@
       viewMarkup: createPracticeModeCardLayout({
         articleClassName: "reading-card",
         metaClassName: "reading-meta",
-        metaItems: [
-          { id: "reading-level", text: "N5" },
-          { id: "reading-source", text: "N5R p1" }
-        ],
+        metaItems: [],
         hudItems: [
           { kind: "progress", label: "진행", valueId: "reading-progress", value: "1 / 3" },
           { kind: "timer", label: "남은 시간", valueId: "reading-timer", value: "00:45" },
           { kind: "correct", label: "정답", valueId: "reading-correct", value: "0" },
           { kind: "wrong", label: "오답", valueId: "reading-wrong", value: "0" }
         ],
-        header: {
-          className: "reading-header",
-          eyebrow: "READING SET",
-          titleId: "reading-title",
-          title: "한 문제씩 읽어봐요",
-          noteClassName: "reading-korean",
-          noteId: "reading-korean",
-          note: ""
-        },
+        header: null,
         contentMarkup: `
           <div class="reading-passage" id="reading-passage"></div>
           <div class="reading-question-box"><span class="eyebrow">QUESTION</span><h4 id="reading-question">질문을 불러오고 있어요.</h4></div>

@@ -10215,11 +10215,7 @@ function renderReadingPractice() {
   const passage = document.getElementById("reading-passage");
   const optionsContainer = document.getElementById("reading-options");
   const nextButton = document.getElementById("reading-next");
-  const level = document.getElementById("reading-level");
-  const source = document.getElementById("reading-source");
   const progress = document.getElementById("reading-progress");
-  const title = document.getElementById("reading-title");
-  const korean = document.getElementById("reading-korean");
   const question = document.getElementById("reading-question");
   const feedback = document.getElementById("reading-feedback");
   const explanation = document.getElementById("reading-explanation");
@@ -10239,11 +10235,7 @@ function renderReadingPractice() {
     !readingCard ||
     !passage ||
     !optionsContainer ||
-    !level ||
-    !source ||
     !progress ||
-    !title ||
-    !korean ||
     !question ||
     !feedback ||
     !explanation
@@ -10284,11 +10276,7 @@ function renderReadingPractice() {
   empty.hidden = true;
   practiceView.hidden = false;
 
-  level.textContent = state.readingLevel;
-  source.textContent = current.source;
   progress.textContent = `${currentSessionIndex + 1} / ${activeCount}`;
-  title.textContent = softenVisibleKoreanCopy(current.title);
-  korean.textContent = softenVisibleKoreanCopy(current.korean);
   question.textContent = softenVisibleKoreanCopy(current.question);
   feedback.textContent = "";
   explanation.textContent = "";

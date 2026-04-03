@@ -124,6 +124,12 @@
     { value: "mastered", label: "익혔어요" },
     { value: "unmarked", label: "아직 안 봤어요" }
   ];
+  const GRAMMAR_COLLECTION_OPTIONS_CATALOG = [
+    { value: "all", label: "전체" },
+    { value: "review", label: "다시 볼래요" },
+    { value: "mastered", label: "익혔어요" },
+    { value: "unmarked", label: "미분류" }
+  ];
 
   const KANJI_COLLECTION_OPTIONS_BASIC = [
     { value: "all", label: "전체" },
@@ -206,6 +212,30 @@
         label: "품사",
         ariaLabel: partAriaLabel || `${ariaPrefix} 품사 고르기`,
         options: partOptions
+      })
+    ];
+  }
+
+  function buildLevelCollectionSelectFields({
+    levelId,
+    collectionId,
+    ariaPrefix,
+    levelOptions = JLPT_LEVEL_OPTIONS,
+    collectionOptions = KANJI_COLLECTION_OPTIONS_CATALOG,
+    levelLabel = "레벨"
+  }) {
+    return [
+      createSelectField({
+        id: levelId,
+        label: levelLabel,
+        ariaLabel: `${ariaPrefix} ${levelLabel} 고르기`,
+        options: levelOptions
+      }),
+      createSelectField({
+        id: collectionId,
+        label: "모아보기",
+        ariaLabel: `${ariaPrefix} 모아보기 고르기`,
+        options: collectionOptions
       })
     ];
   }
@@ -715,6 +745,50 @@
         scope: "kanji",
         viewClassName: "vocab-list-view kanji-list-view",
         listClassName: "vocab-list kanji-list"
+      })
+    },
+    grammar: {
+      viewButtonsScope: "grammar",
+      toolbarAriaLabel: "문법 필터",
+      toolbarClassName: "vocab-select-toolbar grammar-filter-toolbar",
+      panelHeadLayout: "inline",
+      selectFields: buildLevelCollectionSelectFields({
+        levelId: "grammar-level-select",
+        collectionId: "grammar-filter-select",
+        ariaPrefix: "문법",
+        collectionOptions: GRAMMAR_COLLECTION_OPTIONS_CATALOG
+      }),
+      summaryId: "grammar-summary",
+      summaryText: "문형을 준비하고 있어요",
+      viewSwitchAriaLabel: "문법 보기 방식 고르기",
+      flashcard: createCatalogFlashcardConfig({
+        viewId: "grammar-card-view",
+        viewClassName: "vocab-card-view grammar-card-view",
+        articleClassName: "flashcard grammar-flashcard",
+        articleId: "grammar-flashcard",
+        toggleId: "grammar-flashcard-toggle",
+        meaningId: "grammar-flashcard-meaning",
+        levelId: "grammar-flashcard-level",
+        levelText: "N5",
+        wordId: "grammar-flashcard-word",
+        wordText: "문형을 불러오고 있어요",
+        readingId: "grammar-flashcard-reading",
+        readingText: "",
+        readingHidden: true,
+        meaningText: "설명은 뒤집으면 볼 수 있어요",
+        hintId: "grammar-flashcard-hint",
+        hintText: "눌러서 설명을 확인해볼까요?",
+        navAriaLabel: "문법 카드 넘기기",
+        scopeLabel: "문형",
+        prevId: "grammar-flashcard-prev",
+        nextId: "grammar-flashcard-next",
+        againId: "grammar-flashcard-review",
+        masteredId: "grammar-flashcard-mastered"
+      }),
+      listView: createCatalogListViewConfig({
+        scope: "grammar",
+        viewClassName: "vocab-list-view grammar-list-view",
+        listClassName: "vocab-list grammar-list"
       })
     }
   };
@@ -1508,6 +1582,12 @@
             ariaLabel: "문법 레벨 고르기",
             options: JLPT_LEVEL_OPTIONS
           }),
+          createStudySelectGroup({
+            groupLabel: "모아보기",
+            id: "grammar-practice-filter-select",
+            ariaLabel: "문법 퀴즈 모아보기 고르기",
+            options: GRAMMAR_COLLECTION_OPTIONS_CATALOG
+          }),
           ...createQuestionDurationGroups({
             countSpinnerId: "grammar-practice-count",
             countAriaLabel: "문법 퀴즈 문제 수",
@@ -1666,7 +1746,8 @@
   function createStudyLayout(kind) {
     const studyLayoutMap = {
       "vocab-catalog": () => createCatalogLayoutByScope("vocab"),
-      "kanji-catalog": () => createCatalogLayoutByScope("kanji")
+      "kanji-catalog": () => createCatalogLayoutByScope("kanji"),
+      "grammar-catalog": () => createCatalogLayoutByScope("grammar")
     };
     const layoutFactory = studyLayoutMap[kind];
 

@@ -35,14 +35,87 @@
       "level": "N3",
       "pattern": "〜ことになる",
       "description": "그렇게 정해지거나 되기로 한 일을 말할 때 써요."
+    },
+    {
+      "id": "g7",
+      "level": "N5",
+      "pattern": "명사で",
+      "description": "이동 수단이나 방법을 나타낼 때 쓰는 조사예요."
+    },
+    {
+      "id": "g8",
+      "level": "N5",
+      "pattern": "사람に会う",
+      "description": "사람을 만날 때는 「に会う」 형태를 써요."
+    },
+    {
+      "id": "g9",
+      "level": "N5",
+      "pattern": "な형용사で",
+      "description": "な형용사를 이어서 말할 때 쓰는 연결형이에요."
+    },
+    {
+      "id": "g10",
+      "level": "N5",
+      "pattern": "동사ます형 + ながら",
+      "description": "두 동작을 동시에 이어 말할 때 쓰는 연결 표현이에요."
+    },
+    {
+      "id": "g11",
+      "level": "N4",
+      "pattern": "시간 + で終わる",
+      "description": "얼마 만에 끝났는지 말할 때 쓰는 시간 표현이에요."
+    },
+    {
+      "id": "g12",
+      "level": "N4",
+      "pattern": "〜によって",
+      "description": "수동문에서 행위자를 나타낼 때 쓰는 표현이에요."
+    },
+    {
+      "id": "g13",
+      "level": "N4",
+      "pattern": "なかなか〜ない",
+      "description": "기대한 일이 쉽게 일어나지 않을 때 자주 쓰는 흐름이에요."
+    },
+    {
+      "id": "g14",
+      "level": "N4",
+      "pattern": "〜かもしれません",
+      "description": "가능성이나 조심스러운 예상을 말할 때 써요."
+    },
+    {
+      "id": "g15",
+      "level": "N3",
+      "pattern": "〜として",
+      "description": "자격, 역할, 입장을 나타낼 때 쓰는 표현이에요."
+    },
+    {
+      "id": "g16",
+      "level": "N3",
+      "pattern": "どうしても〜たい",
+      "description": "강한 의지나 욕구를 강조할 때 자주 써요."
+    },
+    {
+      "id": "g17",
+      "level": "N3",
+      "pattern": "〜ことになっている",
+      "description": "규칙이나 정해진 운영 방식을 말할 때 쓰는 표현이에요."
+    },
+    {
+      "id": "g18",
+      "level": "N3",
+      "pattern": "〜てもよさそうだ",
+      "description": "상태를 보고 허용 가능성을 판단할 때 쓰는 표현이에요."
     }
   ],
   "practiceSets": {
     "N5": [
       {
         "id": "n5-g1",
+        "grammarId": "g7",
         "source": "N5G 問題1-1",
-        "title": "조사 선택",
+        "title": "명사で",
         "note": "이동 수단을 나타내는 조사",
         "tone": "tone-gold",
         "sentence": "私は あしたの ひこうき（　）国へ 帰ります。",
@@ -57,8 +130,9 @@
       },
       {
         "id": "n5-g2",
+        "grammarId": "g8",
         "source": "N5G 問題1-4",
-        "title": "会う와 조사",
+        "title": "사람に会う",
         "note": "사람을 만날 때는 「に会う」",
         "tone": "tone-coral",
         "sentence": "きのう スーパーで 田中さん（　）会いました。",
@@ -73,8 +147,9 @@
       },
       {
         "id": "n5-g3",
+        "grammarId": "g9",
         "source": "N5G 問題1-8",
-        "title": "な형용사 연결",
+        "title": "な형용사で",
         "note": "きれいだ는 な형용사처럼 연결",
         "tone": "tone-sky",
         "sentence": "南町は、海が きれい（　）、静かです。",
@@ -89,8 +164,9 @@
       },
       {
         "id": "n5-g4",
+        "grammarId": "g10",
         "source": "N5G 問題1-13",
-        "title": "ながら",
+        "title": "동사ます형 + ながら",
         "note": "동시에 하는 두 동작",
         "tone": "tone-mint",
         "sentence": "父は 毎朝 コーヒーを（　）ながら 新聞を 読みます。",
@@ -107,8 +183,9 @@
     "N4": [
       {
         "id": "n4-g1",
+        "grammarId": "g11",
         "source": "N4G 問題1-1",
-        "title": "시간 표현",
+        "title": "시간 + で終わる",
         "note": "얼마 만에 끝났는지 말하기",
         "tone": "tone-gold",
         "sentence": "きのうの しゅくだいは 少なかったので、（　）終わりました。",
@@ -123,8 +200,9 @@
       },
       {
         "id": "n4-g2",
+        "grammarId": "g12",
         "source": "N4G 問題1-5",
-        "title": "수동문의 행위자",
+        "title": "〜によって",
         "note": "누가 만들었는지 나타내기",
         "tone": "tone-coral",
         "sentence": "この 日本語の じしょは、150年前に 外国人（　）作られました。",
@@ -139,8 +217,9 @@
       },
       {
         "id": "n4-g3",
+        "grammarId": "g13",
         "source": "N4G 問題1-9",
-        "title": "부사 선택",
+        "title": "なかなか〜ない",
         "note": "기다렸지만 쉽게 오지 않음",
         "tone": "tone-sky",
         "sentence": "今朝は 駅に 行く バスが（　）来なかったので、タクシーで 行きました。",
@@ -155,8 +234,9 @@
       },
       {
         "id": "n4-g4",
+        "grammarId": "g14",
         "source": "N4G 問題1-13",
-        "title": "가능성 표현",
+        "title": "〜かもしれません",
         "note": "조금 늦을 가능성을 말하기",
         "tone": "tone-mint",
         "sentence": "木村「山田さん、あしたの 午後、サッカーの 練習に 行きますか。」\n山田「ええ、行きます。でも、午前中に 用事が あるので、（　）。」",
@@ -173,6 +253,7 @@
     "N3": [
       {
         "id": "n3-g1",
+        "grammarId": "g15",
         "source": "N3G 問題1-1",
         "title": "として",
         "note": "자격이나 역할을 나타내기",
@@ -189,8 +270,9 @@
       },
       {
         "id": "n3-g2",
+        "grammarId": "g16",
         "source": "N3G 問題1-3",
-        "title": "どうしても",
+        "title": "どうしても〜たい",
         "note": "강한 의지나 욕구",
         "tone": "tone-coral",
         "sentence": "昨日の夜、寝る前に（　）ヨーグルトが食べたくなって、コンビニに買いに行った。",
@@ -205,6 +287,7 @@
       },
       {
         "id": "n3-g3",
+        "grammarId": "g17",
         "source": "N3G 問題1-8",
         "title": "ことになっている",
         "note": "학교 규칙이나 정해진 운영 방식",
@@ -221,6 +304,7 @@
       },
       {
         "id": "n3-g4",
+        "grammarId": "g18",
         "source": "N3G 問題1-12",
         "title": "〜てもよさそうだ",
         "note": "상태를 보고 허용 가능성을 판단",

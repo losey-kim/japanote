@@ -3406,6 +3406,33 @@ button {
   background: var(--panel-dark);
 }
 
+.grammar-filter-toolbar {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grammar-card-view .flashcard-actions {
+  justify-content: space-between;
+}
+
+.grammar-flashcard .flashcard-word {
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: clamp(2.35rem, 4.2vw, 3.4rem);
+}
+
+.grammar-flashcard .flashcard-meaning {
+  line-height: 1.85;
+  white-space: pre-line;
+}
+
+.grammar-list-pattern {
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+.grammar-list-description {
+  margin: 0;
+  line-height: 1.75;
+}
+
 .grammar-practice-shell {
   display: grid;
   grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);

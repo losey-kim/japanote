@@ -1,6 +1,6 @@
 const storageKey = "jlpt-compass-state";
 /** Bump when persisted shape changes; used for localStorage + future remote sync migration. */
-const STATE_SCHEMA_VERSION = 1;
+const STATE_SCHEMA_VERSION = 2;
 let state = null;
 
 function getStudyStateStore() {
@@ -414,10 +414,12 @@ let flashcards = [...fallbackFlashcards];
 let vocabListItems = [...fallbackFlashcards];
 const vocabPageSize = 20;
 const kanjiPageSize = 20;
+const grammarPageSize = 20;
 const vocabQuizSessionSize = 12;
 const studyCardOrderCache = {
   vocab: { signature: "", ids: [] },
-  kanji: { signature: "", ids: [] }
+  kanji: { signature: "", ids: [] },
+  grammar: { signature: "", ids: [] }
 };
 
 function buildStudyCardSignature(items) {
@@ -897,6 +899,35 @@ function getCharactersLibraryTab(value) {
 
 function getGrammarTab(value) {
   return value === "practice" ? "practice" : "list";
+}
+
+function getGrammarLevel(level = state?.grammarLevel) {
+  const normalizedLevel = normalizeStudyLevelValue(level, allLevelValue);
+  return selectableStudyLevels.includes(normalizedLevel) ? normalizedLevel : allLevelValue;
+}
+
+function getGrammarLevelLabel(level = state?.grammarLevel) {
+  return formatStudyLevelLabel(getGrammarLevel(level), "N5");
+}
+
+function getGrammarFilter(value = state?.grammarFilter) {
+  const normalizedValue = normalizeQuizText(value);
+  if (normalizedValue === "saved") {
+    return "review";
+  }
+  return Object.prototype.hasOwnProperty.call(grammarFilterLabels, normalizedValue) ? normalizedValue : "all";
+}
+
+function getGrammarFilterSummaryLabel(filter = state?.grammarFilter) {
+  return grammarFilterLabels[getGrammarFilter(filter)] || grammarFilterLabels.all;
+}
+
+function getGrammarView(view = state?.grammarView) {
+  return view === "list" ? "list" : "card";
+}
+
+function getGrammarViewLabel(view = state?.grammarView) {
+  return getGrammarView(view) === "list" ? "목록" : "카드";
 }
 
 function getVocabTab(value = state?.vocabTab) {
@@ -1431,6 +1462,13 @@ const vocabFilterLabels = {
   review: "다시 볼래요",
   mastered: "익혔어요",
   unmarked: "아직 안 봤어요"
+};
+
+const grammarFilterLabels = {
+  all: "전체",
+  review: "다시 볼래요",
+  mastered: "익혔어요",
+  unmarked: "미분류"
 };
 
 const vocabHeadingCopy = {
@@ -3908,8 +3946,15 @@ const defaultState = {
   },
   masteredIds: [],
   reviewIds: [],
-  grammarDoneIds: [],
+  grammarReviewIds: [],
+  grammarMasteredIds: [],
   grammarTab: "list",
+  grammarLevel: allLevelValue,
+  grammarFilter: "all",
+  grammarView: "card",
+  grammarPage: 1,
+  grammarFlashcardIndex: 0,
+  grammarFlashcardRevealed: false,
   grammarPracticeOptionsOpen: false,
   grammarPracticeStarted: false,
   grammarPracticeLevel: "N5",
@@ -4006,6 +4051,21 @@ function normalizeBasicPracticeState(inputState) {
   return nextState;
 }
 
+function getUniqueStudyIdList(ids) {
+  return Array.from(new Set((Array.isArray(ids) ? ids : []).filter(Boolean)));
+}
+
+function normalizeStudyStatusState({ reviewIds = [], masteredIds = [], migratedMasteredIds = [] }) {
+  const nextMasteredIds = getUniqueStudyIdList([...(Array.isArray(masteredIds) ? masteredIds : []), ...migratedMasteredIds]);
+  const masteredIdSet = new Set(nextMasteredIds);
+  const nextReviewIds = getUniqueStudyIdList(reviewIds).filter((id) => !masteredIdSet.has(id));
+
+  return {
+    reviewIds: nextReviewIds,
+    masteredIds: nextMasteredIds
+  };
+}
+
 function normalizeLoadedState(inputState) {
   const nextState = normalizeBasicPracticeState(inputState);
 
@@ -4017,22 +4077,29 @@ function normalizeLoadedState(inputState) {
   nextState.quizIndex = 0;
   nextState.quizMistakes = Array.isArray(nextState.quizMistakes) ? nextState.quizMistakes : [];
   nextState.quizSessionMistakeIds = [];
-  nextState.masteredIds = Array.from(new Set(Array.isArray(nextState.masteredIds) ? nextState.masteredIds : []));
-  nextState.reviewIds = Array.from(
-    new Set(
-      (Array.isArray(nextState.reviewIds) ? nextState.reviewIds : []).filter(
-        (id) => !nextState.masteredIds.includes(id)
-      )
-    )
-  );
-  nextState.kanjiMasteredIds = Array.from(new Set(Array.isArray(nextState.kanjiMasteredIds) ? nextState.kanjiMasteredIds : []));
-  nextState.kanjiReviewIds = Array.from(
-    new Set(
-      (Array.isArray(nextState.kanjiReviewIds) ? nextState.kanjiReviewIds : []).filter(
-        (id) => !nextState.kanjiMasteredIds.includes(id)
-      )
-    )
-  );
+  ({
+    reviewIds: nextState.reviewIds,
+    masteredIds: nextState.masteredIds
+  } = normalizeStudyStatusState({
+    reviewIds: nextState.reviewIds,
+    masteredIds: nextState.masteredIds
+  }));
+  ({
+    reviewIds: nextState.kanjiReviewIds,
+    masteredIds: nextState.kanjiMasteredIds
+  } = normalizeStudyStatusState({
+    reviewIds: nextState.kanjiReviewIds,
+    masteredIds: nextState.kanjiMasteredIds
+  }));
+  // 기존 문법 체크 기록을 잃지 않도록 schema v1의 done 목록을 mastered 목록으로 한 번만 이관한다.
+  ({
+    reviewIds: nextState.grammarReviewIds,
+    masteredIds: nextState.grammarMasteredIds
+  } = normalizeStudyStatusState({
+    reviewIds: nextState.grammarReviewIds,
+    masteredIds: nextState.grammarMasteredIds,
+    migratedMasteredIds: nextState.grammarDoneIds
+  }));
   nextState.vocabTab = getVocabTab(nextState.vocabTab);
   nextState.vocabLevel = getVocabLevel(nextState.vocabLevel);
   nextState.vocabView = ["card", "list"].includes(nextState.vocabView) ? nextState.vocabView : "card";
@@ -4092,6 +4159,14 @@ function normalizeLoadedState(inputState) {
     ? Math.max(0, Number(nextState.kanjiFlashcardIndex))
     : 0;
   nextState.kanjiFlashcardRevealed = nextState.kanjiFlashcardRevealed === true;
+  nextState.grammarLevel = getGrammarLevel(nextState.grammarLevel);
+  nextState.grammarFilter = getGrammarFilter(nextState.grammarFilter);
+  nextState.grammarView = getGrammarView(nextState.grammarView);
+  nextState.grammarPage = Number.isFinite(Number(nextState.grammarPage)) ? Math.max(1, Number(nextState.grammarPage)) : 1;
+  nextState.grammarFlashcardIndex = Number.isFinite(Number(nextState.grammarFlashcardIndex))
+    ? Math.max(0, Number(nextState.grammarFlashcardIndex))
+    : 0;
+  nextState.grammarFlashcardRevealed = nextState.grammarFlashcardRevealed === true;
   nextState.grammarPracticeOptionsOpen = false;
   nextState.grammarPracticeStarted = false;
   nextState.grammarPracticeLevel = getGrammarPracticeLevel(nextState.grammarPracticeLevel);
@@ -4127,7 +4202,7 @@ function normalizeLoadedState(inputState) {
       ? Math.floor(loadedSchemaVersion)
       : 1;
   if (fromVersion < STATE_SCHEMA_VERSION) {
-    // Example: if (fromVersion === 1) { ... } when bumping STATE_SCHEMA_VERSION.
+    delete nextState.grammarDoneIds;
   }
   nextState.stateVersion = STATE_SCHEMA_VERSION;
 
@@ -4900,11 +4975,13 @@ function applyExternalStudyState(nextState, options = {}) {
 
     if (state.grammarPracticeStarted) {
       [
+        "grammarFilter",
         "grammarPracticeLevel",
         "grammarPracticeCount",
         "grammarPracticeDuration",
         "grammarPracticeIndexes",
-        "grammarDoneIds"
+        "grammarReviewIds",
+        "grammarMasteredIds"
       ].forEach((key) => activeSessionStateKeys.add(key));
     }
 
@@ -5213,7 +5290,8 @@ function nextBasicPracticeSet() {
 
 const studyListConfig = {
   vocab: { reviewIdsKey: "reviewIds", masteredIdsKey: "masteredIds" },
-  kanji: { reviewIdsKey: "kanjiReviewIds", masteredIdsKey: "kanjiMasteredIds" }
+  kanji: { reviewIdsKey: "kanjiReviewIds", masteredIdsKey: "kanjiMasteredIds" },
+  grammar: { reviewIdsKey: "grammarReviewIds", masteredIdsKey: "grammarMasteredIds" }
 };
 
 function getStudyListConfig(kind) {
@@ -5376,6 +5454,38 @@ function getKanjiListStatus(id) {
 
 function setKanjiListStatus(id, status) {
   setStudyListStatus("kanji", id, status);
+}
+
+function saveGrammarToReviewList(id) {
+  ensureReviewList("grammar", id);
+}
+
+function removeGrammarFromReviewList(id) {
+  removeFromStudyReviewList("grammar", id);
+}
+
+function saveGrammarToMasteredList(id) {
+  ensureMasteredList("grammar", id);
+}
+
+function removeGrammarFromMasteredList(id) {
+  removeFromStudyMasteredList("grammar", id);
+}
+
+function isGrammarSavedToReviewList(id) {
+  return isSavedToReviewList("grammar", id);
+}
+
+function isGrammarSavedToMasteredList(id) {
+  return isSavedToMasteredList("grammar", id);
+}
+
+function getGrammarListStatus(id) {
+  return getStudyListStatus("grammar", id);
+}
+
+function setGrammarListStatus(id, status) {
+  setStudyListStatus("grammar", id, status);
 }
 
 function getKanjiCollectionItems(collectionFilter = state?.kanjiCollectionFilter) {
@@ -7893,16 +8003,19 @@ function showJapanoteToast(message) {
 }
 
 function createStudyListStatusCycleButtonMarkup(id, kind) {
-  const statusConfig = kind === "kanji"
-    ? { idAttr: "data-kanji-list-id", cycleAttr: "data-kanji-cycle", getStatus: getKanjiListStatus }
-    : { idAttr: "data-vocab-word-id", cycleAttr: "data-vocab-cycle", getStatus: getWordVocabStatus };
+  const statusConfigMap = {
+    vocab: { idAttr: "data-vocab-word-id", cycleAttr: "data-vocab-cycle", getStatus: getWordVocabStatus },
+    kanji: { idAttr: "data-kanji-list-id", cycleAttr: "data-kanji-cycle", getStatus: getKanjiListStatus },
+    grammar: { idAttr: "data-grammar-list-id", cycleAttr: "data-grammar-cycle", getStatus: getGrammarListStatus }
+  };
+  const statusConfig = statusConfigMap[kind] || statusConfigMap.vocab;
   const idAttr = statusConfig.idAttr;
   const cycleAttr = statusConfig.cycleAttr;
   const status = statusConfig.getStatus(id);
-  const icon = getVocabStatusIconName(status);
-  const label = getVocabStatusShortLabel(status);
-  const nextStatus = getNextVocabStatus(status);
-  const nextLabel = getVocabStatusShortLabel(nextStatus);
+  const icon = getStudyListStatusIconName(status);
+  const label = getStudyListStatusShortLabel(status);
+  const nextStatus = getNextStudyListStatus(status);
+  const nextLabel = getStudyListStatusShortLabel(nextStatus);
 
   return `
     <div class="vocab-list-status-icons">
@@ -7919,6 +8032,10 @@ function createVocabListStatusIconsMarkup(id) {
 
 function createKanjiListStatusIconsMarkup(id) {
   return createStudyListStatusCycleButtonMarkup(id, "kanji");
+}
+
+function createGrammarListStatusIconsMarkup(id) {
+  return createStudyListStatusCycleButtonMarkup(id, "grammar");
 }
 
 function getVocabQuizResultCounts() {
@@ -8720,50 +8837,411 @@ function markFlashcardMastered() {
   });
 }
 
-function renderGrammar() {
-  const grammarGrid = document.getElementById("grammar-grid");
+function getGrammarLevelItems(level = state?.grammarLevel) {
+  const activeLevel = getGrammarLevel(level);
+  return activeLevel === allLevelValue ? [...grammarItems] : grammarItems.filter((item) => item.level === activeLevel);
+}
 
-  if (!grammarGrid) {
-    return;
+function getGrammarCollectionItems(filter = state?.grammarFilter, level = state?.grammarLevel) {
+  const items = getGrammarLevelItems(level);
+  const activeFilter = getGrammarFilter(filter);
+
+  if (activeFilter === "review") {
+    return items.filter((item) => isGrammarSavedToReviewList(item.id));
   }
 
-  grammarGrid.innerHTML = "";
+  if (activeFilter === "mastered") {
+    return items.filter((item) => isGrammarSavedToMasteredList(item.id));
+  }
 
-  grammarItems.forEach((item) => {
-    const article = document.createElement("article");
-    article.className = "grammar-item";
-    const checked = state.grammarDoneIds.includes(item.id);
+  if (activeFilter === "unmarked") {
+    return items.filter((item) => !isGrammarSavedToReviewList(item.id) && !isGrammarSavedToMasteredList(item.id));
+  }
 
-    article.innerHTML = `
-      <div class="grammar-header">
-        <span class="grammar-level">${item.level}</span>
-        <span>${checked ? "해봤어요" : "지금 해봐요"}</span>
-      </div>
-      <h3>${item.pattern}</h3>
-      <p>${item.description}</p>
-      <button class="secondary-btn grammar-toggle${checked ? " is-checked" : ""}" type="button">
-        ${checked ? "한 번 더 해봐요" : "해봤어요"}
-      </button>
-    `;
+  return items;
+}
 
-    article.querySelector(".grammar-toggle").addEventListener("click", () => {
-      if (checked) {
-        state.grammarDoneIds = state.grammarDoneIds.filter((id) => id !== item.id);
-      } else {
-        state.grammarDoneIds.push(item.id);
-        updateStudyStreak();
-      }
+function getVisibleGrammarItems(level = state?.grammarLevel, filter = state?.grammarFilter) {
+  return getGrammarCollectionItems(filter, level);
+}
 
-      saveState();
-      renderAll();
-    });
+function getGrammarCollectionCounts(items = getGrammarLevelItems()) {
+  return {
+    all: items.length,
+    review: items.filter((item) => isGrammarSavedToReviewList(item.id)).length,
+    mastered: items.filter((item) => isGrammarSavedToMasteredList(item.id)).length,
+    unmarked: items.filter((item) => !isGrammarSavedToReviewList(item.id) && !isGrammarSavedToMasteredList(item.id)).length
+  };
+}
 
-    grammarGrid.appendChild(article);
+function getGrammarPracticeSetsByLevel(level = state?.grammarPracticeLevel) {
+  return grammarPracticeSets[getGrammarPracticeLevel(level)] || [];
+}
+
+function getGrammarPracticeSetGrammarId(set) {
+  const explicitId = normalizeQuizText(set?.grammarId);
+
+  if (explicitId) {
+    return explicitId;
+  }
+
+  // 오래된 캐시나 수동 편집 데이터에도 대응하려고 grammarId가 없으면 문제 id에서 보조 키를 추론한다.
+  const legacyMatch = normalizeQuizText(set?.id).match(/g(\d+)$/i);
+  return legacyMatch ? `g${legacyMatch[1]}` : "";
+}
+
+function getGrammarPracticeSetLevel(set, fallbackLevel = state?.grammarPracticeLevel) {
+  const grammarId = getGrammarPracticeSetGrammarId(set);
+  const matchedItem = grammarItems.find((item) => item.id === grammarId);
+
+  if (matchedItem?.level) {
+    return matchedItem.level;
+  }
+
+  const activeLevel = getGrammarPracticeLevel(fallbackLevel);
+  return activeLevel === allLevelValue ? "전체" : activeLevel;
+}
+
+function getVisibleGrammarPracticeSets(level = state?.grammarPracticeLevel, filter = state?.grammarFilter) {
+  const sets = getGrammarPracticeSetsByLevel(level);
+  const activeFilter = getGrammarFilter(filter);
+
+  if (activeFilter === "all") {
+    return sets;
+  }
+
+  return sets.filter((set) => {
+    const grammarId = getGrammarPracticeSetGrammarId(set);
+
+    if (activeFilter === "review") {
+      return isGrammarSavedToReviewList(grammarId);
+    }
+
+    if (activeFilter === "mastered") {
+      return isGrammarSavedToMasteredList(grammarId);
+    }
+
+    return !isGrammarSavedToReviewList(grammarId) && !isGrammarSavedToMasteredList(grammarId);
   });
 }
 
-function renderGrammarPageLayout() {
+function getGrammarPracticeCollectionCounts(level = state?.grammarPracticeLevel) {
+  const sets = getGrammarPracticeSetsByLevel(level);
+
+  return {
+    all: sets.length,
+    review: sets.filter((set) => isGrammarSavedToReviewList(getGrammarPracticeSetGrammarId(set))).length,
+    mastered: sets.filter((set) => isGrammarSavedToMasteredList(getGrammarPracticeSetGrammarId(set))).length,
+    unmarked: sets.filter((set) => {
+      const grammarId = getGrammarPracticeSetGrammarId(set);
+      return !isGrammarSavedToReviewList(grammarId) && !isGrammarSavedToMasteredList(grammarId);
+    }).length
+  };
+}
+
+function getGrammarEmptyMessage(filter = state?.grammarFilter, level = state?.grammarLevel) {
+  const activeFilter = getGrammarFilter(filter);
+  const activeLevel = getGrammarLevel(level);
+  const levelLabel = activeLevel === allLevelValue ? "전체" : activeLevel;
+
+  if (activeFilter === "review") {
+    return `${levelLabel} 다시 볼래요 문형이 아직 없어요.`;
+  }
+
+  if (activeFilter === "mastered") {
+    return `${levelLabel} 익혔어요 문형이 아직 없어요.`;
+  }
+
+  if (activeFilter === "unmarked") {
+    return `${levelLabel} 미분류 문형이 아직 없어요.`;
+  }
+
+  return `${levelLabel} 문형을 준비하고 있어요.`;
+}
+
+function getGrammarSummaryText(count, level = state?.grammarLevel, filter = state?.grammarFilter) {
+  const activeLevel = getGrammarLevel(level);
+  const levelLabel = activeLevel === allLevelValue ? "전체" : activeLevel;
+
+  if (getGrammarFilter(filter) === "all") {
+    return `${levelLabel} 문형 ${count}개를 보고 있어요`;
+  }
+
+  return `${levelLabel} ${getGrammarFilterSummaryLabel(filter)} 문형 ${count}개를 보고 있어요`;
+}
+
+function getVisibleGrammarCards() {
+  return getOrderedStudyCards("grammar", getVisibleGrammarItems());
+}
+
+function getGrammarPageCount(items) {
+  return getStudyPageCount(items, grammarPageSize);
+}
+
+function resetGrammarStudyPointers() {
+  resetStudyCatalogPointers({
+    pageKey: "grammarPage",
+    indexKey: "grammarFlashcardIndex",
+    revealedKey: "grammarFlashcardRevealed"
+  });
+}
+
+function syncGrammarFlashcardIndexAfterUpdate(currentCardId, previousIndex) {
+  syncStudyFlashcardIndexAfterUpdate({
+    currentCardId,
+    previousIndex,
+    getCards: getVisibleGrammarCards,
+    indexKey: "grammarFlashcardIndex"
+  });
+}
+
+function setGrammarLevel(level) {
+  updateStudyCatalogState({
+    stateKey: "grammarLevel",
+    nextValue: getGrammarLevel(level),
+    resetPointers: resetGrammarStudyPointers,
+    render: renderGrammarPage
+  });
+}
+
+function setGrammarFilter(filter) {
+  updateStudyCatalogState({
+    stateKey: "grammarFilter",
+    nextValue: getGrammarFilter(filter),
+    resetPointers: resetGrammarStudyPointers,
+    invalidate: invalidateGrammarPracticeSession,
+    render: renderGrammarPage
+  });
+}
+
+function setGrammarView(view) {
+  updateStudyCatalogState({
+    stateKey: "grammarView",
+    nextValue: getGrammarView(view),
+    render: renderGrammarPage
+  });
+}
+
+function populateGrammarLevelSelect(select, activeLevel = getGrammarLevel()) {
+  populateContentLevelSelect(select, activeLevel, { includeAll: true });
+}
+
+function populateGrammarFilterSelect(select, counts, activeFilter = getGrammarFilter()) {
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  Object.entries(grammarFilterLabels).forEach(([filter, label]) => {
+    const option = document.createElement("option");
+    option.value = filter;
+    option.textContent = `${label} (${counts[filter] ?? 0})`;
+    select.appendChild(option);
+  });
+
+  select.value = getGrammarFilter(activeFilter);
+}
+
+function renderGrammarStudyControls() {
+  const summary = document.getElementById("grammar-summary");
+  const levelSelect = document.getElementById("grammar-level-select");
+  const filterSelect = document.getElementById("grammar-filter-select");
+  const counts = getGrammarCollectionCounts(getGrammarLevelItems());
+  const visibleItems = getVisibleGrammarItems();
+
+  renderStudyCatalogControls({
+    summary,
+    summaryText: getGrammarSummaryText(visibleItems.length),
+    viewSelector: "[data-grammar-view]",
+    viewAttribute: "data-grammar-view",
+    activeView: getGrammarView(),
+    selectConfigs: [
+      {
+        element: levelSelect,
+        populate: (element) => populateGrammarLevelSelect(element)
+      },
+      {
+        element: filterSelect,
+        populate: (element) => populateGrammarFilterSelect(element, counts)
+      }
+    ]
+  });
+}
+
+function getGrammarFlashcardPlaceholder() {
+  return {
+    id: "grammar-empty",
+    level: getGrammarLevelLabel(),
+    pattern: getGrammarEmptyMessage(),
+    description: "필터를 바꾸거나 저장 상태를 조정하면 다른 문형을 바로 이어서 볼 수 있어요."
+  };
+}
+
+function renderGrammarFlashcard() {
+  const flashcard = document.getElementById("grammar-flashcard");
+  const toggle = document.getElementById("grammar-flashcard-toggle");
+  const prev = document.getElementById("grammar-flashcard-prev");
+  const next = document.getElementById("grammar-flashcard-next");
+  const reviewButton = document.getElementById("grammar-flashcard-review");
+  const masteredButton = document.getElementById("grammar-flashcard-mastered");
+  const level = document.getElementById("grammar-flashcard-level");
+  const word = document.getElementById("grammar-flashcard-word");
+  const reading = document.getElementById("grammar-flashcard-reading");
+  const meaning = document.getElementById("grammar-flashcard-meaning");
+  const hint = document.getElementById("grammar-flashcard-hint");
+  const cards = getVisibleGrammarCards();
+
+  if (
+    !flashcard ||
+    !toggle ||
+    !prev ||
+    !next ||
+    !reviewButton ||
+    !masteredButton ||
+    !level ||
+    !word ||
+    !reading ||
+    !meaning ||
+    !hint
+  ) {
+    return;
+  }
+
+  const hasCards = cards.length > 0;
+  const currentIndex = hasCards ? state.grammarFlashcardIndex % cards.length : 0;
+  const currentCard = hasCards ? cards[currentIndex] : getGrammarFlashcardPlaceholder();
+  const review = hasCards && isGrammarSavedToReviewList(currentCard.id);
+  const mastered = hasCards && isGrammarSavedToMasteredList(currentCard.id);
+  const isRevealed = hasCards && state.grammarFlashcardRevealed;
+  const hintText = hasCards
+    ? isRevealed
+      ? review
+        ? "다시 볼래요에 담긴 문형이에요"
+        : mastered
+          ? "익혔어요에 담긴 문형이에요"
+          : "이 문형도 바로 저장 상태를 바꿀 수 있어요"
+      : "눌러서 설명을 확인해볼까요?"
+    : "필터를 바꾸면 다른 문형을 바로 이어서 볼 수 있어요";
+
+  renderStudyFlashcardComponent({
+    flashcard,
+    toggle,
+    prev,
+    next,
+    level,
+    word,
+    reading,
+    meaning,
+    hint,
+    hasCards,
+    isRevealed,
+    revealWhenEmpty: true,
+    levelText: currentCard.level || getGrammarLevelLabel(),
+    wordText: currentCard.pattern || "",
+    meaningText: currentCard.description || "",
+    hintText,
+    hideReading: true,
+    toggleOpenLabel: "설명을 다시 접을까요?",
+    toggleClosedLabel: "설명을 확인해볼까요?",
+    toggleEmptyLabel: "지금 볼 수 있는 문형이 없어요",
+    prevDisabled: cards.length <= 1,
+    nextDisabled: cards.length <= 1,
+    actionButtons: [
+      {
+        button: reviewButton,
+        selected: review,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      },
+      {
+        button: masteredButton,
+        selected: mastered,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      }
+    ]
+  });
+}
+
+function renderGrammarList() {
+  const list = document.getElementById("grammar-list");
+  const pageInfo = document.getElementById("grammar-page-info");
+  const prev = document.getElementById("grammar-page-prev");
+  const next = document.getElementById("grammar-page-next");
+  const items = getVisibleGrammarItems();
+
+  renderStatefulStudyList({
+    list,
+    pageInfo,
+    prev,
+    next,
+    items,
+    pageKey: "grammarPage",
+    pageSize: grammarPageSize,
+    emptyMessage: getGrammarEmptyMessage(),
+    renderItem: (item, displayIndex) => createStudyListCardMarkup({
+      index: displayIndex,
+      headMetaMarkup: `<span class="vocab-list-index">${formatStudyLevelLabel(item.level, "N5")}</span>`,
+      headRightMarkup: createGrammarListStatusIconsMarkup(item.id),
+      mainClassName: "vocab-list-main grammar-list-main",
+      titleClassName: "vocab-list-word grammar-list-pattern",
+      titleText: formatQuizLineBreaks(item.pattern),
+      subtitleClassName: "vocab-list-reading grammar-list-description",
+      subtitleText: formatQuizLineBreaks(item.description),
+      descriptionMarkup: "",
+      actionsMarkup: ""
+    })
+  });
+}
+
+function toggleGrammarFlashcardReveal() {
+  toggleStudyFlashcardReveal("grammarFlashcardRevealed", () => {
+    renderStudyViewWithStats(renderGrammarPage);
+  });
+}
+
+function moveGrammarFlashcard(step) {
+  moveStudyFlashcard(step, {
+    getCards: getVisibleGrammarCards,
+    indexKey: "grammarFlashcardIndex",
+    revealedKey: "grammarFlashcardRevealed",
+    render: renderGrammarPage
+  });
+}
+
+function markGrammarFlashcardForReview() {
+  markStudyFlashcardStatus({
+    getCards: getVisibleGrammarCards,
+    indexKey: "grammarFlashcardIndex",
+    revealedKey: "grammarFlashcardRevealed",
+    saveItem: saveGrammarToReviewList,
+    syncIndexAfterUpdate: syncGrammarFlashcardIndexAfterUpdate,
+    render: () => renderStudyViewWithStats(renderGrammarPage)
+  });
+}
+
+function markGrammarFlashcardMastered() {
+  markStudyFlashcardStatus({
+    getCards: getVisibleGrammarCards,
+    indexKey: "grammarFlashcardIndex",
+    revealedKey: "grammarFlashcardRevealed",
+    saveItem: saveGrammarToMasteredList,
+    syncIndexAfterUpdate: syncGrammarFlashcardIndexAfterUpdate,
+    render: () => renderStudyViewWithStats(renderGrammarPage)
+  });
+}
+
+function renderGrammarPage() {
+  if (flushPendingExternalStudyStateIfIdle()) {
+    return;
+  }
+
   const activeTab = getGrammarTab(state.grammarTab);
+  const cardView = document.getElementById("grammar-card-view");
+  const listView = document.getElementById("grammar-list-view");
+
+  renderGrammarStudyControls();
 
   document.querySelectorAll("[data-grammar-tab]").forEach((button) => {
     const isActive = button.dataset.grammarTab === activeTab;
@@ -8785,11 +9263,27 @@ function renderGrammarPageLayout() {
 
   stopQuizSessionTimer("grammar");
   renderQuizSessionHud("grammar");
+  renderStudyCatalogSection({
+    cardView,
+    listView,
+    activeView: getGrammarView(),
+    renderFlashcard: renderGrammarFlashcard,
+    renderList: renderGrammarList
+  });
+}
+
+function renderGrammarPageLayout() {
+  renderGrammarPage();
+}
+
+function renderGrammar() {
+  renderGrammarPage();
 }
 
 function getGrammarPracticeOptionsSummaryText() {
   return [
     getLevelSummaryLabel(getGrammarPracticeLevel()),
+    getGrammarFilterSummaryLabel(),
     formatQuestionCountLabel(getGrammarPracticeCount()),
     getDurationLabel(getGrammarPracticeDuration())
   ].join(" · ");
@@ -8803,6 +9297,7 @@ function setGrammarPracticeLevel(level) {
   }
 
   state.grammarPracticeLevel = nextLevel;
+  invalidateGrammarPracticeSession();
   saveState();
   renderGrammarPractice();
 }
@@ -8833,15 +9328,17 @@ function renderGrammarPracticeControls() {
   const optionsPanel = document.getElementById("grammar-practice-options-panel");
   const optionsSummary = document.getElementById("grammar-practice-options-summary");
   const levelSelect = document.getElementById("grammar-practice-level-select");
+  const filterSelect = document.getElementById("grammar-practice-filter-select");
   const countSpinner = document.querySelector('[data-spinner-id="grammar-practice-count"]');
   const timeSpinner = document.querySelector('[data-spinner-id="grammar-practice-time"]');
   const startButton = document.getElementById("grammar-practice-start");
   const startLabel = document.getElementById("grammar-practice-start-label");
   const activeLevel = getGrammarPracticeLevel(state.grammarPracticeLevel);
+  const practiceCounts = getGrammarPracticeCollectionCounts(activeLevel);
   const activeCount = getGrammarPracticeCount(state.grammarPracticeCount);
   const activeDuration = getGrammarPracticeDuration(state.grammarPracticeDuration);
   const isOptionsOpen = state.grammarPracticeOptionsOpen === true;
-  const canStart = (grammarPracticeSets[activeLevel] || []).length > 0;
+  const canStart = getVisibleGrammarPracticeSets(activeLevel).length > 0;
   const isSettingsLocked = state.grammarPracticeStarted;
 
   renderStudyOptionsControls({
@@ -8872,6 +9369,11 @@ function renderGrammarPracticeControls() {
       {
         element: levelSelect,
         populate: (element) => populateContentLevelSelect(element, activeLevel, { includeAll: true })
+      },
+      {
+        element: filterSelect,
+        populate: (element) => populateGrammarFilterSelect(element, practiceCounts),
+        disabled: isSettingsLocked
       }
     ],
     actionButton: {
@@ -8891,7 +9393,7 @@ function getPracticeLevelIndex(indexes, activeLevel) {
 
 function getCurrentGrammarPracticeSet() {
   const activeLevel = getGrammarPracticeLevel(state.grammarPracticeLevel);
-  const sets = grammarPracticeSets[activeLevel] || [];
+  const sets = getVisibleGrammarPracticeSets(activeLevel);
   const currentIndex = getPracticeLevelIndex(state.grammarPracticeIndexes, activeLevel) % (sets.length || 1);
 
   if (!sets.length) {
@@ -8920,7 +9422,7 @@ function renderGrammarPractice() {
   const explanation = document.getElementById("grammar-practice-explanation");
   const activeLevel = getGrammarPracticeLevel(state.grammarPracticeLevel);
   const activeDuration = getGrammarPracticeDuration(state.grammarPracticeDuration);
-  const sets = grammarPracticeSets[activeLevel] || [];
+  const sets = getVisibleGrammarPracticeSets(activeLevel);
   const current = getCurrentGrammarPracticeSet();
   const activeCount = getGrammarPracticeCount(state.grammarPracticeCount);
   const currentSessionIndex = Number.isFinite(Number(state.grammarPracticeSessionQuestionIndex))
@@ -8952,10 +9454,8 @@ function renderGrammarPractice() {
     resetQuizSessionScore("grammar");
     setQuizSessionDuration("grammar", activeDuration);
     empty.hidden = false;
-    empty.textContent = sets?.length
-      ? "준비됐다면 시작해볼까요?"
-      : "문법 문제를 준비하고 있어요.";
     practiceView.hidden = true;
+    empty.textContent = sets?.length ? "준비되면 시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -8972,8 +9472,8 @@ function renderGrammarPractice() {
     stopQuizSessionTimer("grammar");
     setQuizSessionDuration("grammar", activeDuration);
     empty.hidden = false;
-    empty.textContent = "문법 문제를 준비하고 있어요.";
     practiceView.hidden = true;
+    empty.textContent = sets?.length ? "준비되면 시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -8981,7 +9481,7 @@ function renderGrammarPractice() {
   empty.hidden = true;
   practiceView.hidden = false;
 
-  level.textContent = activeLevel;
+  level.textContent = getGrammarPracticeSetLevel(current, activeLevel);
   source.textContent = current.source;
   progress.textContent =
     `${currentSessionIndex + 1} / ${activeCount}`;
@@ -9087,7 +9587,7 @@ function handleGrammarPracticeTimeout() {
 function nextGrammarPracticeSet() {
   const nextButton = document.getElementById("grammar-practice-next");
   const activeLevel = getGrammarPracticeLevel(state.grammarPracticeLevel);
-  const sets = grammarPracticeSets[activeLevel] || [];
+  const sets = getVisibleGrammarPracticeSets(activeLevel);
   const questionLimit = getGrammarPracticeCount(state.grammarPracticeCount);
   const currentSessionIndex = Number.isFinite(Number(state.grammarPracticeSessionQuestionIndex))
     ? Number(state.grammarPracticeSessionQuestionIndex)
@@ -9960,7 +10460,7 @@ function renderStats() {
     mastered.textContent = `${state.masteredIds.length}개`;
   }
   if (grammar) {
-    grammar.textContent = `${state.grammarDoneIds.length}개`;
+    grammar.textContent = `${state.grammarMasteredIds.length}개`;
   }
   if (quiz) {
     quiz.textContent = `${accuracy}%`;
@@ -10052,25 +10552,41 @@ function attachStudyListStatusIconListeners({ list, kind, render }) {
     return;
   }
 
-  const isKanji = kind === "kanji";
+  const statusConfigMap = {
+    vocab: {
+      selector: "[data-vocab-cycle]",
+      getId: (button) => button.dataset.vocabWordId,
+      getStatus: getWordVocabStatus,
+      setStatus: setWordVocabStatus
+    },
+    kanji: {
+      selector: "[data-kanji-cycle]",
+      getId: (button) => button.dataset.kanjiListId,
+      getStatus: getKanjiListStatus,
+      setStatus: setKanjiListStatus
+    },
+    grammar: {
+      selector: "[data-grammar-cycle]",
+      getId: (button) => button.dataset.grammarListId,
+      getStatus: getGrammarListStatus,
+      setStatus: setGrammarListStatus
+    }
+  };
+  const statusConfig = statusConfigMap[kind] || statusConfigMap.vocab;
 
   list.addEventListener("click", (event) => {
-    const button = event.target.closest(isKanji ? "[data-kanji-cycle]" : "[data-vocab-cycle]");
+    const button = event.target.closest(statusConfig.selector);
     if (!button || !list.contains(button)) {
       return;
     }
 
-    const id = isKanji ? button.dataset.kanjiListId : button.dataset.vocabWordId;
+    const id = statusConfig.getId(button);
     if (!id) {
       return;
     }
 
-    const nextStatus = getNextStudyListStatus(isKanji ? getKanjiListStatus(id) : getWordVocabStatus(id));
-    if (isKanji) {
-      setKanjiListStatus(id, nextStatus);
-    } else {
-      setWordVocabStatus(id, nextStatus);
-    }
+    const nextStatus = getNextStudyListStatus(statusConfig.getStatus(id));
+    statusConfig.setStatus(id, nextStatus);
     showJapanoteToast(getStudyListStatusCycleMessage(nextStatus));
     updateStudyStreak();
     saveState();
@@ -10084,6 +10600,10 @@ function attachVocabListStatusIconListeners({ list, render }) {
 
 function attachKanjiListStatusIconListeners({ list, render }) {
   return attachStudyListStatusIconListeners({ list, kind: "kanji", render });
+}
+
+function attachGrammarListStatusIconListeners({ list, render }) {
+  return attachStudyListStatusIconListeners({ list, kind: "grammar", render });
 }
 
 function attachStudyCatalogListeners({
@@ -10228,6 +10748,55 @@ function attachKanjiStudyListeners({
   attachValueButtonListeners(kanjiGradeButtons, (button) => button.dataset.kanjiGradeOption, setKanjiGrade);
 }
 
+function attachGrammarStudyListeners({
+  grammarViewButtons,
+  grammarLevelSelect,
+  grammarFilterSelect,
+  grammarPagePrev,
+  grammarPageNext,
+  grammarFlashcardToggle,
+  grammarFlashcardPrev,
+  grammarFlashcardNext,
+  grammarFlashcardReview,
+  grammarFlashcardMastered,
+  grammarList
+}) {
+  attachStudyCatalogListeners({
+    viewButtons: grammarViewButtons,
+    getViewValue: (button) => button.dataset.grammarView,
+    setView: setGrammarView,
+    flashcardListeners: {
+      toggle: grammarFlashcardToggle,
+      prev: grammarFlashcardPrev,
+      next: grammarFlashcardNext,
+      review: grammarFlashcardReview,
+      mastered: grammarFlashcardMastered,
+      onToggle: toggleGrammarFlashcardReveal,
+      onMove: moveGrammarFlashcard,
+      onReview: markGrammarFlashcardForReview,
+      onMastered: markGrammarFlashcardMastered
+    },
+    paginationListeners: {
+      prev: grammarPagePrev,
+      next: grammarPageNext,
+      getPage: () => state.grammarPage,
+      setPage: (page) => {
+        state.grammarPage = page;
+      },
+      getPageCount: () => getGrammarPageCount(getVisibleGrammarItems()),
+      render: renderGrammarPage
+    },
+    selectListeners: [
+      { element: grammarLevelSelect, handler: setGrammarLevel },
+      { element: grammarFilterSelect, handler: setGrammarFilter }
+    ]
+  });
+  attachGrammarListStatusIconListeners({
+    list: grammarList,
+    render: () => renderStudyViewWithStats(renderGrammarPage)
+  });
+}
+
 function attachEventListeners() {
   const flashcardToggle = document.getElementById("flashcard-toggle");
   const flashcardPrev = document.getElementById("flashcard-prev");
@@ -10265,9 +10834,21 @@ function attachEventListeners() {
   const quizTimeButtons = document.querySelectorAll("[data-quiz-time]");
   const grammarPracticeOptionsToggle = document.getElementById("grammar-practice-options-toggle");
   const grammarPracticeLevelSelect = document.getElementById("grammar-practice-level-select");
+  const grammarPracticeFilterSelect = document.getElementById("grammar-practice-filter-select");
   const grammarPracticeCountSpinner = document.querySelector('[data-spinner-id="grammar-practice-count"]');
   const grammarPracticeTimeSpinner = document.querySelector('[data-spinner-id="grammar-practice-time"]');
   const grammarPracticeStart = document.getElementById("grammar-practice-start");
+  const grammarViewButtons = document.querySelectorAll("[data-grammar-view]");
+  const grammarLevelSelect = document.getElementById("grammar-level-select");
+  const grammarFilterSelect = document.getElementById("grammar-filter-select");
+  const grammarList = document.getElementById("grammar-list");
+  const grammarPagePrev = document.getElementById("grammar-page-prev");
+  const grammarPageNext = document.getElementById("grammar-page-next");
+  const grammarFlashcardToggle = document.getElementById("grammar-flashcard-toggle");
+  const grammarFlashcardPrev = document.getElementById("grammar-flashcard-prev");
+  const grammarFlashcardNext = document.getElementById("grammar-flashcard-next");
+  const grammarFlashcardReview = document.getElementById("grammar-flashcard-review");
+  const grammarFlashcardMastered = document.getElementById("grammar-flashcard-mastered");
   const readingOptionsToggle = document.getElementById("reading-options-toggle");
   const readingLevelSelect = document.getElementById("reading-level-select");
   const readingCountSpinner = document.querySelector('[data-spinner-id="reading-count"]');
@@ -10432,8 +11013,22 @@ function attachEventListeners() {
     startNewQuizSession();
   });
   attachValueButtonListeners(quizTimeButtons, (button) => button.dataset.quizTime, setQuizDuration);
+  attachGrammarStudyListeners({
+    grammarViewButtons,
+    grammarLevelSelect,
+    grammarFilterSelect,
+    grammarPagePrev,
+    grammarPageNext,
+    grammarFlashcardToggle,
+    grammarFlashcardPrev,
+    grammarFlashcardNext,
+    grammarFlashcardReview,
+    grammarFlashcardMastered,
+    grammarList
+  });
   attachStateOptionsToggle(grammarPracticeOptionsToggle, "grammarPracticeOptionsOpen", renderGrammarPracticeControls);
   attachSelectValueListener(grammarPracticeLevelSelect, setGrammarPracticeLevel);
+  attachSelectValueListener(grammarPracticeFilterSelect, setGrammarFilter);
   attachStateSpinner({
     spinner: grammarPracticeCountSpinner,
     options: grammarPracticeCountOptions,
@@ -10709,8 +11304,7 @@ function renderAll() {
   renderKanaQuizSheet();
   renderQuizSessionHud("kana");
   renderVocabPage();
-  renderGrammar();
-  renderGrammarPageLayout();
+  renderGrammarPage();
   renderQuiz();
   renderStats();
 }

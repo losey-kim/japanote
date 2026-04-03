@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="문자부터 퀴즈까지, 오늘도 가볍게 일본어 해봐요.">
+  <meta name="description" content="문형도 저장해두고, 다시 볼 문법과 익힌 문법을 나눠서 가볍게 복습해봐요.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Japanote">
   <meta property="og:title" content="Japanote">
-  <meta property="og:description" content="문자부터 퀴즈까지, 오늘도 가볍게 일본어 해봐요.">
+  <meta property="og:description" content="문형도 저장해두고, 다시 볼 문법과 익힌 문법을 나눠서 가볍게 복습해봐요.">
   <meta property="og:url" content="https://losey-kim.github.io/Japanote/grammar.html">
   <meta property="og:image" content="https://losey-kim.github.io/Japanote/assets/images/social-preview.png">
   <meta property="og:image:alt" content="Japanote 로고">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Japanote">
-  <meta name="twitter:description" content="문자부터 퀴즈까지, 오늘도 가볍게 일본어 해봐요.">
+  <meta name="twitter:description" content="문형도 저장해두고, 다시 볼 문법과 익힌 문법을 나눠서 가볍게 복습해봐요.">
   <meta name="twitter:image" content="https://losey-kim.github.io/Japanote/assets/images/social-preview.png">
-  <title>Japanote - 문법 익혀봐요</title>
+  <title>Japanote - 문법 정리해볼까요?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -26,8 +26,21 @@
 <body>
   <div class="page-shell">
     <header class="topbar">
-      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span><div><p class="brand-name">Japanote</p><p class="brand-sub">오늘도 가볍게 일본어 해봐요</p></div></a>
-      <nav class="nav-links"><a href="index.html">홈</a><a href="characters.html">문자</a><a href="kanji.html">한자</a><a href="vocab.html">단어</a><a href="grammar.html" aria-current="page">문법</a><a href="reading.html">독해</a></nav>
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"><img src="assets/images/favicon.png" alt=""></span>
+        <div>
+          <p class="brand-name">Japanote</p>
+          <p class="brand-sub">오늘도 가볍게 일본어 해봐요</p>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">홈</a>
+        <a href="characters.html">문자</a>
+        <a href="kanji.html">한자</a>
+        <a href="vocab.html">단어</a>
+        <a href="grammar.html" aria-current="page">문법</a>
+        <a href="reading.html">독해</a>
+      </nav>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="테마 바꿔볼까요?" title="테마 바꿔볼까요?"></button>
     </header>
     <main>
@@ -37,8 +50,8 @@
         </div>
 
         <div class="grammar-panel-copy">
-          <h3>자주 쓰는 문형부터 가볍게 체크해봐요</h3>
-          <p>헷갈리는 표현부터 눌러 보면서 진도를 남겨봐요. 다시 볼 때 더 편해요.</p>
+          <h3>문형도 저장해두고 다시 꺼내볼 수 있어요</h3>
+          <p>카드로 가볍게 훑거나 목록에서 상태를 바꾸면서, 다시 볼 문형과 익힌 문형을 나눠 관리해요.</p>
         </div>
 
         <div class="grammar-tab-list" role="tablist" aria-label="문법 학습 탭">
@@ -52,7 +65,7 @@
 
         <div class="grammar-tab-panels">
           <section class="grammar-tab-panel" id="grammar-tab-panel-list" data-grammar-tab-panel="list" role="tabpanel" aria-labelledby="grammar-tab-list">
-            <div class="grammar-grid" id="grammar-grid"></div>
+            <div data-shared-study-layout="grammar-catalog"></div>
           </section>
 
           <section class="grammar-tab-panel" id="grammar-tab-panel-practice" data-grammar-tab-panel="practice" role="tabpanel" aria-labelledby="grammar-tab-practice" hidden aria-hidden="true">
@@ -62,6 +75,6 @@
       </section>
     </main>
   </div>
-<script src="assets/js/page-script-loader.js?v=20260402e"></script>
+  <script src="assets/js/page-script-loader.js?v=20260402e"></script>
 </body>
 </html>

@@ -1119,7 +1119,7 @@
     ];
 
     return createChoiceQuizLayout({
-      sidebarHead: "<div class=\"match-sidebar-head\"><span class=\"eyebrow\">QUIZ HUD</span><h3>단어 퀴즈</h3></div>",
+      sidebarHead: "",
       shellClassName: "match-shell vocab-quiz-shell",
       sidebarClassName: "match-sidebar vocab-quiz-sidebar",
       optionsShellConfig: {
@@ -1379,7 +1379,7 @@
 
   function createMatchLayout() {
     return createMatchRoundLayout({
-      sidebarHead: "<div class=\"match-sidebar-head\"><span class=\"eyebrow\">ROUND HUD</span></div>",
+      sidebarHead: "",
       shellId: "match-options-shell",
       shellClassName: "match-options-shell",
       toggleId: "match-options-toggle",

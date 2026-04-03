@@ -2069,6 +2069,10 @@ button {
   margin-bottom: 24px;
 }
 
+.vocab-page-heading {
+  margin-bottom: 24px;
+}
+
 .kanji-tab-panel {
   min-width: 0;
 }

@@ -9414,11 +9414,7 @@ function renderGrammarPractice() {
   const grammarCard = document.querySelector(".grammar-practice-card");
   const optionsContainer = document.getElementById("grammar-practice-options");
   const nextButton = document.getElementById("grammar-practice-next");
-  const level = document.getElementById("grammar-practice-level");
-  const source = document.getElementById("grammar-practice-source");
   const progress = document.getElementById("grammar-practice-progress");
-  const title = document.getElementById("grammar-practice-title");
-  const note = document.getElementById("grammar-practice-note");
   const sentence = document.getElementById("grammar-practice-sentence");
   const feedback = document.getElementById("grammar-practice-feedback");
   const explanation = document.getElementById("grammar-practice-explanation");
@@ -9439,11 +9435,7 @@ function renderGrammarPractice() {
     !grammarCard ||
     !optionsContainer ||
     !nextButton ||
-    !level ||
-    !source ||
     !progress ||
-    !title ||
-    !note ||
     !sentence ||
     !feedback ||
     !explanation
@@ -9483,12 +9475,8 @@ function renderGrammarPractice() {
   empty.hidden = true;
   practiceView.hidden = false;
 
-  level.textContent = getGrammarPracticeSetLevel(current, activeLevel);
-  source.textContent = current.source;
   progress.textContent =
     `${currentSessionIndex + 1} / ${activeCount}`;
-  title.textContent = softenVisibleKoreanCopy(current.title);
-  note.textContent = softenVisibleKoreanCopy(current.note);
   sentence.textContent = current.sentence;
   feedback.textContent = "";
   explanation.textContent = "";

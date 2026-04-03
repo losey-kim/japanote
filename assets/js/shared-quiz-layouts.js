@@ -1537,6 +1537,9 @@
     nextButtonLabel
   }) {
     const metaMarkup = metaItems.map((item) => `<span${item.id ? ` id="${escapeHtml(item.id)}"` : ""}>${escapeHtml(item.text)}</span>`).join("");
+    const metaSectionMarkup = metaMarkup
+      ? `<div class="${escapeHtml(metaClassName)}">${metaMarkup}</div>`
+      : "";
     const hudMarkup = createQuizHudMarkup(hudItems, "", { pauseButtonId });
 
     const headerMarkup = header
@@ -1553,7 +1556,7 @@
 
     return `
       <article class="${escapeHtml(articleClassName)}">
-        <div class="${escapeHtml(metaClassName)}">${metaMarkup}</div>
+        ${metaSectionMarkup}
         ${hudMarkup}
         ${headerMarkup}
         ${contentMarkup}
@@ -1567,7 +1570,7 @@
 
   function createGrammarPracticeLayout() {
     return createPracticeModeLayout({
-      sidebarHead: "<div class=\"match-sidebar-head\"><span class=\"eyebrow\">GRAMMAR HUD</span><h3>문법 퀴즈</h3></div>",
+      sidebarHead: "",
       optionsShellConfig: {
         shellId: "grammar-practice-options-shell",
         shellClassName: "match-options-shell",
@@ -1607,25 +1610,14 @@
       viewMarkup: createPracticeModeCardLayout({
         articleClassName: "grammar-practice-card",
         metaClassName: "grammar-practice-meta",
-        metaItems: [
-          { id: "grammar-practice-level", text: "N5" },
-          { id: "grammar-practice-source", text: "N5G 1" }
-        ],
+        metaItems: [],
         hudItems: [
           { kind: "progress", label: "진행", valueId: "grammar-practice-progress", value: "1 / 10" },
           { kind: "timer", label: "남은 시간", valueId: "grammar-timer", value: "00:25" },
           { kind: "correct", label: "정답", valueId: "grammar-correct", value: "0" },
           { kind: "wrong", label: "오답", valueId: "grammar-wrong", value: "0" }
         ],
-        header: {
-          className: "grammar-practice-header",
-          eyebrow: "GRAMMAR SET",
-          titleId: "grammar-practice-title",
-          title: "문법 퀴즈",
-          noteClassName: "grammar-practice-note",
-          noteId: "grammar-practice-note",
-          note: ""
-        },
+        header: null,
         contentMarkup: `
           <div class="grammar-practice-question"><span class="eyebrow">SENTENCE</span><p id="grammar-practice-sentence">문장을 불러오고 있어요.</p></div>
         `,

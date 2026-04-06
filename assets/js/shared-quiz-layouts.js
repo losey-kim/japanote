@@ -1223,12 +1223,12 @@
       resultBulkActionLabel: QUIZ_RESULT_ALL_ACTION_LABEL
     });
   }
-  function createStarterKanjiLayout() {
-    const starterKanjiQuestionFieldOptions = [
+  function createKanjiPracticeLayout() {
+    const kanjiPracticeQuestionFieldOptions = [
       { value: "display", label: "한자" },
       { value: "reading", label: "발음" }
     ];
-    const starterKanjiOptionFieldOptions = [
+    const kanjiPracticeOptionFieldOptions = [
       { value: "reading", label: "발음" },
       { value: "display", label: "한자" }
     ];
@@ -1236,35 +1236,35 @@
     return createChoiceQuizLayout({
       sidebarHead: "",
       optionsShellConfig: {
-        shellId: "starter-kanji-options-shell",
+        shellId: "kanji-practice-options-shell",
         shellClassName: "match-options-shell kanji-options-shell",
-        toggleId: "starter-kanji-options-toggle",
+        toggleId: "kanji-practice-options-toggle",
         toggleTitle: "퀴즈 설정, 어떻게 할까요?",
-        summaryId: "starter-kanji-options-summary",
+        summaryId: "kanji-practice-options-summary",
         summaryText: "전체 · 전체 · 10문제 · 15초",
-        panelId: "starter-kanji-options-panel",
+        panelId: "kanji-practice-options-panel",
         panelClassName: "study-options-panel-wide",
         isOpen: false,
         groups: [
           ...createQuizFieldGroups({
             questionField: {
               groupLabel: "문제 영역",
-              id: "starter-kanji-question-field",
+              id: "kanji-practice-question-field",
               ariaLabel: "한자 퀴즈 문제 영역 고르기",
-              options: starterKanjiQuestionFieldOptions
+              options: kanjiPracticeQuestionFieldOptions
             },
             optionField: {
               groupLabel: "보기 영역",
-              id: "starter-kanji-option-field",
+              id: "kanji-practice-option-field",
               ariaLabel: "한자 퀴즈 보기 영역 고르기",
-              options: starterKanjiOptionFieldOptions
+              options: kanjiPracticeOptionFieldOptions
             }
           }),
           ...createQuestionDurationGroups({
-            countSpinnerId: "starter-kanji-count",
+            countSpinnerId: "kanji-practice-count",
             countAriaLabel: "한자 퀴즈 문제 수",
             countValue: 10,
-            durationSpinnerId: "starter-kanji-time",
+            durationSpinnerId: "kanji-practice-time",
             durationAriaLabel: "한자 퀴즈 제한시간",
             durationValue: 15
           })
@@ -1273,44 +1273,44 @@
       sidebarExtra: createKanjiGradeCollectionToolbarHtml({
         toolbarAriaLabel: "한자 퀴즈 학년 필터",
         toolbarClassName: "vocab-select-toolbar vocab-select-toolbar-sidebar kanji-filter-toolbar",
-        gradeSelectId: "starter-kanji-grade-select",
-        collectionSelectId: "starter-kanji-collection-select",
+        gradeSelectId: "kanji-practice-grade-select",
+        collectionSelectId: "kanji-practice-collection-select",
         ariaPrefix: "한자 퀴즈",
         collectionOptions: KANJI_COLLECTION_OPTIONS_BASIC,
         fieldOrder: "grade-first"
       }),
-      startButton: createStartQuizButton({ id: "starter-kanji-start", labelId: "starter-kanji-start-label" }),
+      startButton: createStartQuizButton({ id: "kanji-practice-start", labelId: "kanji-practice-start-label" }),
       boardClassName: "match-board",
-      emptyId: "starter-kanji-empty",
+      emptyId: "kanji-practice-empty",
       emptyText: QUIZ_EMPTY_MESSAGE,
-      viewId: "starter-kanji-practice-view",
+      viewId: "kanji-practice-view",
       choiceQuizCardConfig: {
-        articleId: "starter-kanji-card",
+        articleId: "kanji-practice-card",
         className: "basic-practice-card tone-gold kanji-practice-card",
         hudItems: [
-          { kind: "progress", label: "진행", valueId: "starter-kanji-progress", value: "1 / 5" },
-          { kind: "timer", label: "남은 시간", valueId: "starter-kanji-timer", value: "00:15" },
-          { kind: "correct", label: "정답", valueId: "starter-kanji-correct", value: "0" },
-          { kind: "wrong", label: "오답", valueId: "starter-kanji-wrong", value: "0" }
+          { kind: "progress", label: "진행", valueId: "kanji-practice-progress", value: "1 / 5" },
+          { kind: "timer", label: "남은 시간", valueId: "kanji-practice-timer", value: "00:15" },
+          { kind: "correct", label: "정답", valueId: "kanji-practice-correct", value: "0" },
+          { kind: "wrong", label: "오답", valueId: "kanji-practice-wrong", value: "0" }
         ],
         displayBox: {
           className: "basic-practice-display-box",
-          titleId: "starter-kanji-display",
+          titleId: "kanji-practice-display",
           title: "-",
-          subtitleId: "starter-kanji-display-sub",
+          subtitleId: "kanji-practice-display-sub",
           subtitle: ""
         },
-        optionsId: "starter-kanji-options",
-        pauseButtonId: "starter-kanji-pause",
-        nextButtonId: "starter-kanji-next",
+        optionsId: "kanji-practice-options",
+        pauseButtonId: "kanji-practice-pause",
+        nextButtonId: "kanji-practice-next",
         nextButtonLabel: "다음 한자 볼까요?"
       },
-      resultPrefix: "starter-kanji",
+      resultPrefix: "kanji-practice",
       resultClassName: "match-result-view kanji-result-view",
       resultFilterAriaLabel: "한자 퀴즈 결과 필터",
       resultBulkActionLabel: QUIZ_RESULT_RETRY_ALL_ACTION_LABEL,
       resultFooterHtml:
-        '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="starter-kanji-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
+        '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="kanji-practice-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
     });
   }
   function createMatchRoundLayout({
@@ -1692,7 +1692,7 @@
   function createLayout(kind) {
     const layoutMap = {
       "vocab-quiz": createVocabQuizLayout,
-      "starter-kanji-practice": createStarterKanjiLayout,
+      "kanji-practice": createKanjiPracticeLayout,
       "kanji-match-round": createKanjiMatchLayout,
       "match-round": createMatchLayout,
       "grammar-practice": createGrammarPracticeLayout,

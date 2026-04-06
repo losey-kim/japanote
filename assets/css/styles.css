@@ -848,15 +848,15 @@ button {
   line-height: 1.8;
 }
 
-.starter-shell {
+.quick-start-shell {
   display: grid;
   grid-template-columns: minmax(280px, 0.88fr) minmax(0, 1.12fr);
   gap: 20px;
 }
 
-.starter-overview,
-.starter-checklist-card,
-.starter-item {
+.quick-start-overview,
+.quick-start-checklist-card,
+.quick-start-item {
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   background:
@@ -865,20 +865,20 @@ button {
   box-shadow: var(--shadow);
 }
 
-.starter-overview,
-.starter-checklist-card {
+.quick-start-overview,
+.quick-start-checklist-card {
   padding: 28px;
 }
 
-.starter-overview h3,
-.starter-checklist-head h3,
-.starter-item h3 {
+.quick-start-overview h3,
+.quick-start-checklist-head h3,
+.quick-start-item h3 {
   margin: 12px 0 0;
   font-family: "Space Grotesk", sans-serif;
   letter-spacing: -0.03em;
 }
 
-.starter-priority {
+.quick-start-priority {
   list-style: none;
   padding: 0;
   margin: 22px 0 0;
@@ -886,7 +886,7 @@ button {
   gap: 12px;
 }
 
-.starter-priority li {
+.quick-start-priority li {
   display: flex;
   gap: 14px;
   align-items: flex-start;
@@ -896,7 +896,7 @@ button {
   border: 1px solid rgba(25, 21, 22, 0.08);
 }
 
-.starter-priority strong {
+.quick-start-priority strong {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -907,18 +907,18 @@ button {
   font-family: "Space Grotesk", sans-serif;
 }
 
-.starter-priority span {
+.quick-start-priority span {
   display: block;
   font-weight: 700;
 }
 
-.starter-priority p {
+.quick-start-priority p {
   margin: 6px 0 0;
   color: var(--muted);
   line-height: 1.7;
 }
 
-.starter-callout {
+.quick-start-callout {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -929,19 +929,19 @@ button {
   color: rgba(255, 255, 255, 0.95);
 }
 
-.starter-callout span {
+.quick-start-callout span {
   color: rgba(255, 255, 255, 0.56);
   font-size: 0.84rem;
 }
 
-.starter-checklist-head {
+.quick-start-checklist-head {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   align-items: end;
 }
 
-.starter-checklist-head strong {
+.quick-start-checklist-head strong {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -954,18 +954,18 @@ button {
   font-size: 1.35rem;
 }
 
-.starter-grid {
+.quick-start-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   margin-top: 22px;
 }
 
-.starter-item {
+.quick-start-item {
   padding: 20px;
 }
 
-.starter-item-head {
+.quick-start-item-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -974,7 +974,7 @@ button {
   font-size: 0.9rem;
 }
 
-.starter-track {
+.quick-start-track {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
@@ -985,38 +985,38 @@ button {
   font-family: "Space Grotesk", sans-serif;
 }
 
-.starter-item p {
+.quick-start-item p {
   margin: 10px 0 0;
   color: var(--muted);
   line-height: 1.75;
 }
 
-.starter-item-actions {
+.quick-start-item-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 18px;
 }
 
-.starter-item-actions .starter-learn,
-.starter-item-actions .starter-toggle {
+.quick-start-item-actions .quick-start-link,
+.quick-start-item-actions .quick-start-toggle {
   flex: 1 1 0;
   min-width: 140px;
   margin-top: 0;
 }
 
-.starter-item.is-done {
+.quick-start-item.is-done {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(241, 250, 246, 0.9)),
     linear-gradient(135deg, rgba(95, 174, 139, 0.12), rgba(255, 255, 255, 0.08));
 }
 
-.starter-toggle {
+.quick-start-toggle {
   width: 100%;
   margin-top: 18px;
 }
 
-.starter-toggle.is-checked {
+.quick-start-toggle.is-checked {
   color: white;
   background: var(--panel-dark);
 }
@@ -4479,9 +4479,9 @@ body::after {
 .grammar-item,
 .quiz-card,
 .page-intro,
-.starter-overview,
-.starter-checklist-card,
-.starter-item,
+.quick-start-overview,
+.quick-start-checklist-card,
+.quick-start-item,
 .basic-practice-copy,
 .basic-practice-card,
 .grammar-practice-copy,
@@ -4494,7 +4494,7 @@ body::after {
 
 .hero-copy,
 .page-intro,
-.starter-item,
+.quick-start-item,
 .grammar-item,
 .basic-practice-card,
 .grammar-practice-card,
@@ -4543,8 +4543,8 @@ body::after {
 .section-heading h2,
 .page-intro h1,
 .quiz-card h3,
-.starter-overview h3,
-.starter-checklist-head h3,
+.quick-start-overview h3,
+.quick-start-checklist-head h3,
 .basic-practice-copy h3,
 .basic-practice-header h3,
 .grammar-practice-copy h3,
@@ -4558,8 +4558,8 @@ body::after {
 .page-intro p,
 .section-copy,
 .stat-card p,
-.starter-priority p,
-.starter-item p,
+.quick-start-priority p,
+.quick-start-item p,
 .basic-practice-copy p,
 .basic-practice-note,
 .basic-practice-explanation,
@@ -4690,8 +4690,8 @@ body::after {
 }
 
 .page-intro,
-.starter-overview,
-.starter-checklist-card,
+.quick-start-overview,
+.quick-start-checklist-card,
 .basic-practice-copy,
 .basic-practice-card,
 .grammar-practice-copy,
@@ -4715,19 +4715,19 @@ body::after {
   background: linear-gradient(90deg, var(--coral), var(--gold));
 }
 
-.starter-item,
+.quick-start-item,
 .grammar-item {
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 
-.starter-item:hover,
+.quick-start-item:hover,
 .grammar-item:hover {
   transform: translateY(-3px);
   border-color: rgba(18, 20, 25, 0.14);
   box-shadow: 0 24px 46px rgba(34, 26, 20, 0.12);
 }
 
-.starter-item::before,
+.quick-start-item::before,
 .grammar-item::before {
   content: "";
   position: absolute;
@@ -4739,10 +4739,10 @@ body::after {
   background: rgba(18, 20, 25, 0.04);
 }
 
-.starter-priority li,
-.starter-item,
-.starter-track,
-.starter-checklist-head strong,
+.quick-start-priority li,
+.quick-start-item,
+.quick-start-track,
+.quick-start-checklist-head strong,
 .basic-practice-meta span,
 .reading-meta span,
 .grammar-practice-meta span,
@@ -4756,13 +4756,13 @@ body::after {
   background: rgba(248, 244, 237, 0.92);
 }
 
-.starter-priority strong,
-.starter-checklist-head strong,
-.starter-track {
+.quick-start-priority strong,
+.quick-start-checklist-head strong,
+.quick-start-track {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
-.starter-callout,
+.quick-start-callout,
 .basic-practice-prompt-box,
 .grammar-practice-question,
 .reading-question-box {
@@ -4771,7 +4771,7 @@ body::after {
   background: linear-gradient(160deg, #121720, #212a39);
 }
 
-.starter-callout::before,
+.quick-start-callout::before,
 .basic-practice-prompt-box::before,
 .grammar-practice-question::before,
 .reading-question-box::before {
@@ -4917,9 +4917,9 @@ body::after {
   .hero-panel,
   .stat-card,
   .page-intro,
-  .starter-overview,
-  .starter-checklist-card,
-  .starter-item,
+  .quick-start-overview,
+  .quick-start-checklist-card,
+  .quick-start-item,
   .basic-practice-copy,
   .basic-practice-card,
   .flashcard-panel,
@@ -4933,8 +4933,8 @@ body::after {
   .hero-copy,
   .hero-panel,
   .page-intro,
-  .starter-overview,
-  .starter-checklist-card,
+  .quick-start-overview,
+  .quick-start-checklist-card,
   .basic-practice-copy,
   .basic-practice-card,
   .flashcard-panel,
@@ -4956,14 +4956,14 @@ body::after {
     grid-template-columns: 1fr;
   }
 
-  .starter-grid,
+  .quick-start-grid,
   .focus-grid,
   .grammar-grid,
   .match-columns {
     grid-template-columns: 1fr;
   }
 
-  .starter-shell,
+  .quick-start-shell,
   .basic-practice-shell,
   .grammar-practice-shell,
   .basic-practice-header,
@@ -4972,7 +4972,7 @@ body::after {
     grid-template-columns: 1fr;
   }
 
-  .starter-checklist-head {
+  .quick-start-checklist-head {
     align-items: flex-start;
   }
 
@@ -4980,7 +4980,7 @@ body::after {
     width: 100%;
   }
 
-  .starter-item-actions {
+  .quick-start-item-actions {
     flex-direction: column;
   }
 
@@ -5448,8 +5448,8 @@ body::after {
   .hero-copy,
   .hero-panel,
   .page-intro,
-  .starter-overview,
-  .starter-checklist-card,
+  .quick-start-overview,
+  .quick-start-checklist-card,
   .basic-practice-copy,
   .basic-practice-card,
   .flashcard-panel,
@@ -5629,9 +5629,9 @@ body::after {
   html:not([data-theme="light"]) .grammar-item,
   html:not([data-theme="light"]) .quiz-card,
   html:not([data-theme="light"]) .page-intro,
-  html:not([data-theme="light"]) .starter-overview,
-  html:not([data-theme="light"]) .starter-checklist-card,
-  html:not([data-theme="light"]) .starter-item,
+  html:not([data-theme="light"]) .quick-start-overview,
+  html:not([data-theme="light"]) .quick-start-checklist-card,
+  html:not([data-theme="light"]) .quick-start-item,
   html:not([data-theme="light"]) .kana-setup-panel,
   html:not([data-theme="light"]) .basic-practice-copy,
   html:not([data-theme="light"]) .basic-practice-card,
@@ -5659,7 +5659,7 @@ body::after {
 
   html:not([data-theme="light"]) .hero-copy p,
   html:not([data-theme="light"]) .section-copy,
-  html:not([data-theme="light"]) .starter-item p,
+  html:not([data-theme="light"]) .quick-start-item p,
   html:not([data-theme="light"]) .routine-list p,
   html:not([data-theme="light"]) .panel-summary p,
   html:not([data-theme="light"]) .panel-metrics p,
@@ -5673,7 +5673,7 @@ body::after {
   }
 
   html:not([data-theme="light"]) .hero-panel,
-  html:not([data-theme="light"]) .starter-callout,
+  html:not([data-theme="light"]) .quick-start-callout,
   html:not([data-theme="light"]) .basic-practice-prompt-box,
   html:not([data-theme="light"]) .grammar-practice-question,
   html:not([data-theme="light"]) .reading-question-box {
@@ -5685,9 +5685,9 @@ body::after {
   html:not([data-theme="light"]) .panel-summary,
   html:not([data-theme="light"]) .panel-metrics div,
   html:not([data-theme="light"]) .panel-footer,
-  html:not([data-theme="light"]) .starter-priority li,
-  html:not([data-theme="light"]) .starter-track,
-  html:not([data-theme="light"]) .starter-checklist-head strong,
+  html:not([data-theme="light"]) .quick-start-priority li,
+  html:not([data-theme="light"]) .quick-start-track,
+  html:not([data-theme="light"]) .quick-start-checklist-head strong,
   html:not([data-theme="light"]) .basic-practice-meta span,
   html:not([data-theme="light"]) .reading-meta span,
   html:not([data-theme="light"]) .grammar-practice-meta span,
@@ -5743,7 +5743,7 @@ body::after {
   }
 
   html:not([data-theme="light"]) .level-button.is-active,
-  html:not([data-theme="light"]) .starter-toggle.is-checked {
+  html:not([data-theme="light"]) .quick-start-toggle.is-checked {
     color: #0f141b;
     background: rgba(237, 242, 248, 0.92);
     box-shadow: none;
@@ -5907,9 +5907,9 @@ html[data-theme="dark"] .flashcard-panel,
 html[data-theme="dark"] .grammar-item,
 html[data-theme="dark"] .quiz-card,
 html[data-theme="dark"] .page-intro,
-html[data-theme="dark"] .starter-overview,
-html[data-theme="dark"] .starter-checklist-card,
-html[data-theme="dark"] .starter-item,
+html[data-theme="dark"] .quick-start-overview,
+html[data-theme="dark"] .quick-start-checklist-card,
+html[data-theme="dark"] .quick-start-item,
 html[data-theme="dark"] .basic-practice-copy,
 html[data-theme="dark"] .basic-practice-card,
 html[data-theme="dark"] .grammar-practice-copy,
@@ -5936,7 +5936,7 @@ html[data-theme="dark"] .hero-copy::after {
 
 html[data-theme="dark"] .hero-copy p,
 html[data-theme="dark"] .section-copy,
-html[data-theme="dark"] .starter-item p,
+html[data-theme="dark"] .quick-start-item p,
 html[data-theme="dark"] .routine-list p,
 html[data-theme="dark"] .panel-summary p,
 html[data-theme="dark"] .panel-metrics p,
@@ -5950,7 +5950,7 @@ html[data-theme="dark"] .quiz-note-item-meta {
 }
 
 html[data-theme="dark"] .hero-panel,
-html[data-theme="dark"] .starter-callout,
+html[data-theme="dark"] .quick-start-callout,
 html[data-theme="dark"] .basic-practice-prompt-box,
 html[data-theme="dark"] .grammar-practice-question,
 html[data-theme="dark"] .reading-question-box {
@@ -5962,9 +5962,9 @@ html[data-theme="dark"] .routine-list li,
 html[data-theme="dark"] .panel-summary,
 html[data-theme="dark"] .panel-metrics div,
 html[data-theme="dark"] .panel-footer,
-html[data-theme="dark"] .starter-priority li,
-html[data-theme="dark"] .starter-track,
-html[data-theme="dark"] .starter-checklist-head strong,
+html[data-theme="dark"] .quick-start-priority li,
+html[data-theme="dark"] .quick-start-track,
+html[data-theme="dark"] .quick-start-checklist-head strong,
 html[data-theme="dark"] .basic-practice-meta span,
 html[data-theme="dark"] .reading-meta span,
 html[data-theme="dark"] .grammar-practice-meta span,
@@ -6020,7 +6020,7 @@ html[data-theme="dark"] .quiz-option:focus-visible {
 }
 
 html[data-theme="dark"] .level-button.is-active,
-html[data-theme="dark"] .starter-toggle.is-checked {
+html[data-theme="dark"] .quick-start-toggle.is-checked {
   color: #0f141b;
   background: rgba(237, 242, 248, 0.92);
   box-shadow: none;
@@ -6135,9 +6135,9 @@ html[data-theme="dark"] .reading-feedback {
   html:not([data-theme="light"]) .grammar-item,
   html:not([data-theme="light"]) .quiz-card,
   html:not([data-theme="light"]) .page-intro,
-  html:not([data-theme="light"]) .starter-overview,
-  html:not([data-theme="light"]) .starter-checklist-card,
-  html:not([data-theme="light"]) .starter-item,
+  html:not([data-theme="light"]) .quick-start-overview,
+  html:not([data-theme="light"]) .quick-start-checklist-card,
+  html:not([data-theme="light"]) .quick-start-item,
   html:not([data-theme="light"]) .basic-practice-copy,
   html:not([data-theme="light"]) .basic-practice-card,
   html:not([data-theme="light"]) .grammar-practice-copy,
@@ -6154,9 +6154,9 @@ html[data-theme="dark"] .reading-feedback {
   html[data-theme="dark"] .grammar-item,
   html[data-theme="dark"] .quiz-card,
   html[data-theme="dark"] .page-intro,
-  html[data-theme="dark"] .starter-overview,
-  html[data-theme="dark"] .starter-checklist-card,
-  html[data-theme="dark"] .starter-item,
+  html[data-theme="dark"] .quick-start-overview,
+  html[data-theme="dark"] .quick-start-checklist-card,
+  html[data-theme="dark"] .quick-start-item,
   html[data-theme="dark"] .kana-setup-panel,
   html[data-theme="dark"] .basic-practice-copy,
   html[data-theme="dark"] .basic-practice-card,
@@ -6177,9 +6177,9 @@ html[data-theme="dark"] .reading-feedback {
   html:not([data-theme="light"]) .panel-summary,
   html:not([data-theme="light"]) .panel-metrics div,
   html:not([data-theme="light"]) .panel-footer,
-  html:not([data-theme="light"]) .starter-priority li,
-  html:not([data-theme="light"]) .starter-track,
-  html:not([data-theme="light"]) .starter-checklist-head strong,
+  html:not([data-theme="light"]) .quick-start-priority li,
+  html:not([data-theme="light"]) .quick-start-track,
+  html:not([data-theme="light"]) .quick-start-checklist-head strong,
   html:not([data-theme="light"]) .basic-practice-meta span,
   html:not([data-theme="light"]) .reading-meta span,
   html:not([data-theme="light"]) .grammar-practice-meta span,
@@ -6201,9 +6201,9 @@ html[data-theme="dark"] .reading-feedback {
   html[data-theme="dark"] .panel-summary,
   html[data-theme="dark"] .panel-metrics div,
   html[data-theme="dark"] .panel-footer,
-  html[data-theme="dark"] .starter-priority li,
-  html[data-theme="dark"] .starter-track,
-  html[data-theme="dark"] .starter-checklist-head strong,
+  html[data-theme="dark"] .quick-start-priority li,
+  html[data-theme="dark"] .quick-start-track,
+  html[data-theme="dark"] .quick-start-checklist-head strong,
   html[data-theme="dark"] .basic-practice-meta span,
   html[data-theme="dark"] .reading-meta span,
   html[data-theme="dark"] .grammar-practice-meta span,
@@ -6350,7 +6350,7 @@ html[data-theme="dark"] .section-copy,
 html[data-theme="dark"] .panel-summary p,
 html[data-theme="dark"] .panel-metrics p,
 html[data-theme="dark"] .stat-card p,
-html[data-theme="dark"] .starter-item p,
+html[data-theme="dark"] .quick-start-item p,
 html[data-theme="dark"] .quiz-result-copy,
 html[data-theme="dark"] .flashcard-hint,
 html[data-theme="dark"] .match-feedback,
@@ -6374,8 +6374,8 @@ html[data-theme="dark"] .hero-copy h1,
 html[data-theme="dark"] .section-heading h2,
 html[data-theme="dark"] .page-intro h1,
 html[data-theme="dark"] .quiz-card h3,
-html[data-theme="dark"] .starter-overview h3,
-html[data-theme="dark"] .starter-checklist-head h3,
+html[data-theme="dark"] .quick-start-overview h3,
+html[data-theme="dark"] .quick-start-checklist-head h3,
 html[data-theme="dark"] .basic-practice-copy h3,
 html[data-theme="dark"] .basic-practice-header h3,
 html[data-theme="dark"] .grammar-practice-copy h3,
@@ -6395,9 +6395,9 @@ html[data-theme="dark"] .flashcard-panel,
 html[data-theme="dark"] .grammar-item,
 html[data-theme="dark"] .quiz-card,
 html[data-theme="dark"] .page-intro,
-html[data-theme="dark"] .starter-overview,
-html[data-theme="dark"] .starter-checklist-card,
-html[data-theme="dark"] .starter-item,
+html[data-theme="dark"] .quick-start-overview,
+html[data-theme="dark"] .quick-start-checklist-card,
+html[data-theme="dark"] .quick-start-item,
 html[data-theme="dark"] .basic-practice-copy,
 html[data-theme="dark"] .basic-practice-card,
 html[data-theme="dark"] .grammar-practice-copy,
@@ -6426,9 +6426,9 @@ html[data-theme="dark"] .routine-list li,
 html[data-theme="dark"] .panel-summary,
 html[data-theme="dark"] .panel-metrics div,
 html[data-theme="dark"] .panel-footer,
-html[data-theme="dark"] .starter-priority li,
-html[data-theme="dark"] .starter-track,
-html[data-theme="dark"] .starter-checklist-head strong,
+html[data-theme="dark"] .quick-start-priority li,
+html[data-theme="dark"] .quick-start-track,
+html[data-theme="dark"] .quick-start-checklist-head strong,
 html[data-theme="dark"] .basic-practice-meta span,
 html[data-theme="dark"] .reading-meta span,
 html[data-theme="dark"] .grammar-practice-meta span,
@@ -6461,7 +6461,7 @@ html[data-theme="dark"] .quiz-note-item {
   html:not([data-theme="light"]) .panel-summary p,
   html:not([data-theme="light"]) .panel-metrics p,
   html:not([data-theme="light"]) .stat-card p,
-  html:not([data-theme="light"]) .starter-item p,
+  html:not([data-theme="light"]) .quick-start-item p,
   html:not([data-theme="light"]) .quiz-result-copy,
   html:not([data-theme="light"]) .flashcard-hint,
   html:not([data-theme="light"]) .match-feedback,
@@ -6485,8 +6485,8 @@ html[data-theme="dark"] .quiz-note-item {
   html:not([data-theme="light"]) .section-heading h2,
   html:not([data-theme="light"]) .page-intro h1,
   html:not([data-theme="light"]) .quiz-card h3,
-  html:not([data-theme="light"]) .starter-overview h3,
-  html:not([data-theme="light"]) .starter-checklist-head h3,
+  html:not([data-theme="light"]) .quick-start-overview h3,
+  html:not([data-theme="light"]) .quick-start-checklist-head h3,
   html:not([data-theme="light"]) .basic-practice-copy h3,
   html:not([data-theme="light"]) .basic-practice-header h3,
   html:not([data-theme="light"]) .grammar-practice-copy h3,
@@ -6506,9 +6506,9 @@ html[data-theme="dark"] .quiz-note-item {
   html:not([data-theme="light"]) .grammar-item,
   html:not([data-theme="light"]) .quiz-card,
   html:not([data-theme="light"]) .page-intro,
-  html:not([data-theme="light"]) .starter-overview,
-  html:not([data-theme="light"]) .starter-checklist-card,
-  html:not([data-theme="light"]) .starter-item,
+  html:not([data-theme="light"]) .quick-start-overview,
+  html:not([data-theme="light"]) .quick-start-checklist-card,
+  html:not([data-theme="light"]) .quick-start-item,
   html:not([data-theme="light"]) .basic-practice-copy,
   html:not([data-theme="light"]) .basic-practice-card,
   html:not([data-theme="light"]) .grammar-practice-copy,
@@ -6537,9 +6537,9 @@ html[data-theme="dark"] .quiz-note-item {
   html:not([data-theme="light"]) .panel-summary,
   html:not([data-theme="light"]) .panel-metrics div,
   html:not([data-theme="light"]) .panel-footer,
-  html:not([data-theme="light"]) .starter-priority li,
-  html:not([data-theme="light"]) .starter-track,
-  html:not([data-theme="light"]) .starter-checklist-head strong,
+  html:not([data-theme="light"]) .quick-start-priority li,
+  html:not([data-theme="light"]) .quick-start-track,
+  html:not([data-theme="light"]) .quick-start-checklist-head strong,
   html:not([data-theme="light"]) .basic-practice-meta span,
   html:not([data-theme="light"]) .reading-meta span,
   html:not([data-theme="light"]) .grammar-practice-meta span,
@@ -6826,9 +6826,9 @@ html[data-theme="dark"] .match-save-btn.is-saved {
   html[data-theme-mode="system"] .grammar-item,
   html[data-theme-mode="system"] .quiz-card,
   html[data-theme-mode="system"] .page-intro,
-  html[data-theme-mode="system"] .starter-overview,
-  html[data-theme-mode="system"] .starter-checklist-card,
-  html[data-theme-mode="system"] .starter-item,
+  html[data-theme-mode="system"] .quick-start-overview,
+  html[data-theme-mode="system"] .quick-start-checklist-card,
+  html[data-theme-mode="system"] .quick-start-item,
   html[data-theme-mode="system"] .basic-practice-copy,
   html[data-theme-mode="system"] .basic-practice-card,
   html[data-theme-mode="system"] .grammar-practice-copy,
@@ -6895,7 +6895,7 @@ html[data-theme="dark"] .match-save-btn.is-saved {
   }
 
   html[data-theme-mode="system"] .level-button.is-active,
-  html[data-theme-mode="system"] .starter-toggle.is-checked {
+  html[data-theme-mode="system"] .quick-start-toggle.is-checked {
     color: white;
     background: linear-gradient(135deg, #f24b49, #ff6b67);
     border-color: transparent;

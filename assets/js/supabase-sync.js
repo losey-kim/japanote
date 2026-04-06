@@ -151,7 +151,6 @@
     "reviewIds",
     "kanjiMasteredIds",
     "kanjiReviewIds",
-    "starterDoneIds",
     "grammarDoneIds",
     "quizSessionMistakeIds"
   ];

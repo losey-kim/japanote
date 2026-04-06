@@ -47,7 +47,6 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
 - `vocab.html`: 단어 플래시카드
 - `grammar.html`: 문법 체크리스트 + 문법 드릴
 - `reading.html`: 독해 문제 풀이
-- `quiz.html`: 짧은 모의 퀴즈
 
 ## 포함 기능
 

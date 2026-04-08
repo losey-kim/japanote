@@ -583,7 +583,16 @@ const studyCardOrderCache = {
 };
 
 function buildStudyCardSignature(items) {
-  return Array.isArray(items) ? items.map((item) => item?.id || "").join("|") : "";
+  if (!Array.isArray(items)) {
+    return "";
+  }
+
+  // 비동기 데이터 동기화 과정에서 source 배열 순서만 달라져도 카드가 다시 섞이면
+  // 같은 목록인데 첫 카드가 다른 단어로 바뀌어 보이므로, 시그니처는 ID 집합 기준으로 고정한다.
+  return items
+    .map((item) => item?.id || "")
+    .sort()
+    .join("|");
 }
 
 function shuffleStudyCardIds(ids) {
@@ -1200,7 +1209,9 @@ function buildDynamicFlashcardPool(items, level = "N5") {
     }))
     .filter((item) => item.id && item.word && item.reading && item.meaning);
 
-  return cards.length ? shuffleQuizArray(cards) : shuffleQuizArray(getFallbackVocabItems(normalizedLevel));
+  // 카드 보기의 랜덤 순서는 getOrderedStudyCards가 한 번만 관리한다.
+  // 여기서도 다시 섞어버리면 원격 동기화/재렌더마다 첫 카드가 다른 단어로 튄다.
+  return cards.length ? cards : getFallbackVocabItems(normalizedLevel);
 }
 
 function buildDynamicVocabListPool(items, level = "N5") {
@@ -4898,6 +4909,23 @@ function applyExternalStudyState(nextState, options = {}) {
   const activeSessionStateKeys = new Set();
   const preservedPanels = {};
   const preservedRuntimeSessions = {};
+  const preservedFlashcardIds =
+    state && typeof state === "object"
+      ? {
+          vocab: getCurrentStudyFlashcardId({
+            getCards: getVisibleFlashcards,
+            indexKey: "flashcardIndex"
+          }),
+          kanji: getCurrentStudyFlashcardId({
+            getCards: getVisibleKanjiCards,
+            indexKey: "kanjiFlashcardIndex"
+          }),
+          grammar: getCurrentStudyFlashcardId({
+            getCards: getVisibleGrammarCards,
+            indexKey: "grammarFlashcardIndex"
+          })
+        }
+      : {};
 
   if (state && typeof state === "object") {
     for (const key of panelOpenKeys) {
@@ -5000,8 +5028,32 @@ function applyExternalStudyState(nextState, options = {}) {
   }
 
   resetStateDrivenQuizSessions();
-  renderAll();
-  loadRelevantVocabData();
+  // 원격 상태가 바뀌면서 단어 레벨도 함께 달라질 수 있어서, 필요한 단어 데이터가 준비된 뒤 한 번만 다시 그린다.
+  preloadRelevantVocabData()
+    .catch((error) => {
+      console.error("Failed to preload vocab data for external study state.", error);
+      return [];
+    })
+    .finally(() => {
+      syncDynamicVocabCollections();
+      // 원격 동기화 뒤에도 같은 카드가 아직 보이는 목록 안에 있으면 그 카드를 유지한다.
+      syncStudyFlashcardIndexToCardId({
+        currentCardId: preservedFlashcardIds.vocab,
+        getCards: getVisibleFlashcards,
+        indexKey: "flashcardIndex"
+      });
+      syncStudyFlashcardIndexToCardId({
+        currentCardId: preservedFlashcardIds.kanji,
+        getCards: getVisibleKanjiCards,
+        indexKey: "kanjiFlashcardIndex"
+      });
+      syncStudyFlashcardIndexToCardId({
+        currentCardId: preservedFlashcardIds.grammar,
+        getCards: getVisibleGrammarCards,
+        indexKey: "grammarFlashcardIndex"
+      });
+      renderAll();
+    });
 }
 
 function getLocalDateKey() {
@@ -5960,6 +6012,35 @@ function resetStudyCatalogPointers({ pageKey, indexKey, revealedKey }) {
   state[pageKey] = 1;
   state[indexKey] = 0;
   state[revealedKey] = false;
+}
+
+function getCurrentStudyFlashcardId({ getCards, indexKey }) {
+  const cards = typeof getCards === "function" ? getCards() : [];
+
+  if (!cards.length) {
+    return "";
+  }
+
+  const currentIndex = Math.max(0, Number(state?.[indexKey]) || 0) % cards.length;
+  return cards[currentIndex]?.id || "";
+}
+
+function syncStudyFlashcardIndexToCardId({ currentCardId, getCards, indexKey }) {
+  const nextCards = typeof getCards === "function" ? getCards() : [];
+
+  if (!nextCards.length) {
+    state[indexKey] = 0;
+    return;
+  }
+
+  const nextVisibleIndex = nextCards.findIndex((item) => item.id === currentCardId);
+
+  if (nextVisibleIndex !== -1) {
+    state[indexKey] = nextVisibleIndex;
+    return;
+  }
+
+  state[indexKey] = Math.min(Math.max(Number(state[indexKey]) || 0, 0), nextCards.length - 1);
 }
 
 function syncStudyFlashcardIndexAfterUpdate({ currentCardId, previousIndex, getCards, indexKey }) {
@@ -11524,7 +11605,11 @@ window.addEventListener("japanote:storage-updated", (event) => {
 
   applyExternalStudyState(event.detail.value);
 });
-loadSupplementaryContentData()
+Promise.all([
+  loadSupplementaryContentData(),
+  // 카드 기본 문구가 먼저 보였다가 실제 단어로 바뀌는 현상을 막기 위해 첫 렌더 전에 필요한 단어 데이터를 같이 기다린다.
+  preloadRelevantVocabData()
+])
   .then(() => {
     syncDynamicVocabCollections();
     activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
@@ -11537,7 +11622,4 @@ loadSupplementaryContentData()
     activeQuizQuestions = createQuizSession(state.quizMode, state.quizSessionSize, state.quizLevel);
     renderAll();
     dispatchSupplementaryContentLoaded();
-  })
-  .finally(() => {
-    loadRelevantVocabData();
   });

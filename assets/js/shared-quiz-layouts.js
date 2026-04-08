@@ -449,7 +449,7 @@
       .join("");
 
     return `
-      <div class="${escapeHtml(viewClassName)}" id="${escapeHtml(viewId)}">
+      <div class="${escapeHtml(viewClassName)}" id="${escapeHtml(viewId)}" hidden>
         <article class="${escapeHtml(articleClassName)}" id="${escapeHtml(articleId)}" aria-live="polite">
           <button class="flashcard-toggle" id="${escapeHtml(toggleId)}" type="button" aria-controls="${escapeHtml(meaningId)}" aria-expanded="false">
             <span class="flashcard-level" id="${escapeHtml(levelId)}">${escapeHtml(levelText)}</span>

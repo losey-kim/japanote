@@ -8021,7 +8021,11 @@ function syncActivePronunciationButton() {
   }
 
   const encodedItemId = encodePronunciationAudioItemId(pronunciationAudioState.itemId);
-  const button = document.querySelector(`[data-vocab-audio-id="${encodedItemId}"]`);
+  const buttons = Array.from(document.querySelectorAll(`[data-vocab-audio-id="${encodedItemId}"]`));
+  const button =
+    buttons.find((candidate) => !candidate.hidden && !candidate.closest("[hidden]")) ||
+    buttons[0] ||
+    null;
 
   if (!button) {
     pronunciationAudioState.button = null;
@@ -8138,8 +8142,24 @@ function createVocabAudioButtonMarkup(item) {
   `;
 }
 
+function findVisibleFlashcardById(id) {
+  return getVisibleFlashcards().find((item) => item.id === id) || null;
+}
+
 function findVisibleVocabItemById(id) {
   return getVisibleVocabList().find((item) => item.id === id) || null;
+}
+
+function handleFlashcardPronunciationButtonClick(button) {
+  const itemId = decodePronunciationAudioItemId(button?.dataset?.vocabAudioId);
+  const item = findVisibleFlashcardById(itemId);
+
+  if (!item) {
+    showJapanoteToast("단어 정보를 찾지 못했어요.");
+    return;
+  }
+
+  playPronunciationForItem(item, button);
 }
 
 function attachVocabPronunciationListListeners({ list }) {
@@ -8439,6 +8459,7 @@ function renderFlashcard() {
   const flashcardNext = document.getElementById("flashcard-next");
   const flashcardAgain = document.getElementById("flashcard-again");
   const flashcardMastered = document.getElementById("flashcard-mastered");
+  const flashcardPronunciation = document.getElementById("flashcard-pronunciation");
   const level = document.getElementById("flashcard-level");
   const word = document.getElementById("flashcard-word");
   const reading = document.getElementById("flashcard-reading");
@@ -8554,37 +8575,20 @@ function renderFlashcard() {
     ]
   });
 
-  const actions = document.querySelector("#vocab-card-view .flashcard-actions");
-
-  if (!actions) {
+  if (!flashcardPronunciation) {
     return;
-  }
-
-  let pronunciationButton = document.getElementById("flashcard-pronunciation");
-
-  if (!pronunciationButton) {
-    pronunciationButton = document.createElement("button");
-    pronunciationButton.id = "flashcard-pronunciation";
-    pronunciationButton.type = "button";
-    pronunciationButton.className = "secondary-btn button-with-icon vocab-audio-btn";
-    pronunciationButton.innerHTML =
-      '<span class="material-symbols-rounded" data-audio-button-icon aria-hidden="true">volume_up</span><span data-audio-button-label>음성 듣기</span>';
-    actions.prepend(pronunciationButton);
   }
 
   const hasAudio = hasCards && getPronunciationAudioUrls(currentCard).length > 0;
   const isPlaying = hasAudio && pronunciationAudioState.audio && pronunciationAudioState.itemId === currentCard.id;
 
-  pronunciationButton.hidden = !hasCards;
-  pronunciationButton.dataset.vocabAudioId = encodePronunciationAudioItemId(currentCard.id);
-  pronunciationButton.setAttribute("aria-label", hasAudio ? "이 단어 음성 듣기" : "재생할 수 있는 음성 없음");
-  syncPronunciationButtonState(pronunciationButton, hasAudio, isPlaying);
-  pronunciationButton.onclick = () => {
-    playPronunciationForItem(currentCard, pronunciationButton);
-  };
+  flashcardPronunciation.hidden = !hasCards;
+  flashcardPronunciation.dataset.vocabAudioId = encodePronunciationAudioItemId(currentCard.id);
+  flashcardPronunciation.setAttribute("aria-label", hasAudio ? "이 단어 음성 듣기" : "재생할 수 있는 음성 없음");
+  syncPronunciationButtonState(flashcardPronunciation, hasAudio, isPlaying);
 
   if (isPlaying) {
-    pronunciationAudioState.button = pronunciationButton;
+    pronunciationAudioState.button = flashcardPronunciation;
   }
 }
 
@@ -10833,6 +10837,7 @@ function attachVocabStudyListeners({
   flashcardNext,
   flashcardAgain,
   flashcardMastered,
+  flashcardPronunciation,
   vocabList,
   vocabTabButtons,
   vocabViewButtons,
@@ -10872,6 +10877,9 @@ function attachVocabStudyListeners({
       { element: vocabFilterSelect, handler: setVocabFilter },
       { element: vocabPartSelect, handler: setVocabPartFilter }
     ]
+  });
+  attachClickListener(flashcardPronunciation, () => {
+    handleFlashcardPronunciationButtonClick(flashcardPronunciation);
   });
   attachVocabListStatusIconListeners({ list: vocabList, render: renderAll });
   attachVocabPronunciationListListeners({ list: vocabList });
@@ -10988,6 +10996,7 @@ function attachEventListeners() {
   const flashcardNext = document.getElementById("flashcard-next");
   const flashcardAgain = document.getElementById("flashcard-again");
   const flashcardMastered = document.getElementById("flashcard-mastered");
+  const flashcardPronunciation = document.getElementById("flashcard-pronunciation");
   const vocabTabButtons = document.querySelectorAll("[data-vocab-tab]");
   const vocabViewButtons = document.querySelectorAll("[data-vocab-view]");
   const vocabLevelSelect = document.getElementById("vocab-level-select");
@@ -11098,6 +11107,7 @@ function attachEventListeners() {
     flashcardNext,
     flashcardAgain,
     flashcardMastered,
+    flashcardPronunciation,
     vocabList,
     vocabTabButtons,
     vocabViewButtons,

@@ -430,7 +430,22 @@
     actionButtons = []
   }) {
     const actionMarkup = actionButtons
-      .map((button) => `<button class="${escapeHtml(button.className)}" id="${escapeHtml(button.id)}" type="button">${escapeHtml(button.label)}</button>`)
+      .map((button) => {
+        const attributes = renderAttributes(button.attributes || {});
+        const buttonAttributes = attributes ? ` ${attributes}` : "";
+        const iconAttributes = renderAttributes(button.iconAttributes || {});
+        const iconMarkup = button.icon
+          ? `<span class="material-symbols-rounded" aria-hidden="true"${iconAttributes ? ` ${iconAttributes}` : ""}>${escapeHtml(button.icon)}</span>`
+          : "";
+        const labelAttributes = renderAttributes(button.labelAttributes || {});
+
+        return `
+          <button class="${escapeHtml(button.className)}" id="${escapeHtml(button.id)}" type="button"${buttonAttributes}>
+            ${iconMarkup}
+            <span${labelAttributes ? ` ${labelAttributes}` : ""}>${escapeHtml(button.label)}</span>
+          </button>
+        `;
+      })
       .join("");
 
     return `
@@ -547,8 +562,9 @@
     ];
   }
 
-  function createCatalogActionButtons({ againId, masteredId }) {
+  function createCatalogActionButtons({ againId, masteredId, leadingButtons = [] }) {
     return [
+      ...leadingButtons,
       { id: againId, className: "secondary-btn", label: "다시 볼래요" },
       { id: masteredId, className: "primary-btn", label: "마스터했어요!" }
     ];
@@ -603,7 +619,8 @@
     prevId,
     nextId,
     againId,
-    masteredId
+    masteredId,
+    leadingActionButtons = []
   }) {
     return {
       viewId,
@@ -630,7 +647,8 @@
       }),
       actionButtons: createCatalogActionButtons({
         againId,
-        masteredId
+        masteredId,
+        leadingButtons: leadingActionButtons
       })
     };
   }
@@ -698,7 +716,27 @@
         prevId: "flashcard-prev",
         nextId: "flashcard-next",
         againId: "flashcard-again",
-        masteredId: "flashcard-mastered"
+        masteredId: "flashcard-mastered",
+        leadingActionButtons: [
+          {
+            id: "flashcard-pronunciation",
+            className: "secondary-btn button-with-icon vocab-audio-btn",
+            label: "\uC74C\uC131 \uB4E3\uAE30",
+            icon: "volume_up",
+            attributes: {
+              hidden: true,
+              "data-audio-available": "false",
+              "aria-pressed": "false",
+              "aria-label": "\uB2E8\uC5B4 \uC74C\uC131 \uB4E3\uAE30"
+            },
+            iconAttributes: {
+              "data-audio-button-icon": true
+            },
+            labelAttributes: {
+              "data-audio-button-label": true
+            }
+          }
+        ]
       }),
       listView: createCatalogListViewConfig({ scope: "vocab" })
     },

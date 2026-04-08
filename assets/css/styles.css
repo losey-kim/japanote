@@ -2122,6 +2122,16 @@ button {
   min-width: 0;
 }
 
+.vocab-list-actions--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.vocab-audio-btn.is-playing {
+  color: white;
+  background: var(--ink);
+  border-color: rgba(23, 37, 84, 0.24);
+}
+
 .vocab-status-btn.is-selected-review,
 .kanji-status-btn.is-selected-review {
   color: white;
@@ -2471,6 +2481,10 @@ button {
 .vocab-card-view .flashcard-actions > * {
   flex: 1 1 180px;
   min-width: 0;
+}
+
+.vocab-card-view .vocab-audio-btn[hidden] {
+  display: none;
 }
 
 .vocab-tab-list {

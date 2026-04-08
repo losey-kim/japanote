@@ -913,6 +913,37 @@ function getQuizPart(item) {
   return normalizeQuizText(item.parts[0] || "");
 }
 
+function getQuizPronunciationFile(item) {
+  return String(item?.pron_file || item?.pronFile || "").trim();
+}
+
+function getPronunciationAudioUrls(item) {
+  const rawValue = getQuizPronunciationFile(item);
+
+  if (!rawValue) {
+    return [];
+  }
+
+  return uniqueQuizValues(
+    rawValue
+      .split("||")
+      .map((value) => String(value || "").trim())
+      .filter(Boolean)
+  );
+}
+
+function encodePronunciationAudioItemId(value) {
+  return encodeURIComponent(normalizeQuizText(value));
+}
+
+function decodePronunciationAudioItemId(value) {
+  try {
+    return decodeURIComponent(String(value ?? ""));
+  } catch (error) {
+    return normalizeQuizText(value);
+  }
+}
+
 function getQuizSessionSize(value) {
   return Number(value) === 10 ? 10 : 20;
 }
@@ -1124,7 +1155,8 @@ function buildDynamicQuizPool(items) {
       word: getQuizDisplayWord(item),
       reading: getQuizReading(item),
       meaning: getQuizMeaning(item),
-      part: getQuizPart(item)
+      part: getQuizPart(item),
+      pronFile: getQuizPronunciationFile(item)
     }))
     .filter((item) => item.id && item.word && item.reading && item.meaning);
 
@@ -1163,7 +1195,8 @@ function buildDynamicFlashcardPool(items, level = "N5") {
       word: item.word,
       reading: item.reading,
       meaning: item.meaning,
-      part: item.part || ""
+      part: item.part || "",
+      pronFile: item.pronFile || ""
     }))
     .filter((item) => item.id && item.word && item.reading && item.meaning);
 
@@ -1179,7 +1212,8 @@ function buildDynamicVocabListPool(items, level = "N5") {
       word: item.word,
       reading: item.reading,
       meaning: item.meaning,
-      part: item.part || ""
+      part: item.part || "",
+      pronFile: item.pronFile || ""
     }))
     .filter((item) => item.id && item.word && item.reading && item.meaning);
 
@@ -7553,6 +7587,7 @@ function setVocabTab(tab) {
     return;
   }
 
+  stopPronunciationAudio();
   state.vocabTab = nextTab;
 
   if (nextTab !== "quiz") {
@@ -7581,6 +7616,7 @@ function setVocabView(view) {
   updateStudyCatalogState({
     stateKey: "vocabView",
     nextValue: nextView,
+    afterChange: stopPronunciationAudio,
     render: renderVocabPage
   });
 }
@@ -7678,6 +7714,7 @@ function setVocabLevel(level) {
     return;
   }
 
+  stopPronunciationAudio();
   state.vocabLevel = nextLevel;
   resetVocabStudyPointers();
   invalidateVocabQuizSession();
@@ -7695,6 +7732,7 @@ function setVocabFilter(filter) {
     nextValue: nextFilter,
     resetPointers: resetVocabStudyPointers,
     invalidate: invalidateVocabQuizSession,
+    afterChange: stopPronunciationAudio,
     render: renderVocabPage
   });
 }
@@ -7706,6 +7744,7 @@ function setVocabPartFilter(part) {
     nextValue: nextPart,
     resetPointers: resetVocabStudyPointers,
     invalidate: invalidateVocabQuizSession,
+    afterChange: stopPronunciationAudio,
     render: renderVocabPage
   });
 }
@@ -7906,6 +7945,225 @@ function showJapanoteToast(message) {
       el.hidden = true;
     }, 280);
   }, 2600);
+}
+
+// 음성은 한 번에 하나만 재생해서 카드와 목록을 오갈 때 상태가 꼬이지 않게 유지한다.
+const pronunciationAudioState = {
+  audio: null,
+  itemId: "",
+  button: null
+};
+
+function releasePronunciationAudio(audio) {
+  if (!audio) {
+    return;
+  }
+
+  audio.onended = null;
+  audio.onerror = null;
+  audio.onpause = null;
+  audio.pause();
+  audio.src = "";
+}
+
+function setPronunciationButtonState(button, { disabled = false, playing = false } = {}) {
+  if (!button) {
+    return;
+  }
+
+  const label = button.querySelector("[data-audio-button-label]");
+  const icon = button.querySelector("[data-audio-button-icon]");
+
+  button.disabled = disabled;
+  button.classList.toggle("is-playing", playing);
+  button.setAttribute("aria-pressed", String(playing));
+
+  if (label) {
+    label.textContent = disabled ? "음성 없음" : playing ? "재생 중" : "음성 듣기";
+  }
+
+  if (icon) {
+    icon.textContent = playing ? "graphic_eq" : "volume_up";
+  }
+}
+
+function syncPronunciationButtonState(button, hasAudio, playing = false) {
+  if (!button) {
+    return;
+  }
+
+  button.dataset.audioAvailable = hasAudio ? "true" : "false";
+  setPronunciationButtonState(button, { disabled: !hasAudio, playing: hasAudio && playing });
+}
+
+function clearPronunciationAudioState() {
+  if (pronunciationAudioState.button) {
+    const hasAudio = pronunciationAudioState.button.dataset.audioAvailable === "true";
+    setPronunciationButtonState(pronunciationAudioState.button, { disabled: !hasAudio, playing: false });
+  }
+
+  pronunciationAudioState.audio = null;
+  pronunciationAudioState.itemId = "";
+  pronunciationAudioState.button = null;
+}
+
+function stopPronunciationAudio() {
+  if (pronunciationAudioState.audio) {
+    releasePronunciationAudio(pronunciationAudioState.audio);
+  }
+
+  clearPronunciationAudioState();
+}
+
+function syncActivePronunciationButton() {
+  if (!pronunciationAudioState.itemId || !pronunciationAudioState.audio) {
+    return;
+  }
+
+  const encodedItemId = encodePronunciationAudioItemId(pronunciationAudioState.itemId);
+  const button = document.querySelector(`[data-vocab-audio-id="${encodedItemId}"]`);
+
+  if (!button) {
+    pronunciationAudioState.button = null;
+    return;
+  }
+
+  pronunciationAudioState.button = button;
+  syncPronunciationButtonState(button, button.dataset.audioAvailable === "true", true);
+}
+
+function playPronunciationAudioSource({ itemId, urls, index, button }) {
+  if (index >= urls.length) {
+    clearPronunciationAudioState();
+    showJapanoteToast("음성을 재생하지 못했어요.");
+    return;
+  }
+
+  const audio = new Audio(urls[index]);
+
+  pronunciationAudioState.audio = audio;
+  pronunciationAudioState.itemId = itemId;
+  pronunciationAudioState.button = button || null;
+
+  if (button) {
+    syncPronunciationButtonState(button, true, true);
+  }
+
+  audio.preload = "none";
+  audio.onended = () => {
+    if (pronunciationAudioState.audio !== audio) {
+      return;
+    }
+
+    releasePronunciationAudio(audio);
+    clearPronunciationAudioState();
+  };
+  audio.onerror = () => {
+    if (pronunciationAudioState.audio !== audio) {
+      return;
+    }
+
+    releasePronunciationAudio(audio);
+    pronunciationAudioState.audio = null;
+    playPronunciationAudioSource({ itemId, urls, index: index + 1, button });
+  };
+  audio.onpause = () => {
+    if (pronunciationAudioState.audio !== audio || audio.ended) {
+      return;
+    }
+
+    releasePronunciationAudio(audio);
+    clearPronunciationAudioState();
+  };
+
+  const playPromise = audio.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(() => {
+      if (pronunciationAudioState.audio !== audio) {
+        return;
+      }
+
+      releasePronunciationAudio(audio);
+      pronunciationAudioState.audio = null;
+      playPronunciationAudioSource({ itemId, urls, index: index + 1, button });
+    });
+  }
+}
+
+function playPronunciationForItem(item, button) {
+  const itemId = normalizeQuizText(item?.id);
+  const urls = getPronunciationAudioUrls(item);
+
+  if (!itemId) {
+    return;
+  }
+
+  if (!urls.length) {
+    syncPronunciationButtonState(button, false, false);
+    showJapanoteToast("이 단어는 들을 수 있는 음성이 없어요.");
+    return;
+  }
+
+  if (pronunciationAudioState.audio && pronunciationAudioState.itemId === itemId) {
+    stopPronunciationAudio();
+    syncPronunciationButtonState(button, true, false);
+    return;
+  }
+
+  stopPronunciationAudio();
+  playPronunciationAudioSource({ itemId, urls, index: 0, button });
+}
+
+function createVocabAudioButtonMarkup(item) {
+  if (!getPronunciationAudioUrls(item).length) {
+    return "";
+  }
+
+  const encodedItemId = encodePronunciationAudioItemId(item.id);
+  const isPlaying = pronunciationAudioState.audio && pronunciationAudioState.itemId === item.id;
+
+  return `
+    <div class="vocab-list-actions vocab-list-actions--single">
+      <button
+        type="button"
+        class="secondary-btn button-with-icon vocab-audio-btn${isPlaying ? " is-playing" : ""}"
+        data-vocab-audio-id="${encodedItemId}"
+        data-audio-available="true"
+        aria-pressed="${isPlaying ? "true" : "false"}"
+      >
+        <span class="material-symbols-rounded" data-audio-button-icon aria-hidden="true">${isPlaying ? "graphic_eq" : "volume_up"}</span>
+        <span data-audio-button-label>${isPlaying ? "재생 중" : "음성 듣기"}</span>
+      </button>
+    </div>
+  `;
+}
+
+function findVisibleVocabItemById(id) {
+  return getVisibleVocabList().find((item) => item.id === id) || null;
+}
+
+function attachVocabPronunciationListListeners({ list }) {
+  if (!list) {
+    return;
+  }
+
+  list.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-vocab-audio-id]");
+
+    if (!button || !list.contains(button)) {
+      return;
+    }
+
+    const itemId = decodePronunciationAudioItemId(button.dataset.vocabAudioId);
+    const item = findVisibleVocabItemById(itemId);
+
+    if (!item) {
+      showJapanoteToast("단어 정보를 찾지 못했어요.");
+      return;
+    }
+
+    playPronunciationForItem(item, button);
+  });
 }
 
 function createStudyListStatusCycleButtonMarkup(id, kind) {
@@ -8295,6 +8553,39 @@ function renderFlashcard() {
       }
     ]
   });
+
+  const actions = document.querySelector("#vocab-card-view .flashcard-actions");
+
+  if (!actions) {
+    return;
+  }
+
+  let pronunciationButton = document.getElementById("flashcard-pronunciation");
+
+  if (!pronunciationButton) {
+    pronunciationButton = document.createElement("button");
+    pronunciationButton.id = "flashcard-pronunciation";
+    pronunciationButton.type = "button";
+    pronunciationButton.className = "secondary-btn button-with-icon vocab-audio-btn";
+    pronunciationButton.innerHTML =
+      '<span class="material-symbols-rounded" data-audio-button-icon aria-hidden="true">volume_up</span><span data-audio-button-label>음성 듣기</span>';
+    actions.prepend(pronunciationButton);
+  }
+
+  const hasAudio = hasCards && getPronunciationAudioUrls(currentCard).length > 0;
+  const isPlaying = hasAudio && pronunciationAudioState.audio && pronunciationAudioState.itemId === currentCard.id;
+
+  pronunciationButton.hidden = !hasCards;
+  pronunciationButton.dataset.vocabAudioId = encodePronunciationAudioItemId(currentCard.id);
+  pronunciationButton.setAttribute("aria-label", hasAudio ? "이 단어 음성 듣기" : "재생할 수 있는 음성 없음");
+  syncPronunciationButtonState(pronunciationButton, hasAudio, isPlaying);
+  pronunciationButton.onclick = () => {
+    playPronunciationForItem(currentCard, pronunciationButton);
+  };
+
+  if (isPlaying) {
+    pronunciationAudioState.button = pronunciationButton;
+  }
 }
 
 function renderVocabList() {
@@ -8324,10 +8615,12 @@ function renderVocabList() {
         titleText: formatQuizLineBreaks(item.word),
         subtitleText: formatQuizLineBreaks(item.reading),
         descriptionMarkup: `<p class="vocab-list-meaning">${formatQuizLineBreaks(item.meaning)}</p>`,
-        actionsMarkup: ""
+        actionsMarkup: createVocabAudioButtonMarkup(item)
       });
     }
   });
+
+  syncActivePronunciationButton();
 }
 
 function renderVocabTabLayout() {
@@ -8713,6 +9006,7 @@ function toggleFlashcardReveal() {
 }
 
 function moveFlashcard(step) {
+  stopPronunciationAudio();
   moveStudyFlashcard(step, {
     getCards: getVisibleFlashcards,
     indexKey: "flashcardIndex",
@@ -10580,6 +10874,7 @@ function attachVocabStudyListeners({
     ]
   });
   attachVocabListStatusIconListeners({ list: vocabList, render: renderAll });
+  attachVocabPronunciationListListeners({ list: vocabList });
   attachValueButtonListeners(vocabTabButtons, (button) => button.dataset.vocabTab, setVocabTab);
 }
 

@@ -2338,6 +2338,17 @@ button {
   line-height: 1.1;
 }
 
+.basic-practice-display-box[data-text-size="md"] strong {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  line-height: 1.4;
+}
+
+.basic-practice-display-box[data-text-size="sm"] strong {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
 .basic-practice-display-box p {
   margin: 10px 0 0;
   color: var(--muted);
@@ -3511,30 +3522,6 @@ button {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.74);
   border: 1px solid rgba(25, 21, 22, 0.08);
-}
-
-.grammar-practice-question {
-  margin-top: 18px;
-  min-height: var(--quiz-question-min-height);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 26px;
-  background: var(--panel-dark);
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.grammar-practice-question .eyebrow {
-  color: rgba(255, 255, 255, 0.56);
-}
-
-.grammar-practice-question p {
-  margin: 12px 0 0;
-  font-family: "Noto Sans JP", sans-serif;
-  font-size: 1.22rem;
-  line-height: 1.9;
-  white-space: pre-line;
 }
 
 .grammar-practice-options {
@@ -4984,7 +4971,8 @@ body::after {
 .basic-practice-note,
 .grammar-practice-note,
 .reading-passage,
-.basic-practice-display-box {
+.basic-practice-display-box,
+.grammar-practice-question {
   border-color: rgba(18, 20, 25, 0.08);
   background: rgba(248, 244, 237, 0.92);
 }
@@ -4997,7 +4985,6 @@ body::after {
 
 .quick-start-callout,
 .basic-practice-prompt-box,
-.grammar-practice-question,
 .reading-question-box {
   position: relative;
   overflow: hidden;
@@ -5006,7 +4993,6 @@ body::after {
 
 .quick-start-callout::before,
 .basic-practice-prompt-box::before,
-.grammar-practice-question::before,
 .reading-question-box::before {
   content: "";
   position: absolute;
@@ -5018,6 +5004,7 @@ body::after {
 }
 
 .basic-practice-display-box,
+.grammar-practice-question,
 .reading-passage {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
@@ -5919,7 +5906,6 @@ body::after {
   html:not([data-theme="light"]) .hero-panel,
   html:not([data-theme="light"]) .quick-start-callout,
   html:not([data-theme="light"]) .basic-practice-prompt-box,
-  html:not([data-theme="light"]) .grammar-practice-question,
   html:not([data-theme="light"]) .reading-question-box {
     background: linear-gradient(160deg, #0f141b, #182130);
     border-color: rgba(237, 242, 248, 0.06);
@@ -6197,7 +6183,6 @@ html[data-theme="dark"] .quiz-note-item-meta {
 html[data-theme="dark"] .hero-panel,
 html[data-theme="dark"] .quick-start-callout,
 html[data-theme="dark"] .basic-practice-prompt-box,
-html[data-theme="dark"] .grammar-practice-question,
 html[data-theme="dark"] .reading-question-box {
   background: linear-gradient(160deg, #0f141b, #182130);
   border-color: rgba(237, 242, 248, 0.06);

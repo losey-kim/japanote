@@ -73,15 +73,20 @@
 
     const items = resultView.querySelectorAll(".match-result-item");
     if (items.length > 0) {
-      html += '<div style="margin-top:4px;border-top:1px solid rgba(25,21,22,0.08);padding-top:10px;">';
+      html += '<div style="margin-top:4px;border-top:1px solid rgba(25,21,22,0.08);padding-top:12px;">';
       items.forEach((item) => {
         const isCorrect = item.classList.contains("is-correct");
         const icon = isCorrect ? "✅" : "❌";
         const titleEl = item.querySelector("strong");
+        const descEl = item.querySelector("p");
         const title = titleEl?.textContent || "";
-        html += `<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;font-size:0.86rem;line-height:1.5;">
-          <span style="flex-shrink:0;font-size:0.76rem;">${icon}</span>
-          <span style="font-weight:600;word-break:keep-all;">${title}</span>
+        const desc = descEl?.textContent || "";
+        html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:0.88rem;line-height:1.45;">
+          <span style="flex-shrink:0;font-size:0.78rem;line-height:1.8;">${icon}</span>
+          <div style="min-width:0;flex:1;">
+            <span style="font-weight:600;word-break:keep-all;overflow-wrap:anywhere;">${title}</span>
+            ${desc ? `<span style="color:#625a56;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;"> ${desc}</span>` : ""}
+          </div>
         </div>`;
       });
       html += "</div>";

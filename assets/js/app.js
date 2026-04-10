@@ -919,6 +919,20 @@ function formatQuizLineBreaks(value) {
   return normalizeQuizText(value).replace(/\s*;\s*/g, "\n");
 }
 
+function applyDisplayTextSize(element) {
+  if (!element) return;
+  const box = element.closest(".basic-practice-display-box");
+  if (!box) return;
+  const len = (element.textContent || "").replace(/\s/g, "").length;
+  if (len <= 4) {
+    delete box.dataset.textSize;
+  } else if (len <= 10) {
+    box.dataset.textSize = "md";
+  } else {
+    box.dataset.textSize = "sm";
+  }
+}
+
 function hasFinalConsonant(char) {
   const code = char.charCodeAt(0);
   return code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
@@ -7067,6 +7081,7 @@ function renderKanjiPractice() {
   display.textContent = formatQuizLineBreaks(current.display);
   displaySub.textContent = formatQuizLineBreaks(current.displaySub || "");
   displaySub.hidden = !normalizeQuizText(current.displaySub || "");
+  applyDisplayTextSize(display);
 
   card.className = `basic-practice-card kanji-practice-card ${current.tone || "tone-gold"}`;
   nextButton.textContent =
@@ -8828,6 +8843,7 @@ function renderVocabQuiz() {
   prompt.textContent = formatQuizLineBreaks(softenVisibleKoreanCopy(question.prompt));
   display.textContent = formatQuizLineBreaks(question.display);
   displaySub.textContent = formatQuizLineBreaks(softenVisibleKoreanCopy(question.displaySub || ""));
+  applyDisplayTextSize(display);
   feedback.textContent = "";
   explanation.textContent = "";
   next.hidden = false;
@@ -9754,6 +9770,7 @@ function renderGrammarPractice() {
   progress.textContent =
     `${currentSessionIndex + 1} / ${activeCount}`;
   sentence.textContent = current.sentence;
+  applyDisplayTextSize(sentence);
   feedback.textContent = "";
   explanation.textContent = "";
   nextButton.textContent = currentSessionIndex >= activeCount - 1 ? "결과 보기" : "다음 문제 보기";
@@ -9800,7 +9817,7 @@ function handleGrammarPracticeAnswer(index) {
   document.getElementById("grammar-practice-feedback").textContent = correct
     ? ""
     : "";
-  document.getElementById("grammar-practice-explanation").textContent = softenExplanationCopy(current.explanation);
+  document.getElementById("grammar-practice-explanation").textContent = "";
   if (nextButton) {
     nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
     nextButton.disabled = false;
@@ -9838,7 +9855,7 @@ function handleGrammarPracticeTimeout() {
   });
 
   document.getElementById("grammar-practice-feedback").textContent = "";
-  document.getElementById("grammar-practice-explanation").textContent = softenExplanationCopy(current.explanation);
+  document.getElementById("grammar-practice-explanation").textContent = "";
   if (nextButton) {
     nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
     nextButton.disabled = false;

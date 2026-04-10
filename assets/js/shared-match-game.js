@@ -1436,6 +1436,267 @@
     return shuffleItems(safeItems).slice(0, totalCount);
   }
 
+  function normalizeText(value) {
+    const text = String(value ?? "").trim();
+
+    if (/%[0-9A-Fa-f]{2}/.test(text)) {
+      try {
+        return decodeURIComponent(text).replace(/\s+/g, " ").trim();
+      } catch (error) {
+        return text.replace(/\s+/g, " ").trim();
+      }
+    }
+
+    return text.replace(/\s+/g, " ").trim();
+  }
+
+  function setFeedbackById(elementId, message, tone = "") {
+    const feedback = document.getElementById(elementId);
+
+    if (!feedback) {
+      return;
+    }
+
+    feedback.hidden = !message;
+    feedback.textContent = message;
+    feedback.classList.remove("is-success", "is-fail");
+
+    if (tone) {
+      feedback.classList.add(tone);
+    }
+  }
+
+  function setActionAvailabilityById(elementId, enabled) {
+    const button = document.getElementById(elementId);
+
+    if (button) {
+      button.disabled = !enabled;
+    }
+  }
+
+  function scrollElementIntoViewById(elementId) {
+    const element = document.getElementById(elementId);
+
+    if (!element?.scrollIntoView) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      element.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+  }
+
+  function createMatchCard({ state, onSelection }) {
+    return function buildCard(card, selectedId) {
+      const button = document.createElement("button");
+      const label = document.createElement("span");
+      const matched = state.matchedIds.includes(card.id);
+      const wrong =
+        (card.side === "left" && state.wrongLeft === card.id) ||
+        (card.side === "right" && state.wrongRight === card.id);
+
+      button.type = "button";
+      button.className = "match-card";
+      label.className = "button-text-clamp match-card-label";
+      label.textContent = card.value;
+      button.appendChild(label);
+      button.disabled = state.isLocked || matched || state.timedOut;
+
+      if (selectedId === card.id) {
+        button.classList.add("is-selected");
+      }
+
+      if (matched) {
+        button.classList.add("is-matched");
+      }
+
+      if (wrong) {
+        button.classList.add("is-wrong");
+      }
+
+      button.addEventListener("click", () => {
+        onSelection(card);
+      });
+
+      return button;
+    };
+  }
+
+  function renderUnavailableState({
+    leftListId,
+    rightListId,
+    resultListId,
+    resultEmptyId,
+    state,
+    engine,
+    setActionAvailability,
+    setFeedback,
+    renderScreen,
+    message
+  }) {
+    const leftList = document.getElementById(leftListId);
+    const rightList = document.getElementById(rightListId);
+    const resultList = document.getElementById(resultListId);
+    const resultEmpty = document.getElementById(resultEmptyId);
+
+    engine.clearAllTimers();
+    state.sessionItems = [];
+    state.pageItems = [];
+    state.results = [];
+    state.leftCards = [];
+    state.rightCards = [];
+    state.pageIndex = 0;
+    state.hasStarted = false;
+    state.showResults = false;
+    engine.resetCurrentPageState();
+
+    if (leftList) {
+      leftList.innerHTML = "";
+    }
+
+    if (rightList) {
+      rightList.innerHTML = "";
+    }
+
+    if (resultList) {
+      resultList.innerHTML = "";
+    }
+
+    if (resultEmpty) {
+      resultEmpty.hidden = true;
+    }
+
+    setActionAvailability(false);
+    setFeedback(message, "is-fail");
+    renderScreen();
+  }
+
+  function createPreferenceHandler({ preferences, key, normalize, savePreferences, renderSettings, enterReadyState, beforeApply }) {
+    return function setPreference(value) {
+      const nextValue = normalize(value);
+
+      if (preferences[key] === nextValue) {
+        return;
+      }
+
+      preferences[key] = nextValue;
+
+      if (typeof beforeApply === "function") {
+        beforeApply(nextValue);
+      }
+
+      savePreferences();
+      renderSettings();
+      enterReadyState();
+    };
+  }
+
+  function createResultFilterHandler({ state, normalize, renderResults }) {
+    return function setResultFilter(filter) {
+      const nextFilter = normalize(filter);
+
+      if (state.resultFilter === nextFilter) {
+        return;
+      }
+
+      state.resultFilter = nextFilter;
+      renderResults();
+    };
+  }
+
+  function createStudyListManager({ storageKey, reviewKey, masteredKey }) {
+    function loadState() {
+      return loadStoredObject(storageKey);
+    }
+
+    function saveState(studyState) {
+      saveStoredObject(storageKey, studyState);
+    }
+
+    function syncToApp(studyState) {
+      if (typeof global.applyExternalStudyState === "function") {
+        global.applyExternalStudyState(studyState);
+        return;
+      }
+
+      dispatchStorageUpdated(storageKey, studyState, "local");
+    }
+
+    function getIds(studyState) {
+      return {
+        reviewIds: Array.isArray(studyState[reviewKey]) ? studyState[reviewKey] : [],
+        masteredIds: Array.isArray(studyState[masteredKey]) ? studyState[masteredKey] : []
+      };
+    }
+
+    function saveToReviewList(id) {
+      if (!id) return;
+      const studyState = loadState();
+      const { reviewIds, masteredIds } = getIds(studyState);
+      studyState[reviewKey] = Array.from(new Set([...reviewIds, id]));
+      studyState[masteredKey] = masteredIds.filter((itemId) => itemId !== id);
+      saveState(studyState);
+      syncToApp(studyState);
+    }
+
+    function removeFromReviewList(id) {
+      if (!id) return;
+      const studyState = loadState();
+      const { reviewIds } = getIds(studyState);
+      studyState[reviewKey] = reviewIds.filter((itemId) => itemId !== id);
+      saveState(studyState);
+      syncToApp(studyState);
+    }
+
+    function isInReviewList(id) {
+      if (!id) return false;
+      const studyState = loadState();
+      return Array.isArray(studyState[reviewKey]) && studyState[reviewKey].includes(id);
+    }
+
+    function saveToMasteredList(id) {
+      if (!id) return;
+      const studyState = loadState();
+      const { reviewIds, masteredIds } = getIds(studyState);
+      studyState[masteredKey] = Array.from(new Set([...masteredIds, id]));
+      studyState[reviewKey] = reviewIds.filter((itemId) => itemId !== id);
+      saveState(studyState);
+      syncToApp(studyState);
+    }
+
+    function removeFromMasteredList(id) {
+      if (!id) return;
+      const studyState = loadState();
+      const { masteredIds } = getIds(studyState);
+      studyState[masteredKey] = masteredIds.filter((itemId) => itemId !== id);
+      saveState(studyState);
+      syncToApp(studyState);
+    }
+
+    function isInMasteredList(id) {
+      if (!id) return false;
+      const studyState = loadState();
+      return Array.isArray(studyState[masteredKey]) && studyState[masteredKey].includes(id);
+    }
+
+    function getBuckets() {
+      return getIds(loadState());
+    }
+
+    return {
+      loadState,
+      saveState,
+      syncToApp,
+      saveToReviewList,
+      removeFromReviewList,
+      isInReviewList,
+      saveToMasteredList,
+      removeFromMasteredList,
+      isInMasteredList,
+      getBuckets
+    };
+  }
+
   global.japanoteSharedMatchGame = {
     loadStoredObject,
     saveStoredObject,
@@ -1465,6 +1726,15 @@
     attachResultSaveListener,
     createMatchGameEngine,
     shuffleItems,
-    createSessionItems
+    createSessionItems,
+    normalizeText,
+    createStudyListManager,
+    setFeedbackById,
+    setActionAvailabilityById,
+    scrollElementIntoViewById,
+    createMatchCard,
+    renderUnavailableState,
+    createPreferenceHandler,
+    createResultFilterHandler
   };
 })(globalThis);

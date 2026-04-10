@@ -2,6 +2,13 @@
 const studyStateStorageKey = "jlpt-compass-state";
 const sharedMatchGame = globalThis.japanoteSharedMatchGame;
 const matchCopy = globalThis.japanoteMatchCopy || {};
+const normalizeMatchText = sharedMatchGame.normalizeText;
+
+const matchStudyList = sharedMatchGame.createStudyListManager({
+  storageKey: studyStateStorageKey,
+  reviewKey: "reviewIds",
+  masteredKey: "masteredIds"
+});
 
 const matchSourceLevels = ["N5", "N4", "N3"];
 const matchLevelOptions = [...matchSourceLevels, "all"];
@@ -53,109 +60,15 @@ function saveMatchPreferences() {
   sharedMatchGame.saveStoredObject(matchStorageKey, matchPreferences);
 }
 
-function loadSharedStudyState() {
-  return sharedMatchGame.loadStoredObject(studyStateStorageKey);
-}
-
-function saveSharedStudyState(studyState) {
-  sharedMatchGame.saveStoredObject(studyStateStorageKey, studyState);
-}
-
-function syncStudyStateToApp() {
-  if (typeof applyExternalStudyState === "function") {
-    applyExternalStudyState(loadSharedStudyState());
-    return;
-  }
-
-  sharedMatchGame.dispatchStorageUpdated(studyStateStorageKey, loadSharedStudyState(), "local");
-}
-
-function saveWordToMemorizationList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadSharedStudyState();
-  const reviewIds = Array.isArray(studyState.reviewIds) ? studyState.reviewIds : [];
-  const masteredIds = Array.isArray(studyState.masteredIds) ? studyState.masteredIds : [];
-
-  studyState.reviewIds = Array.from(new Set([...reviewIds, id]));
-  studyState.masteredIds = masteredIds.filter((itemId) => itemId !== id);
-  saveSharedStudyState(studyState);
-  syncStudyStateToApp();
-}
-
-function removeWordFromMemorizationList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadSharedStudyState();
-  const reviewIds = Array.isArray(studyState.reviewIds) ? studyState.reviewIds : [];
-
-  studyState.reviewIds = reviewIds.filter((itemId) => itemId !== id);
-  saveSharedStudyState(studyState);
-  syncStudyStateToApp();
-}
-
-function isWordSavedToMemorizationList(id) {
-  if (!id) {
-    return false;
-  }
-
-  const studyState = loadSharedStudyState();
-  return Array.isArray(studyState.reviewIds) && studyState.reviewIds.includes(id);
-}
-
-function saveWordToMasteredList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadSharedStudyState();
-  const reviewIds = Array.isArray(studyState.reviewIds) ? studyState.reviewIds : [];
-  const masteredIds = Array.isArray(studyState.masteredIds) ? studyState.masteredIds : [];
-
-  studyState.masteredIds = Array.from(new Set([...masteredIds, id]));
-  studyState.reviewIds = reviewIds.filter((itemId) => itemId !== id);
-  saveSharedStudyState(studyState);
-  syncStudyStateToApp();
-}
-
-function removeWordFromMasteredList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadSharedStudyState();
-  const masteredIds = Array.isArray(studyState.masteredIds) ? studyState.masteredIds : [];
-
-  studyState.masteredIds = masteredIds.filter((itemId) => itemId !== id);
-  saveSharedStudyState(studyState);
-  syncStudyStateToApp();
-}
-
-function isWordSavedToMasteredList(id) {
-  if (!id) {
-    return false;
-  }
-
-  const studyState = loadSharedStudyState();
-  return Array.isArray(studyState.masteredIds) && studyState.masteredIds.includes(id);
-}
+const saveWordToMemorizationList = matchStudyList.saveToReviewList;
+const removeWordFromMemorizationList = matchStudyList.removeFromReviewList;
+const isWordSavedToMemorizationList = matchStudyList.isInReviewList;
+const saveWordToMasteredList = matchStudyList.saveToMasteredList;
+const removeWordFromMasteredList = matchStudyList.removeFromMasteredList;
+const isWordSavedToMasteredList = matchStudyList.isInMasteredList;
 
 function normalizeMatchText(value) {
-  const text = String(value ?? "").trim();
-
-  if (/%[0-9A-Fa-f]{2}/.test(text)) {
-    try {
-      return decodeURIComponent(text).replace(/\s+/g, " ").trim();
-    } catch (error) {
-      return text.replace(/\s+/g, " ").trim();
-    }
-  }
-
-  return text.replace(/\s+/g, " ").trim();
+  return sharedMatchGame.normalizeText(value);
 }
 
 function getMatchLevel(value = matchPreferences.level) {
@@ -230,11 +143,7 @@ function getMatchPartValue(item) {
 }
 
 function getMatchStudyBuckets() {
-  const studyState = loadSharedStudyState();
-  return {
-    reviewIds: Array.isArray(studyState.reviewIds) ? studyState.reviewIds : [],
-    masteredIds: Array.isArray(studyState.masteredIds) ? studyState.masteredIds : []
-  };
+  return matchStudyList.getBuckets();
 }
 
 function getMatchLevelSource(level) {
@@ -494,19 +403,7 @@ function resetCurrentPageState() {
 }
 
 function setMatchFeedback(message, tone = "") {
-  const feedback = document.getElementById("match-feedback");
-
-  if (!feedback) {
-    return;
-  }
-
-  feedback.hidden = !message;
-  feedback.textContent = message;
-  feedback.classList.remove("is-success", "is-fail");
-
-  if (tone) {
-    feedback.classList.add(tone);
-  }
+  sharedMatchGame.setFeedbackById("match-feedback", message, tone);
 }
 
 function renderMatchActionCopy() {
@@ -630,58 +527,17 @@ function renderMatchSettings() {
 }
 
 function setMatchActionAvailability(startEnabled) {
-  const newRound = document.getElementById("match-new-round");
-
-  if (newRound) {
-    newRound.disabled = !startEnabled;
-  }
+  sharedMatchGame.setActionAvailabilityById("match-new-round", startEnabled);
 }
 
 function scrollMatchBoardIntoView() {
-  const board = document.getElementById("match-board");
-
-  if (!board?.scrollIntoView) {
-    return;
-  }
-
-  window.requestAnimationFrame(() => {
-    board.scrollIntoView({ block: "start", behavior: "smooth" });
-  });
+  sharedMatchGame.scrollElementIntoViewById("match-board");
 }
 
-function createMatchCard(card, selectedId) {
-  const button = document.createElement("button");
-  const label = document.createElement("span");
-  const matched = matchState.matchedIds.includes(card.id);
-  const wrong =
-    (card.side === "left" && matchState.wrongLeft === card.id) ||
-    (card.side === "right" && matchState.wrongRight === card.id);
-
-  button.type = "button";
-  button.className = "match-card";
-  label.className = "button-text-clamp match-card-label";
-  label.textContent = card.value;
-  button.appendChild(label);
-  button.disabled = matched || matchState.isLocked || matchState.timedOut;
-
-  if (selectedId === card.id) {
-    button.classList.add("is-selected");
-  }
-
-  if (matched) {
-    button.classList.add("is-matched");
-  }
-
-  if (wrong) {
-    button.classList.add("is-wrong");
-  }
-
-  button.addEventListener("click", () => {
-    handleMatchSelection(card);
-  });
-
-  return button;
-}
+const createMatchCard = sharedMatchGame.createMatchCard({
+  state: matchState,
+  onSelection: handleMatchSelection
+});
 
 function renderMatchBoard() {
   sharedMatchGame.renderBoard({
@@ -866,41 +722,18 @@ function replayCurrentMatchSet() {
 }
 
 function renderMatchUnavailableState(message) {
-  const leftList = document.getElementById("match-left-list");
-  const rightList = document.getElementById("match-right-list");
-  const resultList = document.getElementById("match-result-list");
-  const resultEmpty = document.getElementById("match-result-empty");
-
-  clearAllMatchTimers();
-  matchState.sessionItems = [];
-  matchState.pageItems = [];
-  matchState.results = [];
-  matchState.leftCards = [];
-  matchState.rightCards = [];
-  matchState.pageIndex = 0;
-  matchState.hasStarted = false;
-  matchState.showResults = false;
-  resetCurrentPageState();
-
-  if (leftList) {
-    leftList.innerHTML = "";
-  }
-
-  if (rightList) {
-    rightList.innerHTML = "";
-  }
-
-  if (resultList) {
-    resultList.innerHTML = "";
-  }
-
-  if (resultEmpty) {
-    resultEmpty.hidden = true;
-  }
-
-  setMatchActionAvailability(false);
-  setMatchFeedback(message, "is-fail");
-  renderMatchScreen();
+  sharedMatchGame.renderUnavailableState({
+    leftListId: "match-left-list",
+    rightListId: "match-right-list",
+    resultListId: "match-result-list",
+    resultEmptyId: "match-result-empty",
+    state: matchState,
+    engine: matchEngine,
+    setActionAvailability: setMatchActionAvailability,
+    setFeedback: setMatchFeedback,
+    renderScreen: renderMatchScreen,
+    message
+  });
 }
 
 function handleMatchSelection(card) {
@@ -929,18 +762,14 @@ function setMatchLevel(level) {
   enterMatchReadyState();
 }
 
-function setMatchFilterPreference(filter) {
-  const nextFilter = getMatchFilter(filter);
-
-  if (matchPreferences.filter === nextFilter) {
-    return;
-  }
-
-  matchPreferences.filter = nextFilter;
-  saveMatchPreferences();
-  renderMatchSettings();
-  enterMatchReadyState();
-}
+const setMatchFilterPreference = sharedMatchGame.createPreferenceHandler({
+  preferences: matchPreferences,
+  key: "filter",
+  normalize: getMatchFilter,
+  savePreferences: saveMatchPreferences,
+  renderSettings: renderMatchSettings,
+  enterReadyState: enterMatchReadyState
+});
 
 function setMatchPartPreference(part) {
   const nextPart = getMatchPartFilter(part, getBaseMatchPool(matchPreferences.level));
@@ -955,42 +784,29 @@ function setMatchPartPreference(part) {
   enterMatchReadyState();
 }
 
-function setMatchTotalCount(totalCount) {
-  const nextCount = getMatchTotalCount(totalCount);
+const setMatchTotalCount = sharedMatchGame.createPreferenceHandler({
+  preferences: matchPreferences,
+  key: "totalCount",
+  normalize: getMatchTotalCount,
+  savePreferences: saveMatchPreferences,
+  renderSettings: renderMatchSettings,
+  enterReadyState: enterMatchReadyState
+});
 
-  if (matchPreferences.totalCount === nextCount) {
-    return;
-  }
+const setMatchDuration = sharedMatchGame.createPreferenceHandler({
+  preferences: matchPreferences,
+  key: "duration",
+  normalize: getMatchDuration,
+  savePreferences: saveMatchPreferences,
+  renderSettings: renderMatchSettings,
+  enterReadyState: enterMatchReadyState
+});
 
-  matchPreferences.totalCount = nextCount;
-  saveMatchPreferences();
-  renderMatchSettings();
-  enterMatchReadyState();
-}
-
-function setMatchDuration(duration) {
-  const nextDuration = getMatchDuration(duration);
-
-  if (matchPreferences.duration === nextDuration) {
-    return;
-  }
-
-  matchPreferences.duration = nextDuration;
-  saveMatchPreferences();
-  renderMatchSettings();
-  enterMatchReadyState();
-}
-
-function setMatchResultFilter(filter) {
-  const nextFilter = getMatchResultFilter(filter);
-
-  if (matchState.resultFilter === nextFilter) {
-    return;
-  }
-
-  matchState.resultFilter = nextFilter;
-  renderMatchResults();
-}
+const setMatchResultFilter = sharedMatchGame.createResultFilterHandler({
+  state: matchState,
+  normalize: getMatchResultFilter,
+  renderResults: renderMatchResults
+});
 
 function handleMatchResetAction() {
   if (matchState.showResults) {

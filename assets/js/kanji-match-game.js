@@ -2,6 +2,13 @@
 const kanjiStudyStateStorageKey = "jlpt-compass-state";
 const sharedMatchGame = globalThis.japanoteSharedMatchGame;
 const matchCopy = globalThis.japanoteMatchCopy || {};
+const normalizeKanjiMatchText = sharedMatchGame.normalizeText;
+
+const kanjiStudyList = sharedMatchGame.createStudyListManager({
+  storageKey: kanjiStudyStateStorageKey,
+  reviewKey: "kanjiReviewIds",
+  masteredKey: "kanjiMasteredIds"
+});
 
 const kanjiMatchGradeOptions = ["all", "1", "2", "3", "4", "5", "6"];
 const kanjiMatchDurationOptions = [10, 15, 20, 0];
@@ -42,17 +49,7 @@ const kanjiMatchReadyStateText =
       };
 
 function normalizeKanjiMatchText(value) {
-  const text = String(value ?? "").trim();
-
-  if (/%[0-9A-Fa-f]{2}/.test(text)) {
-    try {
-      return decodeURIComponent(text).replace(/\s+/g, " ").trim();
-    } catch (error) {
-      return text.replace(/\s+/g, " ").trim();
-    }
-  }
-
-  return text.replace(/\s+/g, " ").trim();
+  return sharedMatchGame.normalizeText(value);
 }
 
 function loadKanjiMatchPreferences() {
@@ -65,103 +62,15 @@ function saveKanjiMatchPreferences() {
   sharedMatchGame.saveStoredObject(kanjiMatchStorageKey, kanjiMatchPreferences);
 }
 
-function loadKanjiSharedStudyState() {
-  return sharedMatchGame.loadStoredObject(kanjiStudyStateStorageKey);
-}
-
-function saveKanjiSharedStudyState(studyState) {
-  sharedMatchGame.saveStoredObject(kanjiStudyStateStorageKey, studyState);
-}
-
-function syncKanjiStudyStateToApp() {
-  if (typeof applyExternalStudyState === "function") {
-    applyExternalStudyState(loadKanjiSharedStudyState());
-    return;
-  }
-
-  sharedMatchGame.dispatchStorageUpdated(kanjiStudyStateStorageKey, loadKanjiSharedStudyState(), "local");
-}
-
-function saveKanjiToMemorizationList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadKanjiSharedStudyState();
-  const reviewIds = Array.isArray(studyState.kanjiReviewIds) ? studyState.kanjiReviewIds : [];
-  const masteredIds = Array.isArray(studyState.kanjiMasteredIds) ? studyState.kanjiMasteredIds : [];
-
-  studyState.kanjiReviewIds = Array.from(new Set([...reviewIds, id]));
-  studyState.kanjiMasteredIds = masteredIds.filter((itemId) => itemId !== id);
-  saveKanjiSharedStudyState(studyState);
-  syncKanjiStudyStateToApp();
-}
-
-function removeKanjiFromMemorizationList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadKanjiSharedStudyState();
-  const reviewIds = Array.isArray(studyState.kanjiReviewIds) ? studyState.kanjiReviewIds : [];
-
-  studyState.kanjiReviewIds = reviewIds.filter((itemId) => itemId !== id);
-  saveKanjiSharedStudyState(studyState);
-  syncKanjiStudyStateToApp();
-}
-
-function isKanjiSavedToMemorizationList(id) {
-  if (!id) {
-    return false;
-  }
-
-  const studyState = loadKanjiSharedStudyState();
-  return Array.isArray(studyState.kanjiReviewIds) && studyState.kanjiReviewIds.includes(id);
-}
-
-function saveKanjiToMasteredList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadKanjiSharedStudyState();
-  const reviewIds = Array.isArray(studyState.kanjiReviewIds) ? studyState.kanjiReviewIds : [];
-  const masteredIds = Array.isArray(studyState.kanjiMasteredIds) ? studyState.kanjiMasteredIds : [];
-
-  studyState.kanjiMasteredIds = Array.from(new Set([...masteredIds, id]));
-  studyState.kanjiReviewIds = reviewIds.filter((itemId) => itemId !== id);
-  saveKanjiSharedStudyState(studyState);
-  syncKanjiStudyStateToApp();
-}
-
-function removeKanjiFromMasteredList(id) {
-  if (!id) {
-    return;
-  }
-
-  const studyState = loadKanjiSharedStudyState();
-  const masteredIds = Array.isArray(studyState.kanjiMasteredIds) ? studyState.kanjiMasteredIds : [];
-
-  studyState.kanjiMasteredIds = masteredIds.filter((itemId) => itemId !== id);
-  saveKanjiSharedStudyState(studyState);
-  syncKanjiStudyStateToApp();
-}
-
-function isKanjiSavedToMasteredList(id) {
-  if (!id) {
-    return false;
-  }
-
-  const studyState = loadKanjiSharedStudyState();
-  return Array.isArray(studyState.kanjiMasteredIds) && studyState.kanjiMasteredIds.includes(id);
-}
+const saveKanjiToMemorizationList = kanjiStudyList.saveToReviewList;
+const removeKanjiFromMemorizationList = kanjiStudyList.removeFromReviewList;
+const isKanjiSavedToMemorizationList = kanjiStudyList.isInReviewList;
+const saveKanjiToMasteredList = kanjiStudyList.saveToMasteredList;
+const removeKanjiFromMasteredList = kanjiStudyList.removeFromMasteredList;
+const isKanjiSavedToMasteredList = kanjiStudyList.isInMasteredList;
 
 function getKanjiMatchStudyBuckets() {
-  const studyState = loadKanjiSharedStudyState();
-  return {
-    reviewIds: Array.isArray(studyState.kanjiReviewIds) ? studyState.kanjiReviewIds : [],
-    masteredIds: Array.isArray(studyState.kanjiMasteredIds) ? studyState.kanjiMasteredIds : []
-  };
+  return kanjiStudyList.getBuckets();
 }
 
 function getKanjiMatchGrade(value = kanjiMatchPreferences.grade) {
@@ -460,19 +369,7 @@ function resetKanjiCurrentPageState() {
 }
 
 function setKanjiMatchFeedback(message, tone = "") {
-  const feedback = document.getElementById("kanji-match-feedback");
-
-  if (!feedback) {
-    return;
-  }
-
-  feedback.hidden = !message;
-  feedback.textContent = message;
-  feedback.classList.remove("is-success", "is-fail");
-
-  if (tone) {
-    feedback.classList.add(tone);
-  }
+  sharedMatchGame.setFeedbackById("kanji-match-feedback", message, tone);
 }
 
 function renderKanjiMatchActionCopy() {
@@ -551,58 +448,17 @@ function renderKanjiMatchSettings() {
 }
 
 function setKanjiMatchActionAvailability(startEnabled) {
-  const newRound = document.getElementById("kanji-match-new-round");
-
-  if (newRound) {
-    newRound.disabled = !startEnabled;
-  }
+  sharedMatchGame.setActionAvailabilityById("kanji-match-new-round", startEnabled);
 }
 
 function scrollKanjiMatchBoardIntoView() {
-  const board = document.getElementById("kanji-match-board");
-
-  if (!board?.scrollIntoView) {
-    return;
-  }
-
-  window.requestAnimationFrame(() => {
-    board.scrollIntoView({ block: "start", behavior: "smooth" });
-  });
+  sharedMatchGame.scrollElementIntoViewById("kanji-match-board");
 }
 
-function createKanjiMatchCard(card, selectedId) {
-  const button = document.createElement("button");
-  const label = document.createElement("span");
-  const matched = kanjiMatchState.matchedIds.includes(card.id);
-  const wrong =
-    (card.side === "left" && kanjiMatchState.wrongLeft === card.id) ||
-    (card.side === "right" && kanjiMatchState.wrongRight === card.id);
-
-  button.type = "button";
-  button.className = "match-card";
-  label.className = "button-text-clamp match-card-label";
-  label.textContent = card.value;
-  button.appendChild(label);
-  button.disabled = kanjiMatchState.isLocked || matched;
-
-  if (selectedId === card.id) {
-    button.classList.add("is-selected");
-  }
-
-  if (matched) {
-    button.classList.add("is-matched");
-  }
-
-  if (wrong) {
-    button.classList.add("is-wrong");
-  }
-
-  button.addEventListener("click", () => {
-    handleKanjiMatchSelection(card);
-  });
-
-  return button;
-}
+const createKanjiMatchCard = sharedMatchGame.createMatchCard({
+  state: kanjiMatchState,
+  onSelection: handleKanjiMatchSelection
+});
 
 function renderKanjiMatchBoard() {
   sharedMatchGame.renderBoard({
@@ -776,41 +632,18 @@ function replayCurrentKanjiMatchSet() {
   kanjiMatchEngine.replayCurrentSet();
 }
 function renderKanjiMatchUnavailableState(message) {
-  const leftList = document.getElementById("kanji-match-left-list");
-  const rightList = document.getElementById("kanji-match-right-list");
-  const resultList = document.getElementById("kanji-match-result-list");
-  const resultEmpty = document.getElementById("kanji-match-result-empty");
-
-  clearAllKanjiMatchTimers();
-  kanjiMatchState.sessionItems = [];
-  kanjiMatchState.pageItems = [];
-  kanjiMatchState.results = [];
-  kanjiMatchState.leftCards = [];
-  kanjiMatchState.rightCards = [];
-  kanjiMatchState.pageIndex = 0;
-  kanjiMatchState.hasStarted = false;
-  kanjiMatchState.showResults = false;
-  resetKanjiCurrentPageState();
-
-  if (leftList) {
-    leftList.innerHTML = "";
-  }
-
-  if (rightList) {
-    rightList.innerHTML = "";
-  }
-
-  if (resultList) {
-    resultList.innerHTML = "";
-  }
-
-  if (resultEmpty) {
-    resultEmpty.hidden = true;
-  }
-
-  setKanjiMatchActionAvailability(false);
-  setKanjiMatchFeedback(message, "is-fail");
-  renderKanjiMatchScreen();
+  sharedMatchGame.renderUnavailableState({
+    leftListId: "kanji-match-left-list",
+    rightListId: "kanji-match-right-list",
+    resultListId: "kanji-match-result-list",
+    resultEmptyId: "kanji-match-result-empty",
+    state: kanjiMatchState,
+    engine: kanjiMatchEngine,
+    setActionAvailability: setKanjiMatchActionAvailability,
+    setFeedback: setKanjiMatchFeedback,
+    renderScreen: renderKanjiMatchScreen,
+    message
+  });
 }
 
 function handleKanjiMatchSelection(card) {
@@ -823,68 +656,47 @@ function startNewKanjiMatchSession() {
   kanjiMatchEngine.startNewSession();
 }
 
-function setKanjiMatchGrade(grade) {
-  const nextGrade = getKanjiMatchGrade(grade);
+const setKanjiMatchGrade = sharedMatchGame.createPreferenceHandler({
+  preferences: kanjiMatchPreferences,
+  key: "grade",
+  normalize: getKanjiMatchGrade,
+  savePreferences: saveKanjiMatchPreferences,
+  renderSettings: renderKanjiMatchSettings,
+  enterReadyState: enterKanjiMatchReadyState
+});
 
-  if (kanjiMatchPreferences.grade === nextGrade) {
-    return;
-  }
+const setKanjiMatchFilterPreference = sharedMatchGame.createPreferenceHandler({
+  preferences: kanjiMatchPreferences,
+  key: "filter",
+  normalize: getKanjiMatchFilter,
+  savePreferences: saveKanjiMatchPreferences,
+  renderSettings: renderKanjiMatchSettings,
+  enterReadyState: enterKanjiMatchReadyState
+});
 
-  kanjiMatchPreferences.grade = nextGrade;
-  saveKanjiMatchPreferences();
-  renderKanjiMatchSettings();
-  enterKanjiMatchReadyState();
-}
+const setKanjiMatchTotalCount = sharedMatchGame.createPreferenceHandler({
+  preferences: kanjiMatchPreferences,
+  key: "totalCount",
+  normalize: getKanjiMatchTotalCount,
+  savePreferences: saveKanjiMatchPreferences,
+  renderSettings: renderKanjiMatchSettings,
+  enterReadyState: enterKanjiMatchReadyState
+});
 
-function setKanjiMatchFilterPreference(filter) {
-  const nextFilter = getKanjiMatchFilter(filter);
+const setKanjiMatchDuration = sharedMatchGame.createPreferenceHandler({
+  preferences: kanjiMatchPreferences,
+  key: "duration",
+  normalize: getKanjiMatchDuration,
+  savePreferences: saveKanjiMatchPreferences,
+  renderSettings: renderKanjiMatchSettings,
+  enterReadyState: enterKanjiMatchReadyState
+});
 
-  if (kanjiMatchPreferences.filter === nextFilter) {
-    return;
-  }
-
-  kanjiMatchPreferences.filter = nextFilter;
-  saveKanjiMatchPreferences();
-  renderKanjiMatchSettings();
-  enterKanjiMatchReadyState();
-}
-
-function setKanjiMatchTotalCount(totalCount) {
-  const nextCount = getKanjiMatchTotalCount(totalCount);
-
-  if (kanjiMatchPreferences.totalCount === nextCount) {
-    return;
-  }
-
-  kanjiMatchPreferences.totalCount = nextCount;
-  saveKanjiMatchPreferences();
-  renderKanjiMatchSettings();
-  enterKanjiMatchReadyState();
-}
-
-function setKanjiMatchDuration(duration) {
-  const nextDuration = getKanjiMatchDuration(duration);
-
-  if (kanjiMatchPreferences.duration === nextDuration) {
-    return;
-  }
-
-  kanjiMatchPreferences.duration = nextDuration;
-  saveKanjiMatchPreferences();
-  renderKanjiMatchSettings();
-  enterKanjiMatchReadyState();
-}
-
-function setKanjiMatchResultFilter(filter) {
-  const nextFilter = getKanjiMatchResultFilter(filter);
-
-  if (kanjiMatchState.resultFilter === nextFilter) {
-    return;
-  }
-
-  kanjiMatchState.resultFilter = nextFilter;
-  renderKanjiMatchResults();
-}
+const setKanjiMatchResultFilter = sharedMatchGame.createResultFilterHandler({
+  state: kanjiMatchState,
+  normalize: getKanjiMatchResultFilter,
+  renderResults: renderKanjiMatchResults
+});
 
 function attachKanjiMatchEventListeners() {
   const newRound = document.getElementById("kanji-match-new-round");

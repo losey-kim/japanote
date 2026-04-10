@@ -8808,6 +8808,29 @@ function renderVocabQuiz() {
     return;
   }
 
+  // 결과 화면에서 학습 상태를 바꿔도 방금 끝낸 세션 결과는 그대로 볼 수 있어야 해서
+  // 문제 풀 서명이 달라지기 전에 완료 상태를 먼저 렌더링한다.
+  if (state.vocabQuizFinished) {
+    const total = activeVocabQuizQuestions.length;
+
+    stopQuizSessionTimer("vocab");
+    renderQuizSessionHud("vocab");
+    view.hidden = true;
+    resultView.hidden = false;
+    empty.hidden = true;
+    card.hidden = true;
+    progress.textContent = `${total} / ${total}`;
+    restart.classList.add("secondary-btn");
+    restart.classList.remove("primary-btn");
+    restart.disabled = false;
+    next.hidden = true;
+    next.disabled = false;
+    restartLabel.textContent = "다시 해볼까요?";
+    setActionButtonIcon(restart, "autorenew");
+    renderVocabQuizResults();
+    return;
+  }
+
   ensureVocabQuizSession();
   const question = getCurrentVocabQuizQuestion();
 

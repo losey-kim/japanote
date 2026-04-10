@@ -50,10 +50,7 @@
     const gameLabel = getGameLabel(resultViewId);
 
     let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div>
-        <div style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;">${SHARE_WATERMARK}</div>
-        <div style="color:#625a56;font-size:0.82rem;margin-top:2px;">오늘도 일본어 해봐요</div>
-      </div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;">${SHARE_WATERMARK}</div>
       ${gameLabel ? `<span style="padding:5px 14px;border-radius:999px;background:rgba(25,21,22,0.06);font-size:0.82rem;font-weight:600;color:#625a56;">${gameLabel}</span>` : ""}
     </div>`;
 

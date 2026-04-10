@@ -41,7 +41,7 @@
     }
 
     if (stats.length) {
-      html += '<div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px;">';
+      html += '<div style="display:flex;gap:12px;justify-content:center;margin-bottom:4px;">';
       stats.forEach((stat) => {
         const label = stat.querySelector("span")?.textContent || "";
         const value = stat.querySelector("strong")?.textContent || "0";
@@ -49,28 +49,9 @@
         const isWrong = stat.dataset?.resultFilter === "wrong";
         const bg = isCorrect ? "rgba(95,174,139,0.15)" : isWrong ? "rgba(222,107,72,0.15)" : "rgba(25,21,22,0.06)";
         const color = isCorrect ? "#2d7a54" : isWrong ? "#b84430" : "#191516";
-        html += `<div style="flex:1;padding:14px 10px;border-radius:16px;background:${bg};text-align:center;">
-          <div style="font-size:0.82rem;color:#625a56;">${label}</div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;color:${color};margin-top:4px;">${value}</div>
-        </div>`;
-      });
-      html += "</div>";
-    }
-
-    const items = resultView.querySelectorAll(".match-result-item");
-    if (items.length > 0) {
-      html += '<div style="display:grid;gap:8px;">';
-      items.forEach((item) => {
-        const status = item.classList.contains("is-correct") ? "correct" : "wrong";
-        const badge = status === "correct" ? "정답" : "오답";
-        const badgeBg = status === "correct" ? "rgba(95,174,139,0.18)" : "rgba(222,107,72,0.18)";
-        const badgeColor = status === "correct" ? "#2d7a54" : "#b84430";
-        const titleEl = item.querySelector("strong");
-        const descEl = item.querySelector("p");
-        html += `<div style="padding:12px 14px;border-radius:14px;background:rgba(25,21,22,0.04);border:1px solid rgba(25,21,22,0.08);">
-          <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:${badgeBg};color:${badgeColor};font-size:0.76rem;font-weight:700;">${badge}</span>
-          <div style="margin-top:6px;font-weight:700;">${titleEl?.textContent || ""}</div>
-          <div style="color:#625a56;font-size:0.9rem;">${descEl?.textContent || ""}</div>
+        html += `<div style="flex:1;padding:18px 12px;border-radius:18px;background:${bg};text-align:center;">
+          <div style="font-size:0.84rem;color:#625a56;">${label}</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:${color};margin-top:6px;">${value}</div>
         </div>`;
       });
       html += "</div>";
@@ -78,7 +59,7 @@
 
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`;
-    html += `<div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid rgba(25,21,22,0.1);color:#625a56;font-size:0.8rem;">${dateStr}</div>`;
+    html += `<div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid rgba(25,21,22,0.1);color:#625a56;font-size:0.82rem;">${dateStr}</div>`;
 
     card.innerHTML = html;
     return card;
@@ -91,7 +72,7 @@
     document.body.appendChild(card);
     try {
       return await global.html2canvas(card, {
-        backgroundColor: SHARE_CANVAS_BG, scale: 2, useCORS: true, logging: false
+        backgroundColor: SHARE_CANVAS_BG, scale: 3, useCORS: true, logging: false
       });
     } finally {
       card.remove();
@@ -250,7 +231,17 @@
     const footer = document.createElement("div");
     footer.className = "match-result-share-footer";
     footer.appendChild(button);
-    resultView.appendChild(footer);
+
+    // 통계 그리드 바로 다음에 삽입 (리스트 위)
+    const statsGrid = resultView.querySelector(".match-result-grid");
+    const filters = resultView.querySelector(".match-result-filters");
+    const insertBefore = filters || (statsGrid ? statsGrid.nextElementSibling : null);
+
+    if (insertBefore) {
+      resultView.insertBefore(footer, insertBefore);
+    } else {
+      resultView.insertBefore(footer, resultView.children[1] || null);
+    }
   }
 
   global.japanoteShareResult = {

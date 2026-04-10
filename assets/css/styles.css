@@ -4296,6 +4296,7 @@ button {
 }
 
 .share-modal-panel {
+  position: relative;
   width: min(420px, 100%);
   max-height: calc(100vh - 32px);
   overflow-y: auto;
@@ -4304,6 +4305,30 @@ button {
   border-radius: var(--radius-lg);
   background: var(--surface-strong);
   box-shadow: var(--shadow);
+}
+
+.share-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.share-modal-close:hover,
+.share-modal-close:focus-visible {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .share-modal-image {
@@ -4323,22 +4348,13 @@ button {
 }
 
 .share-modal-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 8px;
-  margin-top: 14px;
-}
-
-.share-modal-actions > :first-child:nth-last-child(3),
-.share-modal-actions > :first-child:nth-last-child(3) ~ * {
-  grid-column: auto;
-}
-
-.share-modal-actions > :last-child {
-  grid-column: 1 / -1;
+  margin-bottom: 14px;
 }
 
 .share-modal-actions button {
+  flex: 1;
   justify-content: center;
 }
 

@@ -154,7 +154,7 @@
     // 안내 문구
     const tip = document.createElement("p");
     tip.className = "share-modal-tip";
-    tip.textContent = "이미지를 길게 눌러 저장하거나, 아래 버튼을 사용하세요.";
+    tip.textContent = "이미지를 길게 눌러 저장할 수도 있어요.";
 
     // 버튼 영역
     const actions = document.createElement("div");
@@ -185,15 +185,15 @@
     });
     actions.appendChild(saveBtn);
 
-    // 닫기 버튼
+    // 닫기 버튼 (우측 상단 아이콘)
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
-    closeBtn.className = "secondary-btn button-with-icon";
-    closeBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">close</span><span>닫기</span>';
+    closeBtn.className = "share-modal-close";
+    closeBtn.setAttribute("aria-label", "닫기");
+    closeBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">close</span>';
     closeBtn.addEventListener("click", removeModal);
-    actions.appendChild(closeBtn);
 
-    panel.append(img, tip, actions);
+    panel.append(closeBtn, actions, img, tip);
     overlay.appendChild(panel);
 
     // 배경 클릭으로 닫기

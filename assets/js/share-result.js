@@ -49,20 +49,13 @@
     const stats = resultView.querySelectorAll(".match-result-stat");
     const gameLabel = getGameLabel(resultViewId);
 
-    let html = `<div style="text-align:center;margin-bottom:20px;">
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;">${SHARE_WATERMARK}</div>
-      <div style="color:#625a56;font-size:0.88rem;margin-top:4px;">오늘도 일본어 해봐요</div>
+    let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;">${SHARE_WATERMARK}</div>
+        <div style="color:#625a56;font-size:0.82rem;margin-top:2px;">오늘도 일본어 해봐요</div>
+      </div>
+      ${gameLabel ? `<span style="padding:5px 14px;border-radius:999px;background:rgba(25,21,22,0.06);font-size:0.82rem;font-weight:600;color:#625a56;">${gameLabel}</span>` : ""}
     </div>`;
-
-    if (gameLabel) {
-      html += `<div style="text-align:center;margin-bottom:8px;">
-        <span style="display:inline-block;padding:4px 14px;border-radius:999px;background:rgba(25,21,22,0.06);font-size:0.82rem;font-weight:600;color:#625a56;">${gameLabel}</span>
-      </div>`;
-    }
-
-    if (title) {
-      html += `<div style="font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:16px;">${title.textContent}</div>`;
-    }
 
     if (stats.length) {
       html += '<div style="display:flex;gap:12px;justify-content:center;margin-bottom:4px;">';

@@ -98,6 +98,38 @@ button {
   padding: 30px 24px 96px;
 }
 
+/* ── 공통 유틸리티 ── */
+
+.meta-chip,
+.writing-practice-meta span,
+.basic-practice-meta span,
+.reading-meta span,
+.grammar-practice-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(25, 21, 22, 0.08);
+  color: var(--muted);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.88rem;
+}
+
+.card-surface,
+.kana-table-card,
+.writing-practice-card,
+.basic-practice-copy,
+.basic-practice-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 240, 0.88)),
+    linear-gradient(135deg, rgba(93, 133, 207, 0.08), rgba(222, 107, 72, 0.08));
+  box-shadow: var(--shadow);
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -1347,12 +1379,6 @@ button {
 
 .kana-table-card {
   padding: 28px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xl);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 240, 0.88)),
-    linear-gradient(135deg, rgba(93, 133, 207, 0.08), rgba(222, 107, 72, 0.08));
-  box-shadow: var(--shadow);
 }
 
 .kana-quiz-link {
@@ -1457,12 +1483,6 @@ button {
   position: relative;
   overflow: hidden;
   padding: 28px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xl);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 240, 0.88)),
-    linear-gradient(135deg, rgba(93, 133, 207, 0.08), rgba(222, 107, 72, 0.08));
-  box-shadow: var(--shadow);
 }
 
 .writing-practice-copy h3,
@@ -1526,18 +1546,6 @@ button {
   margin-top: 18px;
 }
 
-.writing-practice-meta span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(25, 21, 22, 0.08);
-  color: var(--muted);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.88rem;
-}
 
 .writing-practice-scoreboard {
   display: grid;
@@ -2013,12 +2021,6 @@ button {
 .basic-practice-copy,
 .basic-practice-card {
   padding: 28px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xl);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 240, 0.88)),
-    linear-gradient(135deg, rgba(93, 133, 207, 0.08), rgba(222, 107, 72, 0.08));
-  box-shadow: var(--shadow);
 }
 
 .basic-practice-copy h3,
@@ -2177,18 +2179,6 @@ button {
   gap: 10px;
 }
 
-.basic-practice-meta span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(25, 21, 22, 0.08);
-  color: var(--muted);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.88rem;
-}
 
 .quiz-hud {
   display: grid;
@@ -3113,18 +3103,6 @@ button {
   gap: 10px;
 }
 
-.reading-meta span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(25, 21, 22, 0.08);
-  color: var(--muted);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.88rem;
-}
 
 .reading-header {
   display: grid;
@@ -3518,18 +3496,6 @@ button {
   gap: 10px;
 }
 
-.grammar-practice-meta span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(25, 21, 22, 0.08);
-  color: var(--muted);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.88rem;
-}
 
 .grammar-practice-header {
   display: grid;

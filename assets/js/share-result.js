@@ -136,23 +136,65 @@
     const canvas = await captureResultImage(resultViewId);
     const blob = await canvasToBlob(canvas);
     const filename = `japanote-result-${Date.now()}.png`;
+    const file = new File([blob], filename, { type: "image/png" });
 
-    if (navigator.share && navigator.canShare) {
-      const file = new File([blob], filename, { type: "image/png" });
-      const shareData = { files: [file] };
-
-      if (navigator.canShare(shareData)) {
-        try {
+    // 1순위: Web Share API (모바일 공유시트)
+    if (navigator.share) {
+      try {
+        const shareData = { files: [file] };
+        // canShare 체크가 가능하면 확인, 없으면 바로 시도
+        if (!navigator.canShare || navigator.canShare(shareData)) {
           await navigator.share(shareData);
           return "shared";
-        } catch (err) {
-          if (err.name === "AbortError") return "cancelled";
         }
+      } catch (err) {
+        if (err.name === "AbortError") return "cancelled";
+        // share 실패 시 아래 폴백으로
+      }
+
+      // 파일 공유 안 되면 텍스트+URL로라도 공유시트 띄우기
+      try {
+        await navigator.share({
+          title: "Japanote 퀴즈 결과",
+          text: buildShareText(resultViewId)
+        });
+        return "shared";
+      } catch (err) {
+        if (err.name === "AbortError") return "cancelled";
       }
     }
 
+    // 2순위: 클립보드에 이미지 복사
+    if (navigator.clipboard && typeof ClipboardItem !== "undefined") {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blob })
+        ]);
+        return "copied";
+      } catch {
+        // 클립보드도 실패하면 다운로드
+      }
+    }
+
+    // 3순위: 다운로드
     downloadBlob(blob, filename);
     return "downloaded";
+  }
+
+  function buildShareText(resultViewId) {
+    const resultView = document.getElementById(resultViewId);
+    if (!resultView) return "";
+
+    const stats = resultView.querySelectorAll(".match-result-stat");
+    const parts = ["📝 Japanote 퀴즈 결과"];
+
+    stats.forEach((stat) => {
+      const label = stat.querySelector("span")?.textContent || "";
+      const value = stat.querySelector("strong")?.textContent || "0";
+      if (label && value) parts.push(`${label}: ${value}`);
+    });
+
+    return parts.join(" | ");
   }
 
   function createShareButton(resultViewId) {
@@ -177,7 +219,13 @@
 
       try {
         const result = await shareResult(resultViewId);
-        label.textContent = result === "downloaded" ? "저장됐어요" : "공유했어요";
+        const feedbackMap = {
+          shared: "공유했어요",
+          copied: "클립보드에 복사했어요",
+          downloaded: "이미지가 저장됐어요",
+          cancelled: "취소했어요"
+        };
+        label.textContent = feedbackMap[result] || "완료";
         setTimeout(() => { label.textContent = originalLabel; }, 2000);
       } catch {
         label.textContent = "다시 시도해주세요";

@@ -4109,7 +4109,24 @@ button {
 .match-result-item {
   border: 1px solid rgba(25, 21, 22, 0.07);
   border-radius: 20px;
+}
+
+.match-result-stat {
+  background: rgba(25, 21, 22, 0.04);
+}
+
+.match-result-item {
   background: rgba(255, 255, 255, 0.88);
+}
+
+.match-result-stat-button[data-result-filter="correct"] {
+  background: rgba(95, 174, 139, 0.08);
+  border-color: rgba(95, 174, 139, 0.12);
+}
+
+.match-result-stat-button[data-result-filter="wrong"] {
+  background: rgba(222, 107, 72, 0.08);
+  border-color: rgba(222, 107, 72, 0.12);
 }
 
 .match-result-stat {

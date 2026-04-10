@@ -4297,32 +4297,36 @@ button {
 
 .share-modal-panel {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: min(420px, 100%);
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 20px;
+  padding: 16px 20px 20px;
   border-radius: var(--radius-lg);
   background: var(--surface-strong);
   box-shadow: var(--shadow);
 }
 
 .share-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+  position: sticky;
+  top: 0;
+  align-self: flex-end;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
+  margin: -8px -4px 8px auto;
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--surface);
+  background: var(--surface-strong);
   color: var(--muted);
   cursor: pointer;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .share-modal-close:hover,

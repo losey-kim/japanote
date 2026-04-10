@@ -1,5 +1,5 @@
 (function loadJapanotePageScripts(global) {
-  const assetVersion = "20260410j";
+  const assetVersion = "20260410k";
   const pageName = (() => {
     const path = global.location?.pathname || "";
     const segments = path.split("/").filter(Boolean);
@@ -24,6 +24,7 @@
       "assets/js/shared-timer.js",
       "assets/js/shared-match-game.js",
       "assets/js/app.js",
+      "assets/js/grammar-match-game.js",
       "assets/js/share-result.js"
     ],
     "reading.html": [

@@ -1953,12 +1953,15 @@ button {
 }
 
 @media (max-width: 540px) {
-  .grammar-tab-list,
   .characters-library-switcher,
   .study-options-button-grid,
   .kana-setup-buttons,
   .writing-practice-order-switcher {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grammar-tab-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .characters-tab-button {
@@ -3361,9 +3364,9 @@ button {
 
 .grammar-tab-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  width: min(100%, 360px);
+  width: min(100%, 540px);
   margin-bottom: 24px;
 }
 

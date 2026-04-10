@@ -5,6 +5,7 @@
   const GAME_LABELS = {
     "match-result": "단어 짝 맞추기",
     "kanji-match-result": "한자 짝 맞추기",
+    "grammar-match-result": "문법 짝 맞추기",
     "vocab-quiz-result": "단어 퀴즈",
     "kanji-practice-result": "한자 퀴즈",
     "grammar-practice-result": "문법 퀴즈",

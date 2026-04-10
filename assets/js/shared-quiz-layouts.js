@@ -272,6 +272,22 @@
     `;
   }
 
+  function createGrammarMatchSidebarToolbarHtml() {
+    const fields = buildLevelCollectionSelectFields({
+      levelId: "grammar-match-level-select",
+      collectionId: "grammar-match-filter-select",
+      ariaPrefix: "문법 짝 맞추기",
+      levelOptions: JLPT_LEVEL_OPTIONS,
+      collectionOptions: GRAMMAR_COLLECTION_OPTIONS_CATALOG
+    });
+
+    return `
+      <div class="vocab-select-toolbar vocab-select-toolbar-sidebar" aria-label="문법 짝 맞추기 필터">
+        ${fields.join("")}
+      </div>
+    `;
+  }
+
   function createStudyOptionsShell({
     shellId,
     shellClassName = "",
@@ -1555,6 +1571,55 @@
     });
   }
 
+  function createGrammarMatchLayout() {
+    return createMatchRoundLayout({
+      sidebarHead: "",
+      shellId: "grammar-match-options-shell",
+      shellClassName: "match-options-shell",
+      toggleId: "grammar-match-options-toggle",
+      toggleTitle: "문법 짝 맞추기 설정",
+      summaryId: "grammar-match-options-summary",
+      summaryText: "N5 · 전체 · 5문제 · 15초",
+      panelId: "grammar-match-options-panel",
+      panelClassName: "study-options-panel-wide",
+      countSpinnerId: "grammar-match-count",
+      countAriaLabel: "문법 짝 맞추기 문제 수",
+      countValue: 5,
+      durationSpinnerId: "grammar-match-time",
+      durationAriaLabel: "문법 짝 맞추기 제한 시간",
+      durationValue: 15,
+      sidebarExtra: createGrammarMatchSidebarToolbarHtml(),
+      startButton: createStartQuizButton({ id: "grammar-match-new-round", labelId: "grammar-match-new-round-label" }),
+      boardId: "grammar-match-board",
+      emptyId: "grammar-match-empty",
+      playBoardConfig: {
+        boardId: "grammar-match-play-view",
+        progressId: "grammar-match-progress",
+        timerId: "grammar-match-timer",
+        feedbackId: "grammar-match-feedback",
+        leftColumnTitle: "문법 보기",
+        rightColumnTitle: "뜻 보기",
+        leftListId: "grammar-match-left-list",
+        rightListId: "grammar-match-right-list"
+      },
+      resultPrefix: "grammar-match",
+      resultFilterAriaLabel: "문법 짝 맞추기 결과 필터",
+      resultBulkActions: [
+        {
+          id: "grammar-match-result-bulk-action",
+          labelId: "grammar-match-result-bulk-label",
+          label: QUIZ_RESULT_REVIEW_ACTION_LABEL
+        },
+        {
+          id: "grammar-match-result-mastered-action",
+          labelId: "grammar-match-result-mastered-label",
+          label: QUIZ_RESULT_LEARN_ACTION_LABEL,
+          icon: "check_circle"
+        }
+      ]
+    });
+  }
+
   function createLayoutShell({
     shellClassName = "match-shell",
     sidebarClassName = "match-sidebar",
@@ -1831,6 +1896,7 @@
       "kanji-practice": createKanjiPracticeLayout,
       "kanji-match-round": createKanjiMatchLayout,
       "match-round": createMatchLayout,
+      "grammar-match-round": createGrammarMatchLayout,
       "grammar-practice": createGrammarPracticeLayout,
       "reading-practice": createReadingPracticeLayout
     };

@@ -274,7 +274,8 @@ function dispatchSupplementaryContentLoaded() {
   window.dispatchEvent(
     new CustomEvent("japanote:supplementary-content-loaded", {
       detail: {
-        kanjiRows: [...kanjiDataRows]
+        kanjiRows: [...kanjiDataRows],
+        grammarItems: [...grammarItems]
       }
     })
   );
@@ -386,6 +387,7 @@ function refreshGrammarContentState(payload) {
   grammarItems = normalized.items;
   grammarPracticeEntriesByLevel = getLevelContentSets(normalized.practiceEntriesByLevel);
   grammarPracticeEntriesByLevel[allLevelValue] = getAllPracticeSets(grammarPracticeEntriesByLevel);
+  globalThis.JAPANOTE_GRAMMAR_ITEMS = [...grammarItems];
 }
 
 function refreshReadingContentState(payload) {
@@ -841,6 +843,26 @@ function getKanjiPracticePrompt(questionField = state?.kanjiPracticeQuestionFiel
     : "이 한자, 어떻게 읽을까요?";
 }
 
+function normalizeKanjiMeaning(value) {
+  return normalizeQuizText(value || "");
+}
+
+function getKanjiMeaningDisplaySub(meaning) {
+  const normalizedMeaning = normalizeKanjiMeaning(meaning);
+  return normalizedMeaning ? `뜻: ${normalizedMeaning}` : "";
+}
+
+function getKanjiFlashcardMeaningText(item) {
+  const lines = [normalizeQuizText(item?.readingsDisplay || item?.reading || "")];
+  const meaningLabel = getKanjiMeaningDisplaySub(item?.meaning);
+
+  if (meaningLabel) {
+    lines.push(meaningLabel);
+  }
+
+  return lines.filter(Boolean).join("\n");
+}
+
 function buildKanjiPracticeItemsFromData(rows = kanjiDataRows) {
   return (Array.isArray(rows) ? rows : [])
     .map((row, index) => {
@@ -871,6 +893,61 @@ function buildKanjiPracticeItemsFromData(rows = kanjiDataRows) {
         strokeCount: strokes,
         tone: getKanjiTone(normalizedGrade),
         explanation: `${normalizedChar}의 대표 읽기 중 하나는 ${normalizedReading}예요.`
+      };
+    })
+    .filter(Boolean);
+}
+
+function getKanjiMeaningDisplaySub(meaning) {
+  const normalizedMeaning = normalizeKanjiMeaning(meaning);
+  return normalizedMeaning ? `\uB73B: ${normalizedMeaning}` : "";
+}
+
+function getKanjiFlashcardMeaningText(item) {
+  const lines = [normalizeQuizText(item?.readingsDisplay || item?.reading || "")];
+  const meaningLabel = getKanjiMeaningDisplaySub(item?.meaning);
+
+  if (meaningLabel) {
+    lines.push(meaningLabel);
+  }
+
+  return lines.filter(Boolean).join("\n");
+}
+
+function buildKanjiPracticeItemsFromData(rows = kanjiDataRows) {
+  return (Array.isArray(rows) ? rows : [])
+    .map((row, index) => {
+      const [char, grade, reading, readingsDisplay, strokeCount, meaning] = Array.isArray(row) ? row : [];
+      const normalizedGrade = String(grade || "");
+      const normalizedReading = normalizeQuizText(reading || "");
+      const normalizedChar = normalizeQuizText(char || "");
+      const normalizedMeaning = normalizeKanjiMeaning(meaning);
+
+      if (!normalizedChar || !normalizedReading || !kanjiGradeOptions.includes(normalizedGrade)) {
+        return null;
+      }
+
+      const gradeLabel = getKanjiGradeLabel(normalizedGrade);
+      const strokes = Number.isFinite(Number(strokeCount)) ? Number(strokeCount) : 0;
+
+      return {
+        id: `kanji-${normalizedGrade}-${index + 1}-${normalizedChar}`,
+        grade: normalizedGrade,
+        gradeLabel,
+        source: gradeLabel,
+        title: `${gradeLabel} ?쒖옄`,
+        note: gradeLabel,
+        prompt: "???쒖옄, ?대뼸寃??쎌쓣源뚯슂?",
+        display: normalizedChar,
+        displaySub: getKanjiMeaningDisplaySub(normalizedMeaning),
+        reading: normalizedReading,
+        readingsDisplay: normalizeQuizText(readingsDisplay || normalizedReading),
+        meaning: normalizedMeaning,
+        strokeCount: strokes,
+        tone: getKanjiTone(normalizedGrade),
+        explanation: normalizedMeaning
+          ? `${normalizedChar}\uB294 ${normalizedReading}\uB77C\uACE0 \uC77D\uACE0, \uB73B\uC740 ${normalizedMeaning}\uC774\uC5D0\uC694.`
+          : `${normalizedChar}??????쎄린 以??섎굹??${normalizedReading}?덉슂.`
       };
     })
     .filter(Boolean);
@@ -1145,7 +1222,7 @@ function getCharactersLibraryTab(value) {
 }
 
 function getGrammarTab(value) {
-  return value === "practice" ? "practice" : "list";
+  return ["list", "practice", "match"].includes(value) ? value : "list";
 }
 
 function getGrammarLevel(level = state?.grammarLevel) {
@@ -5645,6 +5722,31 @@ function buildKanjiPracticeQuestion(item, pool = getVisibleKanjiItems()) {
   };
 }
 
+function buildKanjiPracticeQuestion(item, pool = getVisibleKanjiItems()) {
+  if (!item) {
+    return null;
+  }
+
+  const questionField = getKanjiPracticeQuestionField();
+  const optionField = getKanjiPracticeOptionField();
+  const options = buildKanjiPracticeOptions(item, pool, optionField);
+  const answerValue = getKanjiPracticeItemValue(item, optionField);
+  const answer = options.indexOf(answerValue);
+
+  return {
+    ...item,
+    baseDisplay: item.display,
+    baseReading: item.reading,
+    questionField,
+    optionField,
+    prompt: getKanjiPracticePrompt(questionField),
+    display: getKanjiPracticeItemValue(item, questionField),
+    displaySub: getKanjiPracticeQuestionField(questionField) === "display" ? getKanjiMeaningDisplaySub(item.meaning) : "",
+    options,
+    answer: answer >= 0 ? answer : 0
+  };
+}
+
 function resetKanjiPracticeQuestionOrder() {
   const items = getVisibleKanjiItems();
 
@@ -5857,6 +5959,33 @@ function setKanjiPracticeResult(current, selectedIndex, correct, timedOut = fals
   kanjiPracticeState.results.push(result);
 }
 
+function setKanjiPracticeResult(current, selectedIndex, correct, timedOut = false) {
+  const answerText = current.options[current.answer] || "";
+  const selected = timedOut ? "" : current.options[selectedIndex] || "";
+  const result = {
+    id: current.id,
+    source: current.gradeLabel || current.source,
+    char: current.baseDisplay || current.display,
+    reading: current.baseReading || current.reading,
+    meaning: current.meaning || "",
+    questionField: current.questionField,
+    optionField: current.optionField,
+    answerText,
+    meta: current.gradeLabel || current.note || "",
+    selected,
+    status: correct ? "correct" : "wrong",
+    timedOut
+  };
+  const currentResultIndex = kanjiPracticeState.results.findIndex((item) => item.id === current.id);
+
+  if (currentResultIndex >= 0) {
+    kanjiPracticeState.results[currentResultIndex] = result;
+    return;
+  }
+
+  kanjiPracticeState.results.push(result);
+}
+
 function renderKanjiPracticeBulkActionButtons(results) {
   const reviewActionButton = document.getElementById("kanji-practice-result-bulk-action");
   const reviewActionLabel = document.getElementById("kanji-practice-result-bulk-label");
@@ -5942,6 +6071,28 @@ function getKanjiPracticeResultDetail(item) {
   }
 
   return parts.join(" · ");
+}
+
+function getKanjiPracticeResultDetail(item) {
+  const parts = [];
+
+  if (item.status === "wrong" && item.timedOut) {
+    parts.push("?쒓컙 珥덇낵");
+  }
+
+  if (item.optionField !== "reading" && item.reading) {
+    parts.push(`諛쒖쓬 ${item.reading}`);
+  }
+
+  if (item.meaning) {
+    parts.push(`\uB73B ${item.meaning}`);
+  }
+
+  if (item.meta) {
+    parts.push(item.meta);
+  }
+
+  return parts.join(" 쨌 ");
 }
 
 function createStudyStatusBadgesMarkup(review, mastered) {
@@ -7332,6 +7483,128 @@ function renderKanjiList() {
         titleClassName: "vocab-list-word kanji-list-char",
         titleText: formatQuizLineBreaks(item.display),
         subtitleText: formatQuizLineBreaks(item.readingsDisplay || item.reading),
+        actionsMarkup: ""
+      });
+    }
+  });
+}
+
+function renderKanjiFlashcard() {
+  const flashcard = document.getElementById("kanji-flashcard");
+  const toggle = document.getElementById("kanji-flashcard-toggle");
+  const prev = document.getElementById("kanji-flashcard-prev");
+  const next = document.getElementById("kanji-flashcard-next");
+  const reviewButton = document.getElementById("kanji-flashcard-review");
+  const masteredButton = document.getElementById("kanji-flashcard-mastered");
+  const level = document.getElementById("kanji-flashcard-level");
+  const word = document.getElementById("kanji-flashcard-word");
+  const reading = document.getElementById("kanji-flashcard-reading");
+  const meaning = document.getElementById("kanji-flashcard-meaning");
+  const hint = document.getElementById("kanji-flashcard-hint");
+  const cards = getVisibleKanjiCards();
+
+  if (
+    !flashcard ||
+    !toggle ||
+    !prev ||
+    !next ||
+    !reviewButton ||
+    !masteredButton ||
+    !level ||
+    !word ||
+    !reading ||
+    !meaning ||
+    !hint
+  ) {
+    return;
+  }
+
+  const hasCards = cards.length > 0;
+  const currentIndex = hasCards ? state.kanjiFlashcardIndex % cards.length : 0;
+  const currentCard = hasCards ? cards[currentIndex] : getKanjiFlashcardPlaceholder();
+  const review = hasCards && isKanjiSavedToReviewList(currentCard.id);
+  const mastered = hasCards && isKanjiSavedToMasteredList(currentCard.id);
+  const isRevealed = hasCards && state.kanjiFlashcardRevealed;
+  const hintText = hasCards
+    ? isRevealed
+      ? review
+        ? "?ㅼ떆 蹂쇰옒?붿뿉 ?닿릿 ?쒖옄?덉슂"
+        : mastered
+          ? "?듯삍?댁슂???닿릿 ?쒖옄?덉슂"
+          : "????곹깭瑜?諛붾줈 諛붽퓭蹂????덉뼱??"
+      : "?뚮윭???쎄린瑜??뺤씤?대낵源뚯슂?"
+    : "?꾪꽣瑜?諛붽씀硫??ㅻⅨ ?쒖옄瑜?諛붾줈 蹂????덉뼱??";
+
+  renderStudyFlashcardComponent({
+    flashcard,
+    toggle,
+    prev,
+    next,
+    level,
+    word,
+    reading,
+    meaning,
+    hint,
+    hasCards,
+    isRevealed,
+    revealWhenEmpty: true,
+    levelText: currentCard.gradeLabel || "?쒖옄",
+    wordText: currentCard.display || "轢℡춻",
+    meaningText: hasCards ? getKanjiFlashcardMeaningText(currentCard) : currentCard.statusText || getKanjiEmptyMessage(),
+    hintText,
+    hideReading: true,
+    toggleOpenLabel: "?쎄린瑜??ㅼ떆 ?묒뼱?섍퉴??",
+    toggleClosedLabel: "?쎄린瑜??뺤씤?대낵源뚯슂?",
+    toggleEmptyLabel: "?쒖떆???쒖옄媛 ?놁뼱??",
+    prevDisabled: cards.length <= 1,
+    nextDisabled: cards.length <= 1,
+    actionButtons: [
+      {
+        button: reviewButton,
+        selected: review,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      },
+      {
+        button: masteredButton,
+        selected: mastered,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      }
+    ]
+  });
+}
+
+function renderKanjiList() {
+  const list = document.getElementById("kanji-list");
+  const pageInfo = document.getElementById("kanji-page-info");
+  const prev = document.getElementById("kanji-page-prev");
+  const next = document.getElementById("kanji-page-next");
+  const items = getVisibleKanjiItems();
+
+  renderStatefulStudyList({
+    list,
+    pageInfo,
+    prev,
+    next,
+    items,
+    pageKey: "kanjiPage",
+    pageSize: kanjiPageSize,
+    emptyMessage: getKanjiEmptyMessage(),
+    renderItem: (item, displayIndex) => {
+      const gradeLabel = item.gradeLabel || getKanjiGradeLabel(item.grade);
+
+      return createStudyListCardMarkup({
+        index: displayIndex,
+        headMetaMarkup: gradeLabel ? `<span class="vocab-list-index">${gradeLabel}</span>` : "",
+        headRightMarkup: createKanjiListStatusIconsMarkup(item.id),
+        mainClassName: "vocab-list-main kanji-list-main",
+        titleClassName: "vocab-list-word kanji-list-char",
+        titleText: formatQuizLineBreaks(item.display),
+        subtitleText: formatQuizLineBreaks(item.readingsDisplay || item.reading),
+        descriptionMarkup: item.meaning
+          ? `<p class="vocab-list-meaning">${formatQuizLineBreaks(`\uB73B \u00B7 ${item.meaning}`)}</p>`
+          : "",
         actionsMarkup: ""
       });
     }
@@ -9474,6 +9747,11 @@ function renderGrammarPage() {
 
   stopQuizSessionTimer("grammar");
   renderQuizSessionHud("grammar");
+
+  if (activeTab === "match") {
+    return;
+  }
+
   renderStudyCatalogSection({
     cardView,
     listView,

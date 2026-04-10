@@ -4280,6 +4280,82 @@ button {
   gap: 8px;
 }
 
+/* ── 학습 도구 (오답노트 / 내보내기) ── */
+
+.study-tools-section {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.study-tools-section:empty {
+  display: none;
+}
+
+.study-tools-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.study-tools-header strong {
+  font-size: 1.05rem;
+}
+
+.study-tools-count {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.study-tools-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.study-tools-description {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.study-tools-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.study-tools-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.study-tools-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.study-tools-empty .material-symbols-rounded {
+  font-size: 2.4rem;
+  opacity: 0.4;
+}
+
 .match-result-item {
   padding: 18px;
   display: grid;

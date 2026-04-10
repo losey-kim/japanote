@@ -51,7 +51,8 @@
       "assets/js/app-study-view-helpers.js",
       "assets/js/app.js",
       "assets/js/match-game.js",
-      "assets/js/share-result.js"
+      "assets/js/share-result.js",
+      "assets/js/study-tools.js"
     ],
     "kanji.html": [
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",

@@ -1,9 +1,9 @@
 ﻿const kanjiMatchStorageKey = "japanote-kanji-match-state";
+(function (global) {
+const kanjiMatchStorageKey = "japanote-kanji-match-state";
 const kanjiStudyStateStorageKey = "jlpt-compass-state";
-const sharedMatchGame = globalThis.japanoteSharedMatchGame;
-const matchCopy = globalThis.japanoteMatchCopy || {};
-const normalizeKanjiMatchText = sharedMatchGame.normalizeText;
-
+const sharedMatchGame = global.japanoteSharedMatchGame;
+const matchCopy = global.japanoteMatchCopy || {};
 const kanjiStudyList = sharedMatchGame.createStudyListManager({
   storageKey: kanjiStudyStateStorageKey,
   reviewKey: "kanjiReviewIds",
@@ -810,3 +810,5 @@ sharedMatchGame.initializeStandardMatchScreen({
   ],
   enterReadyState: enterKanjiMatchReadyState
 });
+
+})(globalThis);

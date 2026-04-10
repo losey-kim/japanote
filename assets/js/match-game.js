@@ -1,9 +1,9 @@
 ﻿const matchStorageKey = "japanote-match-state";
+(function (global) {
+const matchStorageKey = "japanote-match-state";
 const studyStateStorageKey = "jlpt-compass-state";
-const sharedMatchGame = globalThis.japanoteSharedMatchGame;
-const matchCopy = globalThis.japanoteMatchCopy || {};
-const normalizeMatchText = sharedMatchGame.normalizeText;
-
+const sharedMatchGame = global.japanoteSharedMatchGame;
+const matchCopy = global.japanoteMatchCopy || {};
 const matchStudyList = sharedMatchGame.createStudyListManager({
   storageKey: studyStateStorageKey,
   reviewKey: "reviewIds",
@@ -931,3 +931,5 @@ sharedMatchGame.initializeStandardMatchScreen({
   ],
   enterReadyState: enterMatchReadyState
 });
+
+})(globalThis);

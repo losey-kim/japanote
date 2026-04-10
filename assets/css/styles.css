@@ -4280,6 +4280,68 @@ button {
   gap: 8px;
 }
 
+/* ── 공유 미리보기 모달 ── */
+
+.share-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.share-modal-panel {
+  width: min(420px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow);
+}
+
+.share-modal-image {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  -webkit-touch-callout: default;
+}
+
+.share-modal-tip {
+  margin: 12px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.share-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.share-modal-actions > :first-child:nth-last-child(3),
+.share-modal-actions > :first-child:nth-last-child(3) ~ * {
+  grid-column: auto;
+}
+
+.share-modal-actions > :last-child {
+  grid-column: 1 / -1;
+}
+
+.share-modal-actions button {
+  justify-content: center;
+}
+
 /* ── 학습 도구 (오답노트 / 내보내기) ── */
 
 .study-tools-section {

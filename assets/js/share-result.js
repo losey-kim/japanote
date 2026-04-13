@@ -239,21 +239,110 @@
     URL.revokeObjectURL(url);
   }
 
-  async function tryNativeShare(blob, filename) {
+  function parseCountText(value) {
+    const match = String(value || "").match(/\d+/u);
+    return match ? Number(match[0]) : 0;
+  }
+
+  function readShareResultSummary(resultViewId) {
+    const comparisonSnapshot = global.japanoteChallengeLinks?.getComparisonSnapshot?.(resultViewId);
+
+    if (comparisonSnapshot?.currentResult) {
+      return comparisonSnapshot.currentResult;
+    }
+
+    const resultView = document.getElementById(resultViewId);
+
+    if (!resultView) {
+      return null;
+    }
+
+    const stats = Array.from(resultView.querySelectorAll(".match-result-stat"));
+
+    if (!stats.length) {
+      return null;
+    }
+
+    const correct = parseCountText(
+      stats.find((stat) => stat.dataset?.resultFilter === "correct")?.querySelector("strong")?.textContent
+    );
+    const wrong = parseCountText(
+      stats.find((stat) => stat.dataset?.resultFilter === "wrong")?.querySelector("strong")?.textContent
+    );
+    const total = Math.max(correct + wrong, parseCountText(stats[0]?.querySelector("strong")?.textContent));
+
+    if (!total) {
+      return null;
+    }
+
+    return {
+      correct,
+      wrong,
+      total
+    };
+  }
+
+  function buildSharePrompt(resultViewId, challengeUrl = "") {
+    const gameLabel = getGameLabel(resultViewId);
+    const summary = readShareResultSummary(resultViewId);
+    const intro = summary?.total
+      ? `${gameLabel ? `${gameLabel} ` : ""}${summary.correct}/${summary.total} 맞혔어요.`
+      : gameLabel
+        ? `${gameLabel}에 도전해 보세요.`
+        : "Japanote 친구 도전에 도전해 보세요.";
+    const lines = [`${intro} 저보다 많이 맞출 수 있어요?`];
+
+    if (challengeUrl) {
+      lines.push(challengeUrl);
+    }
+
+    return lines.join("\n");
+  }
+
+  async function resolveChallengeShareData(resultViewId) {
+    const challengeLinks = global.japanoteChallengeLinks;
+
+    if (!challengeLinks || typeof challengeLinks.buildChallengeLink !== "function") {
+      return { url: "", error: "" };
+    }
+
+    try {
+      return await challengeLinks.buildChallengeLink(resultViewId);
+    } catch (error) {
+      console.error("Failed to build challenge link for share.", error);
+      return { url: "", error: "" };
+    }
+  }
+
+  async function tryNativeShare(blob, filename, resultViewId) {
     if (!navigator.share) {
       return false;
     }
 
     try {
       const file = new File([blob], filename, { type: "image/png" });
-      const data = { files: [file] };
+      const { url: challengeUrl } = await resolveChallengeShareData(resultViewId);
+      const shareText = buildSharePrompt(resultViewId, challengeUrl);
+      const shareTitle = getGameLabel(resultViewId) || "Japanote 친구 도전";
+      // 일부 모바일 공유 대상은 files와 url 조합을 제대로 처리하지 않아 텍스트에 링크를 함께 넣는다.
+      const candidates = [
+        { files: [file], title: shareTitle, text: shareText },
+        { files: [file], text: shareText },
+        { files: [file] }
+      ];
+      let shared = false;
 
-      if (navigator.canShare && !navigator.canShare(data)) {
-        return false;
+      for (const data of candidates) {
+        if (navigator.canShare && !navigator.canShare(data)) {
+          continue;
+        }
+
+        await navigator.share(data);
+        shared = true;
+        break;
       }
 
-      await navigator.share(data);
-      return true;
+      return shared;
     } catch (error) {
       if (error.name === "AbortError") {
         return true;
@@ -271,7 +360,7 @@
     }
   }
 
-  function showPreviewModal(canvas, blob) {
+  function showPreviewModal(canvas, blob, resultViewId) {
     removeModal();
 
     const filename = `japanote-result-${Date.now()}.png`;
@@ -294,7 +383,9 @@
     img.alt = "퀴즈 결과 이미지";
 
     tip.className = "share-modal-tip";
-    tip.textContent = "이미지를 길게 눌러 저장할 수도 있어요.";
+    tip.textContent = navigator.share && global.japanoteChallengeLinks?.buildChallengeLink
+      ? "공유하기를 누르면 결과 이미지와 도전 링크를 함께 보낼 수 있어요."
+      : "이미지를 길게 눌러 저장할 수도 있어요.";
 
     actions.className = "share-modal-actions";
 
@@ -304,7 +395,9 @@
       shareBtn.className = "primary-btn button-with-icon";
       shareBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">share</span><span>공유하기</span>';
       shareBtn.addEventListener("click", async () => {
-        const shared = await tryNativeShare(blob, filename);
+        shareBtn.disabled = true;
+        const shared = await tryNativeShare(blob, filename, resultViewId);
+        shareBtn.disabled = false;
 
         if (!shared) {
           downloadBlob(blob, filename);
@@ -361,7 +454,7 @@
       try {
         const canvas = await captureResultImage(resultViewId);
         const blob = await canvasToBlob(canvas);
-        showPreviewModal(canvas, blob);
+        showPreviewModal(canvas, blob, resultViewId);
         label.textContent = originalLabel;
       } catch (error) {
         console.error("Failed to capture result image.", error);

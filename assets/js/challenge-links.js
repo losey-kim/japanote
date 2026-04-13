@@ -404,6 +404,46 @@
     });
   }
 
+  function buildChallengeShareText(resultViewId, url) {
+    const summary = readResultSummaryFromView(resultViewId);
+    const intro = summary?.total
+      ? `${summary.correct}/${summary.total} 맞혔어요.`
+      : "친구 도전 링크예요.";
+    const lines = [`${intro} 저보다 많이 맞출 수 있어요?`];
+
+    if (url) {
+      lines.push(url);
+    }
+
+    return lines.join("\n");
+  }
+
+  async function shareChallengeLink(resultViewId, url) {
+    if (!url || typeof global.navigator?.share !== "function") {
+      return "failed";
+    }
+
+    const shareTitle = "Japanote 친구 도전";
+    // 일부 공유 대상은 url 필드를 무시해서 링크를 본문 텍스트에 함께 넣는다.
+    const candidates = [
+      { title: shareTitle, text: buildChallengeShareText(resultViewId, url) },
+      { text: buildChallengeShareText(resultViewId, url) }
+    ];
+
+    for (const data of candidates) {
+      try {
+        await global.navigator.share(data);
+        return "shared";
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          return "cancelled";
+        }
+      }
+    }
+
+    return "failed";
+  }
+
   function parseStatNumber(text) {
     const matched = String(text || "").match(/\d+/u);
     return matched ? Number(matched[0]) : NaN;
@@ -1261,12 +1301,13 @@
 
     button.type = "button";
     button.className = "secondary-btn button-with-icon challenge-link-btn";
+    const canNativeShare = typeof global.navigator?.share === "function";
 
     icon.className = "material-symbols-rounded";
     icon.setAttribute("aria-hidden", "true");
-    icon.textContent = "link";
+    icon.textContent = canNativeShare ? "share" : "link";
 
-    label.textContent = "도전 링크 복사";
+    label.textContent = canNativeShare ? "도전 링크 공유" : "도전 링크 복사";
     button.append(icon, label);
 
     button.addEventListener("click", async () => {
@@ -1282,13 +1323,19 @@
         return;
       }
 
-      label.textContent = "복사하는 중...";
-
-      const copied = await copyText(url);
+      label.textContent = canNativeShare ? "공유하는 중..." : "복사하는 중...";
+      const shareState = canNativeShare ? await shareChallengeLink(resultViewId, url) : "failed";
+      const copied = shareState === "shared" ? true : await copyText(url);
 
       button.disabled = false;
       label.textContent = originalLabel;
-      notify(copied ? "친구 도전 링크를 복사했어요." : "링크 복사에 실패했어요.");
+
+      if (shareState === "cancelled") {
+        return;
+      }
+
+      const successMessage = shareState === "shared" ? "친구 도전 링크를 공유했어요." : "친구 도전 링크를 복사했어요.";
+      notify(copied ? successMessage : "링크 복사에 실패했어요.");
     });
 
     return button;

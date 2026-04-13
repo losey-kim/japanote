@@ -4,7 +4,7 @@ const SUPABASE_URL = "https://nppaqezqwusbagzdnoqi.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wcGFxZXpxd3VzYmFnemRub3FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTU5MzIsImV4cCI6MjA5MDQzMTkzMn0.cVnznT2P0sOoX6nA9mCLLNtIID5m2I1LW8N36FY9iqA";
 const CHALLENGE_PREVIEW_BASE_URL =
-  typeof window !== "undefined" && /\.pages\.dev$/u.test(window.location.hostname)
+  typeof window !== "undefined" && !/^(localhost|127\.0\.0\.1)$/u.test(window.location.hostname)
     ? `${window.location.origin}/challenge-preview`
     : "";
 

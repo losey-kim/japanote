@@ -4,7 +4,7 @@
 const SUPABASE_URL = "";
 const SUPABASE_ANON_KEY = "";
 const CHALLENGE_PREVIEW_BASE_URL =
-  typeof window !== "undefined" && /\.pages\.dev$/u.test(window.location.hostname)
+  typeof window !== "undefined" && !/^(localhost|127\.0\.0\.1)$/u.test(window.location.hostname)
     ? `${window.location.origin}/challenge-preview`
     : "";
 

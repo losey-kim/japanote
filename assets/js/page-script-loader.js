@@ -1,5 +1,5 @@
 (function loadJapanotePageScripts(global) {
-  const assetVersion = "20260413o";
+  const assetVersion = "20260413p";
   const pageName = (() => {
     const path = global.location?.pathname || "";
     const segments = path.split("/").filter(Boolean);
@@ -16,7 +16,7 @@
     ],
     "grammar.html": [
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-      "assets/js/supabase-config.js?v=f7482a29",
+      "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
       "assets/js/theme.js?v=0cb88168",
       "assets/js/shared-quiz-layouts.js?v=1de1e6a7",
@@ -30,7 +30,7 @@
     ],
     "reading.html": [
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-      "assets/js/supabase-config.js?v=f7482a29",
+      "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
       "assets/js/theme.js?v=0cb88168",
       "assets/js/shared-quiz-layouts.js?v=1de1e6a7",
@@ -43,7 +43,7 @@
     ],
     "vocab.html": [
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-      "assets/js/supabase-config.js?v=f7482a29",
+      "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
       "assets/js/theme.js?v=0cb88168",
       "assets/js/vocab-registry.js?v=eb163433",
@@ -60,7 +60,7 @@
     ],
     "kanji.html": [
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-      "assets/js/supabase-config.js?v=f7482a29",
+      "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
       "assets/js/theme.js?v=0cb88168",
       "assets/js/vocab-registry.js?v=eb163433",
@@ -76,7 +76,7 @@
     ],
     "characters.html": [
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-      "assets/js/supabase-config.js?v=f7482a29",
+      "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
       "assets/js/theme.js?v=0cb88168",
       "assets/js/vocab-registry.js?v=eb163433",

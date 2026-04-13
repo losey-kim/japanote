@@ -89,7 +89,7 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
 1. [Supabase](https://supabase.com/) 프로젝트를 만들고, **Project Settings → API**에서 **Project URL**과 **anon public** 키를 복사합니다.
 2. `assets/js/supabase-config.js` 맨 위의 `SUPABASE_URL`, `SUPABASE_ANON_KEY` 두 줄에 붙여 넣습니다.
    - `stateTable`: 기본 `user_state`입니다. 테이블명을 바꾼 경우에만 수정합니다.
-   - `challengePreviewBaseUrl`: 선택 사항입니다. Cloudflare Pages Functions 같은 HTML 응답 endpoint가 있을 때 넣습니다. 기본 설정은 `*.pages.dev`에서만 현재 origin의 `/challenge-preview`를 자동으로 사용합니다.
+   - `challengePreviewBaseUrl`: 선택 사항입니다. Cloudflare Pages Functions 같은 HTML 응답 endpoint가 있을 때 넣습니다. 기본 설정은 로컬(`localhost`, `127.0.0.1`)이 아닌 현재 origin에서 `/challenge-preview`를 자동으로 사용합니다.
    - `emailRedirectTo`: 비워 두면 현재 페이지 URL로 돌아옵니다.
    - `anon public` 키는 브라우저로 전달되는 클라이언트 공개 키라서, 저장소를 `private`으로 바꿔도 사용자에게 계속 보입니다.
 3. Supabase Authentication에서 **Email** 로그인(매직 링크)을 켭니다.
@@ -102,7 +102,7 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
    - 이 작업이 빠지면 `Could not find the table 'public.user_state' in the schema cache` 같은 오류가 날 수 있습니다.
 6. 친구 도전 짧은 링크와 동적 공유 미리보기를 쓰려면 `supabase/migrations/003_shared_challenges.sql`도 실행합니다.
 7. Cloudflare Pages에 배포하면 `functions/challenge-preview/[code].js`가 공유 미리보기 endpoint로 함께 배포됩니다.
-   - 기본 `*.pages.dev` 주소에서는 `challengePreviewBaseUrl`이 자동으로 활성화됩니다.
+   - 로컬이 아닌 실제 배포 주소에서는 `challengePreviewBaseUrl`이 자동으로 활성화됩니다.
    - 커스텀 도메인을 쓰면 `challengePreviewBaseUrl`에 `https://내도메인/challenge-preview`를 직접 넣어도 됩니다.
 8. 참고로 Supabase 기본 `functions/v1` 도메인은 HTML을 `text/plain`으로 내려주기 때문에 링크 미리보기 용도로는 그대로 쓸 수 없습니다.
 

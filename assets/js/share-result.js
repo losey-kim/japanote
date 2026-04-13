@@ -35,6 +35,14 @@
       .replace(/'/g, "&#39;");
   }
 
+  function normalizeShareMessageLines(lines) {
+    return (Array.isArray(lines) ? lines : [])
+      .map((line) => String(line || "").trim())
+      .filter(Boolean)
+      .join("\n")
+      .trim();
+  }
+
   function loadHtml2Canvas() {
     if (html2canvasLoaded || global.html2canvas) {
       html2canvasLoaded = true;
@@ -292,11 +300,8 @@
         : "Japanote 친구 도전에 도전해 보세요.";
     const lines = [`${intro} 저보다 많이 맞출 수 있어요?`];
 
-    if (challengeUrl) {
-      lines.push(challengeUrl);
-    }
-
-    return lines.join("\n");
+    lines.push(challengeUrl);
+    return normalizeShareMessageLines(lines);
   }
 
   async function resolveChallengeShareData(resultViewId) {

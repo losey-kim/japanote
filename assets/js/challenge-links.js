@@ -405,6 +405,14 @@
     });
   }
 
+  function normalizeShareMessageLines(lines) {
+    return (Array.isArray(lines) ? lines : [])
+      .map((line) => String(line || "").trim())
+      .filter(Boolean)
+      .join("\n")
+      .trim();
+  }
+
   function buildChallengeShareText(resultViewId, url) {
     const summary = readResultSummaryFromView(resultViewId);
     const intro = summary?.total
@@ -412,11 +420,8 @@
       : "친구 도전 링크예요.";
     const lines = [`${intro} 저보다 많이 맞출 수 있어요?`];
 
-    if (url) {
-      lines.push(url);
-    }
-
-    return lines.join("\n");
+    lines.push(url);
+    return normalizeShareMessageLines(lines);
   }
 
   async function shareChallengeLink(resultViewId, url) {

@@ -97,20 +97,11 @@ function buildTargetUrl(code, origin, path, hash) {
   return url.toString();
 }
 
-function buildPreviewText(payload) {
-  const summary = readResultSummary(payload);
-
-  if (!summary) {
-    return {
+function buildPreviewText() {
+  return {
       title: DEFAULT_TITLE,
       description: DEFAULT_DESCRIPTION
     };
-  }
-
-  return {
-    title: `${summary.correct}/${summary.total} 맞췄어요`,
-    description: "같은 문제로 바로 도전해 보세요"
-  };
 }
 
 function buildPreviewImageUrl(requestUrl, code) {

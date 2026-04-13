@@ -778,7 +778,7 @@
 
     const normalizedBaseUrl = String(config.previewBaseUrl).replace(/\/+$/u, "");
     return {
-      url: `${normalizedBaseUrl}/${challengePreviewFunctionName}?code=${encodeURIComponent(code)}`,
+      url: `${normalizedBaseUrl}/${encodeURIComponent(code)}`,
       warning: ""
     };
   }

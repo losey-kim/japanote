@@ -1,6 +1,13 @@
 (function (global) {
-  const SHARE_CANVAS_PADDING = 32;
-  const SHARE_CANVAS_BG = "#fffaf4";
+  const SHARE_CANVAS_PADDING = 36;
+  const SHARE_CANVAS_BG = "linear-gradient(165deg, #fff2ea 0%, #fff9f4 42%, #fffaf6 100%)";
+  /** html2canvas `backgroundColor`는 단색이 안전함 */
+  const SHARE_CAPTURE_CLEAR_COLOR = "#fff4ec";
+  const SHARE_CARD_SHADOW =
+    "0 1px 2px rgba(25, 21, 22, 0.04), 0 10px 32px rgba(200, 86, 58, 0.09), 0 28px 64px rgba(200, 75, 53, 0.06)";
+  const SHARE_CARD_INSET =
+    "inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(25, 21, 22, 0.04)";
+  const SHARE_CARD_SURFACE = "linear-gradient(180deg, #ffffff 0%, #fffdfb 38%, #fff5ec 100%)";
   const SHARE_WATERMARK = "Japanote";
   const MAX_COMPARISON_LIST_ITEMS = 12;
   const GAME_LABELS = {
@@ -67,23 +74,26 @@
     const hiddenCount = Math.max(safeItems.length - visibleItems.length, 0);
 
     if (!visibleItems.length) {
-      return '<div style="font-size:0.82rem;color:#625a56;">기록이 없어요.</div>';
+      return '<div style="font-size:0.82rem;color:#8a8078;text-align:center;padding:8px;">기록이 없어요.</div>';
     }
 
     const rows = visibleItems.map((item) => {
-      const emoji = item?.status === "correct" ? "⭕" : "❌";
+      const ok = item?.status === "correct";
+      const emoji = ok ? "⭕" : "❌";
       const label = escapeHtml(item?.label || item?.title || "");
+      const rowBg = ok ? "rgba(95,174,139,0.07)" : "rgba(222,107,72,0.07)";
+      const border = ok ? "rgba(95,174,139,0.2)" : "rgba(222,107,72,0.2)";
 
       return `
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(25,21,22,0.06);font-size:0.84rem;line-height:1.45;">
-          <span style="flex-shrink:0;font-size:0.92rem;line-height:1.2;">${emoji}</span>
-          <span style="min-width:0;word-break:keep-all;overflow-wrap:anywhere;">${label}</span>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:${rowBg};border:1px solid ${border};font-size:0.83rem;line-height:1.45;box-shadow:0 1px 0 rgba(255,255,255,0.5) inset;">
+          <span style="flex-shrink:0;width:26px;height:26px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.55);font-size:0.88rem;line-height:1;">${emoji}</span>
+          <span style="min-width:0;word-break:keep-all;overflow-wrap:anywhere;color:#2a2624;padding-top:1px;">${label}</span>
         </div>
       `;
     }).join("");
 
     const more = hiddenCount > 0
-      ? `<div style="padding-top:8px;font-size:0.8rem;color:#625a56;">외 ${hiddenCount}개</div>`
+      ? `<div style="padding-top:10px;font-size:0.78rem;color:#8a8078;text-align:center;">외 ${hiddenCount}개</div>`
       : "";
 
     return `${rows}${more}`;
@@ -97,27 +107,27 @@
     }
 
     const buildColumnMarkup = (label, result, items) => `
-      <section style="display:grid;gap:12px;padding:14px;border-radius:18px;border:1px solid rgba(25,21,22,0.08);background:rgba(255,255,255,0.78);">
+      <section style="display:grid;gap:12px;padding:16px 15px;border-radius:20px;border:1px solid rgba(25,21,22,0.06);background:linear-gradient(168deg,rgba(255,255,255,0.99) 0%,rgba(255,248,242,0.94) 100%);box-shadow:0 4px 18px rgba(25,21,22,0.045),inset 0 1px 0 rgba(255,255,255,0.9);">
         <div>
-          <div style="font-size:0.8rem;color:#625a56;">${escapeHtml(label)}</div>
-          <div style="margin-top:4px;font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:#191516;">${result.correct} / ${result.total}</div>
-          <div style="margin-top:6px;font-size:0.82rem;line-height:1.55;color:#625a56;">
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;color:#a8988e;text-transform:uppercase;">${escapeHtml(label)}</div>
+          <div style="margin-top:8px;font-family:'Space Grotesk',sans-serif;font-size:1.48rem;font-weight:700;letter-spacing:-0.04em;color:#1a1614;line-height:1;">${result.correct}<span style="font-size:1.05rem;font-weight:600;color:#c4bbb3;margin:0 4px;">/</span>${result.total}</div>
+          <div style="margin-top:8px;font-size:0.78rem;line-height:1.55;color:#7a716a;">
             정답 ${result.correct}개 · 오답 ${result.wrong}개 · 정확도 ${result.accuracy}%
           </div>
         </div>
-        <div style="padding:10px 12px;border-radius:14px;background:rgba(25,21,22,0.03);">
+        <div style="padding:9px 9px;border-radius:15px;background:rgba(25,21,22,0.028);border:1px solid rgba(25,21,22,0.05);display:grid;gap:7px;">
           ${buildComparisonListMarkup(items)}
         </div>
       </section>
     `;
 
     return `
-      <div style="margin-top:4px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
-          <span style="font-size:0.78rem;font-weight:700;letter-spacing:0.08em;color:#625a56;text-transform:uppercase;">친구 도전 비교</span>
-          <strong style="font-size:0.94rem;color:#191516;">${escapeHtml(snapshot.outcome.text)}</strong>
+      <div style="margin-top:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,245,240,0.95) 0%,rgba(241,98,72,0.09) 100%);border:1px solid rgba(241,98,72,0.14);box-shadow:0 2px 12px rgba(241,98,72,0.08);">
+          <span style="font-size:0.74rem;font-weight:700;letter-spacing:0.09em;color:#a85a48;text-transform:uppercase;">친구 도전 비교</span>
+          <strong style="font-size:0.96rem;color:#1a1614;font-weight:700;letter-spacing:-0.02em;">${escapeHtml(snapshot.outcome.text)}</strong>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;">
           ${buildColumnMarkup("친구 기록", snapshot.sourceResult, snapshot.sourceItems)}
           ${buildColumnMarkup("내 기록", snapshot.currentResult, snapshot.currentItems)}
         </div>
@@ -125,42 +135,68 @@
     `;
   }
 
-  function buildStandardShareMarkup(resultView) {
+  function buildStandardShareMarkup(resultView, resultViewId) {
+    const summary = readShareResultSummary(resultViewId);
     const stats = resultView.querySelectorAll(".match-result-stat");
     const items = resultView.querySelectorAll(".match-result-item");
     let html = "";
 
-    if (stats.length) {
-      html += '<div style="display:flex;gap:12px;justify-content:center;margin-bottom:4px;">';
+    if (summary?.total) {
+      const accuracy = Math.min(100, Math.max(0, Math.round((summary.correct / summary.total) * 100)));
+      html += `
+        <div style="text-align:center;padding:4px 2px 20px;">
+          <div style="display:inline-block;margin-bottom:12px;padding:4px 12px;border-radius:999px;background:rgba(241,98,72,0.07);border:1px solid rgba(241,98,72,0.12);">
+            <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.16em;color:#c75d45;">RESULT</span>
+          </div>
+          <div style="padding:18px 22px 20px;border-radius:22px;background:linear-gradient(175deg,rgba(255,255,255,0.98) 0%,rgba(255,250,246,0.92) 55%,rgba(255,242,232,0.35) 100%);border:1px solid rgba(25,21,22,0.06);box-shadow:0 6px 24px rgba(25,21,22,0.05),inset 0 1px 0 rgba(255,255,255,0.9);">
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:2.65rem;font-weight:700;letter-spacing:-0.06em;line-height:1;color:#1a1614;">
+              ${summary.correct}<span style="font-size:1.45rem;font-weight:600;color:#c9c0b8;margin:0 4px;">/</span>${summary.total}
+            </div>
+            <div style="margin-top:6px;font-size:0.78rem;color:#9a918a;font-weight:500;">맞힌 문제</div>
+          </div>
+          <div style="margin-top:14px;display:flex;justify-content:center;flex-wrap:wrap;gap:7px;">
+            <span style="padding:6px 13px;border-radius:999px;background:rgba(95,174,139,0.11);border:1px solid rgba(95,174,139,0.22);color:#1f6b4a;font-size:0.76rem;font-weight:600;">정답 ${summary.correct}</span>
+            <span style="padding:6px 13px;border-radius:999px;background:rgba(222,107,72,0.09);border:1px solid rgba(222,107,72,0.2);color:#8f3a26;font-size:0.76rem;font-weight:600;">오답 ${summary.wrong}</span>
+            <span style="padding:6px 13px;border-radius:999px;background:rgba(25,21,22,0.04);border:1px solid rgba(25,21,22,0.08);color:#5a524a;font-size:0.76rem;font-weight:600;">정확도 ${accuracy}%</span>
+          </div>
+        </div>`;
+    } else if (stats.length) {
+      html += '<div style="display:flex;gap:10px;justify-content:center;margin-bottom:6px;">';
       stats.forEach((stat) => {
         const label = stat.querySelector("span")?.textContent || "";
         const value = stat.querySelector("strong")?.textContent || "0";
         const isCorrect = stat.dataset?.resultFilter === "correct";
         const isWrong = stat.dataset?.resultFilter === "wrong";
-        const bg = isCorrect ? "rgba(95,174,139,0.15)" : isWrong ? "rgba(222,107,72,0.15)" : "rgba(25,21,22,0.06)";
-        const color = isCorrect ? "#2d7a54" : isWrong ? "#b84430" : "#191516";
+        const bg = isCorrect ? "rgba(95,174,139,0.14)" : isWrong ? "rgba(222,107,72,0.12)" : "rgba(25,21,22,0.06)";
+        const color = isCorrect ? "#246748" : isWrong ? "#9a3f28" : "#1a1614";
+        const border = isCorrect ? "rgba(95,174,139,0.28)" : isWrong ? "rgba(222,107,72,0.25)" : "rgba(25,21,22,0.08)";
 
-        html += `<div style="flex:1;padding:10px 10px;border-radius:14px;background:${bg};text-align:center;">
-          <div style="font-size:0.78rem;color:#625a56;">${escapeHtml(label)}</div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:${color};margin-top:2px;">${escapeHtml(value)}</div>
+        html += `<div style="flex:1;min-width:0;padding:12px 8px;border-radius:17px;background:${bg};border:1px solid ${border};text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.65);">
+          <div style="font-size:0.72rem;font-weight:600;color:#7a7168;letter-spacing:-0.01em;">${escapeHtml(label)}</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:1.38rem;font-weight:700;color:${color};margin-top:5px;letter-spacing:-0.04em;">${escapeHtml(value)}</div>
         </div>`;
       });
       html += "</div>";
     }
 
     if (items.length > 0) {
-      html += '<div style="margin-top:4px;border-top:1px solid rgba(25,21,22,0.08);padding-top:12px;">';
+      const topBorder = summary?.total || stats.length ? "margin-top:6px;border-top:1px solid rgba(25,21,22,0.07);padding-top:16px;" : "";
+      html += `<div style="${topBorder}display:grid;gap:8px;">`;
       items.forEach((item) => {
         const isCorrect = item.classList.contains("is-correct");
         const icon = isCorrect ? "⭕" : "❌";
         const title = item.querySelector("strong")?.textContent || "";
         const description = item.querySelector("p")?.textContent || "";
+        const rowBg = isCorrect ? "rgba(95,174,139,0.06)" : "rgba(222,107,72,0.07)";
+        const accent = isCorrect ? "#3d8f6a" : "#c75d45";
+        const border = isCorrect ? "rgba(95,174,139,0.18)" : "rgba(222,107,72,0.2)";
 
-        html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:0.88rem;line-height:1.45;">
-          <span style="flex-shrink:0;font-size:0.92rem;line-height:1.2;">${icon}</span>
-          <div style="min-width:0;flex:1;">
-            <span style="font-weight:600;word-break:keep-all;overflow-wrap:anywhere;">${escapeHtml(title)}</span>
-            ${description ? `<span style="color:#625a56;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;"> ${escapeHtml(description)}</span>` : ""}
+        html += `<div style="display:flex;align-items:flex-start;gap:11px;padding:12px 14px;border-radius:15px;background:${rowBg};border:1px solid ${border};font-size:0.86rem;line-height:1.45;box-shadow:0 1px 0 rgba(255,255,255,0.7) inset,0 2px 8px rgba(25,21,22,0.03);">
+          <span style="flex-shrink:0;width:3px;align-self:stretch;border-radius:999px;background:linear-gradient(180deg,${accent},${accent}cc);min-height:2.4em;opacity:0.95;"></span>
+          <span style="flex-shrink:0;width:28px;height:28px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.65);font-size:0.95rem;line-height:1;box-shadow:0 1px 2px rgba(25,21,22,0.05);">${icon}</span>
+          <div style="min-width:0;flex:1;padding-top:1px;">
+            <span style="font-weight:600;color:#1a1614;word-break:keep-all;overflow-wrap:anywhere;letter-spacing:-0.02em;">${escapeHtml(title)}</span>
+            ${description ? `<div style="margin-top:4px;color:#756d66;font-size:0.81rem;font-weight:500;line-height:1.4;word-break:keep-all;overflow-wrap:anywhere;">${escapeHtml(description)}</div>` : ""}
           </div>
         </div>`;
       });
@@ -180,7 +216,7 @@
 
     const card = document.createElement("div");
     const gameLabel = getGameLabel(resultViewId);
-    const width = comparisonSnapshot ? 560 : 460;
+    const width = comparisonSnapshot ? 580 : 440;
 
     card.style.cssText = `
       position:fixed;
@@ -193,22 +229,37 @@
       color:#191516;
     `;
 
-    let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;">${SHARE_WATERMARK}</div>
-      ${gameLabel ? `<span style="padding:5px 14px;border-radius:999px;background:rgba(25,21,22,0.06);font-size:0.82rem;font-weight:600;color:#625a56;">${gameLabel}</span>` : ""}
-    </div>`;
-
-    if (comparisonSnapshot) {
-      html += buildComparisonShareMarkup(resultViewId);
-    } else {
-      html += buildStandardShareMarkup(resultView);
-    }
-
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`;
-    html += `<div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid rgba(25,21,22,0.1);color:#625a56;font-size:0.82rem;">${dateStr}</div>`;
 
-    card.innerHTML = html;
+    const bodyContent = comparisonSnapshot
+      ? buildComparisonShareMarkup(resultViewId)
+      : buildStandardShareMarkup(resultView, resultViewId);
+
+    const badge = gameLabel
+      ? `<span style="padding:6px 14px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.95) 0%,rgba(255,250,246,0.88) 100%);border:1px solid rgba(25,21,22,0.07);font-size:0.76rem;font-weight:600;color:#5a524a;box-shadow:0 2px 6px rgba(25,21,22,0.04);letter-spacing:-0.02em;">${escapeHtml(gameLabel)}</span>`
+      : "";
+
+    card.innerHTML = `
+      <div style="border-radius:28px;overflow:hidden;background:${SHARE_CARD_SURFACE};border:1px solid rgba(25,21,22,0.055);box-shadow:${SHARE_CARD_SHADOW}, ${SHARE_CARD_INSET};">
+        <div style="position:relative;padding:20px 22px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(122deg,rgba(255,248,244,0.98) 0%,rgba(241,98,72,0.09) 42%,rgba(255,255,255,0) 72%);border-bottom:1px solid rgba(25,21,22,0.055);">
+          <div style="position:absolute;right:-28px;top:-36px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(241,98,72,0.14) 0%,transparent 68%);pointer-events:none;"></div>
+          <div style="display:flex;align-items:center;gap:12px;min-width:0;position:relative;z-index:1;">
+            <div style="width:4px;height:28px;border-radius:999px;background:linear-gradient(180deg,#ffb39e,#e85d3d);flex-shrink:0;box-shadow:0 2px 6px rgba(232,93,61,0.35);"></div>
+            <div style="min-width:0;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:-0.03em;color:#1a1614;line-height:1.12;">${SHARE_WATERMARK}</div>
+              <div style="font-size:0.7rem;color:#9a9189;margin-top:4px;letter-spacing:0.03em;">오늘의 연습 결과</div>
+            </div>
+          </div>
+          ${badge ? `<div style="position:relative;z-index:1;">${badge}</div>` : ""}
+        </div>
+        <div style="padding:20px 22px 12px;">
+          ${bodyContent}
+        </div>
+        <div style="text-align:center;padding:13px 16px 16px;border-top:1px solid rgba(25,21,22,0.055);background:linear-gradient(180deg,rgba(25,21,22,0.02) 0%,rgba(255,250,246,0.35) 100%);color:#9a9189;font-size:0.74rem;letter-spacing:0.08em;font-weight:500;">${dateStr} · Japanote</div>
+      </div>
+    `;
+
     return card;
   }
 
@@ -224,7 +275,7 @@
 
     try {
       return await global.html2canvas(card, {
-        backgroundColor: SHARE_CANVAS_BG,
+        backgroundColor: SHARE_CAPTURE_CLEAR_COLOR,
         scale: 3,
         useCORS: true,
         logging: false

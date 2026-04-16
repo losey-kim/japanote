@@ -1578,20 +1578,20 @@ const grammarFilterLabels = {
 
 const vocabHeadingCopy = {
   N5: {
-    title: "N5 단어, 카드로 익혀봐요",
-    description: ""
+    title: "N5 단어를 차근차근 익혀봐요",
+    description: "자주 쓰는 단어를 익히고, 퀴즈와 짝 맞추기로 다시 복습해봐요."
   },
   N4: {
-    title: "N4 단어, 카드로 익혀봐요",
-    description: "조금 더 넓어진 표현을 카드와 목록으로 같이 익혀봐요."
+    title: "N4 단어를 차근차근 익혀봐요",
+    description: "조금 더 넓어진 표현을 익히고, 퀴즈로 다시 확인해봐요."
   },
   N3: {
-    title: "N3 단어, 카드로 익혀봐요",
-    description: "실전에서 자주 만나는 N3 단어를 천천히 쌓아봐요."
+    title: "N3 단어를 차근차근 익혀봐요",
+    description: "실전에서 자주 만나는 N3 단어를 익히고 복습해봐요."
   },
   all: {
-    title: "전체 단어, 한 번에 익혀봐요",
-    description: "N5부터 N3까지 섞어서 카드와 목록으로 같이 훑어봐요."
+    title: "전체 단어를 한 번에 익혀봐요",
+    description: "N5부터 N3까지 섞어서 단어를 익히고 다시 복습해봐요."
   }
 };
 
@@ -1615,8 +1615,8 @@ const quizHeadingCopy = {
 };
 
 const matchHeadingCopy = {
-  title: "단어 짝맞추기, 바로 감각 올려봐요",
-  description: ""
+  title: "단어 짝 맞추기로 가볍게 복습해봐요",
+  description: "단어와 뜻을 연결하면서 배운 내용을 다시 확인해봐요."
 };
 
 function getVocabItemPart(item) {
@@ -7233,8 +7233,8 @@ function getKanjiPageHeading(tab = getKanjiTab(state.kanjiTab)) {
   }
 
   return {
-    title: "기초 한자, 카드와 목록으로 익혀봐요",
-    description: "학년별 한자를 차근차근 익혀볼 수 있어요."
+    title: "기초 한자를 차근차근 익혀봐요",
+    description: "자주 나오는 한자를 보고, 퀴즈와 짝 맞추기로 가볍게 복습해봐요."
   };
 }
 

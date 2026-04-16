@@ -2286,8 +2286,8 @@ function getCharactersPageHeading(tab = getCharactersTab(state.charactersTab)) {
   }
 
   return {
-    title: "히라가나랑 카타카나를 한눈에 봐요",
-    description: "문자를 누르면 바로 따라쓰기로 이어져요."
+    title: "문자부터 차근차근 익혀봐요",
+    description: "히라가나와 카타카나를 익히고, 퀴즈로 가볍게 복습해봐요."
   };
 }
 

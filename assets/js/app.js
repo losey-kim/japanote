@@ -1554,7 +1554,7 @@ const kanaQuizResultFilterLabels = {
   wrong: "오답"
 };
 
-const STUDY_READY_TO_START_HINT = "준비됐다면 시작해볼까요?";
+const STUDY_READY_TO_START_HINT = "준비됐다면 시작해봐요";
 const STUDY_NO_CONTENT_LEVEL_HINT = "아직 보여줄 내용이 없어요. 다른 레벨로 바꿔보세요.";
 
 function getStudyPracticeResultEmptyMessage(activeFilter) {
@@ -9551,8 +9551,8 @@ function renderGrammarFlashcard() {
         : mastered
           ? "익혔어요에 담긴 문법이에요"
           : "이 문법도 바로 저장 상태를 바꿀 수 있어요"
-      : "눌러서 설명을 확인해볼까요?"
-    : "다른 레벨이나 모아보기로 바꿔볼까요?";
+      : "눌러서 설명을 확인해봐요"
+    : "다른 레벨이나 모아보기로 바꿔봐요";
 
   renderStudyFlashcardComponent({
     flashcard,
@@ -9574,7 +9574,7 @@ function renderGrammarFlashcard() {
     hideReading: true,
     toggleOpenLabel: "설명을 다시 접을까요?",
     toggleClosedLabel: "설명을 확인해볼까요?",
-    toggleEmptyLabel: "다른 레벨이나 모아보기로 바꿔볼까요?",
+    toggleEmptyLabel: "다른 레벨이나 모아보기로 바꿔봐요",
     prevDisabled: cards.length <= 1,
     nextDisabled: cards.length <= 1,
     actionButtons: [

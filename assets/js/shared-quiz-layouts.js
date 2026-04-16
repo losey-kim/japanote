@@ -358,7 +358,7 @@
   }
 
   const QUIZ_EMPTY_MESSAGE = "시작해볼까요?";
-  const QUIZ_READY_TO_START_HINT = "준비됐다면 시작해볼까요?";
+  const QUIZ_READY_TO_START_HINT = "준비됐다면 시작해봐요";
   const QUIZ_BOARD_READY_MESSAGE = "퀴즈를 준비하고 있어요.";
   const QUIZ_RESULT_EMPTY_MESSAGE = "아직 결과가 없어요. 문제를 풀고 다시 확인해봐요.";
   const QUIZ_RESULT_ALL_ACTION_LABEL = "전체 담기";
@@ -817,7 +817,7 @@
         readingHidden: true,
         meaningText: "설명은 뒤집으면 볼 수 있어요",
         hintId: "grammar-flashcard-hint",
-        hintText: "눌러서 설명을 확인해볼까요?",
+        hintText: "눌러서 설명을 확인해봐요",
         navAriaLabel: "문법 카드 넘기기",
         scopeLabel: "문법",
         prevId: "grammar-flashcard-prev",

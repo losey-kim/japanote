@@ -61,7 +61,7 @@
     typeof matchCopy.getReadyStateText === "function"
       ? matchCopy.getReadyStateText()
       : {
-          ready: "준비됐다면 시작해볼까요?",
+          ready: "준비됐다면 시작해봐요",
           unavailable: "지금은 준비 중이에요."
         };
 

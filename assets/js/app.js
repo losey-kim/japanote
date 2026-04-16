@@ -1554,6 +1554,9 @@ const kanaQuizResultFilterLabels = {
   wrong: "오답"
 };
 
+const STUDY_READY_TO_START_HINT = "준비됐다면 시작해볼까요?";
+const STUDY_NO_CONTENT_LEVEL_HINT = "아직 보여줄 내용이 없어요. 다른 레벨로 바꿔보세요.";
+
 function getStudyPracticeResultEmptyMessage(activeFilter) {
   if (activeFilter === "correct") {
     return "아직 정답 결과가 없어요. 문제를 더 풀어볼까요?";
@@ -1651,6 +1654,7 @@ const japanoteCopyFallback = {
     restart: "다시 해볼까요?",
     nextQuestion: "다음 문제 볼까요?",
     nextPassage: "다음 글 볼까요?",
+    rereadPassage: "다시 읽어볼까요?",
     result: "결과 볼까요?",
     reviewSave: "다시 보기로 표시",
     reviewRemove: "다시 보기 해제",
@@ -4907,7 +4911,11 @@ function renderQuizSessionHud(key) {
 
   if (pauseButton) {
     const canPause = session.duration > 0 && (Boolean(session.timerId) || session.isPaused);
-    const nextLabel = session.isPaused ? "다시 시작" : "일시정지";
+    const nextLabel = session.isPaused
+      ? key === "reading"
+        ? getJapanoteButtonLabel("rereadPassage")
+        : "다시 시작"
+      : "일시정지";
     pauseButton.disabled = !canPause;
     pauseButton.classList.toggle("is-paused", session.isPaused);
     pauseButton.setAttribute("aria-label", nextLabel);
@@ -9378,7 +9386,7 @@ function getGrammarEmptyMessage(filter = state?.grammarFilter, level = state?.gr
     return "아직 상태를 정하지 않은 문법은 지금 없어요. 다른 레벨도 같이 볼까요?";
   }
 
-  return "지금 보여줄 문법이 없어요. 다른 레벨이나 모아보기로 바꿔볼까요?";
+  return STUDY_NO_CONTENT_LEVEL_HINT;
 }
 
 function getGrammarSummaryText(count, level = state?.grammarLevel, filter = state?.grammarFilter) {
@@ -10026,7 +10034,7 @@ function renderGrammarPractice() {
     empty.hidden = false;
     practiceView.hidden = true;
     resultView.hidden = true;
-    empty.textContent = sets?.length ? getJapanoteButtonLabel("start") : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
+    empty.textContent = sets?.length ? STUDY_READY_TO_START_HINT : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -10060,7 +10068,7 @@ function renderGrammarPractice() {
     empty.hidden = false;
     practiceView.hidden = true;
     resultView.hidden = true;
-    empty.textContent = sets?.length ? getJapanoteButtonLabel("start") : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
+    empty.textContent = sets?.length ? STUDY_READY_TO_START_HINT : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -10996,9 +11004,7 @@ function renderReadingPractice() {
     stopQuizSessionTimer("reading");
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
-    empty.textContent = sets.length
-      ? getJapanoteButtonLabel("start")
-      : "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
+    empty.textContent = sets.length ? STUDY_READY_TO_START_HINT : STUDY_NO_CONTENT_LEVEL_HINT;
     practiceView.hidden = true;
     resultView.hidden = true;
     renderQuizSessionHud("reading");
@@ -11009,7 +11015,7 @@ function renderReadingPractice() {
     stopQuizSessionTimer("reading");
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
-    empty.textContent = "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
+    empty.textContent = STUDY_NO_CONTENT_LEVEL_HINT;
     practiceView.hidden = true;
     resultView.hidden = true;
     renderQuizSessionHud("reading");
@@ -11032,7 +11038,7 @@ function renderReadingPractice() {
     stopQuizSessionTimer("reading");
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
-    empty.textContent = "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
+    empty.textContent = STUDY_NO_CONTENT_LEVEL_HINT;
     practiceView.hidden = true;
     resultView.hidden = true;
     renderQuizSessionHud("reading");

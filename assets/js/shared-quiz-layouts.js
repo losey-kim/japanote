@@ -315,7 +315,7 @@
 
     return `
       <div class="${escapeHtml(shellClass)}" id="${escapeHtml(shellId)}">
-        <button class="study-options-toggle" id="${escapeHtml(toggleId)}" type="button" aria-expanded="${isOpen ? "true" : "false"}" aria-controls="${escapeHtml(panelId)}">
+        <button class="study-options-toggle" id="${escapeHtml(toggleId)}" type="button" aria-expanded="${isOpen ? "true" : "false"}" aria-controls="${escapeHtml(panelId)}" aria-label="${escapeHtml(toggleTitle)}" title="${escapeHtml(toggleTitle)}">
           <div class="study-options-toggle-copy">
             <strong>${escapeHtml(toggleTitle)}</strong>
             <p class="study-options-toggle-summary" id="${escapeHtml(summaryId)}">${escapeHtml(summaryText)}</p>
@@ -358,6 +358,7 @@
   }
 
   const QUIZ_EMPTY_MESSAGE = "시작해볼까요?";
+  const QUIZ_READY_TO_START_HINT = "준비됐다면 시작해볼까요?";
   const QUIZ_BOARD_READY_MESSAGE = "퀴즈를 준비하고 있어요.";
   const QUIZ_RESULT_EMPTY_MESSAGE = "아직 결과가 없어요. 문제를 풀고 다시 확인해봐요.";
   const QUIZ_RESULT_ALL_ACTION_LABEL = "전체 담기";
@@ -1081,7 +1082,7 @@
 
     return `
       <div class="${escapeHtml(className)}" id="${escapeHtml(viewId)}" hidden>
-        <p class="match-result-title">결과를 볼까요?</p>
+        <p class="match-result-title">결과 볼까요?</p>
         <div class="match-result-grid" role="group" aria-label="${escapeHtml(filterAriaLabel)}">
           <button class="match-result-stat match-result-stat-button is-active" id="${escapeHtml(filterId)}-all" type="button" data-result-filter="all" aria-pressed="true">
             <span>전체</span>
@@ -1419,6 +1420,7 @@
     startButton,
     boardId,
     emptyId,
+    emptyText = QUIZ_EMPTY_MESSAGE,
     playBoardConfig,
     resultPrefix,
     resultFilterAriaLabel,
@@ -1454,6 +1456,7 @@
       boardMarkup: createMatchBoardLayout({
         boardId,
         emptyId,
+        emptyText,
         playBoardConfig,
         resultPrefix,
         resultFilterAriaLabel,
@@ -1577,7 +1580,7 @@
       shellId: "grammar-match-options-shell",
       shellClassName: "match-options-shell",
       toggleId: "grammar-match-options-toggle",
-      toggleTitle: "문법 짝 맞추기 설정",
+      toggleTitle: "문법 짝 맞추기 설정을 골라볼까요?",
       summaryId: "grammar-match-options-summary",
       summaryText: "N5 · 전체 · 5문제 · 15초",
       panelId: "grammar-match-options-panel",
@@ -1592,6 +1595,7 @@
       startButton: createStartQuizButton({ id: "grammar-match-new-round", labelId: "grammar-match-new-round-label" }),
       boardId: "grammar-match-board",
       emptyId: "grammar-match-empty",
+      emptyText: QUIZ_READY_TO_START_HINT,
       playBoardConfig: {
         boardId: "grammar-match-play-view",
         progressId: "grammar-match-progress",
@@ -1751,7 +1755,7 @@
         shellId: "grammar-practice-options-shell",
         shellClassName: "match-options-shell",
         toggleId: "grammar-practice-options-toggle",
-        toggleTitle: "문법 설정",
+        toggleTitle: "문법 퀴즈 설정을 골라볼까요?",
         summaryId: "grammar-practice-options-summary",
         summaryText: "N5 · 10문제 · 25초",
         panelId: "grammar-practice-options-panel",
@@ -1782,7 +1786,7 @@
       startButton: createStartQuizButton({ id: "grammar-practice-start", labelId: "grammar-practice-start-label" }),
       boardClassName: "match-board grammar-practice-board",
       emptyId: "grammar-practice-empty",
-      emptyText: QUIZ_EMPTY_MESSAGE,
+      emptyText: QUIZ_READY_TO_START_HINT,
       viewId: "grammar-practice-view",
       resultViewConfig: {
         idPrefix: "grammar-practice",
@@ -1834,7 +1838,7 @@
         shellId: "reading-options-shell",
         shellClassName: "match-options-shell",
         toggleId: "reading-options-toggle",
-        toggleTitle: "독해 설정",
+        toggleTitle: "독해 설정을 골라볼까요?",
         summaryId: "reading-options-summary",
         summaryText: "N5 · 10문제 · 45초",
         panelId: "reading-options-panel",
@@ -1859,6 +1863,7 @@
       startButton: createStartQuizButton({ id: "reading-start", labelId: "reading-start-label" }),
       boardClassName: "match-board reading-practice-board",
       emptyId: "reading-empty",
+      emptyText: QUIZ_READY_TO_START_HINT,
       viewId: "reading-practice-view",
       resultViewConfig: {
         idPrefix: "reading-practice",
@@ -1908,6 +1913,7 @@
   function createMatchBoardLayout({
     boardId,
     emptyId,
+    emptyText = QUIZ_EMPTY_MESSAGE,
     playBoardConfig,
     resultPrefix,
     resultFilterAriaLabel,
@@ -1917,7 +1923,7 @@
   }) {
     return `
         <div class="match-board" id="${escapeHtml(boardId)}" hidden>
-          ${createPracticeEmptyMessage({ id: emptyId })}
+          ${createPracticeEmptyMessage({ id: emptyId, text: emptyText })}
           ${createMatchPlayView(playBoardConfig)}
           ${createPrefixedResultView({
             idPrefix: resultPrefix,

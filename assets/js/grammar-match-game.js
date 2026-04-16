@@ -61,7 +61,7 @@
     typeof matchCopy.getReadyStateText === "function"
       ? matchCopy.getReadyStateText()
       : {
-          ready: "시작해볼까요?",
+          ready: "준비됐다면 시작해볼까요?",
           unavailable: "지금은 준비 중이에요."
         };
 
@@ -284,7 +284,8 @@
     onRender: renderGrammarMatchScreen,
     onSetActionAvailability: setGrammarMatchActionAvailability,
     onSetFeedback: (message, tone = "") => sharedMatchGame.setFeedbackById("grammar-match-feedback", message, tone),
-    onUnavailable: () => renderGrammarMatchUnavailableState("지금 선택한 조건에 맞는 문법이 없어요."),
+    onUnavailable: () =>
+      renderGrammarMatchUnavailableState("아직 보여줄 내용이 없어요. 다른 레벨로 바꿔보세요."),
     onPageOpened: ({ isInitialPage }) => {
       if (isInitialPage) {
         sharedMatchGame.scrollElementIntoViewById("grammar-match-board");

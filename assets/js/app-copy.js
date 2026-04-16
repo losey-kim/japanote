@@ -61,6 +61,7 @@
       restart: "다시 해볼까요?",
       nextQuestion: "다음 문제 볼까요?",
       nextPassage: "다음 글 볼까요?",
+      rereadPassage: "다시 읽어볼까요?",
       result: "결과 볼까요?",
       reviewSave: "다시 보기로 표시",
       reviewRemove: "다시 보기 해제",

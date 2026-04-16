@@ -73,8 +73,8 @@
             <div class="match-shell kana-quiz-shell">
               <aside class="match-sidebar">
                 <div class="study-options-shell match-options-shell" id="kana-setup-shell">
-                  <button class="study-options-toggle" id="kana-setup-toggle" type="button" aria-expanded="false" aria-controls="kana-setup-panel">
-                    <div class="study-options-toggle-copy"><strong>퀴즈 설정, 어떻게 할까요?</strong><p class="study-options-toggle-summary" id="kana-setup-summary">히라가나 · 10문제 · 5초</p></div>
+                  <button class="study-options-toggle" id="kana-setup-toggle" type="button" aria-expanded="false" aria-controls="kana-setup-panel" aria-label="퀴즈 설정을 골라볼까요?" title="퀴즈 설정을 골라볼까요?">
+                    <div class="study-options-toggle-copy"><strong>퀴즈 설정을 골라볼까요?</strong><p class="study-options-toggle-summary" id="kana-setup-summary">히라가나 · 10문제 · 5초</p></div>
                     <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
                   </button>
                   <div class="study-options-panel study-options-panel-compact" id="kana-setup-panel" hidden aria-hidden="true">
@@ -92,11 +92,11 @@
                   </div>
                 </div>
                 <div class="match-actions">
-                  <button class="primary-btn button-with-icon kana-setup-start" id="kana-setup-start" type="button"><span class="material-symbols-rounded" aria-hidden="true">play_arrow</span><span>퀴즈 시작</span></button>
+                  <button class="primary-btn button-with-icon kana-setup-start" id="kana-setup-start" type="button"><span class="material-symbols-rounded" aria-hidden="true">play_arrow</span><span id="kana-setup-start-label">시작해볼까요?</span></button>
                 </div>
               </aside>
               <div class="match-board kana-quiz-board">
-                <p class="vocab-list-empty" id="kana-quiz-empty">준비가 되면 시작하세요.</p>
+                <p class="vocab-list-empty" id="kana-quiz-empty">준비됐다면 시작해볼까요?</p>
                 <div class="kana-quiz-sheet" id="kana-quiz-practice-view" aria-hidden="true" hidden>
                   <article class="basic-practice-card kana-practice-card" id="kana-quiz-card" hidden>
                     <div class="basic-practice-meta"><span id="kana-quiz-sheet-source">-</span></div>
@@ -141,9 +141,9 @@
                     <button class="match-result-stat match-result-stat-button" id="kana-quiz-result-filter-correct" type="button" data-result-filter="correct" aria-pressed="false"><span>정답</span><strong id="kana-quiz-result-correct-count">0</strong></button>
                     <button class="match-result-stat match-result-stat-button" id="kana-quiz-result-filter-wrong" type="button" data-result-filter="wrong" aria-pressed="false"><span>오답</span><strong id="kana-quiz-result-wrong-count">0</strong></button>
                   </div>
-                  <p class="match-result-empty" id="kana-quiz-result-empty" hidden>아직 보여줄 결과가 없어요.</p>
+                  <p class="match-result-empty" id="kana-quiz-result-empty" hidden>아직 결과가 없어요. 문제를 풀고 다시 확인해봐요.</p>
                   <div class="match-result-list" id="kana-quiz-result-list"></div>
-                  <div class="quiz-actions"><button class="primary-btn button-with-icon" id="kana-quiz-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 하기</span></button></div>
+                  <div class="quiz-actions"><button class="primary-btn button-with-icon" id="kana-quiz-restart" type="button" aria-label="다시 해볼까요?" title="다시 해볼까요?"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>
                 </div>
               </div>
             </div>
@@ -153,8 +153,8 @@
             <div class="writing-practice-shell" id="writing-practice-shell">
               <article class="match-sidebar writing-practice-copy">
                 <div class="study-options-shell match-options-shell writing-setup-shell" id="writing-setup-shell">
-                  <button class="study-options-toggle" id="writing-setup-toggle" type="button" aria-expanded="false" aria-controls="writing-setup-panel">
-                    <div class="study-options-toggle-copy"><strong>따라쓰기 설정, 어떻게 할까요?</strong><p class="study-options-toggle-summary" id="writing-setup-summary">히라가나 · 순서대로</p></div>
+                  <button class="study-options-toggle" id="writing-setup-toggle" type="button" aria-expanded="false" aria-controls="writing-setup-panel" aria-label="따라쓰기 설정을 골라볼까요?" title="따라쓰기 설정을 골라볼까요?">
+                    <div class="study-options-toggle-copy"><strong>따라쓰기 설정을 골라볼까요?</strong><p class="study-options-toggle-summary" id="writing-setup-summary">히라가나 · 순서대로</p></div>
                     <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
                   </button>
                   <div class="kana-setup-panel writing-setup-panel" id="writing-setup-panel" hidden aria-hidden="true">
@@ -179,26 +179,26 @@
                       <strong id="writing-practice-reading">-</strong>
                     </div>
                   </div>
-                  <div><span>점수</span><strong id="writing-practice-score">-</strong></div>
+                  <div><span>점수 확인</span><strong id="writing-practice-score">-</strong></div>
                 </div>
                 <div class="writing-practice-actions-row writing-practice-actions-row-trio">
-                    <button class="secondary-btn" id="writing-practice-replay" type="button">획순</button>
+                    <button class="secondary-btn" id="writing-practice-replay" type="button" aria-label="획순 보기" title="획순 보기">획순 보기</button>
                     <button class="secondary-btn writing-practice-guide-toggle" id="writing-guide-toggle" type="button" aria-label="가이드">
                       <span class="writing-practice-guide-label">가이드</span>
                       <span class="material-symbols-rounded writing-practice-guide-icon" aria-hidden="true">visibility</span>
                     </button>
-                    <button class="primary-btn" id="writing-practice-score-btn" type="button">점수</button>
+                    <button class="primary-btn" id="writing-practice-score-btn" type="button" aria-label="점수 확인" title="점수 확인">점수 확인</button>
                 </div>
                 <div class="writing-practice-stage-shell">
                   <div class="writing-practice-stage" id="writing-practice-stage">
                     <div class="writing-svg-layer" id="writing-svg-layer" aria-hidden="true"></div>
                     <canvas id="writing-overlay-canvas" aria-label="문자 따라쓰기 캔버스"></canvas>
-                    <div class="writing-practice-stage-empty" id="writing-practice-stage-empty" hidden>따라쓰기를 준비하고 있어요.</div>
+                    <div class="writing-practice-stage-empty" id="writing-practice-stage-empty" hidden>따라쓰기를 준비 중이에요. 잠시만 기다려주세요.</div>
                   </div>
                 </div>
                 <div class="writing-practice-actions">
                   <div class="writing-practice-actions-row writing-practice-actions-row-trio">
-                    <button class="secondary-btn" id="writing-practice-prev" type="button">앞 글자</button>
+                    <button class="secondary-btn" id="writing-practice-prev" type="button" aria-label="이전 글자" title="이전 글자">이전 글자</button>
                     <button class="secondary-btn" id="writing-practice-clear" type="button">지우기</button>
                     <button class="secondary-btn" id="writing-practice-next" type="button">다음 글자</button>
                   </div>

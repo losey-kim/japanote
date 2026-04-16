@@ -357,16 +357,16 @@
     `;
   }
 
-  const QUIZ_EMPTY_MESSAGE = "준비됐다면 시작해볼까요?";
+  const QUIZ_EMPTY_MESSAGE = "시작해볼까요?";
   const QUIZ_BOARD_READY_MESSAGE = "퀴즈를 준비하고 있어요.";
   const QUIZ_RESULT_EMPTY_MESSAGE = "아직 보여줄 결과가 없어요.";
   const QUIZ_RESULT_ALL_ACTION_LABEL = "전체 담기";
   const QUIZ_RESULT_RETRY_ALL_ACTION_LABEL = "전체 다시 볼래요";
 
-  const QUIZ_RESULT_MASTERED_ACTION_LABEL = "전체 익혔어요";
+  const QUIZ_RESULT_MASTERED_ACTION_LABEL = "익힘으로 표시";
 
-  const QUIZ_RESULT_REVIEW_ACTION_LABEL = "모두 다시 보기";
-  const QUIZ_RESULT_LEARN_ACTION_LABEL = "모두 익히기";
+  const QUIZ_RESULT_REVIEW_ACTION_LABEL = "다시 보기로 표시";
+  const QUIZ_RESULT_LEARN_ACTION_LABEL = "익힘으로 표시";
 
   function createPracticeEmptyMessage({ id, text = QUIZ_EMPTY_MESSAGE }) {
     return `<p class="vocab-list-empty" id="${escapeHtml(id)}" hidden>${escapeHtml(text)}</p>`;
@@ -406,7 +406,7 @@
     return createActionButton({
       id,
       labelId,
-      label: "시작하기"
+      label: "시작해볼까요?"
     });
   }
 
@@ -1376,7 +1376,7 @@
         optionsId: "kanji-practice-options",
         pauseButtonId: "kanji-practice-pause",
         nextButtonId: "kanji-practice-next",
-        nextButtonLabel: "다음 한자 볼까요?"
+        nextButtonLabel: "다음 문제 볼까요?"
       },
       resultPrefix: "kanji-practice",
       resultClassName: "match-result-view kanji-result-view",
@@ -1822,7 +1822,7 @@
         explanationId: "grammar-practice-explanation",
         pauseButtonId: "grammar-pause",
         nextButtonId: "grammar-practice-next",
-        nextButtonLabel: "다음 문제 보기"
+        nextButtonLabel: "다음 문제 볼까요?"
       })
     });
   }
@@ -1885,7 +1885,7 @@
         explanationId: "reading-explanation",
         pauseButtonId: "reading-pause",
         nextButtonId: "reading-next",
-        nextButtonLabel: "다음 글 보기"
+        nextButtonLabel: "다음 문제 볼까요?"
       })
     });
   }

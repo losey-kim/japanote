@@ -2023,7 +2023,7 @@ function renderKanaQuizSheet() {
   options.hidden = false;
   next.disabled = true;
   next.textContent =
-    current.index + 1 >= current.total ? "결과 보러 갈까요?" : "다음 문제 볼까요?";
+    current.index + 1 >= current.total ? "결과 볼까요?" : "다음 문제 볼까요?";
 
   options.innerHTML = "";
   current.item.options.forEach((option, optionIndex) => {
@@ -5983,7 +5983,7 @@ function renderKanjiPracticeBulkActionButtons(results) {
     datasetKey: "kanjiPracticeBulkAction",
     saveActionValue: "save-review",
     removeActionValue: "remove-review",
-    saveLabel: "모두 다시 보기",
+    saveLabel: "다시 보기로 표시",
     removeLabel: "다시 보기 해제",
     emptyTitle: "지금 표시 중인 한자가 없어요.",
     saveTitle: "지금 보이는 한자를 모두 다시 볼 항목으로 표시해요.",
@@ -5999,7 +5999,7 @@ function renderKanjiPracticeBulkActionButtons(results) {
     datasetKey: "kanjiPracticeMasteredBulkAction",
     saveActionValue: "save-mastered",
     removeActionValue: "remove-mastered",
-    saveLabel: "모두 익히기",
+    saveLabel: "익힘으로 표시",
     removeLabel: "익힘 해제",
     emptyTitle: "지금 표시 중인 한자가 없어요.",
     saveTitle: "지금 보이는 한자를 모두 익힘으로 표시해요.",
@@ -6026,8 +6026,8 @@ function renderKanjiPracticeBulkActionButton(results) {
     datasetKey: "kanjiPracticeBulkAction",
     saveActionValue: "save-review",
     removeActionValue: "remove-review",
-    saveLabel: "전체 다시 볼래요",
-    removeLabel: "전체 빼기",
+    saveLabel: "다시 보기로 표시",
+    removeLabel: "다시 보기 해제",
     emptyTitle: "지금은 담을 한자가 없어요.",
     saveTitle: "지금 보이는 한자를 다시 볼래요에 모두 담을게요.",
     removeTitle: "지금 보이는 한자를 다시 볼래요에서 모두 뺄게요."
@@ -7201,7 +7201,7 @@ function renderKanjiPractice() {
 
   card.className = `basic-practice-card kanji-practice-card ${current.tone || "tone-gold"}`;
   nextButton.textContent =
-    state.basicPracticeIndexes.kanji >= questionCount - 1 ? "결과 볼까요?" : "다음 한자 볼까요?";
+    state.basicPracticeIndexes.kanji >= questionCount - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
   nextButton.disabled = true;
 
   delete optionsContainer.dataset.answered;
@@ -7510,7 +7510,7 @@ function renderKanjiPageLayout() {
     setQuizSessionDuration("kanjiPractice", getKanjiPracticeQuizDuration());
     if (empty) {
       empty.textContent = getKanjiPracticeQuestionCount() > 0
-        ? "준비됐다면 시작해볼까요?"
+        ? "시작해볼까요?"
         : getKanjiEmptyMessage();
     }
     setElementHidden(empty, false);
@@ -7592,7 +7592,7 @@ function handleKanjiPracticeAnswer(index) {
   renderStats();
 
   nextButton.textContent =
-    kanjiPracticeState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 한자 볼까요?";
+    kanjiPracticeState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 문제 볼까요?";
   nextButton.disabled = false;
 }
 
@@ -7622,7 +7622,7 @@ function handleKanjiPracticeTimeout() {
   saveState();
   renderStats();
   nextButton.textContent =
-    kanjiPracticeState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 한자 볼까요?";
+    kanjiPracticeState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 문제 볼까요?";
   nextButton.disabled = false;
 }
 
@@ -8327,7 +8327,7 @@ function renderVocabQuizBulkActionButtons(results) {
     getId: (item) => item.id,
     isSaved: isWordSavedToReviewList,
     datasetKey: "vocabQuizBulkAction",
-    saveLabel: "모두 다시 보기",
+    saveLabel: "다시 보기로 표시",
     removeLabel: "다시 보기 해제",
     emptyTitle: "지금 표시 중인 단어가 없어요.",
     saveTitle: "지금 보이는 단어를 모두 다시 볼 항목으로 표시해요.",
@@ -8343,7 +8343,7 @@ function renderVocabQuizBulkActionButtons(results) {
     datasetKey: "vocabQuizMasteredBulkAction",
     saveActionValue: "save-mastered",
     removeActionValue: "remove-mastered",
-    saveLabel: "모두 익히기",
+    saveLabel: "익힘으로 표시",
     removeLabel: "익힘 해제",
     emptyTitle: "지금 표시 중인 단어가 없어요.",
     saveTitle: "지금 보이는 단어를 모두 익힘으로 표시해요.",
@@ -8946,7 +8946,7 @@ function renderVocabQuiz() {
     resultView.hidden = true;
     empty.hidden = false;
     empty.textContent = canStart
-      ? "준비됐다면 시작해볼까요?"
+      ? "시작해볼까요?"
       : getVocabQuizEmptyText(items);
     card.hidden = true;
     progress.textContent = `0 / ${getVocabQuizCount()}`;
@@ -9323,7 +9323,7 @@ function renderGrammarPracticeBulkActionButtons(results) {
     isSaved: isGrammarSavedToReviewList,
     datasetKey: "grammarPracticeBulkAction",
     removeActionValue: "remove-review",
-    saveLabel: "모두 다시 보기",
+    saveLabel: "다시 보기로 표시",
     removeLabel: "다시 보기 해제",
     emptyTitle: "지금 표시 중인 문법이 없어요.",
     saveTitle: "지금 보이는 문법을 모두 다시 볼 항목으로 표시해요.",
@@ -9339,7 +9339,7 @@ function renderGrammarPracticeBulkActionButtons(results) {
     datasetKey: "grammarPracticeMasteredBulkAction",
     saveActionValue: "save-mastered",
     removeActionValue: "remove-mastered",
-    saveLabel: "모두 익히기",
+    saveLabel: "익힘으로 표시",
     removeLabel: "익힘 해제",
     emptyTitle: "지금 표시 중인 문법이 없어요.",
     saveTitle: "지금 보이는 문법을 모두 익힘으로 표시해요.",
@@ -10012,7 +10012,7 @@ function renderGrammarPractice() {
     empty.hidden = false;
     practiceView.hidden = true;
     resultView.hidden = true;
-    empty.textContent = sets?.length ? "준비되면 시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
+    empty.textContent = sets?.length ? "시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -10046,7 +10046,7 @@ function renderGrammarPractice() {
     empty.hidden = false;
     practiceView.hidden = true;
     resultView.hidden = true;
-    empty.textContent = sets?.length ? "준비되면 시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
+    empty.textContent = sets?.length ? "시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -10061,7 +10061,7 @@ function renderGrammarPractice() {
   applyDisplayTextSize(sentence);
   feedback.textContent = "";
   explanation.textContent = "";
-  nextButton.textContent = currentSessionIndex >= questionCount - 1 ? "결과 보기" : "다음 문제 보기";
+  nextButton.textContent = currentSessionIndex >= questionCount - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
   nextButton.disabled = true;
   delete optionsContainer.dataset.answered;
 
@@ -10107,7 +10107,7 @@ function handleGrammarPracticeAnswer(index) {
     : "";
   document.getElementById("grammar-practice-explanation").textContent = "";
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
+    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
     nextButton.disabled = false;
   }
   const optionsContainer = document.getElementById("grammar-practice-options");
@@ -10145,7 +10145,7 @@ function handleGrammarPracticeTimeout() {
   document.getElementById("grammar-practice-feedback").textContent = "";
   document.getElementById("grammar-practice-explanation").textContent = "";
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 문제 보기";
+    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
     nextButton.disabled = false;
   }
   if (document.getElementById("grammar-practice-options")) {
@@ -10468,13 +10468,13 @@ function legacyFinalizeQuizQuestion(question, selectedOption, correct) {
 
   if (feedback) {
     feedback.textContent = lastQuestion
-      ? `${getQuizFeedbackText(question, correct, selectedOption || "시간 초과")} 마지막 문제예요. 결과 보러 가볼까요?`
+      ? `${getQuizFeedbackText(question, correct, selectedOption || "시간 초과")} 마지막 문제예요. 결과 볼까요?`
       : getQuizFeedbackText(question, correct, selectedOption || "시간 초과");
   }
 
   legacyRevealQuizAnswer(question, selectedOption, correct);
   setQuizActionState({
-    nextLabel: lastQuestion ? "결과 보러 갈까요?" : "다음 문제 볼까요?",
+    nextLabel: lastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?",
     nextDisabled: false,
     nextHidden: false,
     restartHidden: false
@@ -10549,7 +10549,7 @@ function renderQuiz() {
   setQuizActionState({
     nextLabel:
       state.quizIndex >= activeQuizQuestions.length - 1
-        ? "결과 보러 갈까요?"
+        ? "결과 볼까요?"
         : "다음 문제 볼까요?",
     nextDisabled: true,
     nextHidden: false,
@@ -10602,7 +10602,7 @@ function finalizeQuizQuestion(question, selectedOptionOrIndex, correct) {
 
   revealQuizAnswer(question, selectedOptionOrIndex, correct);
   setQuizActionState({
-    nextLabel: lastQuestion ? "결과 확인" : "다음 문제 풀이",
+    nextLabel: lastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?",
     nextDisabled: false,
     nextHidden: false,
     restartHidden: false
@@ -10983,7 +10983,7 @@ function renderReadingPractice() {
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
     empty.textContent = sets.length
-      ? "준비됐다면 시작해볼까요?"
+      ? "시작해볼까요?"
       : "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
     practiceView.hidden = true;
     resultView.hidden = true;
@@ -11033,7 +11033,7 @@ function renderReadingPractice() {
   question.textContent = softenVisibleKoreanCopy(current.question);
   feedback.textContent = "";
   explanation.textContent = "";
-  nextButton.textContent = currentSessionIndex >= questionCount - 1 ? "결과 보기" : "다음 글 보기";
+  nextButton.textContent = currentSessionIndex >= questionCount - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
   nextButton.disabled = true;
   delete optionsContainer.dataset.answered;
 
@@ -11084,7 +11084,7 @@ function handleReadingAnswer(index) {
     : "";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 글 보기";
+    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
     nextButton.disabled = false;
   }
   const optionsContainer = document.getElementById("reading-options");
@@ -11123,7 +11123,7 @@ function handleReadingTimeout() {
   document.getElementById("reading-feedback").textContent = "";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 보기" : "다음 글 보기";
+    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
     nextButton.disabled = false;
   }
   if (document.getElementById("reading-options")) {

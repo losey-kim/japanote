@@ -458,7 +458,7 @@
     }
 
     const actionLabel =
-      typeof getActionLabel === "function" ? getActionLabel(allSaved) : allSaved ? "전체 빼기" : "전체 담기";
+      typeof getActionLabel === "function" ? getActionLabel(allSaved) : allSaved ? "다시 보기 해제" : "다시 보기로 표시";
     const actionTitle =
       typeof getActionTitle === "function" ? getActionTitle({ count, allSaved }) : "";
 
@@ -1176,7 +1176,7 @@
     hasStarted,
     showResults,
     isReady,
-    emptyReadyText = "준비됐다면 시작해볼까요?",
+    emptyReadyText = "시작해볼까요?",
     emptyUnavailableText = "준비 중이에요.",
     renderSettings,
     renderActionCopy,

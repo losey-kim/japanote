@@ -44,7 +44,7 @@ const kanjiMatchReadyStateText =
   typeof matchCopy.getReadyStateText === "function"
     ? matchCopy.getReadyStateText()
     : {
-        ready: "준비되면 시작해볼까요?",
+        ready: "시작해볼까요?",
         unavailable: "지금은 준비 중이에요."
       };
 
@@ -496,7 +496,7 @@ function renderKanjiMatchBulkActionButtons(results) {
       count: uniqueIds.length,
       allSaved,
       datasetKey: "kanjiMatchBulkAction",
-      getActionLabel: () => allSaved ? "다시 보기 해제" : "모두 다시 보기",
+      getActionLabel: () => allSaved ? "다시 보기 해제" : "다시 보기로 표시",
       getActionTitle: ({ count, allSaved: savedState }) =>
         count === 0
           ? "지금 표시 중인 한자가 없어요."
@@ -516,7 +516,7 @@ function renderKanjiMatchBulkActionButtons(results) {
       count: uniqueIds.length,
       allSaved: allMastered,
       datasetKey: "kanjiMatchMasteredBulkAction",
-      getActionLabel: () => allMastered ? "익힘 해제" : "모두 익히기",
+      getActionLabel: () => allMastered ? "익힘 해제" : "익힘으로 표시",
       getActionTitle: ({ count, allSaved: savedState }) =>
         count === 0
           ? "지금 표시 중인 한자가 없어요."

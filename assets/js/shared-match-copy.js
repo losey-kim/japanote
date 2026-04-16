@@ -18,7 +18,7 @@ globalThis.japanoteMatchCopy = {
     return (Array.isArray(items) ? items : []).filter(Boolean).join(" · ");
   },
   getBulkActionLabel(allSaved) {
-    return allSaved ? "전체 빼기" : "전체 담기";
+    return allSaved ? "다시 보기 해제" : "다시 보기로 표시";
   },
   getBulkActionTitle({ count, itemLabel, allSaved }) {
     const label = itemLabel || "항목";
@@ -32,7 +32,7 @@ globalThis.japanoteMatchCopy = {
       : `지금 보이는 ${label}를 다시 볼래요 목록에 모두 담아요.`;
   },
   getSavedActionLabel(saved) {
-    return saved ? "다시 볼래요에서 빼기" : "다시 볼래요에 담기";
+    return saved ? "다시 보기 해제" : "다시 보기로 표시";
   },
   getActionButtonText(isResetState) {
     return {
@@ -42,7 +42,7 @@ globalThis.japanoteMatchCopy = {
   },
   getReadyStateText() {
     return {
-      ready: "준비되면 시작해볼까요?",
+      ready: "시작해볼까요?",
       unavailable: "지금은 준비 중이에요."
     };
   },

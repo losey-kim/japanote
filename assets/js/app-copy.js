@@ -55,6 +55,17 @@
         title: "한자 짝 맞추기로 가볍게 복습해봐요",
         description: "한자와 뜻, 읽기를 연결하면서 다시 익혀봐요."
       }
+    },
+    buttons: {
+      start: "시작해볼까요?",
+      restart: "다시 해볼까요?",
+      nextQuestion: "다음 문제 볼까요?",
+      nextPassage: "다음 글 볼까요?",
+      result: "결과 볼까요?",
+      reviewSave: "다시 보기로 표시",
+      reviewRemove: "다시 보기 해제",
+      masteredSave: "익힘으로 표시",
+      masteredRemove: "익힘 해제"
     }
   };
 })(window);

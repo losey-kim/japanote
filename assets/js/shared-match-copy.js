@@ -27,9 +27,7 @@ globalThis.japanoteMatchCopy = {
       return `지금 담을 ${label}가 없어요.`;
     }
 
-    return allSaved
-      ? `지금 보이는 ${label}를 다시 볼래요 목록에서 모두 빼요.`
-      : `지금 보이는 ${label}를 다시 볼래요 목록에 모두 담아요.`;
+    return allSaved ? "다시 보기 해제" : "다시 보기로 표시";
   },
   getSavedActionLabel(saved) {
     return saved ? "다시 보기 해제" : "다시 보기로 표시";

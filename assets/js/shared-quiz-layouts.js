@@ -1885,7 +1885,7 @@
         explanationId: "reading-explanation",
         pauseButtonId: "reading-pause",
         nextButtonId: "reading-next",
-        nextButtonLabel: "다음 문제 볼까요?"
+        nextButtonLabel: "다음 글 볼까요?"
       })
     });
   }

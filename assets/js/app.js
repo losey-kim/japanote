@@ -1645,12 +1645,30 @@ const japanoteCopyFallback = {
       title: "한자 짝 맞추기로 가볍게 복습해봐요",
       description: "한자와 뜻, 읽기를 연결하면서 다시 익혀봐요."
     }
+  },
+  buttons: {
+    start: "시작해볼까요?",
+    restart: "다시 해볼까요?",
+    nextQuestion: "다음 문제 볼까요?",
+    nextPassage: "다음 글 볼까요?",
+    result: "결과 볼까요?",
+    reviewSave: "다시 보기로 표시",
+    reviewRemove: "다시 보기 해제",
+    masteredSave: "익힘으로 표시",
+    masteredRemove: "익힘 해제"
   }
 };
 
 function getJapanoteCopy() {
   const fromGlobal = globalThis.japanoteCopy;
   return fromGlobal && typeof fromGlobal === "object" ? fromGlobal : japanoteCopyFallback;
+}
+
+function getJapanoteButtonLabel(key) {
+  const fallback = japanoteCopyFallback.buttons || {};
+  const from = getJapanoteCopy().buttons;
+  const value = from?.[key] ?? fallback[key];
+  return typeof value === "string" && value.length > 0 ? value : "";
 }
 
 function resolveHeadingNode(node, fallback) {
@@ -2023,7 +2041,7 @@ function renderKanaQuizSheet() {
   options.hidden = false;
   next.disabled = true;
   next.textContent =
-    current.index + 1 >= current.total ? "결과 볼까요?" : "다음 문제 볼까요?";
+    current.index + 1 >= current.total ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
 
   options.innerHTML = "";
   current.item.options.forEach((option, optionIndex) => {
@@ -5983,8 +6001,8 @@ function renderKanjiPracticeBulkActionButtons(results) {
     datasetKey: "kanjiPracticeBulkAction",
     saveActionValue: "save-review",
     removeActionValue: "remove-review",
-    saveLabel: "다시 보기로 표시",
-    removeLabel: "다시 보기 해제",
+    saveLabel: getJapanoteButtonLabel("reviewSave"),
+    removeLabel: getJapanoteButtonLabel("reviewRemove"),
     emptyTitle: "지금 표시 중인 한자가 없어요.",
     saveTitle: "지금 보이는 한자를 모두 다시 볼 항목으로 표시해요.",
     removeTitle: "지금 보이는 한자의 다시 보기 표시를 모두 해제해요."
@@ -5999,8 +6017,8 @@ function renderKanjiPracticeBulkActionButtons(results) {
     datasetKey: "kanjiPracticeMasteredBulkAction",
     saveActionValue: "save-mastered",
     removeActionValue: "remove-mastered",
-    saveLabel: "익힘으로 표시",
-    removeLabel: "익힘 해제",
+    saveLabel: getJapanoteButtonLabel("masteredSave"),
+    removeLabel: getJapanoteButtonLabel("masteredRemove"),
     emptyTitle: "지금 표시 중인 한자가 없어요.",
     saveTitle: "지금 보이는 한자를 모두 익힘으로 표시해요.",
     removeTitle: "지금 보이는 한자의 익힘 표시를 모두 해제해요.",
@@ -6026,8 +6044,8 @@ function renderKanjiPracticeBulkActionButton(results) {
     datasetKey: "kanjiPracticeBulkAction",
     saveActionValue: "save-review",
     removeActionValue: "remove-review",
-    saveLabel: "다시 보기로 표시",
-    removeLabel: "다시 보기 해제",
+    saveLabel: getJapanoteButtonLabel("reviewSave"),
+    removeLabel: getJapanoteButtonLabel("reviewRemove"),
     emptyTitle: "지금은 담을 한자가 없어요.",
     saveTitle: "지금 보이는 한자를 다시 볼래요에 모두 담을게요.",
     removeTitle: "지금 보이는 한자를 다시 볼래요에서 모두 뺄게요."
@@ -6381,7 +6399,7 @@ function renderRestartableActionButton(button, label, isStarted, canStart) {
   }
 
   if (label) {
-    label.textContent = isStarted ? "다시 해볼까요?" : "시작해볼까요?";
+    label.textContent = isStarted ? getJapanoteButtonLabel("restart") : getJapanoteButtonLabel("start");
   }
 
   setActionButtonIcon(button, isStarted ? "autorenew" : "play_arrow");
@@ -6831,11 +6849,7 @@ function renderResultBulkActionButton({
   const uniqueIds = getUniqueStudyResultIds(results, getId);
   const allSaved = uniqueIds.length > 0 && uniqueIds.every((id) => isSaved(id));
   const actionTitle =
-    uniqueIds.length === 0
-      ? emptyTitle
-      : allSaved
-        ? removeTitle
-        : saveTitle;
+    uniqueIds.length === 0 ? emptyTitle : allSaved ? removeLabel : saveLabel;
 
   button.disabled = uniqueIds.length === 0;
   button.dataset[datasetKey] = allSaved ? removeActionValue : saveActionValue;
@@ -7066,7 +7080,7 @@ function renderKanjiPracticeResults() {
             {
               itemId: item.id,
               selected: reviewSelected,
-              actionLabel: reviewSelected ? "다시 보기 해제" : "다시 보기로 표시",
+              actionLabel: reviewSelected ? getJapanoteButtonLabel("reviewRemove") : getJapanoteButtonLabel("reviewSave"),
               datasetName: "kanjiResultReview",
               defaultIcon: "bookmark_add",
               selectedIcon: "delete",
@@ -7075,7 +7089,7 @@ function renderKanjiPracticeResults() {
             {
               itemId: item.id,
               selected: masteredSelected,
-              actionLabel: masteredSelected ? "익힘 해제" : "익힘으로 표시",
+              actionLabel: masteredSelected ? getJapanoteButtonLabel("masteredRemove") : getJapanoteButtonLabel("masteredSave"),
               datasetName: "kanjiResultMastered",
               defaultIcon: "check_circle",
               selectedIcon: "task_alt",
@@ -7201,7 +7215,7 @@ function renderKanjiPractice() {
 
   card.className = `basic-practice-card kanji-practice-card ${current.tone || "tone-gold"}`;
   nextButton.textContent =
-    state.basicPracticeIndexes.kanji >= questionCount - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
+    state.basicPracticeIndexes.kanji >= questionCount - 1 ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
   nextButton.disabled = true;
 
   delete optionsContainer.dataset.answered;
@@ -7510,7 +7524,7 @@ function renderKanjiPageLayout() {
     setQuizSessionDuration("kanjiPractice", getKanjiPracticeQuizDuration());
     if (empty) {
       empty.textContent = getKanjiPracticeQuestionCount() > 0
-        ? "시작해볼까요?"
+        ? getJapanoteButtonLabel("start")
         : getKanjiEmptyMessage();
     }
     setElementHidden(empty, false);
@@ -7592,7 +7606,7 @@ function handleKanjiPracticeAnswer(index) {
   renderStats();
 
   nextButton.textContent =
-    kanjiPracticeState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 문제 볼까요?";
+    kanjiPracticeState.results.length >= totalQuestions ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
   nextButton.disabled = false;
 }
 
@@ -7622,7 +7636,7 @@ function handleKanjiPracticeTimeout() {
   saveState();
   renderStats();
   nextButton.textContent =
-    kanjiPracticeState.results.length >= totalQuestions ? "결과 볼까요?" : "다음 문제 볼까요?";
+    kanjiPracticeState.results.length >= totalQuestions ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
   nextButton.disabled = false;
 }
 
@@ -8327,8 +8341,8 @@ function renderVocabQuizBulkActionButtons(results) {
     getId: (item) => item.id,
     isSaved: isWordSavedToReviewList,
     datasetKey: "vocabQuizBulkAction",
-    saveLabel: "다시 보기로 표시",
-    removeLabel: "다시 보기 해제",
+    saveLabel: getJapanoteButtonLabel("reviewSave"),
+    removeLabel: getJapanoteButtonLabel("reviewRemove"),
     emptyTitle: "지금 표시 중인 단어가 없어요.",
     saveTitle: "지금 보이는 단어를 모두 다시 볼 항목으로 표시해요.",
     removeTitle: "지금 보이는 단어의 다시 보기 표시를 모두 해제해요."
@@ -8343,8 +8357,8 @@ function renderVocabQuizBulkActionButtons(results) {
     datasetKey: "vocabQuizMasteredBulkAction",
     saveActionValue: "save-mastered",
     removeActionValue: "remove-mastered",
-    saveLabel: "익힘으로 표시",
-    removeLabel: "익힘 해제",
+    saveLabel: getJapanoteButtonLabel("masteredSave"),
+    removeLabel: getJapanoteButtonLabel("masteredRemove"),
     emptyTitle: "지금 표시 중인 단어가 없어요.",
     saveTitle: "지금 보이는 단어를 모두 익힘으로 표시해요.",
     removeTitle: "지금 보이는 단어의 익힘 표시를 모두 해제해요.",
@@ -8406,7 +8420,7 @@ function renderVocabQuizResults() {
             {
               itemId: item.id,
               selected: reviewSelected,
-              actionLabel: reviewSelected ? "다시 보기 해제" : "다시 보기로 표시",
+              actionLabel: reviewSelected ? getJapanoteButtonLabel("reviewRemove") : getJapanoteButtonLabel("reviewSave"),
               datasetName: "vocabQuizReview",
               defaultIcon: "bookmark_add",
               selectedIcon: "delete",
@@ -8415,7 +8429,7 @@ function renderVocabQuizResults() {
             {
               itemId: item.id,
               selected: masteredSelected,
-              actionLabel: masteredSelected ? "익힘 해제" : "익힘으로 표시",
+              actionLabel: masteredSelected ? getJapanoteButtonLabel("masteredRemove") : getJapanoteButtonLabel("masteredSave"),
               datasetName: "vocabQuizMastered",
               defaultIcon: "check_circle",
               selectedIcon: "task_alt",
@@ -8466,7 +8480,7 @@ function finalizeVocabQuizQuestion(selectedIndex, timedOut = false) {
   explanation.textContent = softenExplanationCopy(question.explanation || "");
   nextButton.disabled = false;
   nextButton.hidden = false;
-  nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
+  nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
 
   updateStudyStreak();
   saveState();
@@ -8946,14 +8960,14 @@ function renderVocabQuiz() {
     resultView.hidden = true;
     empty.hidden = false;
     empty.textContent = canStart
-      ? "시작해볼까요?"
+      ? getJapanoteButtonLabel("start")
       : getVocabQuizEmptyText(items);
     card.hidden = true;
     progress.textContent = `0 / ${getVocabQuizCount()}`;
     restart.classList.add("primary-btn");
     restart.classList.remove("secondary-btn");
     restart.disabled = !canStart;
-    restartLabel.textContent = "시작해볼까요?";
+    restartLabel.textContent = getJapanoteButtonLabel("start");
     setActionButtonIcon(restart, "play_arrow");
     next.hidden = true;
     next.disabled = true;
@@ -8978,7 +8992,7 @@ function renderVocabQuiz() {
     restart.disabled = false;
     next.hidden = true;
     next.disabled = false;
-    restartLabel.textContent = "다시 해볼까요?";
+    restartLabel.textContent = getJapanoteButtonLabel("restart");
     setActionButtonIcon(restart, "autorenew");
     renderVocabQuizResults();
     return;
@@ -8999,7 +9013,7 @@ function renderVocabQuiz() {
     restart.classList.add("primary-btn");
     restart.classList.remove("secondary-btn");
     restart.disabled = !canStart;
-    restartLabel.textContent = "시작해볼까요?";
+    restartLabel.textContent = getJapanoteButtonLabel("start");
     setActionButtonIcon(restart, "play_arrow");
     state.vocabQuizStarted = false;
     renderQuizSessionHud("vocab");
@@ -9015,7 +9029,7 @@ function renderVocabQuiz() {
   restart.classList.add("secondary-btn");
   restart.classList.remove("primary-btn");
   restart.disabled = false;
-  restartLabel.textContent = "다시 해볼까요?";
+  restartLabel.textContent = getJapanoteButtonLabel("restart");
   setActionButtonIcon(restart, "autorenew");
 
   if (state.vocabQuizFinished) {
@@ -9028,7 +9042,7 @@ function renderVocabQuiz() {
     progress.textContent = `${total} / ${total}`;
     next.hidden = true;
     next.disabled = false;
-    restartLabel.textContent = "다시 해볼까요?";
+    restartLabel.textContent = getJapanoteButtonLabel("restart");
     setActionButtonIcon(restart, "autorenew");
     renderVocabQuizResults();
     return;
@@ -9048,7 +9062,7 @@ function renderVocabQuiz() {
   next.hidden = false;
   next.disabled = true;
   next.textContent =
-    state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
+    state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1 ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
 
   renderChoiceOptionButtons({
     container: options,
@@ -9323,8 +9337,8 @@ function renderGrammarPracticeBulkActionButtons(results) {
     isSaved: isGrammarSavedToReviewList,
     datasetKey: "grammarPracticeBulkAction",
     removeActionValue: "remove-review",
-    saveLabel: "다시 보기로 표시",
-    removeLabel: "다시 보기 해제",
+    saveLabel: getJapanoteButtonLabel("reviewSave"),
+    removeLabel: getJapanoteButtonLabel("reviewRemove"),
     emptyTitle: "지금 표시 중인 문법이 없어요.",
     saveTitle: "지금 보이는 문법을 모두 다시 볼 항목으로 표시해요.",
     removeTitle: "지금 보이는 문법의 다시 보기 표시를 모두 해제해요."
@@ -9339,8 +9353,8 @@ function renderGrammarPracticeBulkActionButtons(results) {
     datasetKey: "grammarPracticeMasteredBulkAction",
     saveActionValue: "save-mastered",
     removeActionValue: "remove-mastered",
-    saveLabel: "익힘으로 표시",
-    removeLabel: "익힘 해제",
+    saveLabel: getJapanoteButtonLabel("masteredSave"),
+    removeLabel: getJapanoteButtonLabel("masteredRemove"),
     emptyTitle: "지금 표시 중인 문법이 없어요.",
     saveTitle: "지금 보이는 문법을 모두 익힘으로 표시해요.",
     removeTitle: "지금 보이는 문법의 익힘 표시를 모두 해제해요.",
@@ -9931,7 +9945,7 @@ function renderGrammarPracticeResults() {
             {
               itemId: item.id,
               selected: reviewSelected,
-              actionLabel: reviewSelected ? "다시 보기 해제" : "다시 보기로 표시",
+              actionLabel: reviewSelected ? getJapanoteButtonLabel("reviewRemove") : getJapanoteButtonLabel("reviewSave"),
               datasetName: "grammarPracticeReview",
               defaultIcon: "bookmark_add",
               selectedIcon: "delete",
@@ -9940,7 +9954,7 @@ function renderGrammarPracticeResults() {
             {
               itemId: item.id,
               selected: masteredSelected,
-              actionLabel: masteredSelected ? "익힘 해제" : "익힘으로 표시",
+              actionLabel: masteredSelected ? getJapanoteButtonLabel("masteredRemove") : getJapanoteButtonLabel("masteredSave"),
               datasetName: "grammarPracticeMastered",
               defaultIcon: "check_circle",
               selectedIcon: "task_alt",
@@ -10012,7 +10026,7 @@ function renderGrammarPractice() {
     empty.hidden = false;
     practiceView.hidden = true;
     resultView.hidden = true;
-    empty.textContent = sets?.length ? "시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
+    empty.textContent = sets?.length ? getJapanoteButtonLabel("start") : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -10046,7 +10060,7 @@ function renderGrammarPractice() {
     empty.hidden = false;
     practiceView.hidden = true;
     resultView.hidden = true;
-    empty.textContent = sets?.length ? "시작해볼까요?" : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
+    empty.textContent = sets?.length ? getJapanoteButtonLabel("start") : getGrammarEmptyMessage(getGrammarFilter(), activeLevel);
     renderQuizSessionHud("grammar");
     return;
   }
@@ -10061,7 +10075,7 @@ function renderGrammarPractice() {
   applyDisplayTextSize(sentence);
   feedback.textContent = "";
   explanation.textContent = "";
-  nextButton.textContent = currentSessionIndex >= questionCount - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
+  nextButton.textContent = currentSessionIndex >= questionCount - 1 ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
   nextButton.disabled = true;
   delete optionsContainer.dataset.answered;
 
@@ -10107,7 +10121,7 @@ function handleGrammarPracticeAnswer(index) {
     : "";
   document.getElementById("grammar-practice-explanation").textContent = "";
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
+    nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
     nextButton.disabled = false;
   }
   const optionsContainer = document.getElementById("grammar-practice-options");
@@ -10145,7 +10159,7 @@ function handleGrammarPracticeTimeout() {
   document.getElementById("grammar-practice-feedback").textContent = "";
   document.getElementById("grammar-practice-explanation").textContent = "";
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
+    nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
     nextButton.disabled = false;
   }
   if (document.getElementById("grammar-practice-options")) {
@@ -10468,13 +10482,13 @@ function legacyFinalizeQuizQuestion(question, selectedOption, correct) {
 
   if (feedback) {
     feedback.textContent = lastQuestion
-      ? `${getQuizFeedbackText(question, correct, selectedOption || "시간 초과")} 마지막 문제예요. 결과 볼까요?`
+      ? `${getQuizFeedbackText(question, correct, selectedOption || "시간 초과")} 마지막 문제예요. ${getJapanoteButtonLabel("result")}`
       : getQuizFeedbackText(question, correct, selectedOption || "시간 초과");
   }
 
   legacyRevealQuizAnswer(question, selectedOption, correct);
   setQuizActionState({
-    nextLabel: lastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?",
+    nextLabel: lastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion"),
     nextDisabled: false,
     nextHidden: false,
     restartHidden: false
@@ -10510,7 +10524,7 @@ function renderQuiz() {
     optionsContainer.innerHTML = "";
     optionsContainer.hidden = true;
     setQuizActionState({
-      nextLabel: "다음 문제 볼까요?",
+      nextLabel: getJapanoteButtonLabel("nextQuestion"),
       nextDisabled: true,
       nextHidden: true,
       restartHidden: false
@@ -10549,8 +10563,8 @@ function renderQuiz() {
   setQuizActionState({
     nextLabel:
       state.quizIndex >= activeQuizQuestions.length - 1
-        ? "결과 볼까요?"
-        : "다음 문제 볼까요?",
+        ? getJapanoteButtonLabel("result")
+        : getJapanoteButtonLabel("nextQuestion"),
     nextDisabled: true,
     nextHidden: false,
     restartHidden: false
@@ -10602,7 +10616,7 @@ function finalizeQuizQuestion(question, selectedOptionOrIndex, correct) {
 
   revealQuizAnswer(question, selectedOptionOrIndex, correct);
   setQuizActionState({
-    nextLabel: lastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?",
+    nextLabel: lastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion"),
     nextDisabled: false,
     nextHidden: false,
     restartHidden: false
@@ -10983,7 +10997,7 @@ function renderReadingPractice() {
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
     empty.textContent = sets.length
-      ? "시작해볼까요?"
+      ? getJapanoteButtonLabel("start")
       : "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
     practiceView.hidden = true;
     resultView.hidden = true;
@@ -11033,7 +11047,10 @@ function renderReadingPractice() {
   question.textContent = softenVisibleKoreanCopy(current.question);
   feedback.textContent = "";
   explanation.textContent = "";
-  nextButton.textContent = currentSessionIndex >= questionCount - 1 ? "결과 볼까요?" : "다음 문제 볼까요?";
+  nextButton.textContent =
+    currentSessionIndex >= questionCount - 1
+      ? getJapanoteButtonLabel("result")
+      : getJapanoteButtonLabel("nextPassage");
   nextButton.disabled = true;
   delete optionsContainer.dataset.answered;
 
@@ -11084,7 +11101,7 @@ function handleReadingAnswer(index) {
     : "";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
+    nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextPassage");
     nextButton.disabled = false;
   }
   const optionsContainer = document.getElementById("reading-options");
@@ -11123,7 +11140,7 @@ function handleReadingTimeout() {
   document.getElementById("reading-feedback").textContent = "";
   document.getElementById("reading-explanation").textContent = softenExplanationCopy(current.explanation);
   if (nextButton) {
-    nextButton.textContent = isLastQuestion ? "결과 볼까요?" : "다음 문제 볼까요?";
+    nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextPassage");
     nextButton.disabled = false;
   }
   if (document.getElementById("reading-options")) {

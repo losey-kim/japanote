@@ -396,7 +396,7 @@
         datasetKey: "grammarMatchBulkAction",
         getActionLabel: () => allSaved ? "다시 보기 해제" : "다시 보기로 표시",
         getActionTitle: ({ count, allSaved: savedState }) =>
-          count === 0 ? "지금 표시 중인 문법이 없어요." : savedState ? "지금 보이는 문법의 다시 보기 표시를 모두 해제해요." : "지금 보이는 문법을 모두 다시 볼 항목으로 표시해요."
+          count === 0 ? "지금 표시 중인 문법이 없어요." : savedState ? "다시 보기 해제" : "다시 보기로 표시"
       });
     }
 
@@ -411,7 +411,7 @@
         datasetKey: "grammarMatchMasteredBulkAction",
         getActionLabel: () => allMastered ? "익힘 해제" : "익힘으로 표시",
         getActionTitle: ({ count, allSaved: savedState }) =>
-          count === 0 ? "지금 표시 중인 문법이 없어요." : savedState ? "지금 보이는 문법의 익힘 표시를 모두 해제해요." : "지금 보이는 문법을 모두 익힘으로 표시해요."
+          count === 0 ? "지금 표시 중인 문법이 없어요." : savedState ? "익힘 해제" : "익힘으로 표시"
       });
       masteredActionIcon.textContent = allMastered ? "remove_done" : "check_circle";
     }

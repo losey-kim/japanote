@@ -1,11 +1,5 @@
 (function loadJapanotePageScripts(global) {
-  /*
-   * Phase 1 split scaffold (app-state.js, app-quiz-common.js, app-vocab.js, app-core.js) was
-   * briefly loaded after app-copy.js; it duplicated globals still defined in app.js and risked
-   * runtime conflicts. Those entries are removed until app.js is actually split — then re-add
-   * them in this order after app-copy.js: app-state → app-quiz-common → app-vocab → app-core → app.
-   */
-  const assetVersion = "20260417t";
+  const assetVersion = "20260418t";
   const pageName = (() => {
     const path = global.location?.pathname || "";
     const segments = path.split("/").filter(Boolean);
@@ -19,6 +13,10 @@
       "assets/js/app-study-view-helpers.js?v=444dc3dc",
       "assets/js/shared-timer.js?v=a53be2de",
       "assets/js/app-copy.js?v=33a15021",
+      "assets/js/app-state.js",
+      "assets/js/app-quiz-common.js",
+      "assets/js/app-vocab.js",
+      "assets/js/app-core.js",
       "assets/js/app.js?v=33a15021"
     ],
     "grammar.html": [
@@ -32,6 +30,10 @@
       "assets/js/shared-match-game.js?v=2c46766b",
       "assets/js/challenge-links.js?v=02833806",
       "assets/js/app-copy.js?v=33a15021",
+      "assets/js/app-state.js",
+      "assets/js/app-quiz-common.js",
+      "assets/js/app-vocab.js",
+      "assets/js/app-core.js",
       "assets/js/app.js?v=33a15021",
       "assets/js/grammar-match-game.js?v=4087c18c",
       "assets/js/share-result.js?v=441dcdce"
@@ -47,6 +49,10 @@
       "assets/js/shared-match-game.js?v=2c46766b",
       "assets/js/challenge-links.js?v=02833806",
       "assets/js/app-copy.js?v=33a15021",
+      "assets/js/app-state.js",
+      "assets/js/app-quiz-common.js",
+      "assets/js/app-vocab.js",
+      "assets/js/app-core.js",
       "assets/js/app.js?v=33a15021",
       "assets/js/share-result.js?v=441dcdce"
     ],
@@ -63,6 +69,10 @@
       "assets/js/app-study-view-helpers.js?v=444dc3dc",
       "assets/js/challenge-links.js?v=02833806",
       "assets/js/app-copy.js?v=33a15021",
+      "assets/js/app-state.js",
+      "assets/js/app-quiz-common.js",
+      "assets/js/app-vocab.js",
+      "assets/js/app-core.js",
       "assets/js/app.js?v=33a15021",
       "assets/js/match-game.js?v=3f2e2e22",
       "assets/js/share-result.js?v=441dcdce",
@@ -81,6 +91,10 @@
       "assets/js/app-study-view-helpers.js?v=444dc3dc",
       "assets/js/challenge-links.js?v=02833806",
       "assets/js/app-copy.js?v=33a15021",
+      "assets/js/app-state.js",
+      "assets/js/app-quiz-common.js",
+      "assets/js/app-vocab.js",
+      "assets/js/app-core.js",
       "assets/js/app.js?v=33a15021",
       "assets/js/kanji-match-game.js?v=74bea83e",
       "assets/js/share-result.js?v=441dcdce"
@@ -95,6 +109,10 @@
       "assets/js/shared-timer.js?v=a53be2de",
       "assets/js/challenge-links.js?v=02833806",
       "assets/js/app-copy.js?v=33a15021",
+      "assets/js/app-state.js",
+      "assets/js/app-quiz-common.js",
+      "assets/js/app-vocab.js",
+      "assets/js/app-core.js",
       "assets/js/app.js?v=33a15021",
       "assets/js/share-result.js?v=441dcdce"
     ]

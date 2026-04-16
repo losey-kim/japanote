@@ -1554,6 +1554,18 @@ const kanaQuizResultFilterLabels = {
   wrong: "오답"
 };
 
+function getStudyPracticeResultEmptyMessage(activeFilter) {
+  if (activeFilter === "correct") {
+    return "아직 정답 결과가 없어요. 문제를 더 풀어볼까요?";
+  }
+
+  if (activeFilter === "wrong") {
+    return "지금은 오답이 없어요. 이 흐름 좋네요.";
+  }
+
+  return "아직 결과가 없어요. 문제를 풀고 다시 확인해봐요.";
+}
+
 function getKanaQuizModeLabel(mode) {
   if (mode === "random") {
     return "랜덤";
@@ -1801,7 +1813,7 @@ function renderKanaQuizResults() {
 
   if (!filteredResults.length) {
     empty.hidden = false;
-    empty.textContent = `${kanaQuizResultFilterLabels[getKanaQuizResultFilter(kanaQuizSheetState.resultFilter)]} 결과는 아직 없어요.`;
+    empty.textContent = getStudyPracticeResultEmptyMessage(getKanaQuizResultFilter(kanaQuizSheetState.resultFilter));
     list.innerHTML = "";
     return;
   }
@@ -5882,21 +5894,20 @@ function getKanjiPracticeOptionsSummaryText() {
 
 function getKanjiEmptyMessage(collectionFilter = state?.kanjiCollectionFilter, grade = state?.kanjiGrade) {
   const activeCollectionFilter = getKanjiCollectionFilter(collectionFilter);
-  const activeGrade = getKanjiGrade(grade);
 
   if (activeCollectionFilter === "review") {
-    return activeGrade === allLevelValue ? "다시 볼래요 한자가 아직 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 다시 볼래요 한자가 아직 없어요.`;
+    return "다시 볼 한자가 아직 없어요. 표시해두면 여기서 모아 볼 수 있어요.";
   }
 
   if (activeCollectionFilter === "mastered") {
-    return activeGrade === allLevelValue ? "익혔어요 한자가 아직 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 익혔어요 한자가 아직 없어요.`;
+    return "익힌 한자가 아직 없어요. 익혔어요를 눌러두면 여기 모여요.";
   }
 
   if (activeCollectionFilter === "unmarked") {
-    return activeGrade === allLevelValue ? "아직 안 정한 한자가 없어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 아직 안 정한 한자가 없어요.`;
+    return "아직 상태를 정하지 않은 한자는 지금 없어요. 다른 학년으로 바꿔보세요.";
   }
 
-  return activeGrade === allLevelValue ? "한자를 준비하고 있어요." : `${getKanjiGradeSummaryLabel(activeGrade)} 한자를 준비하고 있어요.`;
+  return "지금 보여줄 한자가 없어요. 학년이나 모아보기를 바꿔볼까요?";
 }
 
 function getStudyResultCounts(results) {
@@ -7038,7 +7049,7 @@ function renderKanjiPracticeResults() {
     activeFilter: getKanjiPracticeResultFilter(kanjiPracticeState.resultFilter),
     filterLabels: kanjiPracticeResultFilterLabels,
     renderBulkActionButton: renderKanjiPracticeBulkActionButtons,
-    getEmptyText: ({ activeFilter, filterLabels }) => `${filterLabels[activeFilter]} 결과가 없어요.`,
+    getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
       results.forEach((item) => {
         const saved = isKanjiSavedToReviewList(item.id);
@@ -7261,12 +7272,7 @@ function getKanjiFlashcardPlaceholder() {
     gradeLabel: getKanjiGradeSummaryLabel(),
     display: "漢字",
     statusText: getKanjiEmptyMessage(),
-    readingsDisplay:
-      activeCollectionFilter === "review"
-        ? "다른 학년이나 모아보기로 바꿔보세요."
-        : activeCollectionFilter === "mastered"
-          ? "아직 익힌 한자가 없어요."
-          : "학년별 한자를 차근차근 익혀볼 수 있어요."
+    readingsDisplay: ""
   };
 }
 
@@ -7907,22 +7913,20 @@ function setVocabView(view) {
 
 function getVocabEmptyMessage(filter = state.vocabFilter, part = state.vocabPartFilter) {
   const activeFilter = getVocabFilter(filter);
-  const activePart = getVocabPartFilter(part);
-  const partLabel = activePart === vocabPartAllValue ? "단어" : `${activePart} 단어`;
 
   if (activeFilter === "review") {
-    return `다시 볼 ${partLabel}가 아직 없어요.`;
+    return "다시 볼 단어가 아직 없어요. 카드에서 담아두면 여기서 다시 볼 수 있어요.";
   }
 
   if (activeFilter === "mastered") {
-    return `익힌 ${partLabel}가 아직 없어요.`;
+    return "익힌 단어가 아직 없어요. 익혔어요를 눌러두면 여기 모여요.";
   }
 
   if (activeFilter === "unmarked") {
-    return `아직 안 정한 ${partLabel}가 없어요.`;
+    return "이 상태의 단어는 지금 없어요. 다른 모아보기로 바꿔보세요.";
   }
 
-  return `${partLabel}가 아직 없어요.`;
+  return "아직 보여줄 단어가 없어요. 다른 레벨이나 품사로 바꿔볼까요?";
 }
 
 function filterVocabItems(items, filter = state.vocabFilter, partFilter = state.vocabPartFilter) {
@@ -8167,7 +8171,7 @@ function ensureVocabQuizSession(force = false) {
 
 function getVocabQuizEmptyText(items = getVocabQuizItems()) {
   if (!items.length) {
-    return `${getVocabEmptyMessage()} 퀴즈는 단어가 준비되면 같이 풀어봐요.`;
+    return getVocabEmptyMessage();
   }
 
   if (items.length < 4) {
@@ -8385,7 +8389,7 @@ function renderVocabQuizResults() {
     activeFilter: getVocabQuizResultFilter(),
     filterLabels: vocabQuizResultFilterLabels,
     renderBulkActionButton: renderVocabQuizBulkActionButtons,
-    getEmptyText: ({ activeFilter, filterLabels }) => `${filterLabels[activeFilter]} 결과는 아직 없어요.`,
+    getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
       results.forEach((item) => {
         const saved = isWordSavedToReviewList(item.id);
@@ -8557,11 +8561,10 @@ function renderFlashcard() {
     return;
   }
 
-  const emptyWordLabel = activePart === vocabPartAllValue ? "아직 단어가 없어요" : `아직 ${activePart} 단어가 없어요`;
-  const emptyReadingLabel =
-    activePart === vocabPartAllValue ? "단어가 채워지면 여기서 바로 볼 수 있어요." : `${activePart} 단어가 채워지면 여기서 바로 볼 수 있어요.`;
+  const emptyWordLabel = "아직 보여줄 단어가 없어요.";
+  const emptyReadingLabel = "다른 레벨이나 품사로 바꿔볼까요?";
   const emptyMeaningLabel =
-    activePart === vocabPartAllValue ? "필터를 바꾸면 다른 단어를 먼저 볼 수 있어요." : "다른 품사나 모아보기를 고르면 바로 이어서 볼 수 있어요.";
+    activePart === vocabPartAllValue ? "" : "이 품사로는 지금 맞는 단어가 없어요. 다른 품사도 둘러볼까요?";
   const emptyCardMap = {
     all: {
       level: activeLevel,
@@ -8572,32 +8575,23 @@ function renderFlashcard() {
     },
     review: {
       level: "REVIEW",
-      word: activePart === vocabPartAllValue ? "다시 볼래요 단어가 없어요" : `다시 볼래요 ${activePart} 단어가 없어요`,
-      reading: "조금 더 담아두면 여기서 모아 볼 수 있어요.",
-      meaning:
-        activePart === vocabPartAllValue
-          ? "카드에서 다시 볼래요를 누르면 여기로 모여요."
-          : "다른 품사를 고르거나 상태를 바꾸면 바로 이어서 볼 수 있어요.",
+      word: "다시 볼 단어가 아직 없어요.",
+      reading: "카드에서 담아두면 여기서 다시 볼 수 있어요.",
+      meaning: activePart === vocabPartAllValue ? "" : "다른 품사로 바꿔볼까요?",
       id: "empty-review"
     },
     mastered: {
       level: "MASTERED",
-      word: activePart === vocabPartAllValue ? "익혔어요 단어가 없어요" : `익혔어요 ${activePart} 단어가 없어요`,
-      reading: "아직 담아둔 단어가 없어요.",
-      meaning:
-        activePart === vocabPartAllValue
-          ? "카드에서 익혔어요를 누르면 여기로 모여요."
-          : "선택한 품사에서 익힌 단어가 생기면 여기서 다시 볼 수 있어요.",
+      word: "익힌 단어가 아직 없어요.",
+      reading: "익혔어요를 눌러두면 여기 모여요.",
+      meaning: activePart === vocabPartAllValue ? "" : "이 품사에서 익힌 단어가 생기면 여기로 모여요.",
       id: "empty-mastered"
     },
     unmarked: {
       level: "UNMARKED",
-      word: activePart === vocabPartAllValue ? "아직 안 정한 단어가 없어요" : `아직 안 정한 ${activePart} 단어가 없어요`,
-      reading: "상태를 고르지 않은 단어를 따로 모아 보고 있어요.",
-      meaning:
-        activePart === vocabPartAllValue
-          ? "다시 볼래요나 익혔어요를 누르면 이 목록에서 빠져요."
-          : "다른 품사나 상태를 고르면 바로 다른 카드로 이어집니다.",
+      word: "이 상태의 단어는 지금 없어요.",
+      reading: "다른 모아보기로 바꿔보세요.",
+      meaning: activePart === vocabPartAllValue ? "" : "다른 품사나 레벨도 함께 볼까요?",
       id: "empty-unmarked"
     }
   };
@@ -8616,12 +8610,12 @@ function renderFlashcard() {
           : "지금 상태를 바로 정할 수 있어요"
       : "눌러서 뜻을 확인해볼까요?"
     : activeFilter === "review"
-      ? "다시 볼래요 상태를 담아두면 여기서 모아 볼 수 있어요."
+      ? "카드에서 담아두면 여기서 다시 볼 수 있어요."
       : activeFilter === "mastered"
-        ? "익혔어요 상태를 담아두면 여기서 다시 볼 수 있어요."
+        ? "익혔어요를 눌러두면 여기 모여요."
         : activeFilter === "unmarked"
-          ? "아직 안 정한 단어만 따로 보고 있어요."
-          : "필터를 바꾸면 다른 단어를 먼저 볼 수 있어요.";
+          ? "다른 모아보기로 바꿔볼까요?"
+          : "다른 레벨이나 품사로 바꿔볼까요?";
 
   renderStudyFlashcardComponent({
     flashcard,
@@ -8643,7 +8637,7 @@ function renderFlashcard() {
     hintText,
     toggleOpenLabel: "뜻을 다시 가릴까요?",
     toggleClosedLabel: "뜻을 확인해볼까요?",
-    toggleEmptyLabel: "지금 볼 수 있는 단어가 없어요",
+    toggleEmptyLabel: "다른 레벨이나 품사로 바꿔볼까요?",
     prevDisabled: cards.length <= 1,
     nextDisabled: cards.length <= 1,
     actionButtons: [
@@ -9357,22 +9351,20 @@ function renderGrammarPracticeBulkActionButtons(results) {
 
 function getGrammarEmptyMessage(filter = state?.grammarFilter, level = state?.grammarLevel) {
   const activeFilter = getGrammarFilter(filter);
-  const activeLevel = getGrammarLevel(level);
-  const levelLabel = activeLevel === allLevelValue ? "전체" : activeLevel;
 
   if (activeFilter === "review") {
-    return `${levelLabel} 다시 볼래요 문법이 아직 없어요.`;
+    return "다시 볼 문법이 아직 없어요. 표시해두면 여기서 다시 볼 수 있어요.";
   }
 
   if (activeFilter === "mastered") {
-    return `${levelLabel} 익혔어요 문법이 아직 없어요.`;
+    return "익힌 문법이 아직 없어요. 익혔어요를 눌러두면 여기 모여요.";
   }
 
   if (activeFilter === "unmarked") {
-    return `${levelLabel} 미분류 문법이 아직 없어요.`;
+    return "아직 상태를 정하지 않은 문법은 지금 없어요. 다른 레벨도 같이 볼까요?";
   }
 
-  return `${levelLabel} 문법을 준비하고 있어요.`;
+  return "지금 보여줄 문법이 없어요. 다른 레벨이나 모아보기로 바꿔볼까요?";
 }
 
 function getGrammarSummaryText(count, level = state?.grammarLevel, filter = state?.grammarFilter) {
@@ -9490,7 +9482,7 @@ function getGrammarFlashcardPlaceholder() {
     id: "grammar-empty",
     level: getGrammarLevelLabel(),
     pattern: getGrammarEmptyMessage(),
-    description: "필터를 바꾸거나 저장 상태를 조정하면 다른 문법을 바로 이어서 볼 수 있어요."
+    description: ""
   };
 }
 
@@ -9538,7 +9530,7 @@ function renderGrammarFlashcard() {
           ? "익혔어요에 담긴 문법이에요"
           : "이 문법도 바로 저장 상태를 바꿀 수 있어요"
       : "눌러서 설명을 확인해볼까요?"
-    : "필터를 바꾸면 다른 문법을 바로 이어서 볼 수 있어요";
+    : "다른 레벨이나 모아보기로 바꿔볼까요?";
 
   renderStudyFlashcardComponent({
     flashcard,
@@ -9560,7 +9552,7 @@ function renderGrammarFlashcard() {
     hideReading: true,
     toggleOpenLabel: "설명을 다시 접을까요?",
     toggleClosedLabel: "설명을 확인해볼까요?",
-    toggleEmptyLabel: "지금 볼 수 있는 문법이 없어요",
+    toggleEmptyLabel: "다른 레벨이나 모아보기로 바꿔볼까요?",
     prevDisabled: cards.length <= 1,
     nextDisabled: cards.length <= 1,
     actionButtons: [
@@ -9923,7 +9915,7 @@ function renderGrammarPracticeResults() {
     activeFilter: getGrammarPracticeResultFilter(grammarPracticeState.resultFilter),
     filterLabels: grammarPracticeResultFilterLabels,
     renderBulkActionButton: renderGrammarPracticeBulkActionButtons,
-    getEmptyText: ({ activeFilter, filterLabels }) => `${filterLabels[activeFilter]} 결과가 아직 없어요.`,
+    getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
       results.forEach((item) => {
         const reviewSelected = isGrammarSavedToReviewList(item.id);
@@ -10920,7 +10912,7 @@ function renderReadingPracticeResults() {
     filteredResults,
     activeFilter: getReadingPracticeResultFilter(readingPracticeState.resultFilter),
     filterLabels: readingPracticeResultFilterLabels,
-    getEmptyText: ({ activeFilter, filterLabels }) => `${filterLabels[activeFilter]} 결과가 아직 없어요.`,
+    getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
       results.forEach((item) => {
         sharedResultUi.appendResultItem({
@@ -10992,7 +10984,7 @@ function renderReadingPractice() {
     empty.hidden = false;
     empty.textContent = sets.length
       ? "준비됐다면 시작해볼까요?"
-      : "독해 데이터를 준비하고 있어요.";
+      : "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
     practiceView.hidden = true;
     resultView.hidden = true;
     renderQuizSessionHud("reading");
@@ -11003,7 +10995,7 @@ function renderReadingPractice() {
     stopQuizSessionTimer("reading");
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
-    empty.textContent = "독해 데이터를 준비하고 있어요.";
+    empty.textContent = "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
     practiceView.hidden = true;
     resultView.hidden = true;
     renderQuizSessionHud("reading");
@@ -11026,7 +11018,7 @@ function renderReadingPractice() {
     stopQuizSessionTimer("reading");
     setQuizSessionDuration("reading", state.readingDuration);
     empty.hidden = false;
-    empty.textContent = "독해 데이터를 준비하고 있어요.";
+    empty.textContent = "아직 보여줄 독해가 없어요. 다른 레벨로 바꿔보세요.";
     practiceView.hidden = true;
     resultView.hidden = true;
     renderQuizSessionHud("reading");

@@ -26,20 +26,6 @@
 
   function scheduleRecallAdvance() {
     clearRecallAdvanceTimer();
-    recallAdvanceTimer = global.setTimeout(() => {
-      recallAdvanceTimer = null;
-
-      if (!state?.vocabQuizStarted || state?.vocabQuizFinished !== false) {
-        return;
-      }
-
-      const nextButton = document.getElementById("vocab-quiz-next");
-      if (!nextButton || nextButton.disabled || nextButton.hidden) {
-        return;
-      }
-
-      nextButton.click();
-    }, 450);
   }
 
   function getRecallQuestionKey(question) {

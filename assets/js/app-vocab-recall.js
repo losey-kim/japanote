@@ -5,6 +5,7 @@
   let recallAnswerCommitted = false;
   let recallRetrySessionKey = "";
   let recallRetriedSourceIds = new Set();
+  let recallAdvanceTimer = null;
 
   function getVocabQuizAnswerMode(value = state?.vocabQuizAnswerMode) {
     return ANSWER_MODE_OPTIONS.includes(value) ? value : "choice";
@@ -14,6 +15,31 @@
     return getVocabQuizAnswerMode(value) === "recall"
       ? getVocabRecallCopy("summaryLabel") || getVocabRecallCopy("recallMode")
       : getVocabRecallCopy("choiceMode");
+  }
+
+  function clearRecallAdvanceTimer() {
+    if (recallAdvanceTimer) {
+      global.clearTimeout(recallAdvanceTimer);
+      recallAdvanceTimer = null;
+    }
+  }
+
+  function scheduleRecallAdvance() {
+    clearRecallAdvanceTimer();
+    recallAdvanceTimer = global.setTimeout(() => {
+      recallAdvanceTimer = null;
+
+      if (!state?.vocabQuizStarted || state?.vocabQuizFinished !== false) {
+        return;
+      }
+
+      const nextButton = document.getElementById("vocab-quiz-next");
+      if (!nextButton || nextButton.disabled || nextButton.hidden) {
+        return;
+      }
+
+      nextButton.click();
+    }, 450);
   }
 
   function getRecallQuestionKey(question) {
@@ -40,6 +66,7 @@
     recallQuestionKey = "";
     recallAnswerRevealed = false;
     recallAnswerCommitted = false;
+    clearRecallAdvanceTimer();
   }
 
   function ensureRecallStyles() {
@@ -141,6 +168,7 @@
           return;
         }
 
+        clearRecallAdvanceTimer();
         state.vocabQuizAnswerMode = nextMode;
         saveState();
         renderVocabPage();
@@ -257,6 +285,7 @@
     updateStudyStreak();
     saveState();
     renderStats();
+    scheduleRecallAdvance();
   }
 
   function renderRecallActions(question) {
@@ -360,10 +389,12 @@
       syncRecallSessionState();
 
       if (getVocabQuizAnswerMode() !== "recall") {
+        clearRecallAdvanceTimer();
         return result;
       }
 
       if (!state?.vocabQuizStarted || state?.vocabQuizFinished) {
+        clearRecallAdvanceTimer();
         return result;
       }
 
@@ -371,6 +402,7 @@
       const questionKey = getRecallQuestionKey(question);
 
       if (!question || !questionKey) {
+        clearRecallAdvanceTimer();
         return result;
       }
 
@@ -378,6 +410,7 @@
         recallQuestionKey = questionKey;
         recallAnswerRevealed = false;
         recallAnswerCommitted = false;
+        clearRecallAdvanceTimer();
       }
 
       renderRecallActions(question);

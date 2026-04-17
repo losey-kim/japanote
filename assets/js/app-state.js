@@ -1,7 +1,7 @@
 /* Japanote — persisted UI state (split from app.js, phase 1) */
 const storageKey = "jlpt-compass-state";
 /** Bump when persisted shape changes; used for localStorage + future remote sync migration. */
-const STATE_SCHEMA_VERSION = 3;
+const STATE_SCHEMA_VERSION = 4;
 var state = null;
 function getStudyStateStore() {
   if (globalThis.japanoteSync && typeof globalThis.japanoteSync.readValue === "function") {
@@ -110,6 +110,7 @@ const defaultState = {
   streak: 0,
   vocabTodayReview: { date: null, signature: "", ids: [] },
   recentVocabWrongIds: [],
+  vocabRecallMasteryCounts: {},
   vocabQuizTodayReviewActive: false,
   stateVersion: STATE_SCHEMA_VERSION
 };
@@ -190,6 +191,22 @@ function normalizeStudyStatusState({ reviewIds = [], masteredIds = [], migratedM
     reviewIds: nextReviewIds,
     masteredIds: nextMasteredIds
   };
+}
+
+function normalizeVocabRecallMasteryCounts(source) {
+  const raw = source && typeof source === "object" ? source : {};
+
+  return Object.entries(raw).reduce((map, [id, value]) => {
+    const normalizedId = String(id || "").trim();
+    const normalizedCount = Number(value);
+
+    if (!normalizedId || !Number.isFinite(normalizedCount) || normalizedCount <= 0) {
+      return map;
+    }
+
+    map[normalizedId] = Math.min(3, Math.max(1, Math.floor(normalizedCount)));
+    return map;
+  }, {});
 }
 
 function normalizeLoadedState(inputState) {
@@ -276,6 +293,7 @@ function normalizeLoadedState(inputState) {
     recentWrongOrdered.push(id);
   });
   nextState.recentVocabWrongIds = recentWrongOrdered.slice(0, 30);
+  nextState.vocabRecallMasteryCounts = normalizeVocabRecallMasteryCounts(nextState.vocabRecallMasteryCounts);
   const savedTodayReview = nextState.vocabTodayReview;
   nextState.vocabTodayReview =
     savedTodayReview && typeof savedTodayReview === "object"

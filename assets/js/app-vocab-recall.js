@@ -438,6 +438,40 @@
     };
   }
 
+  const originalNextVocabQuizQuestion = typeof nextVocabQuizQuestion === "function" ? nextVocabQuizQuestion : null;
+  if (originalNextVocabQuizQuestion) {
+    nextVocabQuizQuestion = function nextPatchedVocabQuizQuestion(...args) {
+      if (getVocabQuizAnswerMode() !== "recall") {
+        return originalNextVocabQuizQuestion.apply(this, args);
+      }
+
+      if (state.vocabQuizFinished) {
+        return originalNextVocabQuizQuestion.apply(this, args);
+      }
+
+      if (!recallAnswerCommitted) {
+        return;
+      }
+
+      clearRecallAdvanceTimer();
+
+      if (state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1) {
+        state.vocabQuizFinished = true;
+        stopQuizSessionTimer("vocab");
+        clearVocabQuizSessionRuntime();
+        saveState();
+        renderVocabQuiz();
+        return;
+      }
+
+      state.vocabQuizIndex += 1;
+      recallAnswerCommitted = false;
+      recallAnswerRevealed = false;
+      saveState();
+      renderVocabQuiz();
+    };
+  }
+
   ensureRecallStyles();
   ensureRecallModeField();
   syncRecallModeField();

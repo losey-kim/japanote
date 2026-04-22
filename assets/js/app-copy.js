@@ -88,7 +88,17 @@
       reviewSave: "다시 보기로 표시",
       reviewRemove: "다시 보기 해제",
       masteredSave: "익힘으로 표시",
-      masteredRemove: "익힘 해제"
+      masteredRemove: "익힘 해제",
+      resultShare: "공유",
+      resultShareDetail: "결과를 그림으로 만들어 공유해요",
+      resultChallenge: "도전",
+      resultChallengeLinkDetail: "친구가 같은 문제를 풀 수 있게 링크를 보내요",
+      resultChallengeCopy: "복사",
+      resultChallengeCopyDetail: "같은 문제·결과의 도전 링크를 복사해요",
+      reviewSaveShort: "다시 보기",
+      reviewRemoveShort: "다시 해제",
+      masteredSaveShort: "익힘",
+      masteredRemoveShort: "익힘 해제"
     }
   };
 })(window);
@@ -199,7 +209,17 @@ const japanoteCopyFallback = {
     reviewSave: "다시 보기로 표시",
     reviewRemove: "다시 보기 해제",
     masteredSave: "익힘으로 표시",
-    masteredRemove: "익힘 해제"
+    masteredRemove: "익힘 해제",
+    resultShare: "공유",
+    resultShareDetail: "결과를 그림으로 만들어 공유해요",
+    resultChallenge: "도전",
+    resultChallengeLinkDetail: "친구가 같은 문제를 풀 수 있게 링크를 보내요",
+    resultChallengeCopy: "복사",
+    resultChallengeCopyDetail: "같은 문제·결과의 도전 링크를 복사해요",
+    reviewSaveShort: "다시 보기",
+    reviewRemoveShort: "다시 해제",
+    masteredSaveShort: "익힘",
+    masteredRemoveShort: "익힘 해제"
   }
 };
 

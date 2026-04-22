@@ -497,33 +497,57 @@
     const button = document.createElement("button");
     const icon = document.createElement("span");
     const label = document.createElement("span");
+    const g = global.getJapanoteButtonLabel;
+    const shortLabel =
+      typeof g === "function" && g("resultShare")
+        ? g("resultShare")
+        : "공유";
+    const detailLabel =
+      typeof g === "function" && g("resultShareDetail")
+        ? g("resultShareDetail")
+        : "결과를 그림으로 만들어 공유해요";
+    const readyLabel = shortLabel;
+    const readyDescription = detailLabel;
 
     button.type = "button";
-    button.className = "secondary-btn button-with-icon share-result-btn match-result-action-btn";
+    button.className =
+      "secondary-btn button-with-icon share-result-btn match-result-action-btn match-result-action-btn--with-caption";
 
     icon.className = "material-symbols-rounded";
     icon.setAttribute("aria-hidden", "true");
-    icon.textContent = "share";
+    icon.textContent = "ios_share";
 
-    label.textContent = "결과 공유하기";
-    button.title = label.textContent;
+    label.className = "match-result-action-btn__text";
+    label.setAttribute("aria-hidden", "true");
+    label.textContent = readyLabel;
+    button.title = readyDescription;
+    button.setAttribute("aria-label", readyDescription);
     button.append(icon, label);
 
+    const setButtonState = (shortText, { long, busy = false } = {}) => {
+      const resolvedLong = long != null && String(long).length > 0 ? long : shortText;
+      label.textContent = shortText;
+      button.setAttribute("aria-label", resolvedLong);
+      button.title = resolvedLong;
+      if (typeof busy === "boolean") {
+        button.setAttribute("aria-busy", busy ? "true" : "false");
+      }
+    };
+
     button.addEventListener("click", async () => {
-      const originalLabel = label.textContent;
-      label.textContent = "이미지 생성 중...";
+      setButtonState("이미지 생성 중...", { busy: true });
       button.disabled = true;
 
       try {
         const canvas = await captureResultImage(resultViewId);
         const blob = await canvasToBlob(canvas);
         showPreviewModal(canvas, blob, resultViewId);
-        label.textContent = originalLabel;
+        setButtonState(readyLabel, { long: readyDescription, busy: false });
       } catch (error) {
         console.error("Failed to capture result image.", error);
-        label.textContent = "다시 시도해 주세요";
+        setButtonState("다시 시도해 주세요", { busy: false });
         setTimeout(() => {
-          label.textContent = originalLabel;
+          setButtonState(readyLabel, { long: readyDescription, busy: false });
         }, 2000);
       } finally {
         button.disabled = false;

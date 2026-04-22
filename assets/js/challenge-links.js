@@ -1363,35 +1363,59 @@
     const label = document.createElement("span");
 
     button.type = "button";
-    button.className = "secondary-btn button-with-icon challenge-link-btn match-result-action-btn";
+    button.className =
+      "secondary-btn button-with-icon challenge-link-btn match-result-action-btn match-result-action-btn--with-caption";
     const canNativeShare = typeof global.navigator?.share === "function";
+    const g = global.getJapanoteButtonLabel;
+    const shortShare = typeof g === "function" && g("resultChallenge") ? g("resultChallenge") : "도전";
+    const shortCopy = typeof g === "function" && g("resultChallengeCopy") ? g("resultChallengeCopy") : "복사";
+    const detailShare =
+      typeof g === "function" && g("resultChallengeLinkDetail")
+        ? g("resultChallengeLinkDetail")
+        : "친구가 같은 문제를 풀 수 있게 링크를 보내요";
+    const detailCopy =
+      typeof g === "function" && g("resultChallengeCopyDetail")
+        ? g("resultChallengeCopyDetail")
+        : "같은 문제·결과의 도전 링크를 복사해요";
+    const readyLabel = canNativeShare ? shortShare : shortCopy;
+    const readyDescription = canNativeShare ? detailShare : detailCopy;
 
     icon.className = "material-symbols-rounded";
     icon.setAttribute("aria-hidden", "true");
-    icon.textContent = canNativeShare ? "share" : "link";
+    icon.textContent = canNativeShare ? "group_add" : "link";
 
-    label.textContent = canNativeShare ? "도전 링크 공유" : "도전 링크 복사";
+    label.className = "match-result-action-btn__text";
+    label.setAttribute("aria-hidden", "true");
+    label.textContent = readyLabel;
+    button.title = readyDescription;
+    button.setAttribute("aria-label", readyDescription);
     button.append(icon, label);
 
+    const setButtonMessage = (shortText, { long = shortText } = {}) => {
+      const resolved = long != null && String(long).length > 0 ? long : shortText;
+      label.textContent = shortText;
+      button.setAttribute("aria-label", resolved);
+      button.title = resolved;
+    };
+
     button.addEventListener("click", async () => {
-      const originalLabel = label.textContent;
-      label.textContent = "링크 만드는 중...";
+      setButtonMessage("링크 만드는 중...");
       button.disabled = true;
       const { url, error } = await buildChallengeLink(resultViewId);
 
       if (!url) {
         button.disabled = false;
-        label.textContent = originalLabel;
+        setButtonMessage(readyLabel, { long: readyDescription });
         notify(error || "도전 링크를 만들 수 없어요.");
         return;
       }
 
-      label.textContent = canNativeShare ? "공유하는 중..." : "복사하는 중...";
+      setButtonMessage(canNativeShare ? "공유하는 중..." : "복사하는 중...");
       const shareState = canNativeShare ? await shareChallengeLink(resultViewId, url) : "failed";
       const copied = shareState === "shared" ? true : await copyText(url);
 
       button.disabled = false;
-      label.textContent = originalLabel;
+      setButtonMessage(readyLabel, { long: readyDescription });
 
       if (shareState === "cancelled") {
         return;

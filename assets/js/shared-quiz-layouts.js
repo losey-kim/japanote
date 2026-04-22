@@ -369,6 +369,36 @@
   const QUIZ_RESULT_REVIEW_ACTION_LABEL = "다시 보기로 표시";
   const QUIZ_RESULT_LEARN_ACTION_LABEL = "익힘으로 표시";
 
+  function getJapanoteBtn(key, fallback) {
+    const fn = global.getJapanoteButtonLabel;
+    if (typeof fn === "function") {
+      const t = fn(key);
+      if (t) {
+        return t;
+      }
+    }
+    return fallback;
+  }
+
+  function reviewResultBulkAction(id, labelId) {
+    return {
+      id,
+      labelId,
+      label: getJapanoteBtn("reviewSaveShort", "다시 보기"),
+      title: getJapanoteBtn("reviewSave", QUIZ_RESULT_REVIEW_ACTION_LABEL)
+    };
+  }
+
+  function masteredResultBulkAction(id, labelId, icon) {
+    return {
+      id,
+      labelId,
+      label: getJapanoteBtn("masteredSaveShort", "익힘"),
+      title: getJapanoteBtn("masteredSave", QUIZ_RESULT_LEARN_ACTION_LABEL),
+      icon: icon || "check_circle"
+    };
+  }
+
   function createPracticeEmptyMessage({ id, text = QUIZ_EMPTY_MESSAGE }) {
     return `<p class="vocab-list-empty" id="${escapeHtml(id)}" hidden>${escapeHtml(text)}</p>`;
   }
@@ -1063,12 +1093,15 @@
     const bulkActionMarkup = resolvedBulkActions.length
       ? `
         <div class="match-result-bulk-actions match-result-bulk-actions--study">
-          ${resolvedBulkActions.map((action) => `
-            <button class="secondary-btn button-with-icon match-result-action-btn" id="${escapeHtml(action.id)}" type="button" title="${escapeHtml(action.label)}">
+          ${resolvedBulkActions.map((action) => {
+            const titleText = action.title || action.label;
+            const ariaText = action.ariaLabel || titleText;
+            return `
+            <button class="secondary-btn button-with-icon match-result-action-btn match-result-action-btn--with-caption" id="${escapeHtml(action.id)}" type="button" title="${escapeHtml(titleText)}" aria-label="${escapeHtml(ariaText)}">
               <span class="material-symbols-rounded" aria-hidden="true">${escapeHtml(action.icon || "bookmark_add")}</span>
-              <span id="${escapeHtml(action.labelId)}">${escapeHtml(action.label)}</span>
-            </button>
-          `).join("")}
+              <span class="match-result-action-btn__text" id="${escapeHtml(action.labelId)}" aria-hidden="true">${escapeHtml(action.label)}</span>
+            </button>`;
+          }).join("")}
         </div>
       `
       : "";
@@ -1123,7 +1156,8 @@
           {
             id: `${idPrefix}-result-bulk-action`,
             labelId: `${idPrefix}-result-bulk-label`,
-            label: bulkActionLabel
+            label: getJapanoteBtn("reviewSaveShort", "다시 보기"),
+            title: getJapanoteBtn("reviewSave", bulkActionLabel)
           }
         ];
 
@@ -1283,17 +1317,8 @@
       resultPrefix: "vocab-quiz",
       resultFilterAriaLabel: "단어 퀴즈 결과 필터",
       resultBulkActions: [
-        {
-          id: "vocab-quiz-result-bulk-action",
-          labelId: "vocab-quiz-result-bulk-label",
-          label: QUIZ_RESULT_REVIEW_ACTION_LABEL
-        },
-        {
-          id: "vocab-quiz-result-mastered-action",
-          labelId: "vocab-quiz-result-mastered-label",
-          label: QUIZ_RESULT_LEARN_ACTION_LABEL,
-          icon: "check_circle"
-        }
+        reviewResultBulkAction("vocab-quiz-result-bulk-action", "vocab-quiz-result-bulk-label"),
+        masteredResultBulkAction("vocab-quiz-result-mastered-action", "vocab-quiz-result-mastered-label", "check_circle")
       ]
     });
   }
@@ -1383,17 +1408,8 @@
       resultClassName: "match-result-view kanji-result-view",
       resultFilterAriaLabel: "한자 퀴즈 결과 필터",
       resultBulkActions: [
-        {
-          id: "kanji-practice-result-bulk-action",
-          labelId: "kanji-practice-result-bulk-label",
-          label: QUIZ_RESULT_REVIEW_ACTION_LABEL
-        },
-        {
-          id: "kanji-practice-result-mastered-action",
-          labelId: "kanji-practice-result-mastered-label",
-          label: QUIZ_RESULT_LEARN_ACTION_LABEL,
-          icon: "check_circle"
-        }
+        reviewResultBulkAction("kanji-practice-result-bulk-action", "kanji-practice-result-bulk-label"),
+        masteredResultBulkAction("kanji-practice-result-mastered-action", "kanji-practice-result-mastered-label", "check_circle")
       ],
       resultFooterHtml:
         '<div class="quiz-actions"><button class="primary-btn button-with-icon" id="kanji-practice-restart" type="button"><span class="material-symbols-rounded" aria-hidden="true">autorenew</span><span>다시 해볼까요?</span></button></div>'
@@ -1501,17 +1517,8 @@
       resultPrefix: "match",
       resultFilterAriaLabel: "짝 맞추기 결과 필터",
       resultBulkActions: [
-        {
-          id: "match-result-bulk-action",
-          labelId: "match-result-bulk-label",
-          label: QUIZ_RESULT_REVIEW_ACTION_LABEL
-        },
-        {
-          id: "match-result-mastered-action",
-          labelId: "match-result-mastered-label",
-          label: QUIZ_RESULT_LEARN_ACTION_LABEL,
-          icon: "check_circle"
-        }
+        reviewResultBulkAction("match-result-bulk-action", "match-result-bulk-label"),
+        masteredResultBulkAction("match-result-mastered-action", "match-result-mastered-label", "check_circle")
       ]
     });
   }
@@ -1559,17 +1566,8 @@
       resultFilterAriaLabel: "한자 짝 맞추기 결과 필터",
       resultClassName: "match-result-view kanji-result-view",
       resultBulkActions: [
-        {
-          id: "kanji-match-result-bulk-action",
-          labelId: "kanji-match-result-bulk-label",
-          label: QUIZ_RESULT_REVIEW_ACTION_LABEL
-        },
-        {
-          id: "kanji-match-result-mastered-action",
-          labelId: "kanji-match-result-mastered-label",
-          label: QUIZ_RESULT_LEARN_ACTION_LABEL,
-          icon: "check_circle"
-        }
+        reviewResultBulkAction("kanji-match-result-bulk-action", "kanji-match-result-bulk-label"),
+        masteredResultBulkAction("kanji-match-result-mastered-action", "kanji-match-result-mastered-label", "check_circle")
       ]
     });
   }
@@ -1609,17 +1607,8 @@
       resultPrefix: "grammar-match",
       resultFilterAriaLabel: "문법 짝 맞추기 결과 필터",
       resultBulkActions: [
-        {
-          id: "grammar-match-result-bulk-action",
-          labelId: "grammar-match-result-bulk-label",
-          label: QUIZ_RESULT_REVIEW_ACTION_LABEL
-        },
-        {
-          id: "grammar-match-result-mastered-action",
-          labelId: "grammar-match-result-mastered-label",
-          label: QUIZ_RESULT_LEARN_ACTION_LABEL,
-          icon: "check_circle"
-        }
+        reviewResultBulkAction("grammar-match-result-bulk-action", "grammar-match-result-bulk-label"),
+        masteredResultBulkAction("grammar-match-result-mastered-action", "grammar-match-result-mastered-label", "check_circle")
       ]
     });
   }
@@ -1792,17 +1781,8 @@
         idPrefix: "grammar-practice",
         filterAriaLabel: "문법 퀴즈 결과 필터",
         bulkActions: [
-          {
-            id: "grammar-practice-result-bulk-action",
-            labelId: "grammar-practice-result-bulk-label",
-            label: QUIZ_RESULT_REVIEW_ACTION_LABEL
-          },
-          {
-            id: "grammar-practice-result-mastered-action",
-            labelId: "grammar-practice-result-mastered-label",
-            label: QUIZ_RESULT_LEARN_ACTION_LABEL,
-            icon: "check_circle"
-          }
+          reviewResultBulkAction("grammar-practice-result-bulk-action", "grammar-practice-result-bulk-label"),
+          masteredResultBulkAction("grammar-practice-result-mastered-action", "grammar-practice-result-mastered-label", "check_circle")
         ]
       },
       viewMarkup: createPracticeModeCardLayout({

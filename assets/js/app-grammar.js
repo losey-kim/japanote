@@ -428,6 +428,8 @@ function renderGrammarPracticeBulkActionButtons(results) {
     removeActionValue: "remove-review",
     saveLabel: getJapanoteButtonLabel("reviewSave"),
     removeLabel: getJapanoteButtonLabel("reviewRemove"),
+    saveLabelShort: getJapanoteButtonLabel("reviewSaveShort"),
+    removeLabelShort: getJapanoteButtonLabel("reviewRemoveShort"),
     emptyTitle: "지금 표시 중인 문법이 없어요.",
     saveTitle: "지금 보이는 문법을 모두 다시 볼 항목으로 표시해요.",
     removeTitle: "지금 보이는 문법의 다시 보기 표시를 모두 해제해요."
@@ -444,6 +446,8 @@ function renderGrammarPracticeBulkActionButtons(results) {
     removeActionValue: "remove-mastered",
     saveLabel: getJapanoteButtonLabel("masteredSave"),
     removeLabel: getJapanoteButtonLabel("masteredRemove"),
+    saveLabelShort: getJapanoteButtonLabel("masteredSaveShort"),
+    removeLabelShort: getJapanoteButtonLabel("masteredRemoveShort"),
     emptyTitle: "지금 표시 중인 문법이 없어요.",
     saveTitle: "지금 보이는 문법을 모두 익힘으로 표시해요.",
     removeTitle: "지금 보이는 문법의 익힘 표시를 모두 해제해요.",

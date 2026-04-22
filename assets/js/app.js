@@ -2442,6 +2442,8 @@ function renderResultBulkActionButton({
   removeActionValue = "remove",
   saveLabel,
   removeLabel,
+  saveLabelShort,
+  removeLabelShort,
   emptyTitle,
   saveTitle,
   removeTitle,
@@ -2454,14 +2456,28 @@ function renderResultBulkActionButton({
 
   const uniqueIds = getUniqueStudyResultIds(results, getId);
   const allSaved = uniqueIds.length > 0 && uniqueIds.every((id) => isSaved(id));
-  const actionTitle =
-    uniqueIds.length === 0 ? emptyTitle : allSaved ? removeLabel : saveLabel;
+  const displaySave = saveLabelShort && String(saveLabelShort).length > 0 ? saveLabelShort : saveLabel;
+  const displayRemove =
+    removeLabelShort && String(removeLabelShort).length > 0 ? removeLabelShort : removeLabel;
+  const describeEmpty = emptyTitle != null && String(emptyTitle).length > 0 ? String(emptyTitle) : "";
+  const describeSave = saveTitle != null && String(saveTitle).length > 0 ? String(saveTitle) : String(saveLabel);
+  const describeRemove =
+    removeTitle != null && String(removeTitle).length > 0 ? String(removeTitle) : String(removeLabel);
+  const ariaAndTitle = (() => {
+    if (uniqueIds.length === 0) {
+      return describeEmpty;
+    }
+    if (allSaved) {
+      return describeRemove;
+    }
+    return describeSave;
+  })();
 
   button.disabled = uniqueIds.length === 0;
   button.dataset[datasetKey] = allSaved ? removeActionValue : saveActionValue;
-  button.setAttribute("aria-label", actionTitle);
-  button.title = actionTitle;
-  label.textContent = allSaved ? removeLabel : saveLabel;
+  button.setAttribute("aria-label", ariaAndTitle);
+  button.title = ariaAndTitle;
+  label.textContent = allSaved ? displayRemove : displaySave;
   icon.textContent = allSaved ? removeIcon : saveIcon;
 }
 
@@ -3494,6 +3510,8 @@ function renderVocabQuizBulkActionButtons(results) {
     datasetKey: "vocabQuizBulkAction",
     saveLabel: getJapanoteButtonLabel("reviewSave"),
     removeLabel: getJapanoteButtonLabel("reviewRemove"),
+    saveLabelShort: getJapanoteButtonLabel("reviewSaveShort"),
+    removeLabelShort: getJapanoteButtonLabel("reviewRemoveShort"),
     emptyTitle: "지금 표시 중인 단어가 없어요.",
     saveTitle: "지금 보이는 단어를 모두 다시 볼 항목으로 표시해요.",
     removeTitle: "지금 보이는 단어의 다시 보기 표시를 모두 해제해요."
@@ -3510,6 +3528,8 @@ function renderVocabQuizBulkActionButtons(results) {
     removeActionValue: "remove-mastered",
     saveLabel: getJapanoteButtonLabel("masteredSave"),
     removeLabel: getJapanoteButtonLabel("masteredRemove"),
+    saveLabelShort: getJapanoteButtonLabel("masteredSaveShort"),
+    removeLabelShort: getJapanoteButtonLabel("masteredRemoveShort"),
     emptyTitle: "지금 표시 중인 단어가 없어요.",
     saveTitle: "지금 보이는 단어를 모두 익힘으로 표시해요.",
     removeTitle: "지금 보이는 단어의 익힘 표시를 모두 해제해요.",

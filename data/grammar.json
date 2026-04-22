@@ -4,37 +4,37 @@
       "id": "g1",
       "level": "N5",
       "pattern": "〜たい",
-      "description": "무엇을 하고 싶은지 말할 때 자주 써요."
+      "description": "희망·의지"
     },
     {
       "id": "g2",
       "level": "N5",
       "pattern": "〜てください",
-      "description": "부드럽게 부탁할 때 쓰기 좋아요."
+      "description": "정중한 부탁"
     },
     {
       "id": "g3",
       "level": "N4",
       "pattern": "〜ようになる",
-      "description": "상태가 바뀌거나 가능해진 일을 말할 때 써요."
+      "description": "가능·상태 변화"
     },
     {
       "id": "g5",
       "level": "N3",
       "pattern": "〜わけではない",
-      "description": "완전히 그렇진 않다는 느낌을 줄 때 써요."
+      "description": "완곡한 부정"
     },
     {
       "id": "g6",
       "level": "N3",
       "pattern": "〜ことになる",
-      "description": "그렇게 정해지거나 되기로 한 일을 말할 때 써요."
+      "description": "말·규정이 그렇게 정해짐"
     },
     {
       "id": "g7",
       "level": "N5",
       "pattern": "명사で",
-      "description": "이동 수단이나 방법을 나타낼 때 쓰는 조사예요.",
+      "description": "이동·수단",
       "practice": {
         "source": "N5G 問題1-1",
         "note": "이동 수단을 나타내는 조사",
@@ -49,7 +49,7 @@
       "id": "g8",
       "level": "N5",
       "pattern": "사람に会う",
-      "description": "사람을 만날 때는 「に会う」 형태를 써요.",
+      "description": "인물을 만남",
       "practice": {
         "source": "N5G 問題1-4",
         "note": "사람을 만날 때는 「に会う」",
@@ -64,7 +64,7 @@
       "id": "g9",
       "level": "N5",
       "pattern": "な형용사で",
-      "description": "な형용사를 이어서 말할 때 쓰는 연결형이에요.",
+      "description": "꾸밈·이어 말하기",
       "practice": {
         "source": "N5G 問題1-8",
         "note": "きれいだ는 な형용사처럼 연결",
@@ -79,7 +79,7 @@
       "id": "g10",
       "level": "N5",
       "pattern": "동사ます형 + ながら",
-      "description": "두 동작을 동시에 이어 말할 때 쓰는 연결 표현이에요.",
+      "description": "동시에 하는 동작",
       "practice": {
         "source": "N5G 問題1-13",
         "note": "동시에 하는 두 동작",
@@ -94,7 +94,7 @@
       "id": "g11",
       "level": "N4",
       "pattern": "시간 + で終わる",
-      "description": "얼마 만에 끝났는지 말할 때 쓰는 시간 표현이에요.",
+      "description": "소요·완료 시간",
       "practice": {
         "source": "N4G 問題1-1",
         "note": "얼마 만에 끝났는지 말하기",
@@ -109,7 +109,7 @@
       "id": "g12",
       "level": "N4",
       "pattern": "〜によって",
-      "description": "수동문에서 행위자를 나타낼 때 쓰는 표현이에요.",
+      "description": "수동의 주체",
       "practice": {
         "source": "N4G 問題1-5",
         "note": "누가 만들었는지 나타내기",
@@ -124,7 +124,7 @@
       "id": "g13",
       "level": "N4",
       "pattern": "なかなか〜ない",
-      "description": "기대한 일이 쉽게 일어나지 않을 때 자주 쓰는 흐름이에요.",
+      "description": "좀처럼 ~않다",
       "practice": {
         "source": "N4G 問題1-9",
         "note": "기다렸지만 쉽게 오지 않음",
@@ -139,7 +139,7 @@
       "id": "g14",
       "level": "N4",
       "pattern": "〜かもしれません",
-      "description": "가능성이나 조심스러운 예상을 말할 때 써요.",
+      "description": "가능·추정",
       "practice": {
         "source": "N4G 問題1-13",
         "note": "조금 늦을 가능성을 말하기",
@@ -154,7 +154,7 @@
       "id": "g15",
       "level": "N3",
       "pattern": "〜として",
-      "description": "자격, 역할, 입장을 나타낼 때 쓰는 표현이에요.",
+      "description": "자격·입장",
       "practice": {
         "source": "N3G 問題1-1",
         "note": "자격이나 역할을 나타내기",
@@ -169,7 +169,7 @@
       "id": "g16",
       "level": "N3",
       "pattern": "どうしても〜たい",
-      "description": "강한 의지나 욕구를 강조할 때 자주 써요.",
+      "description": "강한 희망",
       "practice": {
         "source": "N3G 問題1-3",
         "note": "강한 의지나 욕구",
@@ -184,7 +184,7 @@
       "id": "g17",
       "level": "N3",
       "pattern": "〜ことになっている",
-      "description": "규칙이나 정해진 운영 방식을 말할 때 쓰는 표현이에요.",
+      "description": "제도·규칙",
       "practice": {
         "source": "N3G 問題1-8",
         "note": "학교 규칙이나 정해진 운영 방식",
@@ -199,7 +199,7 @@
       "id": "g18",
       "level": "N3",
       "pattern": "〜てもよさそうだ",
-      "description": "상태를 보고 허용 가능성을 판단할 때 쓰는 표현이에요.",
+      "description": "허용·괜찮을지 판단",
       "practice": {
         "source": "N3G 問題1-12",
         "note": "상태를 보고 허용 가능성을 판단",
@@ -232,7 +232,7 @@
       "id": "g22",
       "level": "N5",
       "pattern": "いつですか",
-      "description": "언제입니까"
+      "description": "언제"
     },
     {
       "id": "g23",
@@ -304,7 +304,7 @@
       "id": "g34",
       "level": "N5",
       "pattern": "〜たいです",
-      "description": "하고 싶습니다"
+      "description": "정중히 ~하고 싶다"
     },
     {
       "id": "g35",
@@ -340,7 +340,7 @@
       "id": "g40",
       "level": "N5",
       "pattern": "〜ていますか",
-      "description": "하고 있습니까"
+      "description": "하는 중인지 묻기"
     },
     {
       "id": "g41",
@@ -418,13 +418,13 @@
       "id": "g53",
       "level": "N5",
       "pattern": "〜に行きます",
-      "description": "하러 갑니다"
+      "description": "하러 가다"
     },
     {
       "id": "g54",
       "level": "N5",
       "pattern": "〜に来ます",
-      "description": "하러 옵니다"
+      "description": "하러 오다"
     },
     {
       "id": "g55",
@@ -472,25 +472,25 @@
       "id": "g62",
       "level": "N5",
       "pattern": "〜ました",
-      "description": "했습니다"
+      "description": "과거"
     },
     {
       "id": "g63",
       "level": "N5",
       "pattern": "〜ますか",
-      "description": "합니까"
+      "description": "의문(정중)"
     },
     {
       "id": "g64",
       "level": "N5",
       "pattern": "〜ません",
-      "description": "하지 않습니다"
+      "description": "서술 부정"
     },
     {
       "id": "g65",
       "level": "N5",
       "pattern": "〜ませんか",
-      "description": "하지 않겠습니까"
+      "description": "권유·제안"
     },
     {
       "id": "g66",

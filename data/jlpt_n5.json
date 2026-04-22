@@ -4819,7 +4819,7 @@
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=34783e59ed2d3766039f81c33514fffb9d7a64c52407af176f22b77edbd767811b5687bd67257f7c697d6e258b23309e22286ffbe9cca18d5c056e95cdecbac2dbe6a115bcd86013cba84bbaaf0f127ff0e86754f48de87553af9b01bcfefedca704ee4533aa90c2c87dfdff0d1959c52b138fc2dade23c62d82ade8ccc76ddc||https://dict-dn.pstatic.net/v?_lsu_sa_=3fe8d0562d7c39e6be9d214c3314b9f17d8661e5fb06af1f66a2207ffbf563c1de51c79562e57e77e9296155a323e0fdba2e383b6e9457237aab10ba4485340fa3573d8b5502cba33f2696fc698fb000d34547a43583f52389cbc2565d8f30a1bb9e2f4e100e5411d9c86de1fbf44f12de2eafe08585b94bbdcf66fe462f9939",
       "means": [
         "내리다",
-        "참가할 권리를 포기하다, 전하여, 그때까지 관계했던 일 따위를 개인적인 이유로 도중에서 포기하다"
+        "(담당·겸임·시합·진행 중인 일 등) 중도 그만두다, 사퇴하다"
       ],
       "example": null,
       "link_url": null,
@@ -11023,7 +11023,7 @@
       "pron": "辞書",
       "pron_file": "https://dict-dn.pstatic.net/v?_lsu_sa_=3088c1551dbe3a162a9c51ec3f9436f61d116615d900ef836f92b6775b4b6e51e85707c86045e9768993630511281046a01287d028a45458a6b7773b7bb2eb8f62c45344c091e5f3364229e9cc73997c2db56a8071096b8b6c47aac4b1ba21544d0f00c4c150f97376ab6046983837eed56347cbb6eb4306d6b44a9ca9fc74da||https://dict-dn.pstatic.net/v?_lsu_sa_=3e48315e3d193b065f9301273114acfa9d4d6de5420c6fe46e023f7b4b7761c1495a07b669153f70293e6525142e3059bb67140da93d53b7c4199297fc73a0b876de5e40b74b2402ae33ba39d3432a8863085bff9ac122f3222a3d2bdd50b2437b6791565384e1910a8308c808ffc4290beab870420b5240ea1d0c7d2bed204d",
       "means": [
-        "사서, 사전.",
+        "사전",
         "워드 프로세서‧자동 번역기 등에서 한자∙숙어∙문법 등을 등록해 둔 파일"
       ],
       "example": null,

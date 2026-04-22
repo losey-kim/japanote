@@ -36,6 +36,7 @@ const defaultState = {
   vocabQuizIndex: 0,
   vocabQuizFinished: false,
   vocabQuizAnswerMode: "choice",
+  vocabQuizRetryOnWrong: false,
   kanjiPracticeQuestionField: "display",
   kanjiPracticeOptionField: "reading",
   kanjiPracticeQuizCount: 10,
@@ -281,6 +282,7 @@ function normalizeLoadedState(inputState) {
   nextState.vocabQuizAnswerMode = ["choice", "recall"].includes(nextState.vocabQuizAnswerMode)
     ? nextState.vocabQuizAnswerMode
     : "choice";
+  nextState.vocabQuizRetryOnWrong = typeof nextState.vocabQuizRetryOnWrong === "boolean" ? nextState.vocabQuizRetryOnWrong : false;
   const savedRecentWrong = Array.isArray(nextState.recentVocabWrongIds) ? nextState.recentVocabWrongIds.filter(Boolean) : [];
   const recentWrongSeen = new Set();
   const recentWrongOrdered = [];

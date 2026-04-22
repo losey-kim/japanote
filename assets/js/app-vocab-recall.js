@@ -9,10 +9,6 @@
   let recallInlineStatusMessage = "";
   let recallComboCount = 0;
   let recallBestComboCount = 0;
-  let recallBossActive = false;
-  let recallBossUsed = false;
-  let recallSessionQuestionMap = new Map();
-  let recallSessionWeakSourceIds = [];
 
   function getVocabQuizAnswerMode(value = state?.vocabQuizAnswerMode) {
     return ANSWER_MODE_OPTIONS.includes(value) ? value : "choice";
@@ -62,10 +58,6 @@
     recallInlineStatusMessage = "";
     recallComboCount = 0;
     recallBestComboCount = 0;
-    recallBossActive = false;
-    recallBossUsed = false;
-    recallSessionQuestionMap = new Map();
-    recallSessionWeakSourceIds = [];
     clearRecallAdvanceTimer();
   }
 
@@ -81,10 +73,6 @@
   }
 
   function getRecallStageMeta(question) {
-    if (question?.boss) {
-      return { title: "보스전" };
-    }
-
     if (!recallAnswerRevealed) {
       return { title: "먼저 떠올려보세요" };
     }
@@ -134,10 +122,6 @@
       .vocab-recall-chip--combo {
         background: rgba(34, 197, 94, 0.12);
         color: rgba(21, 128, 61, 0.96);
-      }
-      .vocab-recall-chip--boss {
-        background: rgba(239, 68, 68, 0.12);
-        color: rgba(185, 28, 28, 0.96);
       }
       .vocab-recall-head {
         display: grid;
@@ -417,68 +401,7 @@
     return softenExplanationCopy(parts.filter(Boolean).join(" "));
   }
 
-  function rememberRecallQuestion(question) {
-    const sourceId = getRecallSourceId(question);
-
-    if (!sourceId || recallSessionQuestionMap.has(sourceId)) {
-      return;
-    }
-
-    recallSessionQuestionMap.set(sourceId, JSON.parse(JSON.stringify(question)));
-  }
-
-  function buildBossRecallQuestion() {
-    const weakSourceId = recallSessionWeakSourceIds.length
-      ? recallSessionWeakSourceIds[recallSessionWeakSourceIds.length - 1]
-      : "";
-    const fallbackEntry = recallSessionQuestionMap.values().next().value;
-    const sourceQuestion = (weakSourceId && recallSessionQuestionMap.get(weakSourceId)) || fallbackEntry;
-
-    if (!sourceQuestion) {
-      return null;
-    }
-
-    const bossQuestion = JSON.parse(JSON.stringify(sourceQuestion));
-    bossQuestion.id = `${getRecallSourceId(sourceQuestion) || "boss"}-boss-${Date.now()}`;
-    bossQuestion.sourceId = getRecallSourceId(sourceQuestion) || bossQuestion.id;
-    bossQuestion.boss = true;
-    return bossQuestion;
-  }
-
-  function maybeStartRecallBossRound() {
-    if (recallBossUsed || recallBossActive || !Array.isArray(activeVocabQuizQuestions)) {
-      return false;
-    }
-
-    const bossQuestion = buildBossRecallQuestion();
-
-    if (!bossQuestion) {
-      return false;
-    }
-
-    recallBossUsed = true;
-    recallBossActive = true;
-    recallQuestionKey = "";
-    recallAnswerRevealed = false;
-    recallAnswerCommitted = false;
-    recallInlineStatusMessage = "보스전 시작";
-    activeVocabQuizQuestions.push(bossQuestion);
-    state.vocabQuizIndex += 1;
-
-    if (typeof showJapanoteToast === "function") {
-      showJapanoteToast("보스전 시작!");
-    }
-
-    saveState();
-    renderVocabQuiz();
-    return true;
-  }
-
-  function getChoiceBossFeedback(question, verdict, isCorrect) {
-    if (question?.boss) {
-      return isCorrect ? "보스전 클리어" : "보스전 다시 볼래요";
-    }
-
+  function getChoiceComboFeedback(question, verdict, isCorrect) {
     if (isCorrect && recallComboCount >= 2) {
       return `${recallComboCount}콤보!`;
     }
@@ -492,21 +415,13 @@
 
   function applyChoiceQuizMeta(question) {
     const source = document.getElementById("vocab-quiz-source");
-    const note = document.getElementById("vocab-quiz-note");
 
     if (source) {
       const labels = [getVocabQuizSourceLabel()];
       if (recallComboCount >= 2) {
         labels.push(`${recallComboCount}콤보`);
       }
-      if (question?.boss) {
-        labels.push("보스전");
-      }
       source.textContent = labels.filter(Boolean).join(" · ");
-    }
-
-    if (note && question?.boss) {
-      note.textContent = "마지막 한 문제예요";
     }
   }
 
@@ -527,7 +442,6 @@
     } else {
       recallComboCount = 0;
       if (sourceId) {
-        recallSessionWeakSourceIds.push(sourceId);
         rememberRecentWrongVocab(sourceId);
       }
     }
@@ -549,9 +463,7 @@
 
     recallInlineStatusMessage = applyAutoStatusForRecall(sourceId, verdict);
 
-    if (question.boss) {
-      feedback.textContent = isCorrect ? "보스전 클리어" : "보스전 다시 도전";
-    } else if (isCorrect && recallComboCount >= 2) {
+    if (isCorrect && recallComboCount >= 2) {
       feedback.textContent = `${recallComboCount}콤보!`;
     } else {
       feedback.textContent =
@@ -569,14 +481,11 @@
     nextButton.hidden = false;
     nextButton.classList.add("vocab-recall-next-ready");
 
-    if (question.boss) {
-      nextButton.textContent = getJapanoteButtonLabel("result");
-    } else if (isLastQuestion && !recallBossUsed) {
-      nextButton.textContent = "보스전 가기";
-    } else {
-      nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
-    }
+    nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
 
+    if (typeof syncVocabQuizProgressDisplay === "function") {
+      syncVocabQuizProgressDisplay();
+    }
     updateStudyStreak();
     saveState();
     renderStats();
@@ -592,7 +501,6 @@
       return;
     }
 
-    rememberRecallQuestion(question);
     const stage = getRecallStageMeta(question);
     const chips = [];
 
@@ -600,11 +508,7 @@
       chips.push(`<span class="vocab-recall-chip vocab-recall-chip--combo">${recallComboCount}콤보</span>`);
     }
 
-    if (question.boss) {
-      chips.push('<span class="vocab-recall-chip vocab-recall-chip--boss">보스전</span>');
-    }
-
-    if (!question.boss && recallBestComboCount >= 3) {
+    if (recallBestComboCount >= 3) {
       chips.push(`<span class="vocab-recall-chip">최고 ${recallBestComboCount}</span>`);
     }
 
@@ -692,12 +596,17 @@
     typeof getVocabQuizOptionsSummaryText === "function" ? getVocabQuizOptionsSummaryText : null;
   if (originalGetVocabQuizOptionsSummaryText) {
     getVocabQuizOptionsSummaryText = function getPatchedVocabQuizOptionsSummaryText() {
+      const retryLabel = state.vocabQuizRetryOnWrong ? "오답 한 번 더" : "";
+
       return [
         getVocabQuizAnswerModeLabel(),
         getVocabQuizConfigLabel(),
         `${getVocabQuizCount()}문제`,
-        getDurationLabel(getVocabQuizDuration())
-      ].join(" · ");
+        getDurationLabel(getVocabQuizDuration()),
+        retryLabel
+      ]
+        .filter(Boolean)
+        .join(" · ");
     };
   }
 
@@ -714,61 +623,50 @@
 
   const originalFinalizeVocabQuizQuestion = typeof finalizeVocabQuizQuestion === "function" ? finalizeVocabQuizQuestion : null;
   if (originalFinalizeVocabQuizQuestion) {
-    finalizeVocabQuizQuestion = function finalizePatchedVocabQuizQuestion(question, selectedIndex, timedOut = false) {
+    finalizeVocabQuizQuestion = function finalizePatchedVocabQuizQuestion(selectedIndex, timedOut = false) {
       if (getVocabQuizAnswerMode() === "recall") {
         return originalFinalizeVocabQuizQuestion.apply(this, arguments);
       }
 
-      const feedback = document.getElementById("vocab-quiz-feedback");
-      const explanation = document.getElementById("vocab-quiz-explanation");
-      const nextButton = document.getElementById("vocab-quiz-next");
+      const questionBefore =
+        typeof getCurrentVocabQuizQuestion === "function" ? getCurrentVocabQuizQuestion() : null;
+      const feedbackBefore = document.getElementById("vocab-quiz-feedback");
+      const explanationBefore = document.getElementById("vocab-quiz-explanation");
+      const nextButtonBefore = document.getElementById("vocab-quiz-next");
 
-      if (!question || !feedback || !explanation || !nextButton) {
-        return;
-      }
+      if (questionBefore && feedbackBefore && explanationBefore && nextButtonBefore) {
+        const correctPreview = selectedIndex === questionBefore.answer;
 
-      rememberRecallQuestion(question);
-      const correct = selectedIndex === question.answer;
-      const sourceId = getRecallSourceId(question);
-      const isLastQuestion = state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1;
-
-      if (correct) {
-        recallComboCount += 1;
-        recallBestComboCount = Math.max(recallBestComboCount, recallComboCount);
-      } else {
-        recallComboCount = 0;
-        if (sourceId) {
-          recallSessionWeakSourceIds.push(sourceId);
-          rememberRecentWrongVocab(sourceId);
+        if (correctPreview) {
+          recallComboCount += 1;
+          recallBestComboCount = Math.max(recallBestComboCount, recallComboCount);
+        } else {
+          recallComboCount = 0;
         }
       }
 
-      finalizeQuizSession("vocab", correct);
-      state.quizAnsweredCount += 1;
+      const result = originalFinalizeVocabQuizQuestion.apply(this, arguments);
 
-      if (correct) {
-        state.quizCorrectCount += 1;
+      const question = typeof getCurrentVocabQuizQuestion === "function" ? getCurrentVocabQuizQuestion() : null;
+      const feedback = document.getElementById("vocab-quiz-feedback");
+      const nextButton = document.getElementById("vocab-quiz-next");
+
+      if (!question || !feedback || !nextButton) {
+        return result;
       }
 
-      recordVocabQuizResult(question, selectedIndex, correct, timedOut);
-      revealVocabQuizAnswer(question, selectedIndex, correct);
-      feedback.textContent = getChoiceBossFeedback(question, timedOut ? "timeout" : correct ? "correct" : "wrong", correct);
-      explanation.textContent = softenExplanationCopy(question.explanation || "");
-      nextButton.disabled = false;
-      nextButton.hidden = false;
+      const correct = selectedIndex === question.answer;
+      const isLastQuestion = state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1;
+
+      feedback.textContent = getChoiceComboFeedback(
+        question,
+        timedOut ? "timeout" : correct ? "correct" : "wrong",
+        correct
+      );
       nextButton.classList.add("vocab-recall-next-ready");
+      nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
 
-      if (question?.boss) {
-        nextButton.textContent = getJapanoteButtonLabel("result");
-      } else if (isLastQuestion && !recallBossUsed) {
-        nextButton.textContent = "보스전 가기";
-      } else {
-        nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
-      }
-
-      updateStudyStreak();
-      saveState();
-      renderStats();
+      return result;
     };
   }
 
@@ -798,8 +696,7 @@
         recallQuestionKey = questionKey;
         recallAnswerRevealed = false;
         recallAnswerCommitted = false;
-        recallInlineStatusMessage = question?.boss ? "보스전 시작" : "";
-        recallBossActive = Boolean(question?.boss);
+        recallInlineStatusMessage = "";
         clearRecallAdvanceTimer();
       }
 
@@ -808,7 +705,6 @@
         return result;
       }
 
-      rememberRecallQuestion(question);
       applyChoiceQuizMeta(question);
       return result;
     };
@@ -852,10 +748,6 @@
         clearRecallAdvanceTimer();
         const isLastRecallQuestion = state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1;
 
-        if (isLastRecallQuestion && !currentQuestion?.boss && maybeStartRecallBossRound()) {
-          return;
-        }
-
         if (isLastRecallQuestion) {
           state.vocabQuizFinished = true;
           stopQuizSessionTimer("vocab");
@@ -882,12 +774,6 @@
       }
 
       clearRecallAdvanceTimer();
-      const isLastChoiceQuestion = state.vocabQuizIndex >= activeVocabQuizQuestions.length - 1;
-
-      if (isLastChoiceQuestion && !currentQuestion?.boss && maybeStartRecallBossRound()) {
-        return;
-      }
-
       return originalNextVocabQuizQuestion.apply(this, args);
     };
   }

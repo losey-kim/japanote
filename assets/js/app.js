@@ -2807,6 +2807,10 @@ function getTodayVocabReviewQuizItems() {
 }
 
 function scheduleVocabQuizRetryQuestion(question) {
+  if (!state.vocabQuizRetryOnWrong) {
+    return;
+  }
+
   if (activeVocabQuizChallengePayload) {
     return;
   }
@@ -2877,11 +2881,59 @@ function getVocabQuizResultFilter(value = state.vocabQuizResultFilter) {
 }
 
 function getVocabQuizOptionsSummaryText() {
-  return [
-    getVocabQuizConfigLabel(),
-    `${getVocabQuizCount()}문제`,
-    getDurationLabel(getVocabQuizDuration())
-  ].join(" · ");
+  const retryLabel = state.vocabQuizRetryOnWrong ? "오답 한 번 더" : "";
+
+  return [getVocabQuizConfigLabel(), `${getVocabQuizCount()}문제`, getDurationLabel(getVocabQuizDuration()), retryLabel]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function ensureVocabQuizRetryToggle() {
+  const panel = document.getElementById("vocab-quiz-options-panel");
+
+  if (!panel) {
+    return;
+  }
+
+  let input = document.getElementById("vocab-quiz-retry-on-wrong");
+
+  if (!input) {
+    const group = document.createElement("div");
+    group.className = "study-options-group";
+
+    const label = document.createElement("label");
+    label.className = "vocab-quiz-retry-label";
+    label.setAttribute("for", "vocab-quiz-retry-on-wrong");
+
+    input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = "vocab-quiz-retry-on-wrong";
+    input.setAttribute(
+      "aria-label",
+      "틀렸을 때 같은 단어를 한 번 더 풀면 진행 칸이 하나 늘어날 수 있어요"
+    );
+
+    const span = document.createElement("span");
+    span.textContent = "오답이면 같은 단어를 한 번 더 풀기 (진행 칸이 늘어날 수 있어요)";
+
+    label.append(input, span);
+    group.appendChild(label);
+    panel.appendChild(group);
+
+    input.addEventListener("change", () => {
+      if (state.vocabQuizStarted && !state.vocabQuizFinished) {
+        input.checked = Boolean(state.vocabQuizRetryOnWrong);
+        return;
+      }
+
+      state.vocabQuizRetryOnWrong = Boolean(input.checked);
+      saveState();
+      renderVocabPage();
+    });
+  }
+
+  input.disabled = Boolean(state.vocabQuizStarted && !state.vocabQuizFinished);
+  input.checked = Boolean(state.vocabQuizRetryOnWrong);
 }
 
 function syncVocabLocationHash(tab = state.vocabTab) {
@@ -3107,6 +3159,8 @@ function clampVocabPage(items) {
 }
 
 function getVocabQuizSignature(items = getVocabQuizItems()) {
+  const retryKey = state.vocabQuizRetryOnWrong === true ? "retry-on" : "retry-off";
+
   if (state.vocabQuizTodayReviewActive) {
     const queueIds = state.vocabTodayReview?.ids || [];
     return [
@@ -3115,7 +3169,8 @@ function getVocabQuizSignature(items = getVocabQuizItems()) {
       queueIds.join("|"),
       getVocabQuizQuestionField(),
       getVocabQuizOptionField(),
-      getVocabQuizCount()
+      getVocabQuizCount(),
+      retryKey
     ].join("::");
   }
 
@@ -3126,6 +3181,7 @@ function getVocabQuizSignature(items = getVocabQuizItems()) {
     getVocabQuizQuestionField(),
     getVocabQuizOptionField(),
     getVocabQuizCount(),
+    retryKey,
     items.map((item) => item.id).join("|")
   ].join("::");
 }
@@ -3140,6 +3196,23 @@ function getVocabQuizSourceLabel() {
 
 function getCurrentVocabQuizQuestion() {
   return activeVocabQuizQuestions[state.vocabQuizIndex] || activeVocabQuizQuestions[0] || null;
+}
+
+function syncVocabQuizProgressDisplay() {
+  const progress = document.getElementById("vocab-quiz-progress");
+
+  if (!progress || !state.vocabQuizStarted || state.vocabQuizFinished) {
+    return;
+  }
+
+  const total = Array.isArray(activeVocabQuizQuestions) ? activeVocabQuizQuestions.length : 0;
+
+  if (!total) {
+    return;
+  }
+
+  const index = Number.isFinite(Number(state.vocabQuizIndex)) ? Number(state.vocabQuizIndex) : 0;
+  progress.textContent = `${Math.min(index + 1, total)} / ${total}`;
 }
 
 function resetVocabQuizSessionStats() {
@@ -3566,6 +3639,7 @@ function finalizeVocabQuizQuestion(selectedIndex, timedOut = false) {
   nextButton.hidden = false;
   nextButton.textContent = isLastQuestion ? getJapanoteButtonLabel("result") : getJapanoteButtonLabel("nextQuestion");
 
+  syncVocabQuizProgressDisplay();
   updateStudyStreak();
   saveState();
   renderStats();
@@ -3974,6 +4048,8 @@ function renderVocabQuizControls(counts, availableParts, activePart) {
       }
     ]
   });
+
+  ensureVocabQuizRetryToggle();
 }
 
 function renderVocabQuiz() {

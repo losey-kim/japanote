@@ -618,6 +618,8 @@ function renderMatchResults() {
     filterLabels: matchResultFilterLabels,
     renderBulkActionButton: renderMatchBulkActionButtons,
     renderItems: (results, container) => {
+      const fmt = global.japanoteStudyViewHelpers?.formatQuizSemicolonsToCommaList;
+      const listFmt = typeof fmt === "function" ? fmt : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
       results.forEach((item) => {
         const reviewSelected = isWordSavedToMemorizationList(item.id);
         const masteredSelected = isWordSavedToMasteredList(item.id);
@@ -626,8 +628,8 @@ function renderMatchResults() {
           container,
           status: item.status,
           levelText: formatMatchLevelLabel(item.level),
-          titleText: item.reading,
-          descriptionText: item.meaning,
+          titleText: listFmt(item.reading),
+          descriptionText: listFmt(item.meaning),
           actionButtons: [
             {
               itemId: item.id,

@@ -1,4 +1,14 @@
 (function registerJapanoteStudyViewHelpers(global) {
+  /** 뜻·동의어 등에서 쓰는 `;` 구분을 읽기 좋게 `, `로 표기 (퀴즈 본문의 `formatQuizLineBreaks` 줄바꿈용 `;`와는 별개) */
+  function formatQuizSemicolonsToCommaList(value) {
+    if (value == null) {
+      return "";
+    }
+    return String(value)
+      .replace(/\s*;\s*/g, ", ")
+      .trim();
+  }
+
   function applyStudyActionButtonState(button, selected, selectedClass, idleClass, disabled) {
     if (!button) {
       return;
@@ -171,6 +181,7 @@
   }
 
   global.japanoteStudyViewHelpers = {
+    formatQuizSemicolonsToCommaList,
     applyStudyActionButtonState,
     createStudyListCardMarkup,
     syncStudyViewButtons,

@@ -3580,6 +3580,10 @@ function renderVocabQuizResults() {
     renderBulkActionButton: renderVocabQuizBulkActionButtons,
     getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
+      const listFmt =
+        typeof studyViewHelpers.formatQuizSemicolonsToCommaList === "function"
+          ? (v) => studyViewHelpers.formatQuizSemicolonsToCommaList(v)
+          : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
       results.forEach((item) => {
         const saved = isWordSavedToReviewList(item.id);
         const reviewSelected = saved;
@@ -3589,8 +3593,10 @@ function renderVocabQuizResults() {
           container,
           status: item.status,
           levelText: item.level || getVocabLevelLabel(),
-          titleText: item.reading ? `${item.word} · ${item.reading}` : item.word,
-          descriptionText: item.meaning,
+          titleText: item.reading
+            ? `${listFmt(item.word)} · ${listFmt(item.reading)}`
+            : listFmt(item.word),
+          descriptionText: listFmt(item.meaning),
           actionButtons: [
             {
               itemId: item.id,

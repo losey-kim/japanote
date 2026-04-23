@@ -398,12 +398,18 @@ function setGrammarPracticeResult(current, selectedIndex, correct, timedOut = fa
 }
 
 function getGrammarPracticeResultDetail(item) {
+  const h = globalThis.japanoteStudyViewHelpers;
+  const listFmt =
+    h && typeof h.formatQuizSemicolonsToCommaList === "function"
+      ? (v) => h.formatQuizSemicolonsToCommaList(v)
+      : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
+
   if (item.explanation) {
-    return item.explanation;
+    return listFmt(item.explanation);
   }
 
   if (item.sentence && item.sentence !== item.title) {
-    return item.sentence;
+    return listFmt(item.sentence);
   }
 
   return "";
@@ -1001,6 +1007,11 @@ function renderGrammarPracticeResults() {
     renderBulkActionButton: renderGrammarPracticeBulkActionButtons,
     getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
+      const h2 = globalThis.japanoteStudyViewHelpers;
+      const listFmt =
+        h2 && typeof h2.formatQuizSemicolonsToCommaList === "function"
+          ? (v) => h2.formatQuizSemicolonsToCommaList(v)
+          : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
       results.forEach((item) => {
         const reviewSelected = isGrammarSavedToReviewList(item.id);
         const masteredSelected = isGrammarSavedToMasteredList(item.id);
@@ -1009,7 +1020,7 @@ function renderGrammarPracticeResults() {
           container,
           status: item.status,
           levelText: item.source || "문법",
-          titleText: item.title || item.sentence || "-",
+          titleText: listFmt(item.title || item.sentence || "-"),
           descriptionText: getGrammarPracticeResultDetail(item),
           actionButtons: [
             {

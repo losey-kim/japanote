@@ -539,6 +539,8 @@ function renderKanjiMatchResults() {
     filterLabels: kanjiMatchResultFilterLabels,
     renderBulkActionButton: renderKanjiMatchBulkActionButtons,
     renderItems: (results, container) => {
+      const fmt = global.japanoteStudyViewHelpers?.formatQuizSemicolonsToCommaList;
+      const listFmt = typeof fmt === "function" ? fmt : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
       results.forEach((item) => {
         const reviewSelected = isKanjiSavedToMemorizationList(item.id);
         const masteredSelected = isKanjiSavedToMasteredList(item.id);
@@ -547,8 +549,8 @@ function renderKanjiMatchResults() {
           container,
           status: item.status,
           levelText: item.gradeLabel,
-          titleText: item.char,
-          descriptionText: item.reading,
+          titleText: listFmt(item.char),
+          descriptionText: listFmt(item.reading),
           actionButtons: [
             {
               itemId: item.id,

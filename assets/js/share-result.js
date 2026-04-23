@@ -11,7 +11,8 @@
   const SHARE_CARD_HEADER_BG = "#fff1e8";
   const SHARE_CARD_FOOTER_BG = "#f0e4d9";
   const SHARE_WATERMARK = "Japanote";
-  const MAX_COMPARISON_LIST_ITEMS = 12;
+  /** 도전 비교용 공유 이미지: 전체 항목 표시 */
+  const MAX_COMPARISON_LIST_ITEMS = Number.POSITIVE_INFINITY;
   /** html2canvas·모바일 WebView에서 이모지(⭕❌)가 깨지는 경우가 있어 벡터로 표시 */
   const SHARE_ICON_SVG_CORRECT =
     "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" style=\"display:block\"><circle cx=\"12\" cy=\"12\" r=\"10.5\" fill=\"#4a9f78\"/><path fill=\"none\" stroke=\"#fff\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M7.5 12.2l2.8 2.8L17 8.5\"/></svg>";
@@ -50,6 +51,17 @@
       .replace(/'/g, "&#39;");
   }
 
+  function formatShareSemicolons(value) {
+    if (value == null) {
+      return "";
+    }
+    const h = global.japanoteStudyViewHelpers;
+    if (h && typeof h.formatQuizSemicolonsToCommaList === "function") {
+      return h.formatQuizSemicolonsToCommaList(value);
+    }
+    return String(value).replace(/\s*;\s*/g, ", ").trim();
+  }
+
   function loadHtml2Canvas() {
     if (html2canvasLoaded || global.html2canvas) {
       html2canvasLoaded = true;
@@ -80,7 +92,7 @@
     const rows = visibleItems.map((item) => {
       const ok = item?.status === "correct";
       const iconSvg = ok ? SHARE_ICON_SVG_CORRECT : SHARE_ICON_SVG_WRONG;
-      const label = escapeHtml(item?.label || item?.title || "");
+      const label = escapeHtml(formatShareSemicolons(item?.label || item?.title || ""));
       const rowBg = ok ? "rgba(95,174,139,0.07)" : "rgba(222,107,72,0.07)";
       const border = ok ? "rgba(95,174,139,0.2)" : "rgba(222,107,72,0.2)";
 
@@ -185,8 +197,8 @@
       items.forEach((item) => {
         const isCorrect = item.classList.contains("is-correct");
         const iconSvg = isCorrect ? SHARE_ICON_SVG_CORRECT : SHARE_ICON_SVG_WRONG;
-        const title = item.querySelector("strong")?.textContent || "";
-        const description = item.querySelector("p")?.textContent || "";
+        const title = formatShareSemicolons(item.querySelector("strong")?.textContent || "");
+        const description = formatShareSemicolons(item.querySelector("p")?.textContent || "");
         const rowBg = isCorrect ? "rgba(95,174,139,0.06)" : "rgba(222,107,72,0.07)";
         const accent = isCorrect ? "#3d8f6a" : "#c75d45";
         const border = isCorrect ? "rgba(95,174,139,0.18)" : "rgba(222,107,72,0.2)";

@@ -280,7 +280,12 @@ function getReadingPracticeResultDetail(item) {
     parts.push(softenExplanationCopy(item.explanation));
   }
 
-  return parts.join(" · ");
+  const joined = parts.join(" · ");
+  const h = globalThis.japanoteStudyViewHelpers;
+  if (h && typeof h.formatQuizSemicolonsToCommaList === "function") {
+    return h.formatQuizSemicolonsToCommaList(joined);
+  }
+  return String(joined).replace(/\s*;\s*/g, ", ").trim();
 }
 
 function renderReadingPracticeResults() {
@@ -300,12 +305,17 @@ function renderReadingPracticeResults() {
     filterLabels: readingPracticeResultFilterLabels,
     getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
+      const h = globalThis.japanoteStudyViewHelpers;
+      const listFmt =
+        h && typeof h.formatQuizSemicolonsToCommaList === "function"
+          ? (v) => h.formatQuizSemicolonsToCommaList(v)
+          : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
       results.forEach((item) => {
         sharedResultUi.appendResultItem({
           container,
           status: item.status,
           levelText: item.source || "독해",
-          titleText: item.title || item.question || "-",
+          titleText: listFmt(item.title || item.question || "-"),
           descriptionText: getReadingPracticeResultDetail(item)
         });
       });

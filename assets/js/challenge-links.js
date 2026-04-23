@@ -3,7 +3,8 @@
   const challengeRefParamKey = "c";
   const maxEncodedChallengeLength = 20000;
   const comparisonCardClassName = "challenge-result-comparison";
-  const maxVisibleComparisonItems = 6;
+  /** 도전 비교 결과: 항목 전부 표시 (이전 6개 + "외 N개" 제한 제거) */
+  const maxVisibleComparisonItems = Number.POSITIVE_INFINITY;
   const compressedPayloadPrefix = "lz:";
   const lzUrlAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   const shortCodeAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -476,8 +477,13 @@
   }
 
   function buildResultItemLabel(item) {
-    const title = normalizeText(item?.title);
-    const description = normalizeText(item?.description);
+    const h0 = globalThis.japanoteStudyViewHelpers;
+    const listFmt =
+      h0 && typeof h0.formatQuizSemicolonsToCommaList === "function"
+        ? (v) => h0.formatQuizSemicolonsToCommaList(v)
+        : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
+    const title = listFmt(normalizeText(item?.title));
+    const description = listFmt(normalizeText(item?.description));
 
     if (!description || description === title) {
       return title;

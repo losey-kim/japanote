@@ -433,13 +433,15 @@
       filterLabels: grammarMatchResultFilterLabels,
       renderBulkActionButton: renderGrammarMatchBulkActionButtons,
       renderItems: (results, container) => {
+        const fmt = global.japanoteStudyViewHelpers?.formatQuizSemicolonsToCommaList;
+        const listFmt = typeof fmt === "function" ? fmt : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
         results.forEach((item) => {
           sharedMatchGame.appendResultItem({
             container,
             status: item.status,
             levelText: item.levelLabel,
-            titleText: item.pattern,
-            descriptionText: item.description,
+            titleText: listFmt(item.pattern),
+            descriptionText: listFmt(item.description),
             actionButtons: [
               {
                 itemId: item.id,

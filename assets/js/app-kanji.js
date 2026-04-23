@@ -676,7 +676,12 @@ function getKanjiPracticeResultDetail(item) {
     parts.push(item.meta);
   }
 
-  return parts.join(" \u00B7 ");
+  const joined = parts.join(" \u00B7 ");
+  const h = globalThis.japanoteStudyViewHelpers;
+  if (h && typeof h.formatQuizSemicolonsToCommaList === "function") {
+    return h.formatQuizSemicolonsToCommaList(joined);
+  }
+  return String(joined).replace(/\s*;\s*/g, ", ").trim();
 }
 function renderKanjiPracticeResults() {
   const counts = getKanjiPracticeResultCounts();
@@ -696,6 +701,11 @@ function renderKanjiPracticeResults() {
     renderBulkActionButton: renderKanjiPracticeBulkActionButtons,
     getEmptyText: ({ activeFilter }) => getStudyPracticeResultEmptyMessage(activeFilter),
     renderItems: (results, container) => {
+      const h = globalThis.japanoteStudyViewHelpers;
+      const listFmt =
+        h && typeof h.formatQuizSemicolonsToCommaList === "function"
+          ? (v) => h.formatQuizSemicolonsToCommaList(v)
+          : (v) => String(v || "").replace(/\s*;\s*/g, ", ").trim();
       results.forEach((item) => {
         const saved = isKanjiSavedToReviewList(item.id);
         const reviewSelected = saved;
@@ -705,7 +715,9 @@ function renderKanjiPracticeResults() {
           container,
           status: item.status,
           levelText: item.source || "한자",
-          titleText: item.reading ? `${item.char || "-"} · ${item.reading}` : item.char || "-",
+          titleText: item.reading
+            ? `${listFmt(item.char || "-")} · ${listFmt(item.reading)}`
+            : listFmt(item.char || "-"),
           descriptionText: getKanjiPracticeResultDetail(item),
           actionButtons: [
             {

@@ -512,30 +512,6 @@ button {
     linear-gradient(180deg, rgba(222, 107, 72, 0.12), rgba(95, 174, 139, 0.06));
 }
 
-.hero-copy::before,
-.hero-copy::after {
-  content: "";
-  position: absolute;
-  border-radius: 999px;
-  pointer-events: none;
-}
-
-.hero-copy::before {
-  top: -90px;
-  right: -70px;
-  width: 240px;
-  height: 240px;
-  background: rgba(222, 107, 72, 0.14);
-}
-
-.hero-copy::after {
-  bottom: -90px;
-  right: 18%;
-  width: 220px;
-  height: 220px;
-  background: rgba(93, 133, 207, 0.1);
-}
-
 .eyebrow,
 .section-heading span,
 .panel-label,
@@ -5162,25 +5138,6 @@ body::after {
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 242, 236, 0.96));
 }
 
-.hero-copy::before {
-  top: var(--space-7);
-  right: var(--space-7);
-  width: 96px;
-  height: 96px;
-  border-radius: var(--layout-radius-xl);
-  display: none;
-}
-
-.hero-copy::after {
-  right: var(--space-6);
-  bottom: var(--space-6);
-  width: 178px;
-  height: 178px;
-  border: 1px dashed rgba(44, 41, 72, 0.1);
-  background: rgba(127, 122, 167, 0.05);
-  border-radius: var(--layout-radius-lg);
-}
-
 .eyebrow,
 .section-heading span,
 .panel-label,
@@ -5444,18 +5401,6 @@ body::after {
   transform: translateY(-3px);
   border-color: rgba(18, 20, 25, 0.14);
   box-shadow: 0 24px 46px rgba(34, 26, 20, 0.12);
-}
-
-.quick-start-item::before,
-.grammar-item::before {
-  content: "";
-  position: absolute;
-  top: var(--space-5);
-  right: var(--space-5);
-  width: 40px;
-  height: 40px;
-  border-radius: var(--layout-radius-md);
-  background: rgba(18, 20, 25, 0.04);
 }
 
 .quick-start-priority li,
@@ -5969,10 +5914,6 @@ body::after {
     padding: var(--space-7) var(--space-6);
   }
 
-  .hero-copy::after {
-    display: none;
-  }
-
   .page-intro::before {
     left: var(--space-5);
     width: 70px;
@@ -6433,14 +6374,6 @@ body::after {
     box-shadow: var(--shadow);
   }
 
-  html:not([data-theme="light"]) .hero-copy::before {
-    background: rgba(211, 104, 76, 0.1);
-  }
-
-  html:not([data-theme="light"]) .hero-copy::after {
-    background: rgba(63, 100, 201, 0.08);
-  }
-
   html:not([data-theme="light"]) .hero-copy p,
   html:not([data-theme="light"]) .section-copy,
   html:not([data-theme="light"]) .quick-start-item p,
@@ -6708,14 +6641,6 @@ html[data-theme="dark"] .quiz-note-panel {
     linear-gradient(135deg, rgba(63, 100, 201, 0.06), rgba(211, 104, 76, 0.04));
   border-color: rgba(237, 242, 248, 0.08);
   box-shadow: var(--shadow);
-}
-
-html[data-theme="dark"] .hero-copy::before {
-  background: rgba(211, 104, 76, 0.1);
-}
-
-html[data-theme="dark"] .hero-copy::after {
-  background: rgba(63, 100, 201, 0.08);
 }
 
 html[data-theme="dark"] .hero-copy p,

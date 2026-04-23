@@ -38,6 +38,7 @@
       "assets/js/challenge-preview-redirect.js"
     ],
     "index.html": [
+      "assets/js/japanote-boot-early.js",
       "assets/js/theme.js?v=0cb88168",
       "assets/js/app-study-view-helpers.js?v=444dc3dc",
       "assets/js/shared-timer.js?v=a53be2de",
@@ -55,6 +56,7 @@
       "assets/js/app-challenge-links.js"
     ],
     "grammar.html": [
+      "assets/js/japanote-boot-early.js",
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
       "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
@@ -80,6 +82,7 @@
       "assets/js/share-result.js?v=441dcdce"
     ],
     "reading.html": [
+      "assets/js/japanote-boot-early.js",
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
       "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
@@ -104,6 +107,7 @@
       "assets/js/share-result.js?v=441dcdce"
     ],
     "vocab.html": [
+      "assets/js/japanote-boot-early.js",
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
       "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
@@ -133,6 +137,7 @@
       "assets/js/study-tools.js?v=9b778c4f"
     ],
     "kanji.html": [
+      "assets/js/japanote-boot-early.js",
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
       "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
@@ -160,6 +165,7 @@
       "assets/js/share-result.js?v=441dcdce"
     ],
     "characters.html": [
+      "assets/js/japanote-boot-early.js",
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
       "assets/js/supabase-config.js?v=587210d3",
       "assets/js/supabase-sync.js?v=475dffb1",
@@ -200,7 +206,14 @@
   const scripts = (pageScriptMap[pageName] || []).map(resolveScriptSrc);
 
   function hasScript(src) {
-    return Boolean(document.querySelector(`script[data-japanote-src="${src}"]`));
+    if (document.querySelector(`script[data-japanote-src="${src}"]`)) {
+      return true;
+    }
+    const rel = String(src || "").split("?")[0];
+    if (rel.includes("japanote-boot-early")) {
+      return Boolean(document.querySelector('script[src*="japanote-boot-early"]'));
+    }
+    return false;
   }
 
   function loadSequentially(index) {

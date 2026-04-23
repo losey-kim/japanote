@@ -385,6 +385,109 @@ function normalizeLoadedState(inputState) {
   return nextState;
 }
 
+const JAPANOTE_PATH_PAGE_ID_KEY = "japanote_path_page_id";
+
+/**
+ * F5(새로고침)·뒤로/앞으로(bfcache 복원 등)일 때 true — in-page 탭은 localStorage 그대로.
+ * top nav 링크로 .html이 새로 뜬 경우(navigate)는 false — 섹션 기본 탭으로 맞춤(해시/딥링크 제외).
+ */
+function isJapanoteNavigationReloadOrBackForward() {
+  if (typeof performance === "undefined") {
+    return false;
+  }
+
+  try {
+    const entries = performance.getEntriesByType("navigation");
+    if (entries && entries.length > 0 && entries[0].type) {
+      return entries[0].type === "reload" || entries[0].type === "back_forward";
+    }
+  } catch (error) {
+    // ignore
+  }
+
+  if (typeof performance.navigation !== "undefined" && performance.navigation !== null) {
+    // legacy: 1=reload, 2=back/forward
+    return performance.navigation.type === 1 || performance.navigation.type === 2;
+  }
+
+  return false;
+}
+
+/**
+ * Top nav로 다른 .html로 넘어온 경우(navigate) 서브탭(단어 퀴즈, 문자 퀴즈 등)을 기본으로 맞춤.
+ * 같은 URL 새로고침(F5)은 Performance API로 감지해 localStorage에 저장된 탭 유지.
+ * URL hash가 #quiz / #match면(공유·북마크) 단어 쪽은 유지.
+ */
+function getJapanotePathPageId() {
+  const p = (typeof window !== "undefined" && window.location?.pathname
+    ? String(window.location.pathname)
+    : ""
+  ).toLowerCase();
+  if (p.includes("vocab.html")) {
+    return "vocab";
+  }
+  if (p.includes("characters.html")) {
+    return "characters";
+  }
+  if (p.includes("kanji.html")) {
+    return "kanji";
+  }
+  if (p.includes("grammar.html")) {
+    return "grammar";
+  }
+  if (p.includes("reading.html")) {
+    return "reading";
+  }
+  return "other";
+}
+
+function applyDefaultSubTabsForCurrentPathPage() {
+  const current = getJapanotePathPageId();
+  if (current === "vocab") {
+    const h = String(window.location.hash || "")
+      .replace(/^#/, "")
+      .toLowerCase();
+    if (!["quiz", "match"].includes(h)) {
+      state.vocabTab = "study";
+    }
+  } else if (current === "characters") {
+    state.charactersTab = "library";
+  } else if (current === "kanji") {
+    state.kanjiTab = "list";
+  } else if (current === "grammar") {
+    state.grammarTab = "list";
+  }
+}
+
+function applyCrossPageTabResets() {
+  if (typeof window === "undefined" || !state) {
+    return;
+  }
+  let store = null;
+  try {
+    store = window.sessionStorage;
+  } catch (error) {
+    return;
+  }
+  if (!store) {
+    return;
+  }
+
+  const current = getJapanotePathPageId();
+  const prev = store.getItem(JAPANOTE_PATH_PAGE_ID_KEY) || "";
+
+  if (isJapanoteNavigationReloadOrBackForward()) {
+    store.setItem(JAPANOTE_PATH_PAGE_ID_KEY, current);
+    return;
+  }
+
+  if (!prev || prev !== current) {
+    applyDefaultSubTabsForCurrentPathPage();
+    saveState();
+  }
+  store.setItem(JAPANOTE_PATH_PAGE_ID_KEY, current);
+}
+
 function saveState() {
   const syncStore = getStudyStateStore();
 

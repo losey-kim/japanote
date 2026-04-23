@@ -98,6 +98,86 @@ button {
   padding: 30px 24px 96px;
 }
 
+/* 첫 JS 렌더 전 정적 HTML/탭 플래시 방지 (japanote-boot-early.js) — 단어/한자/문법/독해/문자/홈 공통 */
+html.japanote-app-booting .page-shell > main {
+  visibility: hidden;
+}
+
+#japanote-boot-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 24px;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#japanote-boot-root.japanote-boot-fadeout {
+  opacity: 0;
+}
+
+#japanote-boot-root .japanote-boot-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(25, 21, 22, 0.28);
+  pointer-events: auto;
+}
+
+#japanote-boot-root .japanote-boot-panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 200px;
+  max-width: min(90vw, 300px);
+  padding: 28px 32px 26px;
+  border-radius: var(--radius-lg, 28px);
+  background: var(--surface-strong, #fffaf4);
+  border: 1px solid var(--line, rgba(25, 21, 22, 0.12));
+  box-shadow: var(--shadow, 0 28px 70px rgba(54, 40, 33, 0.12));
+  text-align: center;
+  pointer-events: auto;
+}
+
+#japanote-boot-root .japanote-boot-spinner {
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  border: 3px solid var(--line, rgba(25, 21, 22, 0.12));
+  border-top-color: var(--sky, #5d85cf);
+  border-radius: 50%;
+  animation: japanote-boot-spin 0.7s linear infinite;
+}
+
+#japanote-boot-root .japanote-boot-label {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--muted, #625a56);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #japanote-boot-root .japanote-boot-spinner {
+    animation: none;
+    border-color: var(--line, rgba(25, 21, 22, 0.12));
+    border-top-color: var(--line, rgba(25, 21, 22, 0.12));
+    opacity: 0.75;
+  }
+}
+
+@keyframes japanote-boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ── 공통 유틸리티 ── */
 
 .meta-chip,
@@ -5270,6 +5350,80 @@ body::after {
 .panel-metrics strong,
 .panel-footer strong {
   letter-spacing: -0.03em;
+}
+
+/* Light: TODAY PICK — don’t use dark inlay; match warm home surface */
+html[data-theme="light"] .hero-panel {
+  color: var(--text);
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.95) 0%, rgba(252, 247, 255, 0.92) 40%, rgba(255, 248, 240, 0.96) 100%);
+  box-shadow: var(--shadow-soft);
+}
+
+html[data-theme="light"] .hero-panel::before {
+  right: -36px;
+  bottom: -48px;
+  width: 150px;
+  height: 150px;
+  background: rgba(93, 133, 207, 0.1);
+  filter: blur(10px);
+  opacity: 0.9;
+}
+
+html[data-theme="light"] .hero-panel .routine-list li {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(25, 21, 22, 0.1);
+}
+
+html[data-theme="light"] .hero-panel .routine-list span {
+  color: var(--text);
+  background: linear-gradient(150deg, rgba(93, 133, 207, 0.1), rgba(222, 107, 72, 0.06));
+  border: 1px solid rgba(25, 21, 22, 0.06);
+}
+
+html[data-theme="light"] .hero-panel .routine-list p {
+  color: var(--muted);
+}
+
+html[data-theme="light"] .hero-panel .routine-list strong {
+  color: var(--text);
+}
+
+html[data-theme="light"] .hero-panel .panel-summary {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(252, 244, 236, 0.8));
+  border: 1px solid rgba(25, 21, 22, 0.1);
+}
+
+html[data-theme="light"] .hero-panel .panel-summary strong {
+  color: var(--text);
+}
+
+html[data-theme="light"] .hero-panel .panel-summary p {
+  color: var(--muted);
+}
+
+html[data-theme="light"] .hero-panel .panel-metrics div {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(25, 21, 22, 0.1);
+}
+
+html[data-theme="light"] .hero-panel .panel-metrics span,
+html[data-theme="light"] .hero-panel .panel-footer span {
+  color: var(--muted);
+}
+
+html[data-theme="light"] .hero-panel .panel-metrics strong,
+html[data-theme="light"] .hero-panel .panel-footer strong {
+  color: var(--text);
+}
+
+html[data-theme="light"] .hero-panel .panel-metrics p {
+  color: var(--muted);
+}
+
+html[data-theme="light"] .hero-panel .panel-footer {
+  border-top-color: rgba(25, 21, 22, 0.1);
 }
 
 .stat-card {

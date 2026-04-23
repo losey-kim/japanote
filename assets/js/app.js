@@ -1106,6 +1106,10 @@ let vocabQuizRetryNonce = 0;
 let pendingExternalStudyState = null;
 
 state = normalizeLoadedState(loadState());
+applyCrossPageTabResets();
+if (isVocabPagePath()) {
+  syncVocabLocationHash();
+}
 initJapanoteQuizSessions();
 
 function hasBlockingStudySession() {

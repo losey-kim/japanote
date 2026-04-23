@@ -2,9 +2,9 @@
   function getPreviewRefCode() {
     const pathname = String(global.location?.pathname || "");
     const segments = pathname.split("/").filter(Boolean);
-
-    if (segments.length >= 2 && segments[0] === "challenge-preview") {
-      return String(segments[1] || "").trim();
+    const idx = segments.indexOf("challenge-preview");
+    if (idx >= 0 && segments.length >= idx + 2) {
+      return String(segments[idx + 1] || "").trim();
     }
 
     return "";
@@ -34,6 +34,23 @@
     }
 
     return normalizeText(payload.p || payload.targetPath || "");
+  }
+
+  const JAPANOTE_BASE = "/japanote";
+
+  function targetUrlFromPayloadPath(rawPath) {
+    const baseDir = new URL(JAPANOTE_BASE + "/", global.location.origin);
+    if (!rawPath || !String(rawPath).trim()) {
+      return new URL("index.html", baseDir);
+    }
+    const t = String(rawPath).trim();
+    if (t === JAPANOTE_BASE || t.startsWith(JAPANOTE_BASE + "/")) {
+      return new URL(t, global.location.origin);
+    }
+    if (t.startsWith("/")) {
+      return new URL(JAPANOTE_BASE + t, global.location.origin);
+    }
+    return new URL(t, baseDir);
   }
 
   function getTargetHashFromPayload(payload) {
@@ -81,9 +98,8 @@
       }
 
       const payload = data?.payload;
-      const targetPath = getTargetPathFromPayload(payload) || "/index.html";
       const targetHash = getTargetHashFromPayload(payload);
-      const targetUrl = new URL(targetPath, global.location.origin);
+      const targetUrl = targetUrlFromPayloadPath(getTargetPathFromPayload(payload));
 
       targetUrl.searchParams.set("c", refCode);
 

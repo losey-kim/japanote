@@ -7,7 +7,10 @@
     "build:cache": "node scripts/cache-bust.mjs",
     "build:site": "node scripts/build-site.mjs",
     "build": "npm run build:site",
-    "dev": "npx --yes serve@14 -l 8080 .",
+    "dev": "node dev-serve.cjs",
     "start": "npm run dev"
+  },
+  "devDependencies": {
+    "serve-handler": "^6.1.7"
   }
 }

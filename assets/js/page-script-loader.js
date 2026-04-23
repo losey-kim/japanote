@@ -3,9 +3,9 @@
 
   function getChallengePreviewRef(pathname = global.location?.pathname || "") {
     const segments = String(pathname || "").split("/").filter(Boolean);
-
-    if (segments.length >= 2 && segments[0] === "challenge-preview") {
-      return segments[1];
+    const idx = segments.indexOf("challenge-preview");
+    if (idx >= 0 && segments.length >= idx + 2) {
+      return segments[idx + 1];
     }
 
     return "";

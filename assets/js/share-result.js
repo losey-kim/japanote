@@ -1,13 +1,15 @@
 (function (global) {
   const SHARE_CANVAS_PADDING = 36;
-  const SHARE_CANVAS_BG = "linear-gradient(165deg, #fff2ea 0%, #fff9f4 42%, #fffaf6 100%)";
-  /** html2canvas `backgroundColor`는 단색이 안전함 */
-  const SHARE_CAPTURE_CLEAR_COLOR = "#fff4ec";
+  /** html2canvas: 그라데이션/반투明은 얼룩·투명(눈으로는 체크무늬처럼 보임)이 나기 쉬움 — 캡처용은 단색·불투明만 */
+  const SHARE_CANVAS_BG = "#fff0e6";
+  const SHARE_CAPTURE_CLEAR_COLOR = "#fff0e6";
   const SHARE_CARD_SHADOW =
     "0 1px 2px rgba(25, 21, 22, 0.04), 0 10px 32px rgba(200, 86, 58, 0.09), 0 28px 64px rgba(200, 75, 53, 0.06)";
   const SHARE_CARD_INSET =
-    "inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(25, 21, 22, 0.04)";
-  const SHARE_CARD_SURFACE = "linear-gradient(180deg, #ffffff 0%, #fffdfb 38%, #fff5ec 100%)";
+    "inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 -1px 0 rgba(25, 21, 22, 0.05)";
+  const SHARE_CARD_SURFACE = "#fff7f0";
+  const SHARE_CARD_HEADER_BG = "#fff1e8";
+  const SHARE_CARD_FOOTER_BG = "#f0e4d9";
   const SHARE_WATERMARK = "Japanote";
   const MAX_COMPARISON_LIST_ITEMS = 12;
   /** html2canvas·모바일 WebView에서 이모지(⭕❌)가 깨지는 경우가 있어 벡터로 표시 */
@@ -48,14 +50,6 @@
       .replace(/'/g, "&#39;");
   }
 
-  function normalizeShareMessageLines(lines) {
-    return (Array.isArray(lines) ? lines : [])
-      .map((line) => String(line || "").trim())
-      .filter(Boolean)
-      .join("\n")
-      .trim();
-  }
-
   function loadHtml2Canvas() {
     if (html2canvasLoaded || global.html2canvas) {
       html2canvasLoaded = true;
@@ -91,8 +85,8 @@
       const border = ok ? "rgba(95,174,139,0.2)" : "rgba(222,107,72,0.2)";
 
       return `
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:${rowBg};border:1px solid ${border};font-size:0.83rem;line-height:1.45;box-shadow:0 1px 0 rgba(255,255,255,0.5) inset;">
-          <span style="flex-shrink:0;width:26px;height:26px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.55);line-height:0;">${iconSvg}</span>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:${rowBg};border:1px solid ${border};font-size:0.83rem;line-height:1.45;">
+          <span style="flex-shrink:0;width:26px;height:26px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f4e9e2;line-height:0;">${iconSvg}</span>
           <span style="min-width:0;word-break:keep-all;overflow-wrap:anywhere;color:#2a2624;padding-top:1px;">${label}</span>
         </div>
       `;
@@ -113,7 +107,7 @@
     }
 
     const buildColumnMarkup = (label, result, items) => `
-      <section style="display:grid;gap:12px;padding:16px 15px;border-radius:20px;border:1px solid rgba(25,21,22,0.06);background:linear-gradient(168deg,rgba(255,255,255,0.99) 0%,rgba(255,248,242,0.94) 100%);box-shadow:0 4px 18px rgba(25,21,22,0.045),inset 0 1px 0 rgba(255,255,255,0.9);">
+      <section style="display:grid;gap:12px;padding:16px 15px;border-radius:20px;border:1px solid rgba(25,21,22,0.08);background:#fff4ec;box-shadow:0 3px 14px rgba(25,21,22,0.05);">
         <div>
           <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;color:#a8988e;text-transform:uppercase;">${escapeHtml(label)}</div>
           <div style="margin-top:8px;font-family:'Space Grotesk',sans-serif;font-size:1.48rem;font-weight:700;letter-spacing:-0.04em;color:#1a1614;line-height:1;">${result.correct}<span style="font-size:1.05rem;font-weight:600;color:#c4bbb3;margin:0 4px;">/</span>${result.total}</div>
@@ -121,7 +115,7 @@
             정답 ${result.correct}개 · 오답 ${result.wrong}개 · 정확도 ${result.accuracy}%
           </div>
         </div>
-        <div style="padding:9px 9px;border-radius:15px;background:rgba(25,21,22,0.028);border:1px solid rgba(25,21,22,0.05);display:grid;gap:7px;">
+        <div style="padding:9px 9px;border-radius:15px;background:#f7ebe4;border:1px solid rgba(25,21,22,0.08);display:grid;gap:7px;">
           ${buildComparisonListMarkup(items)}
         </div>
       </section>
@@ -129,7 +123,7 @@
 
     return `
       <div style="margin-top:0;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,245,240,0.95) 0%,rgba(241,98,72,0.09) 100%);border:1px solid rgba(241,98,72,0.14);box-shadow:0 2px 12px rgba(241,98,72,0.08);">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px;padding:12px 14px;border-radius:16px;background:#ffeee8;border:1px solid rgba(241,98,72,0.2);">
           <span style="font-size:0.74rem;font-weight:700;letter-spacing:0.09em;color:#a85a48;text-transform:uppercase;">친구 도전 비교</span>
           <strong style="font-size:0.96rem;color:#1a1614;font-weight:700;letter-spacing:-0.02em;">${escapeHtml(snapshot.outcome.text)}</strong>
         </div>
@@ -151,10 +145,10 @@
       const accuracy = Math.min(100, Math.max(0, Math.round((summary.correct / summary.total) * 100)));
       html += `
         <div style="text-align:center;padding:4px 2px 20px;">
-          <div style="display:inline-block;margin-bottom:12px;padding:4px 12px;border-radius:999px;background:rgba(241,98,72,0.07);border:1px solid rgba(241,98,72,0.12);">
+          <div style="display:inline-block;margin-bottom:12px;padding:4px 12px;border-radius:999px;background:#fde8e0;border:1px solid rgba(241,98,72,0.18);">
             <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.16em;color:#c75d45;">RESULT</span>
           </div>
-          <div style="padding:18px 22px 20px;border-radius:22px;background:linear-gradient(175deg,rgba(255,255,255,0.98) 0%,rgba(255,250,246,0.92) 55%,rgba(255,242,232,0.35) 100%);border:1px solid rgba(25,21,22,0.06);box-shadow:0 6px 24px rgba(25,21,22,0.05),inset 0 1px 0 rgba(255,255,255,0.9);">
+          <div style="padding:18px 22px 20px;border-radius:22px;background:#fff2e8;border:1px solid rgba(25,21,22,0.07);box-shadow:0 4px 18px rgba(25,21,22,0.05);">
             <div style="font-family:'Space Grotesk',sans-serif;font-size:2.65rem;font-weight:700;letter-spacing:-0.06em;line-height:1;color:#1a1614;">
               ${summary.correct}<span style="font-size:1.45rem;font-weight:600;color:#c9c0b8;margin:0 4px;">/</span>${summary.total}
             </div>
@@ -177,7 +171,7 @@
         const color = isCorrect ? "#246748" : isWrong ? "#9a3f28" : "#1a1614";
         const border = isCorrect ? "rgba(95,174,139,0.28)" : isWrong ? "rgba(222,107,72,0.25)" : "rgba(25,21,22,0.08)";
 
-        html += `<div style="flex:1;min-width:0;padding:12px 8px;border-radius:17px;background:${bg};border:1px solid ${border};text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.65);">
+        html += `<div style="flex:1;min-width:0;padding:12px 8px;border-radius:17px;background:${bg};border:1px solid ${border};text-align:center;">
           <div style="font-size:0.72rem;font-weight:600;color:#7a7168;letter-spacing:-0.01em;">${escapeHtml(label)}</div>
           <div style="font-family:'Space Grotesk',sans-serif;font-size:1.38rem;font-weight:700;color:${color};margin-top:5px;letter-spacing:-0.04em;">${escapeHtml(value)}</div>
         </div>`;
@@ -197,9 +191,9 @@
         const accent = isCorrect ? "#3d8f6a" : "#c75d45";
         const border = isCorrect ? "rgba(95,174,139,0.18)" : "rgba(222,107,72,0.2)";
 
-        html += `<div style="display:flex;align-items:flex-start;gap:11px;padding:12px 14px;border-radius:15px;background:${rowBg};border:1px solid ${border};font-size:0.86rem;line-height:1.45;box-shadow:0 1px 0 rgba(255,255,255,0.7) inset,0 2px 8px rgba(25,21,22,0.03);">
-          <span style="flex-shrink:0;width:3px;align-self:stretch;border-radius:999px;background:linear-gradient(180deg,${accent},${accent}cc);min-height:2.4em;opacity:0.95;"></span>
-          <span style="flex-shrink:0;width:28px;height:28px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.65);line-height:0;box-shadow:0 1px 2px rgba(25,21,22,0.05);">${iconSvg}</span>
+        html += `<div style="display:flex;align-items:flex-start;gap:11px;padding:12px 14px;border-radius:15px;background:${rowBg};border:1px solid ${border};font-size:0.86rem;line-height:1.45;">
+          <span style="flex-shrink:0;width:3px;align-self:stretch;border-radius:999px;background:${accent};min-height:2.4em;"></span>
+          <span style="flex-shrink:0;width:28px;height:28px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#f7ebe4;line-height:0;box-shadow:0 1px 2px rgba(25,21,22,0.06);">${iconSvg}</span>
           <div style="min-width:0;flex:1;padding-top:1px;">
             <span style="font-weight:600;color:#1a1614;word-break:keep-all;overflow-wrap:anywhere;letter-spacing:-0.02em;">${escapeHtml(title)}</span>
             ${description ? `<div style="margin-top:4px;color:#756d66;font-size:0.81rem;font-weight:500;line-height:1.4;word-break:keep-all;overflow-wrap:anywhere;">${escapeHtml(description)}</div>` : ""}
@@ -243,15 +237,15 @@
       : buildStandardShareMarkup(resultView, resultViewId);
 
     const badge = gameLabel
-      ? `<span style="padding:6px 14px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.95) 0%,rgba(255,250,246,0.88) 100%);border:1px solid rgba(25,21,22,0.07);font-size:0.76rem;font-weight:600;color:#5a524a;box-shadow:0 2px 6px rgba(25,21,22,0.04);letter-spacing:-0.02em;">${escapeHtml(gameLabel)}</span>`
+      ? `<span style="padding:6px 14px;border-radius:999px;background:#fff5ee;border:1px solid rgba(25,21,22,0.1);font-size:0.76rem;font-weight:600;color:#5a524a;box-shadow:0 1px 3px rgba(25,21,22,0.04);letter-spacing:-0.02em;">${escapeHtml(gameLabel)}</span>`
       : "";
 
     card.innerHTML = `
-      <div style="border-radius:28px;overflow:hidden;background:${SHARE_CARD_SURFACE};border:1px solid rgba(25,21,22,0.055);box-shadow:${SHARE_CARD_SHADOW}, ${SHARE_CARD_INSET};">
-        <div style="position:relative;padding:20px 22px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(122deg,rgba(255,248,244,0.98) 0%,rgba(241,98,72,0.09) 42%,rgba(255,255,255,0) 72%);border-bottom:1px solid rgba(25,21,22,0.055);">
-          <div style="position:absolute;right:-28px;top:-36px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(241,98,72,0.14) 0%,transparent 68%);pointer-events:none;"></div>
+      <div data-japanote-share-capture="1" style="border-radius:28px;overflow:hidden;background:${SHARE_CARD_SURFACE};border:1px solid rgba(25,21,22,0.055);box-shadow:${SHARE_CARD_SHADOW}, ${SHARE_CARD_INSET};">
+        <div style="position:relative;padding:20px 22px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:${SHARE_CARD_HEADER_BG};border-bottom:1px solid rgba(25,21,22,0.06);">
+          <div style="position:absolute;right:-28px;top:-36px;width:130px;height:130px;border-radius:50%;background:rgba(241,98,72,0.1);pointer-events:none;opacity:0.85;"></div>
           <div style="display:flex;align-items:center;gap:12px;min-width:0;position:relative;z-index:1;">
-            <div style="width:4px;height:28px;border-radius:999px;background:linear-gradient(180deg,#ffb39e,#e85d3d);flex-shrink:0;box-shadow:0 2px 6px rgba(232,93,61,0.35);"></div>
+            <div style="width:4px;height:28px;border-radius:999px;background:#e86b4a;flex-shrink:0;box-shadow:0 1px 4px rgba(232,93,61,0.25);"></div>
             <div style="min-width:0;">
               <div style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:-0.03em;color:#1a1614;line-height:1.12;">${SHARE_WATERMARK}</div>
               <div style="font-size:0.7rem;color:#9a9189;margin-top:4px;letter-spacing:0.03em;">오늘의 연습 결과</div>
@@ -262,7 +256,7 @@
         <div style="padding:20px 22px 12px;">
           ${bodyContent}
         </div>
-        <div style="text-align:center;padding:13px 16px 16px;border-top:1px solid rgba(25,21,22,0.055);background:linear-gradient(180deg,rgba(25,21,22,0.02) 0%,rgba(255,250,246,0.35) 100%);color:#9a9189;font-size:0.74rem;letter-spacing:0.08em;font-weight:500;">${dateStr} · Japanote</div>
+        <div style="text-align:center;padding:13px 16px 16px;border-top:1px solid rgba(25,21,22,0.06);background:${SHARE_CARD_FOOTER_BG};color:#7a6f66;font-size:0.74rem;letter-spacing:0.08em;font-weight:500;">${dateStr} · Japanote</div>
       </div>
     `;
 
@@ -347,20 +341,6 @@
     };
   }
 
-  function buildSharePrompt(resultViewId, challengeUrl = "") {
-    const gameLabel = getGameLabel(resultViewId);
-    const summary = readShareResultSummary(resultViewId);
-    const intro = summary?.total
-      ? `${gameLabel ? `${gameLabel} ` : ""}${summary.correct}/${summary.total} 맞혔어요.`
-      : gameLabel
-        ? `${gameLabel}에 도전해 보세요.`
-        : "Japanote 친구 도전에 도전해 보세요.";
-    const lines = [`${intro} 저보다 많이 맞출 수 있어요?`];
-
-    lines.push(challengeUrl);
-    return normalizeShareMessageLines(lines);
-  }
-
   async function resolveChallengeShareData(resultViewId) {
     const challengeLinks = global.japanoteChallengeLinks;
 
@@ -384,14 +364,17 @@
     try {
       const file = new File([blob], filename, { type: "image/png" });
       const { url: challengeUrl } = await resolveChallengeShareData(resultViewId);
-      const shareText = buildSharePrompt(resultViewId, challengeUrl);
-      const shareTitle = getGameLabel(resultViewId) || "Japanote 친구 도전";
-      // 일부 모바일 공유 대상은 files와 url 조합을 제대로 처리하지 않아 텍스트에 링크를 함께 넣는다.
-      const candidates = [
-        { files: [file], title: shareTitle, text: shareText },
-        { files: [file], text: shareText },
-        { files: [file] }
-      ];
+      const link = String(challengeUrl || "").trim();
+      const shareTitle = getGameLabel(resultViewId) || "Japanote";
+      // challenge-links: { url } / { title, url } — 본문 멘트 없음. 이미지+url 병행 시 text에는 링크만(폴백).
+      const candidates = link
+        ? [
+            { files: [file], url: link },
+            { title: shareTitle, files: [file], url: link },
+            { files: [file], text: link },
+            { title: shareTitle, files: [file], text: link }
+          ]
+        : [{ title: shareTitle, files: [file] }, { files: [file] }];
       let shared = false;
 
       for (const data of candidates) {
@@ -446,7 +429,7 @@
 
     tip.className = "share-modal-tip";
     tip.textContent = navigator.share && global.japanoteChallengeLinks?.buildChallengeLink
-      ? "공유하기를 누르면 결과 이미지와 도전 링크를 함께 보낼 수 있어요."
+      ? "공유하기를 누르면 결과 이미지와 도전 링크를 보내요. (멘트 없이 링크만, ‘도전 링크’ 공유와 같아요.)"
       : "이미지를 길게 눌러 저장할 수도 있어요.";
 
     actions.className = "share-modal-actions";

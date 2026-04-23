@@ -17,10 +17,18 @@
       return "__challenge_preview__";
     }
 
-    const path = global.location?.pathname || "";
-    const segments = path.split("/").filter(Boolean);
-    const rawPageName = segments[segments.length - 1] || "index.html";
-    return rawPageName.includes(".") ? rawPageName : `${rawPageName}.html`;
+    const path = String(global.location?.pathname || "");
+    const base = "/japanote";
+    if (path === base || path === base + "/") {
+      return "index.html";
+    }
+    const rel = path.startsWith(base + "/") ? path.slice(base.length) : path;
+    const segments = rel.split("/").filter(Boolean);
+    const name = segments[segments.length - 1] || "index.html";
+    if (name.includes(".")) {
+      return name;
+    }
+    return `${name}.html`;
   })();
 
   const pageScriptMap = {

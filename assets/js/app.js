@@ -3103,12 +3103,41 @@ function getVocabSummaryText(count) {
   return `${levelLabel} ${activePart === vocabPartAllValue ? "단어" : partLabel} ${count}개예요`;
 }
 
+function getFlashcardRevealStep(step = state?.flashcardRevealStep) {
+  const normalizedStep = Math.floor(Number(step));
+  return Number.isFinite(normalizedStep) ? Math.min(Math.max(normalizedStep, 0), 2) : 0;
+}
+
+function setFlashcardRevealStep(step) {
+  state.flashcardRevealStep = getFlashcardRevealStep(step);
+  state.flashcardRevealed = state.flashcardRevealStep > 0;
+}
+
+function hasDistinctFlashcardReading(card) {
+  const wordText = normalizeQuizText(card?.word || "");
+  const readingText = normalizeQuizText(card?.reading || "");
+  return Boolean(readingText && readingText !== wordText);
+}
+
+function getFlashcardMaxRevealStep(card) {
+  const hasReading = hasDistinctFlashcardReading(card);
+  const hasMeaning = Boolean(normalizeQuizText(card?.meaning || ""));
+
+  if (hasReading && hasMeaning) {
+    return 2;
+  }
+
+  if (hasReading || hasMeaning) {
+    return 1;
+  }
+
+  return 0;
+}
+
 function resetVocabStudyPointers() {
-  resetStudyCatalogPointers({
-    pageKey: "vocabPage",
-    indexKey: "flashcardIndex",
-    revealedKey: "flashcardRevealed"
-  });
+  state.vocabPage = 1;
+  state.flashcardIndex = 0;
+  setFlashcardRevealStep(0);
 }
 
 function setVocabLevel(level) {
@@ -3743,7 +3772,7 @@ function restartVocabQuiz() {
   }
 }
 
-function renderFlashcard() {
+function renderFlashcardLegacy() {
   const activeFilter = getVocabFilter();
   const activeLevel = getVocabLevel();
   const activePart = getVocabPartFilter();
@@ -3837,10 +3866,148 @@ function renderFlashcard() {
     wordText: currentCard.word || "",
     readingText: currentCard.reading || "",
     meaningText: currentCard.meaning || "",
+    // 단어 카드는 뜻을 숨기지 않고 세 줄을 바로 읽게 한다.
+    disableToggle: true,
     hintText,
     toggleOpenLabel: "뜻을 다시 가릴까요?",
     toggleClosedLabel: "뜻을 확인해볼까요?",
     toggleEmptyLabel: "다른 레벨이나 품사로 바꿔볼까요?",
+    prevDisabled: cards.length <= 1,
+    nextDisabled: cards.length <= 1,
+    actionButtons: [
+      {
+        button: flashcardAgain,
+        selected: review,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      },
+      {
+        button: flashcardMastered,
+        selected: mastered,
+        selectedClass: "primary-btn",
+        idleClass: "secondary-btn"
+      }
+    ]
+  });
+}
+
+function renderVocabFlashcard() {
+  const activeFilter = getVocabFilter();
+  const activeLevel = getVocabLevel();
+  const activePart = getVocabPartFilter();
+  const cards = getVisibleFlashcards();
+  const flashcard = document.getElementById("flashcard");
+  const flashcardToggle = document.getElementById("flashcard-toggle");
+  const flashcardPrev = document.getElementById("flashcard-prev");
+  const flashcardNext = document.getElementById("flashcard-next");
+  const flashcardAgain = document.getElementById("flashcard-again");
+  const flashcardMastered = document.getElementById("flashcard-mastered");
+  const level = document.getElementById("flashcard-level");
+  const word = document.getElementById("flashcard-word");
+  const reading = document.getElementById("flashcard-reading");
+  const meaning = document.getElementById("flashcard-meaning");
+  const hint = document.getElementById("flashcard-hint");
+
+  if (!flashcard || !flashcardToggle || !level || !word || !reading || !meaning || !hint) {
+    return;
+  }
+
+  const emptyWordLabel = "?꾩쭅 蹂댁뿬以??⑥뼱媛 ?놁뼱??";
+  const emptyReadingLabel = "?ㅻⅨ ?덈꺼?대굹 ?덉궗濡?諛붽퓭蹂쇨퉴??";
+  const emptyMeaningLabel =
+    activePart === vocabPartAllValue ? "" : "???덉궗濡쒕뒗 吏湲?留욌뒗 ?⑥뼱媛 ?놁뼱?? ?ㅻⅨ ?덉궗???섎윭蹂쇨퉴??";
+  const emptyCardMap = {
+    all: {
+      level: activeLevel,
+      word: emptyWordLabel,
+      reading: emptyReadingLabel,
+      meaning: emptyMeaningLabel,
+      id: "empty-all"
+    },
+    review: {
+      level: "REVIEW",
+      word: "?ㅼ떆 蹂??⑥뼱媛 ?꾩쭅 ?놁뼱??",
+      reading: "移대뱶?먯꽌 ?댁븘?먮㈃ ?ш린???ㅼ떆 蹂????덉뼱??",
+      meaning: activePart === vocabPartAllValue ? "" : "?ㅻⅨ ?덉궗濡?諛붽퓭蹂쇨퉴??",
+      id: "empty-review"
+    },
+    mastered: {
+      level: "MASTERED",
+      word: "?듯엺 ?⑥뼱媛 ?꾩쭅 ?놁뼱??",
+      reading: "?듯삍?댁슂瑜??뚮윭?먮㈃ ?ш린 紐⑥뿬??",
+      meaning: activePart === vocabPartAllValue ? "" : "???덉궗?먯꽌 ?듯엺 ?⑥뼱媛 ?앷린硫??ш린濡?紐⑥뿬??",
+      id: "empty-mastered"
+    },
+    unmarked: {
+      level: "UNMARKED",
+      word: "???곹깭???⑥뼱??吏湲??놁뼱??",
+      reading: "?ㅻⅨ 紐⑥븘蹂닿린濡?諛붽퓭蹂댁꽭??",
+      meaning: activePart === vocabPartAllValue ? "" : "?ㅻⅨ ?덉궗???덈꺼???④퍡 蹂쇨퉴??",
+      id: "empty-unmarked"
+    }
+  };
+  const hasCards = cards.length > 0;
+  const currentIndex = hasCards ? state.flashcardIndex % cards.length : 0;
+  const currentCard = hasCards ? cards[currentIndex] : emptyCardMap[activeFilter] || emptyCardMap.all;
+  const review = hasCards && isWordSavedToReviewList(currentCard.id);
+  const mastered = hasCards && isWordSavedToMasteredList(currentCard.id);
+  const revealStep = hasCards ? Math.min(getFlashcardRevealStep(), getFlashcardMaxRevealStep(currentCard)) : 0;
+  const hasReadingStep = hasCards && hasDistinctFlashcardReading(currentCard);
+  const hasMeaningStep = hasCards && Boolean(normalizeQuizText(currentCard.meaning || ""));
+  const isRevealed = hasCards && revealStep > 0;
+  const hintText = hasCards
+    ? hasReadingStep
+      ? revealStep === 0
+        ? "누르면 히라가나를 확인해요"
+        : revealStep === 1
+          ? "한 번 더 누르면 뜻을 확인해요"
+          : "한 번 더 누르면 다시 한자로 돌아가요"
+      : revealStep === 0
+        ? "누르면 뜻을 확인해요"
+        : "한 번 더 누르면 다시 처음으로 돌아가요"
+    : activeFilter === "review"
+      ? "移대뱶?먯꽌 ?댁븘?먮㈃ ?ш린???ㅼ떆 蹂????덉뼱??"
+      : activeFilter === "mastered"
+        ? "?듯삍?댁슂瑜??뚮윭?먮㈃ ?ш린 紐⑥뿬??"
+        : activeFilter === "unmarked"
+          ? "?ㅻⅨ 紐⑥븘蹂닿린濡?諛붽퓭蹂쇨퉴??"
+          : "?ㅻⅨ ?덈꺼?대굹 ?덉궗濡?諛붽퓭蹂쇨퉴??";
+  const toggleLabel = hasCards
+    ? hasReadingStep
+      ? revealStep === 0
+        ? "히라가나를 확인해볼까요?"
+        : revealStep === 1
+          ? "뜻을 확인해볼까요?"
+          : "카드를 처음으로 돌릴까요?"
+      : revealStep === 0
+        ? "뜻을 확인해볼까요?"
+        : "카드를 처음으로 돌릴까요?"
+    : "";
+
+  renderStudyFlashcardComponent({
+    flashcard,
+    toggle: flashcardToggle,
+    prev: flashcardPrev,
+    next: flashcardNext,
+    level,
+    word,
+    reading,
+    meaning,
+    hint,
+    hasCards,
+    isRevealed,
+    revealWhenEmpty: true,
+    levelText: formatStudyLevelLabel(currentCard.level, "N5"),
+    wordText: currentCard.word || "",
+    readingText: currentCard.reading || "",
+    meaningText: currentCard.meaning || "",
+    hideReading: hasCards && (!hasReadingStep || revealStep < 1),
+    hideMeaning: hasCards && (!hasMeaningStep || revealStep < (hasReadingStep ? 2 : 1)),
+    hintText,
+    toggleLabel,
+    toggleOpenLabel: "?살쓣 ?ㅼ떆 媛由닿퉴??",
+    toggleClosedLabel: "?살쓣 ?뺤씤?대낵源뚯슂?",
+    toggleEmptyLabel: "?ㅻⅨ ?덈꺼?대굹 ?덉궗濡?諛붽퓭蹂쇨퉴??",
     prevDisabled: cards.length <= 1,
     nextDisabled: cards.length <= 1,
     actionButtons: [
@@ -4334,7 +4501,7 @@ function renderVocabPage() {
     cardView,
     listView,
     activeView: getVocabView(),
-    renderFlashcard: renderFlashcard,
+    renderFlashcard: renderVocabFlashcard,
     renderList: renderVocabList
   });
 
@@ -4348,40 +4515,73 @@ function renderVocabPage() {
 }
 
 function toggleFlashcardReveal() {
-  toggleStudyFlashcardReveal("flashcardRevealed", () => {
-    renderStudyViewWithStats(renderVocabPage);
-  });
+  const cards = getVisibleFlashcards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = state.flashcardIndex % cards.length;
+  const currentCard = cards[currentIndex];
+  const maxRevealStep = getFlashcardMaxRevealStep(currentCard);
+  const currentRevealStep = Math.min(getFlashcardRevealStep(), maxRevealStep);
+
+  // 단어 카드는 클릭할 때마다 한자 -> 히라가나 -> 뜻 순서로 넘어가고 마지막엔 처음으로 돌아간다.
+  const nextRevealStep = currentRevealStep >= maxRevealStep ? 0 : currentRevealStep + 1;
+
+  setFlashcardRevealStep(nextRevealStep);
+  updateStudyStreak();
+  saveState();
+  renderStudyViewWithStats(renderVocabPage);
 }
 
 function moveFlashcard(step) {
-  moveStudyFlashcard(step, {
-    getCards: getVisibleFlashcards,
-    indexKey: "flashcardIndex",
-    revealedKey: "flashcardRevealed",
-    render: renderVocabPage
-  });
+  const cards = getVisibleFlashcards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  state.flashcardIndex = (state.flashcardIndex + step + cards.length) % cards.length;
+  setFlashcardRevealStep(0);
+  saveState();
+  renderVocabPage();
 }
 
 function markFlashcardForReview() {
-  markStudyFlashcardStatus({
-    getCards: getVisibleFlashcards,
-    indexKey: "flashcardIndex",
-    revealedKey: "flashcardRevealed",
-    saveItem: saveWordToReviewList,
-    syncIndexAfterUpdate: syncFlashcardIndexAfterVocabUpdate,
-    render: renderAll
-  });
+  const cards = getVisibleFlashcards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = state.flashcardIndex % cards.length;
+  const currentCard = cards[currentIndex];
+
+  saveWordToReviewList(currentCard.id);
+  updateStudyStreak();
+  setFlashcardRevealStep(0);
+  syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
+  saveState();
+  renderAll();
 }
 
 function markFlashcardMastered() {
-  markStudyFlashcardStatus({
-    getCards: getVisibleFlashcards,
-    indexKey: "flashcardIndex",
-    revealedKey: "flashcardRevealed",
-    saveItem: saveWordToMasteredList,
-    syncIndexAfterUpdate: syncFlashcardIndexAfterVocabUpdate,
-    render: renderAll
-  });
+  const cards = getVisibleFlashcards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  const currentIndex = state.flashcardIndex % cards.length;
+  const currentCard = cards[currentIndex];
+
+  saveWordToMasteredList(currentCard.id);
+  updateStudyStreak();
+  setFlashcardRevealStep(0);
+  syncFlashcardIndexAfterVocabUpdate(currentCard.id, currentIndex);
+  saveState();
+  renderAll();
 }
 
 

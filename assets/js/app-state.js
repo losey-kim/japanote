@@ -1,7 +1,7 @@
 /* Japanote — persisted UI state (split from app.js, phase 1) */
 const storageKey = "jlpt-compass-state";
 /** Bump when persisted shape changes; used for localStorage + future remote sync migration. */
-const STATE_SCHEMA_VERSION = 4;
+const STATE_SCHEMA_VERSION = 5;
 var state = null;
 function getStudyStateStore() {
   if (globalThis.japanoteSync && typeof globalThis.japanoteSync.readValue === "function") {
@@ -18,6 +18,7 @@ const selectablePracticeLevels = [allLevelValue, ...contentLevels];
 const defaultState = {
   flashcardIndex: 0,
   flashcardRevealed: false,
+  flashcardRevealStep: 0,
   vocabTab: "study",
   vocabLevel: "N5",
   vocabView: "card",
@@ -261,6 +262,15 @@ function normalizeLoadedState(inputState) {
     normalizeQuizText(nextState.vocabPartFilter) === vocabPartAllValue
       ? vocabPartAllValue
       : normalizeQuizText(nextState.vocabPartFilter);
+  nextState.flashcardIndex = Number.isFinite(Number(nextState.flashcardIndex))
+    ? Math.max(0, Number(nextState.flashcardIndex))
+    : 0;
+  nextState.flashcardRevealStep = Number.isFinite(Number(nextState.flashcardRevealStep))
+    ? Math.min(Math.max(Math.floor(Number(nextState.flashcardRevealStep)), 0), 2)
+    : nextState.flashcardRevealed === true
+      ? 2
+      : 0;
+  nextState.flashcardRevealed = nextState.flashcardRevealStep > 0;
   nextState.vocabPage = Number.isFinite(Number(nextState.vocabPage)) ? Math.max(1, Number(nextState.vocabPage)) : 1;
   nextState.vocabQuizMode = getVocabQuizMode(nextState.vocabQuizMode);
   nextState.vocabQuizQuestionField = getVocabQuizQuestionField(nextState.vocabQuizQuestionField, nextState.vocabQuizMode);

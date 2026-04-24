@@ -8242,3 +8242,62 @@ html[data-theme="dark"] .quiz-hud-pause:focus-visible {
   }
 }
 
+/* 홈 상단은 단일 히어로 카드로 단순화한다. */
+.hero {
+  grid-template-columns: 1fr;
+}
+
+.hero-copy {
+  min-height: 0;
+  padding: clamp(32px, 4vw, 52px);
+}
+
+.hero-copy-main {
+  max-width: 42rem;
+}
+
+.hero-copy h1 {
+  max-width: none;
+  white-space: nowrap;
+  font-size: clamp(2.8rem, 4.4vw, 4.8rem);
+}
+
+.hero-copy p {
+  max-width: 36rem;
+}
+
+@media (min-width: 1161px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .stat-card {
+    min-height: 134px;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-copy h1 {
+    max-width: none;
+    white-space: normal;
+    font-size: 2.35rem;
+  }
+
+  .vocab-card-view .flashcard {
+    height: auto;
+    min-height: 312px;
+  }
+
+  .vocab-card-view .flashcard-copy {
+    overflow: visible;
+  }
+
+  .vocab-card-view .flashcard-meaning {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-height: 1.55;
+    padding-bottom: 0.14em;
+  }
+}
+

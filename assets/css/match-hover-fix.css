@@ -1,5 +1,13 @@
-/* 짝 맞추기 카드는 hover 때만 떠오르는 효과를 막습니다.
-   선택/정답/오답 상태 표시는 기존 스타일을 그대로 살립니다. */
-.match-card:hover:not(.is-selected):not(.is-active):not(.is-correct):not(.is-wrong):not(.is-matched):not(.is-resolved):not([aria-pressed="true"]) {
+/* 짝 맞추기 카드는 hover 때 위치가 바뀌면 마우스 hit area가 흔들려 떨림이 생깁니다.
+   선택/정답/오답 색상은 유지하고, hover transform만 전부 막습니다. */
+.match-card:hover,
+.match-card:focus-visible:hover,
+.match-card.is-selected:hover,
+.match-card.is-active:hover,
+.match-card.is-correct:hover,
+.match-card.is-wrong:hover,
+.match-card.is-matched:hover,
+.match-card.is-resolved:hover,
+.match-card[aria-pressed="true"]:hover {
   transform: none !important;
 }

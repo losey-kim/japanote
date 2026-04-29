@@ -1,14 +1,36 @@
 /* 짝 맞추기 카드는 선택/정답 상태와 위치감이 중요해서
-   공통 카드 hover 이동 효과를 적용하지 않습니다. */
+   hover 시 위치·크기·그림자 변화가 생기지 않도록 고정합니다. */
 .match-card,
 .match-card:hover,
+.match-card:focus,
 .match-card:focus-visible,
-.match-card:focus-within {
-  transform: none;
+.match-card:focus-within,
+.match-card.is-selected,
+.match-card.is-correct,
+.match-card.is-wrong,
+.match-card.is-matched {
+  transform: none !important;
+}
+
+.match-card {
+  will-change: auto !important;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease !important;
 }
 
 .match-card:hover,
+.match-card:focus,
 .match-card:focus-visible,
 .match-card:focus-within {
-  box-shadow: 0 10px 20px rgba(54, 40, 33, 0.08);
+  box-shadow: inherit !important;
+}
+
+.match-card:hover *,
+.match-card:focus *,
+.match-card:focus-visible *,
+.match-card:focus-within * {
+  transform: none !important;
 }

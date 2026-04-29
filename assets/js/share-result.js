@@ -80,6 +80,23 @@
     });
   }
 
+  /**
+   * 친구 도전 비교·솔로 공유에서 동일한 "단어 한 줄" 행(아이콘 + 본문).
+   * @param {string} textHtml 본문 HTML(이미 escape 등 처리된 안전한 조각)
+   */
+  function buildShareComparisonListRow(isCorrect, textHtml) {
+    const iconSvg = isCorrect ? SHARE_ICON_SVG_CORRECT : SHARE_ICON_SVG_WRONG;
+    const rowBg = isCorrect ? "rgba(95,174,139,0.07)" : "rgba(222,107,72,0.07)";
+    const border = isCorrect ? "rgba(95,174,139,0.2)" : "rgba(222,107,72,0.2)";
+
+    return `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:${rowBg};border:1px solid ${border};font-size:0.83rem;line-height:1.45;">
+          <span style="flex-shrink:0;width:26px;height:26px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f4e9e2;line-height:0;">${iconSvg}</span>
+          <div style="min-width:0;word-break:keep-all;overflow-wrap:anywhere;color:#2a2624;padding-top:1px;">${textHtml}</div>
+        </div>
+      `;
+  }
+
   function buildComparisonListMarkup(items = []) {
     const safeItems = Array.isArray(items) ? items : [];
     const visibleItems = safeItems.slice(0, MAX_COMPARISON_LIST_ITEMS);
@@ -91,17 +108,8 @@
 
     const rows = visibleItems.map((item) => {
       const ok = item?.status === "correct";
-      const iconSvg = ok ? SHARE_ICON_SVG_CORRECT : SHARE_ICON_SVG_WRONG;
       const label = escapeHtml(formatShareSemicolons(item?.label || item?.title || ""));
-      const rowBg = ok ? "rgba(95,174,139,0.07)" : "rgba(222,107,72,0.07)";
-      const border = ok ? "rgba(95,174,139,0.2)" : "rgba(222,107,72,0.2)";
-
-      return `
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:${rowBg};border:1px solid ${border};font-size:0.83rem;line-height:1.45;">
-          <span style="flex-shrink:0;width:26px;height:26px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f4e9e2;line-height:0;">${iconSvg}</span>
-          <span style="min-width:0;word-break:keep-all;overflow-wrap:anywhere;color:#2a2624;padding-top:1px;">${label}</span>
-        </div>
-      `;
+      return buildShareComparisonListRow(ok, label);
     }).join("");
 
     const more = hiddenCount > 0
@@ -151,29 +159,48 @@
     const summary = readShareResultSummary(resultViewId);
     const stats = resultView.querySelectorAll(".match-result-stat");
     const items = resultView.querySelectorAll(".match-result-item");
-    let html = "";
 
-    if (summary?.total) {
+    const columnShellStyle =
+      "display:grid;gap:12px;padding:16px 15px;border-radius:20px;border:1px solid rgba(25,21,22,0.08);background:#fff4ec;box-shadow:0 3px 14px rgba(25,21,22,0.05);";
+    const listInsetStyle =
+      "padding:9px 9px;border-radius:15px;background:#f7ebe4;border:1px solid rgba(25,21,22,0.08);display:grid;gap:7px;";
+
+    function buildItemRowsHtml() {
+      let out = "";
+      items.forEach((item) => {
+        const isCorrect = item.classList.contains("is-correct");
+        const title = formatShareSemicolons(item.querySelector("strong")?.textContent || "");
+        const description = formatShareSemicolons(item.querySelector("p")?.textContent || "");
+        const textHtml = description
+          ? `<div style="font-weight:600;">${escapeHtml(title)}</div><div style="font-size:0.78rem;color:#7a716a;margin-top:2px;line-height:1.45;">${escapeHtml(
+              description
+            )}</div>`
+          : escapeHtml(title);
+        out += buildShareComparisonListRow(isCorrect, textHtml);
+      });
+      return out;
+    }
+
+    const itemRows = items.length > 0 ? buildItemRowsHtml() : "";
+    const hasSummary = Boolean(summary?.total);
+    const hasStats = Boolean(stats.length);
+
+    let topBlock = "";
+
+    if (hasSummary) {
       const accuracy = Math.min(100, Math.max(0, Math.round((summary.correct / summary.total) * 100)));
-      html += `
-        <div style="text-align:center;padding:4px 2px 20px;">
-          <div style="display:inline-block;margin-bottom:12px;padding:4px 12px;border-radius:999px;background:#fde8e0;border:1px solid rgba(241,98,72,0.18);">
-            <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.16em;color:#c75d45;">RESULT</span>
-          </div>
-          <div style="padding:18px 22px 20px;border-radius:22px;background:#fff2e8;border:1px solid rgba(25,21,22,0.07);box-shadow:0 4px 18px rgba(25,21,22,0.05);">
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:2.65rem;font-weight:700;letter-spacing:-0.06em;line-height:1;color:#1a1614;">
-              ${summary.correct}<span style="font-size:1.45rem;font-weight:600;color:#c9c0b8;margin:0 4px;">/</span>${summary.total}
-            </div>
-            <div style="margin-top:6px;font-size:0.78rem;color:#9a918a;font-weight:500;">맞힌 문제</div>
-          </div>
-          <div style="margin-top:14px;display:flex;justify-content:center;flex-wrap:wrap;gap:7px;">
-            <span style="padding:6px 13px;border-radius:999px;background:rgba(95,174,139,0.11);border:1px solid rgba(95,174,139,0.22);color:#1f6b4a;font-size:0.76rem;font-weight:600;">정답 ${summary.correct}</span>
-            <span style="padding:6px 13px;border-radius:999px;background:rgba(222,107,72,0.09);border:1px solid rgba(222,107,72,0.2);color:#8f3a26;font-size:0.76rem;font-weight:600;">오답 ${summary.wrong}</span>
-            <span style="padding:6px 13px;border-radius:999px;background:rgba(25,21,22,0.04);border:1px solid rgba(25,21,22,0.08);color:#5a524a;font-size:0.76rem;font-weight:600;">정확도 ${accuracy}%</span>
-          </div>
-        </div>`;
-    } else if (stats.length) {
-      html += '<div style="display:flex;gap:10px;justify-content:center;margin-bottom:6px;">';
+      topBlock = `
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;color:#a8988e;text-transform:uppercase;">내 기록</div>
+          <div style="margin-top:8px;font-family:'Space Grotesk',sans-serif;font-size:1.48rem;font-weight:700;letter-spacing:-0.04em;color:#1a1614;line-height:1;">${summary.correct}<span style="font-size:1.05rem;font-weight:600;color:#c4bbb3;margin:0 4px;">/</span>${summary.total}</div>
+          <div style="margin-top:8px;font-size:0.78rem;line-height:1.55;color:#7a716a;">정답 ${summary.correct}개 · 오답 ${
+        summary.wrong
+      }개 · 정확도 ${accuracy}%</div>
+        </div>
+      `;
+    } else if (hasStats) {
+      let statsRow = '<div style="display:flex;gap:10px;justify-content:stretch">';
+
       stats.forEach((stat) => {
         const label = stat.querySelector("span")?.textContent || "";
         const value = stat.querySelector("strong")?.textContent || "0";
@@ -183,39 +210,36 @@
         const color = isCorrect ? "#246748" : isWrong ? "#9a3f28" : "#1a1614";
         const border = isCorrect ? "rgba(95,174,139,0.28)" : isWrong ? "rgba(222,107,72,0.25)" : "rgba(25,21,22,0.08)";
 
-        html += `<div style="flex:1;min-width:0;padding:12px 8px;border-radius:17px;background:${bg};border:1px solid ${border};text-align:center;">
+        statsRow += `<div style="flex:1;min-width:0;padding:12px 8px;border-radius:17px;background:${bg};border:1px solid ${border};text-align:center;">
           <div style="font-size:0.72rem;font-weight:600;color:#7a7168;letter-spacing:-0.01em;">${escapeHtml(label)}</div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:1.38rem;font-weight:700;color:${color};margin-top:5px;letter-spacing:-0.04em;">${escapeHtml(value)}</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:1.38rem;font-weight:700;color:${color};margin-top:5px;letter-spacing:-0.04em;">${escapeHtml(
+          value
+        )}</div>
         </div>`;
       });
-      html += "</div>";
+      statsRow += "</div>";
+      topBlock = statsRow;
     }
 
-    if (items.length > 0) {
-      const topBorder = summary?.total || stats.length ? "margin-top:6px;border-top:1px solid rgba(25,21,22,0.07);padding-top:16px;" : "";
-      html += `<div style="${topBorder}display:grid;gap:8px;">`;
-      items.forEach((item) => {
-        const isCorrect = item.classList.contains("is-correct");
-        const iconSvg = isCorrect ? SHARE_ICON_SVG_CORRECT : SHARE_ICON_SVG_WRONG;
-        const title = formatShareSemicolons(item.querySelector("strong")?.textContent || "");
-        const description = formatShareSemicolons(item.querySelector("p")?.textContent || "");
-        const rowBg = isCorrect ? "rgba(95,174,139,0.06)" : "rgba(222,107,72,0.07)";
-        const accent = isCorrect ? "#3d8f6a" : "#c75d45";
-        const border = isCorrect ? "rgba(95,174,139,0.18)" : "rgba(222,107,72,0.2)";
-
-        html += `<div style="display:flex;align-items:flex-start;gap:11px;padding:12px 14px;border-radius:15px;background:${rowBg};border:1px solid ${border};font-size:0.86rem;line-height:1.45;">
-          <span style="flex-shrink:0;width:3px;align-self:stretch;border-radius:999px;background:${accent};min-height:2.4em;"></span>
-          <span style="flex-shrink:0;width:28px;height:28px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#f7ebe4;line-height:0;box-shadow:0 1px 2px rgba(25,21,22,0.06);">${iconSvg}</span>
-          <div style="min-width:0;flex:1;padding-top:1px;">
-            <span style="font-weight:600;color:#1a1614;word-break:keep-all;overflow-wrap:anywhere;letter-spacing:-0.02em;">${escapeHtml(title)}</span>
-            ${description ? `<div style="margin-top:4px;color:#756d66;font-size:0.81rem;font-weight:500;line-height:1.4;word-break:keep-all;overflow-wrap:anywhere;">${escapeHtml(description)}</div>` : ""}
-          </div>
-        </div>`;
-      });
-      html += "</div>";
+    if (hasSummary) {
+      if (itemRows) {
+        return `<div style="margin-top:0;"><section style="${columnShellStyle}">${topBlock}<div style="${listInsetStyle}">${itemRows}</div></section></div>`;
+      }
+      return `<div style="margin-top:0;"><section style="${columnShellStyle}">${topBlock}</section></div>`;
     }
 
-    return html;
+    if (hasStats) {
+      if (itemRows) {
+        return `<div style="margin-top:0;"><section style="${columnShellStyle}">${topBlock}<div style="${listInsetStyle}">${itemRows}</div></section></div>`;
+      }
+      return `<div style="margin-top:0;"><section style="${columnShellStyle}">${topBlock}</section></div>`;
+    }
+
+    if (itemRows) {
+      return `<div style="margin-top:0;"><div style="${listInsetStyle}">${itemRows}</div></div>`;
+    }
+
+    return "";
   }
 
   function buildShareCard(resultViewId) {

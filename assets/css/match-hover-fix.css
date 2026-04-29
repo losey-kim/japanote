@@ -1,13 +1,18 @@
-/* 짝 맞추기 카드는 hover 때 위치가 바뀌면 마우스 hit area가 흔들려 떨림이 생깁니다.
-   선택/정답/오답 색상은 유지하고, hover transform만 전부 막습니다. */
+/* 짝 맞추기 카드는 hover 때 위치/그림자가 바뀌면 마우스 hit area가 흔들려 떨림이 생깁니다.
+   선택/정답/오답 색상은 유지하고, hover 애니메이션만 고정합니다. */
+.match-card {
+  transform: none !important;
+  will-change: auto !important;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease !important;
+}
+
 .match-card:hover,
 .match-card:focus-visible:hover,
-.match-card.is-selected:hover,
-.match-card.is-active:hover,
-.match-card.is-correct:hover,
-.match-card.is-wrong:hover,
-.match-card.is-matched:hover,
-.match-card.is-resolved:hover,
-.match-card[aria-pressed="true"]:hover {
+.match-card:active:hover {
   transform: none !important;
+  box-shadow: inherit !important;
 }

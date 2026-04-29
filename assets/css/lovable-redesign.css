@@ -542,7 +542,6 @@ html[data-theme="dark"] .home-daily-list li {
 .vocab-list-item,
 .grammar-item,
 .reading-item,
-.match-card,
 .basic-practice-options button {
   border-radius: 20px;
   transition: transform 140ms ease, border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
@@ -553,11 +552,14 @@ html[data-theme="dark"] .home-daily-list li {
 .vocab-list-item:hover,
 .grammar-item:hover,
 .reading-item:hover,
-.match-card:hover,
 .basic-practice-options button:hover {
   transform: translateY(-2px);
   border-color: rgba(222, 107, 72, 0.24);
   box-shadow: 0 12px 24px rgba(54, 40, 33, 0.08);
+}
+
+.match-card {
+  border-radius: 20px;
 }
 
 .study-options-toggle,

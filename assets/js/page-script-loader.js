@@ -1,6 +1,6 @@
 (function loadJapanotePageScripts(global) {
   const assetVersion = "20260418t";
-  const redesignStyleVersion = "20260429";
+  const redesignStyleVersion = "20260429b";
 
   function appendStylesheet(href, marker, value) {
     if (document.querySelector(`link[${marker}="${value}"]`)) {

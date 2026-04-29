@@ -2,20 +2,24 @@
   const assetVersion = "20260418t";
   const redesignStyleVersion = "20260429";
 
-  function loadRedesignStylesheet() {
-    const href = `assets/css/lovable-redesign.css?v=${redesignStyleVersion}`;
-    if (document.querySelector('link[data-japanote-redesign="lovable"]')) {
+  function appendStylesheet(href, marker, value) {
+    if (document.querySelector(`link[${marker}="${value}"]`)) {
       return;
     }
 
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = href;
-    link.dataset.japanoteRedesign = "lovable";
+    link.setAttribute(marker, value);
     document.head.appendChild(link);
   }
 
-  loadRedesignStylesheet();
+  function loadRedesignStylesheets() {
+    appendStylesheet(`assets/css/lovable-redesign.css?v=${redesignStyleVersion}`, "data-japanote-redesign", "lovable");
+    appendStylesheet(`assets/css/match-hover-fix.css?v=${redesignStyleVersion}`, "data-japanote-fix", "match-hover");
+  }
+
+  loadRedesignStylesheets();
 
   function getChallengePreviewRef(pathname = global.location?.pathname || "") {
     const segments = String(pathname || "").split("/").filter(Boolean);

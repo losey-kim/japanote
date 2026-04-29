@@ -1,5 +1,21 @@
 (function loadJapanotePageScripts(global) {
   const assetVersion = "20260418t";
+  const redesignStyleVersion = "20260429";
+
+  function loadRedesignStylesheet() {
+    const href = `assets/css/lovable-redesign.css?v=${redesignStyleVersion}`;
+    if (document.querySelector('link[data-japanote-redesign="lovable"]')) {
+      return;
+    }
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    link.dataset.japanoteRedesign = "lovable";
+    document.head.appendChild(link);
+  }
+
+  loadRedesignStylesheet();
 
   function getChallengePreviewRef(pathname = global.location?.pathname || "") {
     const segments = String(pathname || "").split("/").filter(Boolean);

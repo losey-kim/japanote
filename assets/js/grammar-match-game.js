@@ -492,6 +492,7 @@
           rightCards: grammarMatchState.rightCards,
           selectedLeft: grammarMatchState.selectedLeft,
           selectedRight: grammarMatchState.selectedRight,
+          state: grammarMatchState,
           createCard: createGrammarMatchCard,
           renderStats: renderGrammarMatchStats
         })

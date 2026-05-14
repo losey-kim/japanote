@@ -547,6 +547,7 @@ function renderMatchBoard() {
     rightCards: matchState.rightCards,
     selectedLeft: matchState.selectedLeft,
     selectedRight: matchState.selectedRight,
+    state: matchState,
     createCard: createMatchCard,
     renderStats: renderMatchStats
   });

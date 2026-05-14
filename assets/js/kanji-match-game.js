@@ -468,6 +468,7 @@ function renderKanjiMatchBoard() {
     rightCards: kanjiMatchState.rightCards,
     selectedLeft: kanjiMatchState.selectedLeft,
     selectedRight: kanjiMatchState.selectedRight,
+    state: kanjiMatchState,
     createCard: createKanjiMatchCard,
     renderStats: renderKanjiMatchStats
   });

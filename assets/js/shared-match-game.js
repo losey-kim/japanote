@@ -407,24 +407,77 @@
     });
   }
 
-  function renderBoard({ leftListId, rightListId, leftCards, rightCards, selectedLeft, selectedRight, createCard, renderStats }) {
+  function createCardListSignature(cards) {
+    const safeCards = Array.isArray(cards) ? cards : [];
+
+    return safeCards.map((card) => [
+      String(card?.side ?? ""),
+      String(card?.id ?? ""),
+      String(card?.value ?? "")
+    ]);
+  }
+
+  function createBoardRenderSignature({ leftCards, rightCards, selectedLeft, selectedRight, state }) {
+    const matchedIds = Array.isArray(state?.matchedIds)
+      ? [...state.matchedIds].map((id) => String(id)).sort()
+      : [];
+
+    return JSON.stringify({
+      leftCards: createCardListSignature(leftCards),
+      rightCards: createCardListSignature(rightCards),
+      selectedLeft: String(selectedLeft ?? ""),
+      selectedRight: String(selectedRight ?? ""),
+      wrongLeft: String(state?.wrongLeft ?? ""),
+      wrongRight: String(state?.wrongRight ?? ""),
+      matchedIds,
+      isLocked: Boolean(state?.isLocked),
+      timedOut: Boolean(state?.timedOut)
+    });
+  }
+
+  function renderBoard({ leftListId, rightListId, leftCards, rightCards, selectedLeft, selectedRight, state, createCard, renderStats }) {
     const leftList = document.getElementById(leftListId);
     const rightList = document.getElementById(rightListId);
+    const safeLeftCards = Array.isArray(leftCards) ? leftCards : [];
+    const safeRightCards = Array.isArray(rightCards) ? rightCards : [];
 
     if (!leftList || !rightList) {
+      return;
+    }
+
+    const boardSignature = createBoardRenderSignature({
+      leftCards: safeLeftCards,
+      rightCards: safeRightCards,
+      selectedLeft,
+      selectedRight,
+      state
+    });
+    const canReuseCards =
+      leftList.dataset.japanoteMatchBoardSignature === boardSignature &&
+      rightList.dataset.japanoteMatchBoardSignature === boardSignature &&
+      leftList.children.length === safeLeftCards.length &&
+      rightList.children.length === safeRightCards.length;
+
+    if (canReuseCards) {
+      if (typeof renderStats === "function") {
+        renderStats();
+      }
       return;
     }
 
     leftList.innerHTML = "";
     rightList.innerHTML = "";
 
-    leftCards.forEach((card) => {
+    safeLeftCards.forEach((card) => {
       leftList.appendChild(createCard(card, selectedLeft));
     });
 
-    rightCards.forEach((card) => {
+    safeRightCards.forEach((card) => {
       rightList.appendChild(createCard(card, selectedRight));
     });
+
+    leftList.dataset.japanoteMatchBoardSignature = boardSignature;
+    rightList.dataset.japanoteMatchBoardSignature = boardSignature;
 
     if (typeof renderStats === "function") {
       renderStats();

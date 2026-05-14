@@ -4152,10 +4152,10 @@ html.japanote-app-booting .page-shell > main {
   font-weight: 700;
   --button-label-line-height: 1.45;
   transition:
-    transform 140ms ease,
     border-color 140ms ease,
     background 140ms ease,
-    box-shadow 140ms ease;
+    color 140ms ease,
+    opacity 140ms ease;
 }
 
 .match-card-label {
@@ -4164,9 +4164,7 @@ html.japanote-app-booting .page-shell > main {
 
 .match-card:hover,
 .match-card:focus-visible {
-  transform: translateY(-2px);
   border-color: rgba(18, 20, 25, 0.18);
-  box-shadow: 0 12px 20px rgba(34, 26, 21, 0.08);
 }
 
 .match-card.is-selected {

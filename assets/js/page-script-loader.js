@@ -1,5 +1,5 @@
 (function loadJapanotePageScripts(global) {
-  const assetVersion = "20260418t";
+  const assetVersion = "20260514b";
   const redesignStyleVersion = "20260429b";
 
   function appendStylesheet(href, marker, value) {
@@ -16,7 +16,6 @@
 
   function loadRedesignStylesheets() {
     appendStylesheet(`assets/css/lovable-redesign.css?v=${redesignStyleVersion}`, "data-japanote-redesign", "lovable");
-    appendStylesheet(`assets/css/match-hover-fix.css?v=${redesignStyleVersion}`, "data-japanote-fix", "match-hover");
   }
 
   loadRedesignStylesheets();

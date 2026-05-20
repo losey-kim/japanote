@@ -38,6 +38,9 @@ const defaultState = {
   vocabQuizFinished: false,
   vocabQuizAnswerMode: "choice",
   vocabQuizRetryOnWrong: false,
+  studyResultAutoSaveEnabled: true,
+  studyResultAutoSaveCorrectAsMastered: true,
+  studyResultAutoSaveWrongAsReview: true,
   kanjiPracticeQuestionField: "display",
   kanjiPracticeOptionField: "reading",
   kanjiPracticeQuizCount: 10,
@@ -293,6 +296,18 @@ function normalizeLoadedState(inputState) {
     ? nextState.vocabQuizAnswerMode
     : "choice";
   nextState.vocabQuizRetryOnWrong = typeof nextState.vocabQuizRetryOnWrong === "boolean" ? nextState.vocabQuizRetryOnWrong : false;
+  nextState.studyResultAutoSaveEnabled =
+    typeof nextState.studyResultAutoSaveEnabled === "boolean"
+      ? nextState.studyResultAutoSaveEnabled
+      : defaultState.studyResultAutoSaveEnabled;
+  nextState.studyResultAutoSaveCorrectAsMastered =
+    typeof nextState.studyResultAutoSaveCorrectAsMastered === "boolean"
+      ? nextState.studyResultAutoSaveCorrectAsMastered
+      : defaultState.studyResultAutoSaveCorrectAsMastered;
+  nextState.studyResultAutoSaveWrongAsReview =
+    typeof nextState.studyResultAutoSaveWrongAsReview === "boolean"
+      ? nextState.studyResultAutoSaveWrongAsReview
+      : defaultState.studyResultAutoSaveWrongAsReview;
   const savedRecentWrong = Array.isArray(nextState.recentVocabWrongIds) ? nextState.recentVocabWrongIds.filter(Boolean) : [];
   const recentWrongSeen = new Set();
   const recentWrongOrdered = [];

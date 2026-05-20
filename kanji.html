@@ -16,6 +16,11 @@
   <meta name="twitter:description" content="기초 한자를 익히고 퀴즈와 짝 맞추기로 복습해요">
   <meta name="twitter:image" content="__SITE_URL__/assets/images/social-preview.png">
   <title>Japanote | 기초 한자 익히기</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#f4ead9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/assets/images/icon-192x192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -70,5 +75,13 @@
     </main>
   </div>
 <script src="assets/js/page-script-loader.js?v=20260514b"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .catch(function(err) { console.error('SW registration failed:', err); });
+  });
+}
+</script>
 </body>
 </html>

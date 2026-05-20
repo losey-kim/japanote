@@ -15,6 +15,26 @@ function getSavedThemeMode() {
   return themeModes.includes(saved) ? saved : "light";
 }
 
+function updateThemeColorMeta(mode) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (!meta) return;
+
+  const lightColor = "#f4ead9";
+  const darkColor = "#0f141b";
+
+  let color;
+  if (mode === "dark") {
+    color = darkColor;
+  } else if (mode === "system") {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    color = prefersDark ? darkColor : lightColor;
+  } else {
+    color = lightColor;
+  }
+
+  meta.setAttribute("content", color);
+}
+
 function applyThemeMode(mode) {
   const root = document.documentElement;
   const nextMode = themeModes.includes(mode) ? mode : "light";
@@ -28,6 +48,7 @@ function applyThemeMode(mode) {
   }
 
   root.setAttribute("data-theme-mode", nextMode);
+  updateThemeColorMeta(nextMode);
   updateThemeToggleLabel(nextMode);
 }
 

@@ -64,7 +64,7 @@ function updateVersionStrings(filePath, rootDir) {
 
   for (const [asset, hash] of hashMap) {
     const pattern = new RegExp(
-      `${asset.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\?v=[^"'\\s]+)?`,
+      `${asset.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\?v=[^"'\`\\s]+)?`,
       "g"
     );
     const replacement = `${asset}?v=${hash}`;

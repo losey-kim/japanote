@@ -38,7 +38,7 @@
 
     const path = String(global.location?.pathname || "");
     const base = "/japanote";
-    if (path === base || path === base + "/") {
+    if (path === "/" || path === base || path === base + "/") {
       return "index.html";
     }
     const rel = path.startsWith(base + "/") ? path.slice(base.length) : path;

@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "output",
+  "rewrites": [
+    { "source": "/challenge-preview/:code/image", "destination": "/api/challenge-preview/:code/image" },
+    { "source": "/challenge-preview/:code", "destination": "/api/challenge-preview/:code" }
+  ]
+}

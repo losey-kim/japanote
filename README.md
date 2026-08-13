@@ -52,6 +52,19 @@ JLPT 시험 공부를 위한 정적 학습 사이트입니다.
 
 배포 산출물을 로컬에서 확인하려면 빌드 후 `output/`을 정적 서버로 띄우면 됩니다.
 
+## Vercel 배포
+
+Cloudflare Pages 대신 Vercel을 쓰고 싶다면 저장소 루트의 `vercel.json`이 이미 빌드/출력 설정과 `challenge-preview` 라우팅을 처리합니다.
+
+1. [Vercel](https://vercel.com/)에서 이 GitHub 저장소를 Import 합니다.
+2. Framework Preset은 **Other**로 둡니다. Build Command(`npm run build`)와 Output Directory(`output`)는 `vercel.json`에 이미 지정돼 있어 자동으로 적용됩니다.
+3. Project Settings → Environment Variables에 `SITE_URL`을 실제 배포 주소(예: `https://japanote.vercel.app` 또는 커스텀 도메인)로 추가합니다. 비워두면 `https://japanote.pages.dev` 기본값으로 빌드됩니다.
+4. `functions/challenge-preview/[code].js`, `functions/challenge-preview/[code]/image.js`(Cloudflare Pages Functions 문법)는 Vercel에서 동작하지 않으므로, 같은 로직을 재사용하는 `api/challenge-preview/[code].js`, `api/challenge-preview/[code]/image.js`(Vercel Serverless Functions)를 대신 사용합니다. 실제 로직은 여전히 `functions/challenge-preview/shared.js` 하나를 공유합니다.
+5. `vercel.json`의 `rewrites`가 `/challenge-preview/:code`, `/challenge-preview/:code/image` 요청을 해당 API 함수로 연결해 기존 URL 구조를 그대로 유지합니다.
+6. Deploy 후 실제 Vercel 주소가 정해지면, 아래 「로컬에서 Supabase 테스트」 절의 안내대로 Supabase **Authentication → URL Configuration**에 그 주소(`https://your-project.vercel.app/**`)를 Redirect URLs로 추가해야 매직 링크 로그인이 정상 동작합니다.
+
+Cloudflare Pages 설정(`worker.js`, `wrangler.jsonc`, `functions/challenge-preview/[code].js` 등)은 그대로 남아 있으므로 두 플랫폼을 병행하거나 나중에 정리해도 됩니다.
+
 ## 로컬에서 Supabase(클라우드 로그인) 테스트
 
 매직 링크는 **지금 브라우저 주소창에 보이는 URL(포트 포함)**로 돌아오게 요청합니다. Supabase는 **Redirect URLs에 없는 주소**로는 보내 주지 않고, 허용된 주소가 없으면 `Site URL`로 돌려보냅니다. 그래서 로컬에서 보냈는데 배포 주소로 열리면 **허용 목록에 로컬 주소가 빠진 것**입니다.
